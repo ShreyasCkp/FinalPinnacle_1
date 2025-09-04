@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fee Receipt - Pinnacle School Of Commerce And Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
+    <style>
+        @page {
+            size: A5 portrait;
+            margin: 8mm;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+            }
+
+            .btn-container,
+            .footer {
+                display: none !important;
+            }
+
+            .receipt-container {
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+                max-width: 100%;
+                padding: 0;
+            }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            margin: 0;
+            background: #f9fafb;
+            color: #1f2937;
+            padding: 6px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .receipt-container {
+            background: #fff;
+            width: 100%;
+            max-width: 100%; /* A5 width is ~5.8in ~ 420px */
+            padding: 12px 16px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            margin: auto; /* Center the container */
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+            .main-header h1 {
+                margin: 0;
+                font-size: 0.95rem;
+                font-weight: 700;
+            }
+
+            .main-header .address {
+                font-size: 0.75rem;
+                margin: 2px 0 0;
+                color: #374151;
+            }
+
+        .receipt-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 6px 0 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #d1d5db;
+            text-align: center;
+        }
+
+        .details-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .details-box {
+            flex: 1 1 200px;
+            min-width: 160px;
+            background: #f8fafc;
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 0.75rem;
+        }
+
+            .details-box h3 {
+                font-size: 0.78rem;
+                font-weight: 600;
+                margin-bottom: 6px;
+                border-bottom: 1px solid #1e40af;
+                padding-bottom: 3px;
+                color: #1e40af;
+            }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 2px 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .detail-value {
+            text-align: right;
+            color: #4b5563;
+        }
+
+        .fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+
+            .fee-table th,
+            .fee-table td {
+                padding: 4px 6px;
+                border-bottom: 1px solid #e5e7eb;
+                text-align: right;
+            }
+
+                .fee-table th:first-child,
+                .fee-table td:first-child {
+                    text-align: left;
+                }
+
+            .fee-table th {
+                background: #e0e7ff;
+                color: #1e40af;
+                font-weight: 700;
+            }
+
+        .total-row {
+            font-weight: 700;
+            background: #f3f4f6;
+        }
+
+        .terms-section {
+            font-size: 0.68rem;
+            margin: 6px 0;
+            color: #4b5563;
+        }
+
+            .terms-section h3 {
+                font-size: 0.72rem;
+                font-weight: 600;
+                color: #1e40af;
+                margin-bottom: 3px;
+            }
+
+        .terms-list {
+            margin: 0 0 0 14px;
+            padding: 0;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            font-size: 0.75rem;
+        }
+
+        .sig-block {
+            text-align: center;
+        }
+
+        .sig-line {
+            border-bottom: 1px solid #374151;
+            height: 22px;
+            width: 100px;
+            margin: 0 auto 2px;
+        }
+
+        .sig-title {
+            font-weight: 600;
+            font-size: 0.72rem;
+        }
+
+        .sig-role {
+            font-size: 0.68rem;
+            color: #6b7280;
+        }
+
+        .footer {
+            font-size: 0.7rem;
+            color: #6b7280;
+            border-top: 1px solid #d1d5db;
+            padding-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+            gap: 6px;
+        }
+
+        button {
+            cursor: pointer;
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            font-weight: 600;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .btn-print {
+            background: #2563eb;
+            color: #fff;
+        }
+
+            .btn-print:hover {
+                background: #1e40af;
+            }
+
+        .btn-close {
+            background: #ef4444;
+            color: #fff;
+        }
+
+            .btn-close:hover {
+                background: #b91c1c;
+            }
+
+        @media (max-width: 700px) {
+            .details-section {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .signatures {
+                flex-direction: column;
+                gap: 14px;
+            }
+        }
+
+        .logo-header {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            height: 1.2cm;
+            min-height: 1.2cm;
+            max-height: 1.2cm;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .logo-college {
+            height: 1.2cm;
+            max-height: 1.2cm;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            background: #fff;
+            border-radius: 2px;
+            /* Move this logo a bit right, e.g. 1cm from left */
+            margin-left: 2.2cm;
+            margin-right: 1.2cm;
+        }
+
+        .logo-pinnacle {
+            height: 1.2cm;
+            max-height: 1.2cm;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            background: #fff;
+            border-radius: 2px;
+            margin-left: 1cm;
+        }
+    </style>
+    <style>
+        .detail-item.small {
+            font-size: 12px;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .force-bold {
+            font-weight: 700 !important;
+            color: #374151 !important;
+        }
+    </style>
+
+</head>
+<body>
+    <article class="receipt-container" role="document" aria-label="Fee Receipt for {{ payment.name|default:'Student' }}">
+        <!-- LOGO HEADER: Left logo is college-logo-with-name, right logo is Pinnacle (both 1.2cm), left logo has left margin for movement -->
+        <div class="logo-header">
+            <img src="https://i.postimg.cc/HxYthbCy/college-logo-with-name-white-png-1.jpg"
+                 alt="College Logo with Name"
+                 class="logo-college" />
+            <img src="https://i.postimg.cc/Xq9Sp7Mk/Screenshot-2025-06-27-144955.png"
+                 alt="Pinnacle Logo Icon"
+                 class="logo-pinnacle" />
+        </div>
+
+        <h2 class="receipt-title">FEE RECEIPT</h2>
+
+        <section class="details-section">
+            <section class="details-box" aria-labelledby="student-details-title">
+                <h3 id="student-details-title">Student Details</h3>
+                <div class="detail-item"><span class="detail-label">ID:</span><span class="detail-value">{{ payment.admission_no }}</span></div>
+                <div class="detail-item"><span class="detail-label">Name:</span><span class="detail-value">{{ payment.name }}</span></div>
+                <div class="detail-item"><span class="detail-label">Course:</span><span class="detail-value">{{ payment.course }}</span></div>
+                <div class="detail-item"><span class="detail-label">Academic Year:</span><span class="detail-value">{{ payment.academic_year|default:"2024-25" }}</span></div>
+                <div class="detail-item" style="font-size: 10px; white-space: nowrap;">
+                    <span class="detail-label force-bold">Branch Code:</span>
+                    <span class="detail-value force-bold">{{ payment.branch_code }}</span>
+                </div>
+            </section>
+            <section class="details-box" aria-labelledby="payment-details-title">
+                <h3 id="payment-details-title">Payment Details</h3>
+                <div class="detail-item"><span class="detail-label">Receipt:</span><span class="detail-value">RC/{{ payment.receipt_no }}</span></div>
+                <div class="detail-item"><span class="detail-label">Date:</span><span class="detail-value">{{ payment.receipt_date|date:"Y-m-d" }}</span></div>
+                <div class="detail-item"><span class="detail-label">Mode Of Payment:</span><span class="detail-value">{{ payment.payment_method }}</span></div>
+                <div class="detail-item">
+                    <span class="detail-label">Status:</span>
+                    <span> Paid</span>
+                    <!--<span class="detail-value">
+                        {% if status %}{{ status }}{% else %}
+                        {% with t=student.tuition_fee_paid|default_if_none:0 tr=student.transport_fee_paid|default_if_none:0 h=student.hostel_fee_paid|default_if_none:0 b=student.books_fee_paid|default_if_none:0 u=student.uniform_fee_paid|default_if_none:0 %}
+                        {% with total_paid=t|add:tr|add:h|add:b|add:u %}
+                        {% if student.final_fee_after_advance == total_paid %}Full
+                        {% elif total_paid > 0 %}Partial
+                        {% else %}Pending
+                        {% endif %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endif %}
+                    </span>-->
+                </div>
+                <div class="detail-item"><span class="detail-label">Receipt Date:</span><span class="detail-value">{{ payment.receipt_date|default:"-" }}</span></div>
+            </section>
+        </section>
+        <table class="fee-table">
+            <thead>
+                <tr>
+                    <th>Fee</th>
+                    <th>Total Fee</th>
+                    <th>Paid</th>
+                    <th>Pending</th>
+                    <th>Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Tuition</td>
+                    <td>₹{{ payment.tuition_fee|default:"0.00" }}</td>
+                    <td>₹{{ payment.tuition_amount|default:"0.00" }}</td>
+                    <td class="highlight">₹{{ payment.tuition_pending_fee|default:"0.00" }}</td>
+                    <td>{% if payment.tuition_due_date %}{{ payment.tuition_due_date }}{% elif payment.next_due_date %}{{ payment.next_due_date }}{% else %}-{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Transport</td>
+                    <td>₹{{ payment.transport_fee|default:"0.00" }}</td>
+                    <td>₹{{ payment.transport_amount|default:"0.00" }}</td>
+                    <!--<td>₹{{ student.transport_fee_paid|default:"0.00" }}</td>-->
+                    <td class="highlight">₹{{ payment.transport_pending_fee|default:"0.00" }}</td>
+                    <td>{% if payment.transport_due_date %}{{ payment.transport_due_date }}{% elif payment.next_due_date %}{{ payment.next_due_date }}{% else %}-{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Hostel</td>
+                    <td>₹{{ payment.hostel_fee|default:"0.00" }}</td>
+                    <td>₹{{ payment.hostel_amount|default:"0.00" }}</td>
+                    <!--<td>₹{{ payment.hostel_fee_paid|default:"0.00" }}</td>-->
+                    <td class="highlight">₹{{ payment.hostel_pending_fee|default:"0.00" }}</td>
+                    <td>{% if payment.hostel_due_date %}{{ payment.hostel_due_date }}{% elif payment.next_due_date %}{{ payment.next_due_date }}{% else %}-{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Books</td>
+                    <td>₹{{ payment.books_fee|default:"0.00" }}</td>
+                    <td>₹{{ payment.books_amount|default:"0.00" }}</td>
+                    <!--<td>₹{{ payment.books_fee_paid|default:"0.00" }}</td>-->
+                    <td class="highlight">₹{{ payment.books_pending_fee|default:"0.00" }}</td>
+                    <td>{% if payment.books_due_date %}{{ payment.books_due_date }}{% elif payment.next_due_date %}{{ payment.next_due_date }}{% else %}-{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Uniform</td>
+                    <td>₹{{ payment.uniform_fee|default:"0.00" }}</td>
+                    <td>₹{{ payment.uniform_amount|default:"0.00" }}</td>
+                    <!--<td>₹{{ payment.uniform_fee_paid|default:"0.00" }}</td>-->
+                    <td class="highlight">₹{{ payment.uniform_pending_fee|default:"0.00" }}</td>
+                    <td>{% if payment.uniform_due_date %}{{ payment.uniform_due_date }}{% elif payment.next_due_date %}{{ payment.next_due_date }}{% else %}-{% endif %}</td>
+                </tr>
+                {% if payment.other_amount %}
+            <td>{{ payment.other_fee }}</td>
+            <td>-</td>
+            <td>₹{{ payment.other_amount }}</td>
+            <td>-</td>
+            <td>-</td>
+            </tr>
+            {% endif %}
+            <tr class="total-row">
+                <td><strong>Total</strong></td>
+                <td><strong>₹{{ total_fee|stringformat:"0.2f" }}</strong></td>
+                <td><strong>₹{{ total_paid|stringformat:"0.2f" }}</strong></td>
+                <td class="highlight"><strong>₹{{ total_pending|stringformat:"0.2f" }}</strong></td>
+                <td>-</td>
+            </tr>
+
+            </tbody>
+        </table>
+        <!--<section class="payment-summary">
+            <div>
+                Paid(Now): <span class="paid-amount">
+                    {% if total_paid is not None %}
+                    ₹{{ total_paid }}
+                    {% else %}
+                    {% with t=student.tuition_fee_paid|default_if_none:0 tr=student.transport_fee_paid|default_if_none:0 h=student.hostel_fee_paid|default_if_none:0 b=student.books_fee_paid|default_if_none:0 u=student.uniform_fee_paid|default_if_none:0 %}
+                    {% with total_paid=t|add:tr|add:h|add:b|add:u %}
+                    ₹{{ total_paid }}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endif %}
+                </span>
+                &nbsp;|&nbsp;
+                Due: <span class="balance-due">
+                    {% if total_pending is not None %}
+                    ₹{{ total_pending }}
+                    {% else %}
+                    {% with t=student.tuition_pending_fee|default_if_none:0 tr=student.transport_pending_fee|default_if_none:0 h=student.hostel_pending_fee|default_if_none:0 b=student.books_pending_fee|default_if_none:0 u=student.uniform_pending_fee|default_if_none:0 %}
+                    {% with total_pending=t|add:tr|add:h|add:b|add:u %}
+                    ₹{{ total_pending }}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endif %}
+                </span>
+            </div>
+            <div class="payment-status">
+                {% if status %}{{ status }}{% else %}
+                {% with t=student.tuition_fee_paid|default_if_none:0 tr=student.transport_fee_paid|default_if_none:0 h=student.hostel_fee_paid|default_if_none:0 b=student.books_fee_paid|default_if_none:0 u=student.uniform_fee_paid|default_if_none:0 %}
+                {% with total_paid=t|add:tr|add:h|add:b|add:u %}
+                {% if student.final_fee_after_advance == total_paid %}Full
+                {% elif total_paid > 0 %}Partial
+                {% else %}Pending
+                {% endif %}
+                {% endwith %}
+                {% endwith %}
+                {% endif %}
+            </div>
+        </section>-->
+        <!--<section class="terms-section">
+            <h3>Terms &amp; Conditions</h3>
+            <ul class="terms-list">
+                <li>All fees once paid are non-refundable.</li>
+                <li>Late payment charges may apply after due date.</li>
+                <li>Original receipt must be produced for any fee-related queries.</li>
+                <li>Students must clear all dues before examinations.</li>
+                <li>Fee structure is subject to change as per university guidelines.</li>
+            </ul>
+        </section>-->
+        <div class="signatures">
+            <div class="sig-block">
+                <span class="sig-line"></span>
+                <div class="sig-title">Dean Signature with Seal</div>
+            </div>
+            <div class="sig-block">
+                <span class="sig-line"></span>
+                <div class="sig-title">Authorized Signature</div>
+            </div>
+        </div>
+        <div class="footer">
+            <div>Accounts Dept.<br>Pinnacle College Of Commerce And Management</div>
+            <div>Authorized Signature</div>
+        </div>
+        <!--<div style="color:#9ca3af; font-size:0.72rem; text-align:center; margin-top:5px;">
+            Computer-generated. No signature required.<br />
+            Generated: {% now "j/n/Y" %}
+        </div>-->
+        <div class="btn-container">
+            <button class="btn-print" type="button" onclick="window.print()">Print</button>
+            <button class="btn-close" type="button" onclick="window.close()">Close</button>
+        </div>
+    </article>
+</body>
+</html>

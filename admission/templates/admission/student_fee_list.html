@@ -1,0 +1,351 @@
+﻿{% extends 'layout.html' %}
+{% block content %}
+{% load get_safe %}
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .page-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px 0;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    .container {
+        width: 95%;
+        max-width: 1200px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        font-weight: 700;
+        color: #800000;
+        font-size: 22px;
+        margin: 0 0 20px 0;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        vertical-align: middle !important;
+        text-align: center;
+        padding: 2px;
+        border: 1px solid #dee2e6;
+    }
+
+    td {
+        font-size: 11px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    td:hover {
+        background-color: #e9ecef;
+    }
+
+    .search-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+        .search-form label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .search-form select,
+        .search-form button {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-form button {
+            background-color: #800000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+            .search-form button:hover {
+                background-color: #a52a2a;
+            }
+
+    .collect-btn {
+        display: inline-block;
+        background-color: #800000;
+        color: white;
+        padding: 4px 8px;
+        font-size: 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+
+        .collect-btn:hover {
+            background-color: #a52a2a;
+        }
+
+    p {
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 6px 0px 40px;
+        min-height: 100vh;
+    }
+</style>
+<div class="page-wrapper">
+    <div class="container">
+        <h2>Student Fee List</h2>
+
+        <form method="get" id="filterForm">
+            <!-- Academic Year -->
+            <label for="academic_year">Batch:</label>
+            <select name="academic_year" id="academic_year" class="form-control">
+                <option value="">Select Batch</option>
+                {% for year in academic_years %}
+                <option value="{{ year.id }}" {% if year.id|stringformat:"s" == request.GET.academic_year %}selected{% endif %}>
+                    {{ year.year }}
+
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Course Type -->
+            <label for="course_type">Course Type:</label>
+            <select name="course_type" id="course_type" class="form-control">
+                <option value="">Select Course Type</option>
+                {% if course_types %}
+                {% for ct in course_types %}
+                <option value="{{ ct.id }}" {% if ct.id|stringformat:"s" == request.GET.course_type %}selected{% endif %}>
+                    {{ ct.name }}
+                </option>
+                {% endfor %}
+                {% endif %}
+            </select>
+
+            <!-- Course -->
+            <label for="course">Course:</label>
+            <select name="course" id="course" class="form-control">
+                <option value="">Select Course</option>
+                {% if courses %}
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if course.id|stringformat:"s" == request.GET.course %}selected{% endif %}>
+                    {{ course.name }}
+                </option>
+                {% endfor %}
+                {% endif %}
+            </select>
+
+            <!-- Semester -->
+            <label for="semester_select">Semester / Year:</label>
+            <select name="semester" id="semester_select" class="form-control">
+                <option value="">Select Semester</option>
+                {% if semesters %}
+                {% for sem in semesters %}
+                <option value="{{ sem.number }}" {% if sem.number|stringformat:"s" == request.GET.semester %}selected{% endif %}>
+                    {{ sem.name }}
+                </option>
+                {% endfor %}
+                {% endif %}
+            </select>
+
+
+            <button type="submit">Search</button>
+        </form>
+
+        {% if students %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Admission No</th>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Course Type</th>
+                    <th>Course</th>
+                    <th>DOB</th>
+                    <th>Batch</th>
+                    <th>Father Name</th>
+                    <th>Father Phone No</th>
+                    {% for fee_name in fee_names %}
+                    <th>{{ fee_name }}</th>
+                    {% endfor %}
+                    <th>Collect</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.admission_no }}</td>
+                    <td>{{ student.student_id }}</td>
+                    <td>{{ student.student_name }}</td>
+                    <td>{{ student.admission_course_type }}</td>
+                    <td>{{ student.admission_course }}</td>
+                    <td>{{ student.admission_dob }}</td>
+                    <td>{{ student.admission_academic_year }}</td>
+                    <td>{{ student.admission_father_name }}</td>
+                    <td>{{ student.admission_father_mobile_no }}</td>
+                    {% with student.fees as fee_dict %}
+                    {% for fee_name in fee_names %}
+                    <td>₹{{ fee_dict|get_safe:fee_name }}</td>
+                    {% endfor %}
+                    {% endwith %}
+                    <td>
+                        <a href="{% url 'fee_collection_collect' %}?admission_no={{ student.admission_no }}" class="collect-btn">Collect Fees</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No students found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $(document).ready(function () {
+        const csrfToken = getCookie("csrftoken");
+
+        // Academic Year -> Course Types
+        $('#academic_year').off().on('change', function () {
+            const academicYearId = $(this).val();
+            $('#course_type').html('<option value="">Loading...</option>');
+            $('#course').html('<option value="">Select Course</option>');
+            $('#semester_select').html('<option value="">Select Semester</option>');
+
+            if (academicYearId) {
+                $.post("{% url 'get_course_types_by_academic' %}", {
+                    academic_year_id: academicYearId,
+                    csrfmiddlewaretoken: csrfToken
+                }, function (data) {
+                    let options = '<option value="">Select Course Type</option>';
+                    data.course_types.forEach(function (ct) {
+                        options += `<option value="${ct.id}">${ct.name}</option>`;
+                    });
+                    $('#course_type').html(options);
+                });
+            } else {
+                $('#course_type').html('<option value="">Select Course Type</option>');
+            }
+        });
+
+        // Course Type -> Courses
+        $('#course_type').off().on('change', function () {
+            const courseTypeId = $(this).val();
+            $('#course').html('<option value="">Loading...</option>');
+            $('#semester_select').html('<option value="">Select Semester</option>');
+
+            if (courseTypeId) {
+                $.post("{% url 'get_courses_by_type' %}", {
+                    course_type_id: courseTypeId,
+                    csrfmiddlewaretoken: csrfToken
+                }, function (data) {
+                    let options = '<option value="">Select Course</option>';
+                    data.courses.forEach(function (course) {
+                        options += `<option value="${course.id}">${course.name}</option>`;
+                    });
+                    $('#course').html(options);
+                });
+            } else {
+                $('#course').html('<option value="">Select Course</option>');
+            }
+        });
+
+        // Course -> Semesters
+        $('#course').off().on('change', function () {
+            const courseId = $(this).val();
+            const selectedSemester = $('#semester_select').val();  // Save current selected semester
+            $('#semester_select').html('<option value="">Loading...</option>');
+
+            if (courseId) {
+                $.get("{% url 'get_sem_by_course' %}", {
+                    course_id: courseId
+                }, function (data) {
+                    let options = '<option value="">Select Semester</option>';
+                    if (data.semesters && data.semesters.length > 0) {
+                        data.semesters.forEach(function (sem) {
+                            // Mark option selected if it matches saved semester
+                            const selectedAttr = (sem.number.toString() === selectedSemester) ? ' selected' : '';
+                            options += `<option value="${sem.number}"${selectedAttr}>${sem.name}</option>`;
+                        });
+                    }
+                    $('#semester_select').html(options);
+                }).fail(function () {
+                    $('#semester_select').html('<option value="">Error loading semesters</option>');
+                });
+            } else {
+                $('#semester_select').html('<option value="">Select Semester</option>');
+            }
+        });
+
+
+
+        // Final Form Validation
+        $('#filterForm').off().on('submit', function (e) {
+            const academicYear = $('#academic_year').val();
+            const courseType = $('#course_type').val();
+            const course = $('#course').val();
+            const semester = $('#semester_select').val();
+
+            if (!academicYear || !courseType || !course || !semester) {
+                alert("Please select all dropdowns including Semester.");
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

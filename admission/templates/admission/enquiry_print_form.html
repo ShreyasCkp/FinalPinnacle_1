@@ -1,0 +1,440 @@
+{% extends 'layout.html' %}
+
+{% block title %}Enquiry Form{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="form-card mx-auto" style="max-width: 900px;">
+        <!-- LOGO AND HEADING -->
+        <div class="logo-container">
+            <img src="https://i.postimg.cc/fbZjQX3j/Untitled-Project.jpg" alt="College Logo" style="max-width: 621px; margin-top: 13px;">
+            <h2>Enquiry Form</h2>
+        </div>
+        <form id="enquiry-form" autocomplete="off">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Enquiry No:</label>
+                    <input type="text" name="enquiry_no" />
+                </div>
+                <div class="form-group">
+                    <label>Student Name:</label>
+                    <input type="text" name="student_name" />
+                </div>
+                <div class="form-group">
+                    <label>Gender:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="gender" value="Male"> Male</label>
+                        <label><input type="checkbox" name="gender" value="Female"> Female</label>
+                        <label><input type="checkbox" name="gender" value="Other"> Other</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Parent relation:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="parent_relation" value="Father"> Father</label>
+                        <label><input type="checkbox" name="parent_relation" value="Mother"> Mother</label>
+                        <label><input type="checkbox" name="parent_relation" value="Guardian"> Guardian</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Parent name:</label>
+                    <input type="text" name="parent_name" />
+                </div>
+                <div class="form-group">
+                    <label>Parent phone:</label>
+                    <input type="text" name="parent_phone" />
+                </div>
+                <div class="form-group">
+                    <label>Course type:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="course_type" value="PUC"> PUC</label>
+                        <label><input type="checkbox" name="course_type" value="Degree"> Degree</label>
+                        <label><input type="checkbox" name="course_type" value="Diploma"> Diploma</label>
+                        <label><input type="checkbox" name="course_type" value="Other"> Other</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Course:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="course" value="Science"> Science</label>
+                        <label><input type="checkbox" name="course" value="Commerce"> Commerce</label>
+                        <label><input type="checkbox" name="course" value="Arts"> Arts</label>
+                        <label><input type="checkbox" name="course" value="BCA"> BCA</label>
+                        <label><input type="checkbox" name="course" value="BCom"> BCom</label>
+                        <label><input type="checkbox" name="course" value="BA"> BA</label>
+                        <label><input type="checkbox" name="course" value="Other"> Other</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Percentage 10th:</label>
+                    <div class="percentage-group">
+                        <input type="text" name="percentage_10th" maxlength="6" />
+                        <span>%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Percentage 12th:</label>
+                    <div class="percentage-group">
+                        <input type="text" name="percentage_12th" maxlength="6" />
+                        <span>%</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="text" name="email" />
+                </div>
+                <div class="form-group">
+                    <label>Address:</label>
+                    <textarea name="address"></textarea>
+                </div>
+            </div>
+            <div class="mt-4 d-flex justify-content-between">
+                <button type="button" class="btn btn-primary btn-sm no-print" onclick="printForm()">🖨️ Print</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-left: 91px;
+    }
+
+    .form-card {
+        background: #fff;
+        padding: 40px 50px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .logo-container {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+        .logo-container img {
+            max-width: 140px;
+            margin-bottom: -29px;
+        }
+
+        .logo-container h2 {
+            margin-top: 7px;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px 55px;
+        margin-top: -20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0px;
+    }
+
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #222;
+            font-size: 15px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 4px 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 16px;
+        margin-bottom: 2px;
+        margin-top: 2px;
+    }
+
+        .checkbox-group label {
+            font-weight: 400;
+            margin-bottom: 0;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+    .percentage-group {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+        .percentage-group input {
+            width: 60px;
+            min-width: 0;
+            max-width: 90px;
+            margin-right: 2px;
+            text-align: right;
+        }
+
+        .percentage-group span {
+            font-size: 13px;
+            margin-left: 0;
+        }
+
+    .btn {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #0274ee;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #025fc1;
+        }
+
+    textarea[name="address"] {
+        height: 60px !important;
+    }
+
+    @media print {
+        .btn,
+        .no-print,
+        .sidebar,
+        .topbar,
+        .navbar,
+        .footer {
+            display: none !important;
+        }
+
+        body {
+            background: white;
+            margin: 0;
+        }
+
+        .form-card {
+            box-shadow: none;
+            border: none;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .percentage-group {
+            display: inline-block !important;
+        }
+
+            .percentage-group input {
+                border: none !important;
+                background: none !important;
+                width: 28px !important;
+                min-width: 0 !important;
+                display: inline !important;
+                padding: 0 !important;
+                font-size: inherit !important;
+                text-align: right !important;
+            }
+
+            .percentage-group span {
+                display: inline !important;
+                font-size: inherit !important;
+                padding-left: 0 !important;
+            }
+
+        .checkbox-group {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 8px 16px !important;
+            align-items: center !important;
+        }
+
+            .checkbox-group label {
+                display: inline-flex !important;
+                align-items: center !important;
+                font-weight: 400 !important;
+                margin-bottom: 0 !important;
+                font-size: 13px !important;
+            }
+
+            .checkbox-group input[type="checkbox"] {
+                margin-right: 4px !important;
+                vertical-align: middle !important;
+            }
+    }
+
+    @media (max-width: 600px) {
+        .form-card {
+            padding: 30px 20px;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .form-grid {
+            gap: 12px;
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    function printForm() {
+        const originalForm = document.getElementById('enquiry-form');
+        if (!originalForm) {
+            alert("Form not found!");
+            return;
+        }
+        // Clone form deeply
+        const form = originalForm.cloneNode(true);
+        // Mark checked checkboxes for print
+        form.querySelectorAll('input[type="checkbox"]').forEach(el => {
+            if (el.checked) {
+                el.setAttribute('checked', 'checked');
+            } else {
+                el.removeAttribute('checked');
+            }
+        });
+        // For all inputs/textarea, set their value/innerText in cloned form for print
+        form.querySelectorAll('input, textarea').forEach(el => {
+            if (el.type !== 'checkbox') {
+                el.setAttribute('value', el.value);
+            }
+            if (el.tagName.toLowerCase() === 'textarea') {
+                el.innerText = el.value;
+            }
+        });
+        // Remove print buttons
+        form.querySelectorAll('button, input[type="submit"], input[type="button"]').forEach(btn => btn.remove());
+        // Replace percentage with value + %
+        form.querySelectorAll('.percentage-group').forEach(group => {
+            const input = group.querySelector('input');
+            if (input) {
+                const value = input.value;
+                input.remove();
+                group.innerHTML = value + '<span>_____%</span>';
+            }
+        });
+        const content = form.outerHTML;
+        const newWindow = window.open('', '', 'width=900,height=650');
+        newWindow.document.write(`
+        <html>
+            <head>
+                <title>Enquiry Form</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        padding: 20px;
+                    }
+                    .form-group {
+                        margin-bottom: 15px;
+                    }
+                    label {
+                        font-weight: bold;
+                    }
+                    input, textarea {
+                        border: none;
+                        border-bottom: 1px solid #000;
+                        padding: 4px;
+                        width: 100%;
+                        background: none;
+                    }
+                    .percentage-group {
+                        display: inline-block;
+                    }
+                    .percentage-group input {
+                        border: none !important;
+                        background: none !important;
+                        width: 28px !important;
+                        min-width: 0 !important;
+                        display: inline !important;
+                        padding: 0 !important;
+                        font-size: inherit !important;
+                        text-align: right !important;
+                    }
+                    .percentage-group span {
+                        display: inline !important;
+                        font-size: inherit !important;
+                        padding-left: 0 !important;
+                    }
+                    .no-print {
+                        display: none;
+                    }
+                    .logo {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .logo img {
+                        max-height: 100px;
+                    }
+                    .checkbox-group {
+                        display: flex !important;
+                        flex-wrap: wrap !important;
+                        gap: 8px 16px !important;
+                        align-items: center !important;
+                    }
+                    .checkbox-group label {
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        font-weight: 400 !important;
+                        margin-bottom: 0 !important;
+                        font-size: 13px !important;
+                    }
+                    .checkbox-group input[type="checkbox"] {
+                        margin-right: 4px !important;
+                        vertical-align: middle !important;
+                    }
+                    .form-grid {
+                            margin-left: 55px;
+                            margin-right: 56px;
+                     }
+
+                </style>
+            </head>
+            <body>
+                <div class="logo" style="text-align:center; margin-bottom: 20px;">
+                    <img src="https://i.postimg.cc/fbZjQX3j/Untitled-Project.jpg" alt="College Logo" style="max-height: 104px; margin-bottom: -44px; margin-top: -30px; margin-left: -12px;">
+                </div>
+                <h2 style="text-align: center;margin-top: 39px;">Enquiry Form</h2>
+                ${content}
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        window.onafterprint = function() {
+                            window.close();
+                        };
+                    };
+                <\/script>
+            </body>
+        </html>
+    `);
+        newWindow.document.close();
+    }
+</script>
+{% endblock %}

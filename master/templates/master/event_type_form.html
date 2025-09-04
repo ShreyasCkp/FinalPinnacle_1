@@ -1,0 +1,168 @@
+{% extends 'layout.html' %}
+{% load form_filters %}
+
+{% block title %}
+    {% if view_mode %}View{% elif form.instance.pk %}Edit{% else %}Add{% endif %} Event Type
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        margin-top: 0px;
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 6px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 16px;
+        width: 100%;
+    }
+
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .btn-back {
+        background-color: #800000;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background-color: #6e0000;
+            color: white;
+        }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .content {
+        padding: 25px 26px 40px;
+        margin-left: 200px;
+    }
+</style>
+
+<div class="container form-container">
+    <h3>
+        {% if view_mode %}
+        View Event Type
+        {% elif form.instance.pk %}
+        Edit Event Type
+        {% else %}
+        Add Event Type
+        {% endif %}
+    </h3>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- Event Type Name Field -->
+        <div class="mb-3">
+            <label for="id_name" class="form-label">Event Type Name</label>
+            {{ form.name.errors }}
+            {{ form.name|add_class:"form-control" }}
+            {% if view_mode %}
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.getElementById("id_name").disabled = true;
+                });
+            </script>
+            {% endif %}
+        </div>
+        <span id="name-error" style="color:red; font-size: 13px;"></span>
+
+        <!-- Is Active Field -->
+        <div class="mb-3">
+
+            {{ form.is_active.errors }}
+            {{ form.is_active }}
+            {% if view_mode %}
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.getElementById("id_is_active").disabled = true;
+                });
+            </script>
+            {% endif %}
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-container">
+            <a href="{% url 'event_type_list' %}" class="btn-back">Back</a>
+            {% if not view_mode %}
+            <button type="submit" class="btn-save">
+                {% if form.instance.pk %}Update{% else %}Save{% endif %}
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#id_name').on('input', function () {
+            let name = $(this).val().trim();
+            let $errorContainer = $('#name-error');
+
+            if (name.length > 0) {
+                $.get("{% url 'check_event_type_name' %}", { name: name }, function (data) {
+                    if (data.exists) {
+                        $errorContainer.text("This Event Type already exists.");
+                    } else {
+                        $errorContainer.text("");
+                    }
+                });
+            } else {
+                $errorContainer.text("");
+            }
+        });
+    });
+</script>
+{% endblock %}

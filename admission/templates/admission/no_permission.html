@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Permission Denied</title>
+    <style>
+        .centered-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            flex-direction: column;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="centered-container">
+        <h2>Permission Denied</h2>
+        <p>You do not have access to this form.</p>
+    </div>
+</body>
+</html>
+{% endblock %}

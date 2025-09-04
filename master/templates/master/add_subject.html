@@ -1,0 +1,354 @@
+{% extends 'layout.html' %}
+{% load form_filters %}
+
+{% block title %}{% if is_view %}View{% elif form.instance.pk %}Edit{% else %}Add{% endif %} Subject{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 4px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+        width: 100%;
+    }
+
+    .btn-save {
+        background-color: #800000;
+        font-weight: 500;
+        padding: 5px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #800000;
+        }
+
+    .btn-container {
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .form-check-input {
+        margin-right: 6px;
+    }
+
+    .btn-back {
+        background-color: #800000;
+        color: #fff;
+        border: 2px solid #800000;
+        padding: 2px 5px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-back:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .content {
+        margin-left: 200px;
+        padding: 17px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="container form-container">
+    <h3>{% if is_view %}View{% elif form.instance.pk %}Edit{% else %}Add{% endif %} Subject</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <label for="id_name" class="form-label">Subject Name</label>
+                {{ form.name }}
+                <div class="text-danger">{{ form.name.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="id_subject_code" class="form-label">Subject Code</label>
+                {{ form.subject_code }}
+                <div class="text-danger">{{ form.subject_code.errors }}</div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Batch -->
+            <div class="col-md-6">
+                <label for="{{ form.academic_year.id_for_label }}" class="form-label">Batch</label>
+                {{ form.academic_year }}
+                <div class="text-danger">{{ form.academic_year.errors }}</div>
+            </div>
+            <!-- Program Type -->
+            <div class="col-md-6">
+                <label for="id_program_type" class="form-label">Program Type</label>
+               <select name="program_type" id="id_program_type" class="form-select" required>
+    <option value="">Select Program Type</option>
+</select>
+                <div class="text-danger">{{ form.program_type.errors }}</div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Combinations -->
+            <div class="col-md-6">
+                <label for="id_course" class="form-label">Combinations</label>
+                <select name="course" id="id_course" class="form-select" required disabled>
+                    <option value="">Select Combinations</option>
+                    <!-- Options will be loaded by AJAX -->
+                </select>
+                <div class="text-danger">{{ form.course.errors }}</div>
+            </div>
+            <!-- Academic Cycle -->
+            <div class="col-md-6">
+                <label for="id_semester" class="form-label">Sem/Year</label>
+                <select name="semester" id="id_semester" class="form-select" required>
+                    <option value="">Select</option>
+                    {% for sem in semesters %}
+                    <option value="{{ sem.number }}">{{ sem.name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="text-danger">{{ form.semester.errors }}</div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <!-- Credit -->
+            <div class="col-md-6">
+                <label for="id_credit" class="form-label">Credit</label>
+                {{ form.credit }}
+                <div class="text-danger">{{ form.credit.errors }}</div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="form-check mb-2">
+                    <input type="radio" name="is_active" value="True" class="form-check-input"
+                           {% if form.data.is_active == 'True' or form.instance.is_active %}checked{% endif %}
+                           {% if is_view %}disabled{% endif %}>
+                    <label class="form-check-label">Active</label>
+                </div>
+                <div class="form-check">
+                    <input type="radio" name="is_active" value="False" class="form-check-input"
+                           {% if form.data.is_active == 'False' or not form.instance.is_active %}checked{% endif %}
+                           {% if is_view %}disabled{% endif %}>
+                    <label class="form-check-label">Inactive</label>
+                </div>
+                <div class="text-danger">{{ form.is_active.errors }}</div>
+            </div>
+        </div>
+        <div class="btn-container d-flex justify-content-between mt-4">
+            <a href="{% url 'subject_form_list' %}" class="btn-back">Back</a>
+            {% if not is_view %}
+            <button type="submit" class="btn-save">
+                {% if form.instance.pk %}Update{% else %}Save{% endif %}
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<script>
+$(document).ready(function () {
+    // Show/hide correct program type when batch changes
+    function updateProgramTypeDropdown() {
+        let batchText = $("#id_academic_year option:selected").text().trim();
+        let years = batchText.match(/\d{4}/g);
+        let $programType = $("#id_program_type");
+        $programType.val(""); // Reset selection
+        $programType.find("option").hide();
+        $programType.find("option[value='']").show(); // Show placeholder
+        if (years && years.length === 2) {
+            let diff = parseInt(years[1]) - parseInt(years[0]);
+            if (diff === 2) {
+                $programType.find("option[data-name*='pu']").show();
+            } else if (diff === 3) {
+                $programType.find("option[data-name*='bcom']").show();
+            }
+        } else {
+            $programType.find("option").show();
+        }
+        // Reset combinations until program type is selected
+        $("#id_course").empty().append('<option value="">Select Combinations</option>').prop('disabled', true);
+    }
+
+    // AJAX for dependent dropdowns
+    function loadCoursesByProgramType(programTypeId, selectedCourseId) {
+        const csrfToken = $('[name=csrfmiddlewaretoken]').val();
+        const $courseSelect = $('#id_course');
+        $courseSelect.empty().append('<option value="">Select Combinations</option>');
+        if (programTypeId) {
+            $.ajax({
+                url: "{% url 'get_courses_by_program_type' %}",
+                method: "POST",
+                data: {
+                    course_type_id: programTypeId,
+                    csrfmiddlewaretoken: csrfToken
+                },
+                success: function (data) {
+                    $.each(data.courses, function (index, course) {
+                        const selected = String(course.id) === String(selectedCourseId) ? 'selected' : '';
+                        $courseSelect.append(`<option value="${course.id}" ${selected}>${course.name}</option>`);
+                    });
+                    $courseSelect.prop('disabled', false);
+                },
+                error: function () {
+                    $courseSelect.prop('disabled', true);
+                    alert('Unable to fetch courses.');
+                }
+            });
+        } else {
+            // If no program type, combinations should remain disabled
+            $courseSelect.prop('disabled', true);
+        }
+        // Also clear and reset semesters since course has changed
+        $('#id_semester').empty().append('<option value="">Select</option>');
+    }
+
+    function loadSemesters(courseId, selectedSemester) {
+        const csrfToken = $('[name=csrfmiddlewaretoken]').val();
+        if (courseId) {
+            $.ajax({
+                url: "{% url 'get_semesters_by_course' %}",
+                method: "POST",
+                data: {
+                    course_id: courseId,
+                    csrfmiddlewaretoken: csrfToken
+                },
+                success: function (data) {
+                    const semesterSelect = $('#id_semester');
+                    semesterSelect.empty().append('<option value="">Select Sem/Year</option>');
+                    $.each(data.semesters, function (index, semester) {
+                        const selected = String(semester.number) === String(selectedSemester) ? 'selected' : '';
+                        semesterSelect.append(`<option value="${semester.number}" ${selected}>${semester.name}</option>`);
+                    });
+                },
+                error: function () {
+                    alert('Unable to fetch semesters.');
+                }
+            });
+        }
+    }
+
+    // On batch change: set program type dropdown and clear combinations
+    updateProgramTypeDropdown();
+    $("#id_academic_year").change(function () {
+        updateProgramTypeDropdown();
+        $("#id_program_type").trigger('change');
+    });
+
+    // When Program Type changes, update combinations (courses)
+    $('#id_program_type').change(function () {
+        let selectedProgramTypeId = $(this).val();
+        if (selectedProgramTypeId) {
+            loadCoursesByProgramType(selectedProgramTypeId, '');
+        } else {
+            // If no program type selected, combinations should remain disabled
+            $('#id_course').empty().append('<option value="">Select Combinations</option>').prop('disabled', true);
+        }
+        $('#id_course').val('');
+        $('#id_semester').empty().append('<option value="">Select</option>');
+    });
+
+    // When combination (course) changes, update semesters
+    $('#id_course').change(function () {
+        loadSemesters($(this).val(), '');
+    });
+
+    // On page load: if values are pre-selected (edit mode), load dependent dropdowns
+    const selectedProgramType = '{{ selected_program_type_id }}';
+    const selectedCourse = '{{ selected_course_id }}';
+    const selectedSemester = '{{ selected_semester }}';
+    if (selectedProgramType) {
+        loadCoursesByProgramType(selectedProgramType, selectedCourse);
+        $('#id_course').prop('disabled', false);
+    }
+    if (selectedCourse && selectedSemester) {
+        loadSemesters(selectedCourse, selectedSemester);
+    }
+
+    // Enforce required on Combinations and Academic Cycle
+    $("#id_course").attr("required", true);
+    $("#id_semester").attr("required", true);
+});
+</script>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const academicYearSelect = document.getElementById('id_academic_year');
+        const programTypeSelect = document.getElementById('id_program_type');
+
+        academicYearSelect.addEventListener('change', function () {
+            const batchId = this.value;
+            programTypeSelect.innerHTML = '<option value="">Select Program Type</option>';
+
+            if (batchId) {
+                fetch("{% url 'get_program_types_by_batch' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: `batch_id=${batchId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.program_types && data.program_types.length > 0) {
+                        data.program_types.forEach(pt => {
+                            const option = document.createElement('option');
+                            option.value = pt.id;
+                            option.textContent = pt.name;
+                            programTypeSelect.appendChild(option);
+                        });
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = "";
+                        option.textContent = "No Program Types available";
+                        programTypeSelect.appendChild(option);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    });
+</script>
+{% endblock %}

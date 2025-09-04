@@ -1,0 +1,382 @@
+{% extends 'lms/employee_layout.html' %}
+{% block title %} {% if is_edit %}Edit Study Material{% else %}Add Study Material{% endif %}{% endblock %}
+
+{% block content %}
+{% load form_tags %}
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    /*    .form-container {
+            max-width: 800px;
+            margin: 25px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        }*/
+
+    h3 {
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 4px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+        width: 100%;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        background-color: #800000;
+        color: #fff;
+        border: 2px solid #800000;
+        padding: 2px 5px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-back:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .btn-save {
+        background-color: #800000;
+        font-weight: 600;
+        padding: 2px 4px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: white;
+        width: 59px;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn-save:hover {
+            background-color: #a10000;
+        }
+
+
+    .is-invalid {
+        border-color: red !important;
+    }
+
+    .content {
+        margin-left: 115px;
+        padding: 3px 26px 40px;
+        min-height: 100vh;
+    }
+
+    @media (min-width: 768px) {
+        .col-md-6 {
+            flex: 0 0 auto;
+            width: 50%;
+        }
+    }
+
+    .custom-textarea {
+        height: 102px;
+        width: 49%;
+        resize: vertical;
+    }
+
+
+    .form-section {
+        background: #fff;
+        padding: 31px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 40px;
+        margin-left: 101px;
+        margin-right: 4px;
+        width: 1125px;
+    }
+
+    label {
+        font-weight: 600;
+        margin-right: -10px;
+        font-size: 12px;
+    }
+
+    select, input[type="date"] {
+        padding: 6px;
+        margin: 5px 10px 10px 0;
+        min-width: 180px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    input[readonly] {
+        background-color: #e9ecef;
+    }
+
+    .table-section {
+        margin-top: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+        /*        overflow-x: auto;
+    */ width: 100%;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        table-layout: fixed;
+    }
+
+    th {
+        padding: 8px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+        vertical-align: middle;
+        word-wrap: break-word;
+        /*        text-overflow: ellipsis;
+    */ white-space: nowrap;
+        max-width: 150px;
+    }
+
+    td {
+        border: 1px solid #dee2e6;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .table-responsive {
+        margin-top: 20px;
+    }
+
+    th {
+        background-color: #800000;
+        color: white;
+        padding: 4px;
+        font-size: 11px;
+    }
+
+    .btn-submit {
+        background-color: #800000;
+        color: white;
+        padding: 7px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        margin-top: 12px;
+        cursor: pointer;
+        text-decoration: none; /* remove underline */
+    }
+
+        .btn-submit:hover {
+            background-color: #660000;
+        }
+
+
+    .btn-container {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-container-fixed {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+
+
+    .firsts {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 12px;
+        margin: 20px;
+    }
+
+        .firsts select,
+        .firsts input[type="date"],
+        .firsts input[type="text"] {
+            min-width: 140px;
+            max-width: 200px;
+            font-size: 13px;
+            padding: 6px 8px;
+            flex-shrink: 0;
+        }
+
+    .content {
+        padding: 10px 26px 18px;
+        /* background-color: #EEE; */
+        margin-left: 128px;
+        flex-grow: 1;
+    }
+
+    td input[type="radio"] {
+        margin-bottom: 2px;
+    }
+
+    td label {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .status-options {
+        display: flex;
+        /* justify-content: center; */
+        gap: 13px;
+    }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="form-section">
+    <h4 style="text-align: center; font-size: 22px; color: #800; margin-top: -17px;">
+        {% if is_edit %}Edit Study Material{% else %}Add Study Material{% endif %}
+    </h4>
+
+    <form method="GET" class="form-inline filter-row">
+        <div class="firsts">
+
+            <select name="program_type" onchange="this.form.submit()">
+                <option value="">Program Type</option>
+                {% for pt in program_types %}
+                <option value="{{ pt.id }}" {% if pt.id|stringformat:"s" == selected.program_type %}selected{% endif %}>{{ pt.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="academic_year" onchange="this.form.submit()">
+                <option value="">Batch</option>
+                {% for year in academic_years %}
+                <option value="{{ year }}" {% if year|stringformat:"s" == selected.academic_year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="course" onchange="this.form.submit()">
+                <option value="">Combination</option>
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if course.id|stringformat:"s" == selected.course %}selected{% endif %}>{{ course.name }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="semester" onchange="this.form.submit()">
+                <option value="">Sem/Year</option>
+                {% for sem in semesters %}
+                <option value="{{ sem.id }}" {% if sem.id|stringformat:"s" == selected.semester %}selected{% endif %}>{{ sem.label }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="subject" onchange="this.form.submit()">
+                <option value="">Subject</option>
+                {% for sub in subjects %}
+                <option value="{{ sub.id }}" {% if sub.id|stringformat:"s" == selected.subject %}selected{% endif %}>{{ sub.name }}</option>
+                {% endfor %}
+            </select>
+
+        </div>
+    </form>
+
+
+    <!-- Form Container -->
+    <div class="container form-container">
+        <form method="post" enctype="multipart/form-data" action="">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <!-- Title -->
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Title</label>
+                    {{ form.title|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="row mt-2">
+                <div class="col-md-12">
+                    <label class="form-label">Description</label>
+                    {{ form.description|add_class:"form-control custom-textarea" }}
+                </div>
+            </div>
+
+            <!-- Material Type -->
+            <div class="row mt-2">
+                <div class="col-md-6">
+                    <label class="form-label">Material Type</label>
+                    {{ form.material_type|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <!-- Attachment Field -->
+            <div class="row mt-2" id="attachmentField">
+                <div class="col-md-6">
+                    <label class="form-label">Attachment</label>
+                    {{ form.attachment|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <!-- Link URL Field -->
+            <div class="row mt-2" id="linkUrlField">
+                <div class="col-md-6">
+                    <label class="form-label">Link URL</label>
+                    {{ form.link_url|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="btn-container mt-4">
+                <a href="{% url 'employee_study_material_list' %}" class="btn-back">Back</a>
+                <button type="submit" class="btn-back">
+                    {% if is_edit %} Update {% else %} Save {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    function toggleAttachmentField() {
+        const type = document.querySelector('[name="material_type"]').value;
+        document.getElementById('attachmentField').style.display = (type === 'pdf' || type === 'ebook' || type === 'video') ? 'block' : 'none';
+        document.getElementById('linkUrlField').style.display = (type === 'link') ? 'block' : 'none';
+    }
+    toggleAttachmentField();
+</script>
+{% endblock %}

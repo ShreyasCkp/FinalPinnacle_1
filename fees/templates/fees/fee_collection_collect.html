@@ -1,0 +1,374 @@
+{% extends 'layout.html' %}
+{% block title %}Collect Fees{% endblock %}
+
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .page-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px 0;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: 95%;
+        max-width: 1200px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        padding: 30px;
+        font-size: 12px;
+    }
+
+    h2 {
+        font-weight: 700;
+        color: #800000;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        vertical-align: middle !important;
+        text-align: center;
+        padding: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .btn-primary {
+        background-color: #800000;
+        border: none;
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 4px;
+    }
+
+    .btn-secondary {
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 4px;
+        color: #fff;
+        background-color: #800000;
+        border-color: #800000;
+    }
+
+    .status-paid {
+        color: green;
+        font-weight: bold;
+    }
+
+    .status-pending {
+        color: red;
+        font-weight: bold;
+    }
+
+    .status-partial {
+        color: orange;
+        font-weight: bold;
+    }
+
+    .is-invalid {
+        border: 2px solid #dc3545 !important;
+        background-color: #fff0f0;
+    }
+
+    .btn:disabled {
+        background-color: #ccc !important;
+        border-color: #ccc !important;
+        color: #666 !important;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    #collect-btn:disabled {
+        background-color: #ccc !important;
+        border-color: #ccc !important;
+        cursor: not-allowed;
+        color: #666 !important;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 22px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="page-wrapper">
+    <div class="container">
+        <h2>Collect Fees</h2>
+
+        <div class="card mb-3">
+            <h5 class="mb-2" style=" color: #800000; font-size: 16px; font-weight: 600; text-align: center; margin-top: 7px;">Student Details</h5>
+
+            <table class="table table-bordered table-sm">
+                <tbody>
+                    <tr>
+                        <th>Name</th>
+                        <td>{{ student.student_name }}</td>
+                        <th>Roll No</th>
+                        <td>{{ student.roll_number }}</td>
+
+                        <th>Course</th>
+                        <td>{{ student.admission_course }}</td>
+
+                        <th>
+                            {% if student.semester %}
+                            Semester
+                            {% elif student.current_year %}
+                            Year
+                            {% else %}
+                            Term
+                            {% endif %}
+                        </th>
+                        <td>
+                            {% if student.semester %}
+                            {{ student.admission_course }} {{ student.semester }}
+                            {% elif student.current_year %}
+                            {{ student.admission_course }} {{ student.current_year }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    </tr>
+                    <tr>
+                        <th>Course Type</th>
+                        <td>{{ student.admission_course_type }}</td>
+                        <th>Admission No</th>
+                        <td>{{ student.admission_no }}</td>
+                        <th>Mobile</th>
+                        <td>{{ student.admission_father_mobile_no }}</td>
+
+                        <th>Category</th>
+                        <td>{{ student.category }}</td>
+                    </tr>
+                    <tr>
+
+
+                        <th>Date</th>
+                        <td>{{ now|date:"d-m-Y" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <form id="collect-fee-form" method="POST" action="{% url 'fee_collection_collect' %}">
+                {% csrf_token %}
+                <input type="hidden" name="admission_no" value="{{ student.admission_no }}">
+
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Fee Type</th>
+                            <th>Due Date</th>
+                            <th>Amount (₹)</th>
+                            <th>Discount (₹)</th>
+                            <th>Recieved (₹)</th>
+                            <th>Balance (₹)</th>
+                            <th>Status</th>
+                            <th>Pay Now (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fee in fee_collections %}
+                        {% if fee.fee_type.name|lower != 'scholarship' %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ fee.fee_type.name }}</td>
+                            <td>{% if fee.due_date %}{{ fee.due_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
+                            <td>{{ fee.amount }}</td>
+                            <td class="discount" data-discount="{{ fee.applied_discount }}">{{ fee.applied_discount }}</td>
+                            <td class="paid" data-paid="{{ fee.paid_amount }}">{{ fee.paid_amount|add:fee.applied_discount }}</td>
+                            <td class="balance" data-amount="{{ fee.amount }}" data-discount="{{ fee.applied_discount }}" data-paid="{{ fee.paid_amount }}">{{ fee.balance_amount }}</td>
+                            <td class="{% if fee.status == 'Paid' %}status-paid{% elif fee.status == 'Pending' %}status-pending{% else %}status-partial{% endif %}">{{ fee.status }}</td>
+                            <td>
+                                {% if fee.status != 'Paid' %}
+                                <input type="hidden" name="selected_fees" value="{{ fee.id }}">
+                                <input type="number" step="0.01" min="0" max="{{ fee.balance_amount }}" class="form-control form-control-sm pay-now-input" name="paid_amount_{{ fee.id }}" data-fee-id="{{ fee.id }}">
+                                {% else %}-{% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="text-center mt-3">
+                    <button type="button" id="collect-btn" class="btn btn-primary">Collect Payment</button>
+                    <a href="{% url 'student_fee_list' %}" class="btn btn-secondary ml-2">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="payment-mode-form" class="modal-content">
+            <div class="modal-body">
+                <select class="form-control" id="payment_mode" required>
+                    <option value="">Select Payment Mode</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Online">Online</option>
+                </select>
+
+                <div id="qr-section" class="text-center mt-3" style="display: none;">
+                    <img id="qr-img" src="/static/images/sample_qr.png" alt="QR Code"
+                         style="width: 160px; height: 160px; border: 1px solid #ccc; padding: 6px; border-radius: 6px;">
+                    <p style="margin-top: 8px; font-size: 12px;">Scan and pay using your UPI app</p>
+                </div>
+
+                <!-- Wrap transaction reference input -->
+                <div id="reference-wrapper" class="mt-2" style="display: none;">
+                    <input type="text" class="form-control" id="payment_reference"
+                           placeholder="Transaction Reference (if applicable)">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Confirm Payment</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        const $collectBtn = $('#collect-btn');
+
+        // Initially disable collect button
+        $collectBtn.prop('disabled', true);
+
+        // Validate inputs and update UI
+        function validateAllInputs() {
+            let isValid = true;
+
+            $('.pay-now-input').each(function () {
+                const $input = $(this);
+                let row = $input.closest('tr');
+                let paidInput = parseFloat($input.val()) || 0;
+                let paidAlready = parseFloat(row.find('.paid').data('paid')) || 0;
+                let discount = parseFloat(row.find('.discount').data('discount')) || 0;
+                let amount = parseFloat(row.find('.balance').data('amount')) || 0;
+
+                let totalAlready = paidAlready + discount;
+                let balanceAllowed = Math.max(amount - totalAlready, 0);
+
+                if (paidInput > balanceAllowed) {
+                    $input.addClass('is-invalid');
+                    isValid = false;
+
+                    if (!$input.next('.invalid-feedback').length) {
+                        $input.after('<div class="invalid-feedback d-block">Please enter an amount less than or equal to the balance amount.</div>');
+                    }
+                } else {
+                    $input.removeClass('is-invalid');
+                    $input.next('.invalid-feedback').remove();
+                }
+
+                // Live balance update
+                let newTotalPaid = paidAlready + paidInput + discount;
+                let newBalance = Math.max(amount - newTotalPaid, 0);
+                row.find('.balance').text(newBalance.toFixed(2));
+                row.find('.paid').text((paidAlready + discount + paidInput).toFixed(2));
+            });
+
+            $collectBtn.prop('disabled', !isValid || !hasAnyPaymentEntered());
+        }
+
+        function hasAnyPaymentEntered() {
+            let entered = false;
+            $('.pay-now-input').each(function () {
+                if (parseFloat($(this).val()) > 0) {
+                    entered = true;
+                    return false;
+                }
+            });
+            return entered;
+        }
+
+        // On input change
+        $('.pay-now-input').on('input', function () {
+            validateAllInputs();
+        });
+
+        // Collect button click
+        $('#collect-btn').click(function () {
+            if ($collectBtn.prop('disabled')) {
+                alert("Fix input errors before continuing.");
+                return;
+            }
+            $('#paymentModal').modal('show');
+        });
+
+        // Payment form submission
+        $('#payment-mode-form').submit(function (e) {
+            e.preventDefault();
+            const mode = $('#payment_mode').val();
+            const paymentRef = $('#payment_reference').val();
+
+            if (mode === 'Online' && !paymentRef.trim()) {
+                alert("Please enter the transaction reference for online payments.");
+                return;
+            }
+
+            $('<input>').attr({ type: 'hidden', name: 'payment_mode', value: mode }).appendTo('#collect-fee-form');
+            $('<input>').attr({ type: 'hidden', name: 'payment_reference', value: paymentRef }).appendTo('#collect-fee-form');
+
+            $('#paymentModal').modal('hide');
+            $('#collect-fee-form').submit();
+        });
+
+        // Handle payment mode changes
+        $('#payment_mode').change(function () {
+            let totalAmount = 0;
+            $('.pay-now-input').each(function () {
+                totalAmount += parseFloat($(this).val()) || 0;
+            });
+
+            const mode = $(this).val();
+
+            if (mode === 'Online') {
+                $('#qr-img').attr('src', "{% url 'generate_qr_dynamic' %}?amount=" + totalAmount.toFixed(2));
+                $('#qr-section').show();
+                $('#reference-wrapper').show();
+            } else {
+                $('#qr-section').hide();
+                $('#reference-wrapper').hide();
+            }
+        });
+    });
+</script>
+
+
+{% endblock %}

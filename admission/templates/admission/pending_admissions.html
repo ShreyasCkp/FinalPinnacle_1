@@ -1,0 +1,318 @@
+{% extends 'layout.html' %}
+{% block title %}Pending Applications{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-left: 91px;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 10px;
+        margin-left: -64px;
+        margin-right: 27px;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 24px;
+        font-size: 22px;
+        text-transform: uppercase;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        vertical-align: middle;
+        text-align: center;
+        padding: 1px;
+        border: 1px solid #dee2e6;
+    }
+
+    td {
+        font-size: 10px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    /* tr:hover {
+        background-color: #f1f1f1;
+    }*/
+
+    .badge {
+        padding: 2px 6px;
+        font-size: 9px;
+        border-radius: 4px;
+    }
+
+    .bg-primary {
+        background-color: #008000;
+        color: #fff;
+    }
+
+    .bg-danger {
+        background-color: #ffc107;
+        color: #fff;
+    }
+
+    .icon-btn {
+        border: none;
+        background-color: transparent;
+        padding: 3px 6px;
+        margin: 1px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .icon-btn i {
+            font-size: 13px;
+            color: #800000;
+        }
+
+        .icon-btn:hover {
+            background-color: #f8eeee;
+        }
+
+    .readonly-input {
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: center;
+        font-size: 10px;
+        color: #212529;
+    }
+
+    .text-muted {
+        color: #6c757d;
+        font-size: 10px;
+    }
+
+    .alert {
+        color: #800000;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        table {
+            font-size: 11px;
+        }
+
+        .readonly-input {
+            font-size: 10px;
+        }
+    }
+
+    .content {
+        padding: 32px 26px 40px;
+        margin-left: 200px;
+    }
+
+    .search-input {
+        position: absolute;
+        left: 0;
+        font-size: 13px;
+        width: 220px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex" style="position: relative; margin-bottom: 20px;">
+        <input type="text" id="pendingAdmissionSearch" placeholder="Search admissions..." class="search-input">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #800000; text-align: center; width: 100%;">Pending Applications</h2>
+    </div>
+
+
+    <table class="table table-bordered table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Admission ID</th>
+                <th>Student Name</th>
+                <th>Program Type</th>
+                <th>Application Date</th>
+                <th>Documents</th>
+                <th>Application Fee</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for admission in admissions_list %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ admission.admission_no }}</td>
+                <td>{{ admission.student_name }}</td>
+                <td>{{ admission.course_type  }}</td>
+                <td>{{ admission.admission_date }}</td>
+                <td>
+                    {% if admission.documents_complete %}
+                    <span class="badge bg-primary">Submitted</span>
+                    {% else %}
+                    <span class="badge bg-danger">Pending</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <input type="number" step="0.01" class="readonly-input" readonly
+                           value="{% if admission.application_fee %}{{ admission.application_fee|floatformat:2 }}{% else %}0.00{% endif %}">
+                </td>
+
+
+                <td>
+                    {% if admission.status|cut:" " == 'Pending' %}
+                    <!-- Review as a link to the edit form with `next` param -->
+                    {% if admission.course_type == 'PU' %}
+                    <a href="{% url 'edit_pu_admission' admission.pk %}?next={% url 'pending_admissions' %}" class="icon-btn" title="Edit PU Admission (Review)">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    {% elif admission.course_type == 'Degree' %}
+                    <a href="{% url 'edit_degree_admission' admission.pk %}?next={% url 'pending_admissions' %}" class="icon-btn" title="Edit Degree Admission (Review)">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    {% else %}
+                    <span class="text-muted">Unknown Program</span>
+                    {% endif %}
+
+                    <!-- Confirm and Reject buttons remain POST -->
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="admission_no" value="{{ admission.admission_no }}">
+                        <button name="action" value="confirm" class="icon-btn" title="Confirm Admission">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button name="action" value="reject" class="icon-btn" title="Reject Admission">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </form>
+
+                    {% elif admission.status|cut:" " == "Review" %}
+                    <!-- When already in Review, only confirm/reject buttons -->
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="admission_no" value="{{ admission.admission_no }}">
+                        <button name="action" value="confirm" class="icon-btn" title="Confirm Admission">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button name="action" value="reject" class="icon-btn" title="Reject Admission">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </form>
+
+                    {% else %}
+                    <span class="text-muted">No Actions</span>
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center alert">No pending admissions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+document.getElementById('pendingAdmissionSearch').addEventListener('input', function () {
+    const filter = this.value.trim().toLowerCase();
+    const rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll("td"));
+        const isEmptyRow = cells.length === 1 && cells[0].colSpan;
+
+        if (isEmptyRow) {
+            // Always hide the "no data" row unless nothing matches
+            row.style.display = 'none';
+            return;
+        }
+
+        // Check if any cell in this row matches the filter
+        const rowText = cells.map(cell => cell.textContent.toLowerCase()).join(" ");
+        row.style.display = rowText.includes(filter) ? '' : 'none';
+    });
+
+    // Show or hide the "no data" message row manually
+    const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+    const noDataRow = document.querySelector("table tbody tr td[colspan]");
+    if (noDataRow) {
+        noDataRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
+    }
+});
+</script>
+
+
+
+<!-- Snackbar Notification -->
+<div id="snackbar" class="snackbar"></div>
+
+<style>
+    .snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 8px;
+        padding: 12px 20px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 13px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: visibility 0s, opacity 0.3s ease-in-out;
+        opacity: 0;
+    }
+
+        .snackbar.show {
+            visibility: visible;
+            opacity: 1;
+        }
+</style>
+
+<script>
+    // Function to show snackbar
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.classList.add("show");
+        setTimeout(() => {
+            snackbar.classList.remove("show");
+        }, 3000);
+    }
+
+    // Example: You can trigger it manually from the backend
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock %}

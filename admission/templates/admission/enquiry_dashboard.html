@@ -1,0 +1,358 @@
+{% extends 'layout.html' %}
+{% block title %}Student Enquiry Management {% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold  mb-7">Student Enquiry Management</h2>
+
+    <!-- Filter Dropdown -->
+    <!--<div class="mb-4 d-flex justify-content-end">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary px-4 py-2 dropdown-toggle" style="font-size: 10px; width: 100%; background: #800000;" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-funnel"></i> Filter
+            </button>
+            <ul class="dropdown-menu" style=" width: 100%;     font-size: 10px;" aria-labelledby="filterDropdown">
+                <li><a class="dropdown-item {% if active_filter == 'day' %}active{% endif %}" href="?filter=day">Per Day</a></li>
+                <li><a class="dropdown-item {% if active_filter == 'week' %}active{% endif %}" href="?filter=week">Per Week</a></li>
+                <li><a class="dropdown-item {% if active_filter == 'month' %}active{% endif %}" href="?filter=month">Per Month</a></li>
+                <li><a class="dropdown-item {% if active_filter == 'all' %}active{% endif %}" href="?filter=all">All</a></li>
+            </ul>
+        </div>
+    </div>-->
+    <!-- Dashboard Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'enquiry_list1' %}" style="text-decoration: none; color: inherit;">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Total Enquiries <i class="bi bi-telephone icon-font"></i></h6>
+                        <h3 class="fw-bold">{{ total_enquiries }}</h3>
+                        <h6 class="text-mute">
+                            This Month
+                        </h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'converted_enquiry_list' %}" style="text-decoration: none; color: inherit;">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Converted <i class="bi bi-file-earmark-text icon-font"></i></h6>
+                        <h3 class="fw-bold">{{ total_converted_enquiries }}</h3>
+                        <h6 class="text-mute">{{ conversion_rate }}% conversion rate</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'followups_due_list' %}" style="text-decoration: none; color: inherit;">
+                <div class="card shadow-sm border-0  h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Follow-ups Due <i class="bi bi-calendar-event icon-font"></i></h6>
+                        <h3 class="fw-bold">{{ followups_due }}</h3>
+
+                        <h6 class="text-mute">This week</h6>
+
+
+
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'pending_followups_list' %}" style="text-decoration: none; color: inherit;">
+                <div class="card shadow-sm border-0  h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Pending Follow-up <i class="bi bi-envelope icon-font"></i></h6>
+                        <h3 class="fw-bold">{{ pending_followups }}</h3>
+                        <h6 class="text-mute">Requires attention</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-wrap gap-3 mb-4">
+        <div class="d-flex flex-column align-items-start position-relative">
+            {% if form_permissions.enquiry_form.add %}
+            <button id="toggle-applications" class="btn btn-maroon px-4 py-3">
+                <i class="bi bi-journal-text me-2"></i> Add Enquiry
+            </button>
+            <div id="application-buttons" class="d-none flex-column custom-dropdown">
+                <a href="{% url 'enquiry_form_add' %}" class="btn btn-maroon px-4 py-3">
+                    <i class="bi bi-file-earmark-text me-2"></i> PU Course Enquiry
+                </a>
+                <a href="{% url 'degree_enquiry_add' %}" class="btn btn-maroon px-4 py-3">
+                    <i class="bi bi-journal-plus me-2"></i> Degree Course Enquiry
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <a href="{% url 'enquiry_list' %}" class="btn btn-maroon px-4 py-3">
+                <i class="bi bi-card-list me-2"></i> Enquiries Repository
+            </a>
+        </div>
+
+        <div>
+            {% if form_permissions.schedule_follow_up_form.add %}
+            <a href="{% url 'schedule_follow_up_form_add' %}" class="btn btn-maroon px-4 py-3">
+                <i class="bi bi-calendar-event me-2"></i> Schedule Follow-Up
+            </a>
+            {% endif %}
+        </div>
+
+        <div>
+            <a href="{% url 'follow_up_list' %}" class="btn btn-maroon px-4 py-3">
+                <i class="fas fa-history me-2"></i> Follow-up History
+            </a>
+        </div>
+    </div>
+
+    <!-- Loaded content -->
+    <div id="form-container"></div>
+</div>
+
+<!-- JS & CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".load-form").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const url = this.dataset.url;
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById("form-container").innerHTML = html;
+                        document.getElementById("application-buttons").classList.add("d-none");
+                    })
+                    .catch(error => {
+                        console.error("Error loading form:", error);
+                        document.getElementById("form-container").innerHTML =
+                            "<div class='alert alert-danger'>Failed to load form.</div>";
+                    });
+            });
+        });
+
+        const appBtn = document.getElementById("toggle-applications");
+        const appSection = document.getElementById("application-buttons");
+
+        appBtn.addEventListener("click", function () {
+            const isOpen = !appSection.classList.contains("d-none");
+            appSection.classList.toggle("d-none", isOpen);
+        });
+    });
+</script>
+
+<!-- STYLES -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f8f8;
+    }
+
+
+    .btn {
+        min-width: 178px;
+        font-weight: 600;
+        padding: 12px;
+        font-size: 9px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .fw-bold {
+        color: #800000;
+        font-size: 28px;
+    }
+
+    .btn-maroon {
+        color: #800000;
+        border: 2px solid #800000;
+        background-color: transparent;
+    }
+
+        .btn-maroon:hover {
+            background-color: #800000;
+            color: #fff;
+        }
+
+    .text-muted {
+        color: #8b0000 !important;
+        text-align: center;
+    }
+
+    .text-mute {
+        color: #373b3e !important;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .mb-7 {
+        margin-bottom: 21px !important;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .icon-font {
+        margin-left: 10px;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .custom-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background-color: #fff;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .px-4 {
+        padding-right: 1.5rem !important;
+        padding-left: 0.5rem 8px !important;
+    }
+
+    .py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    .gap-3 {
+        gap: 5rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 21px !important;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .py-5 {
+        padding-top: 0rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .mt-5 {
+        margin-top: 0rem !important;
+        margin-left: -111px;
+        text-align: center;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem !important;
+        margin-left: -60px;
+    }
+
+    caption {
+        font-size: 16px;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    th {
+        background-color: #6c7ae0;
+        color: #fff;
+        border: 1px solid #dee2e6;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    td {
+        padding: 1px 7px;
+        border: 1px solid #ddd;
+        text-align: center;
+        font-size: 9px;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            color: #8b0000;
+        }
+
+    #form-container {
+        margin-top: -25px;
+        background-color: #f8f9fa;
+        border-radius: 9px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .btn.show {
+        color: var(--bs-btn-active-color);
+        background-color: #800000;
+        border-color: #800000;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #form-container form label {
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    #form-container form input,
+    #form-container form select,
+    #form-container form textarea {
+        margin-bottom: 0px;
+        padding: 2px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    #form-container form button[type="submit"] {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: .0px .1px;
+        background-color: var(--bs-table-bg);
+        border-bottom-width: var(--bs-border-width);
+    }
+
+    .dropdown-item.active {
+        color: var(--bs-dropdown-link-active-color);
+        text-decoration: none;
+        background-color: #800000;
+    }
+</style>
+{% endblock %}

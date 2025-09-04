@@ -1,0 +1,259 @@
+{% extends 'layout.html' %}
+
+{% block title %}Employee Attendance Records Entry{% endblock %}
+
+{% block content %}
+<div style="width: 100vw; padding: 2rem;">
+    <div class="form-card mx-auto" style="width: 65%; max-width: 100%;">
+        <div class="form-title">
+            {% if mode == 'edit' %}
+            Edit Employee Attendance Records Entry
+            {% elif mode == 'view' %}
+            View Employee Attendance Records Entry
+            {% else %}
+            Add Employee Attendance Records Entry
+            {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <!-- Employee Field -->
+                <div class="form-group">
+                    {{ form.employee.label_tag }}
+                    {% if mode == 'view' %}
+                    <input type="text" readonly value="{{ attendance.employee.name }}">
+                    {% else %}
+                    {{ form.employee }}
+                    {% endif %}
+                </div>
+
+                <!-- Employee Code Auto-filled -->
+                <div class="form-group">
+                    <label for="emp_code">Employee ID</label>
+                    <input type="text" id="emp_code" readonly placeholder="Auto-filled"
+                           {% if attendance and attendance.employee %}
+                           value="{{ attendance.employee.emp_code }}"
+                           {% else %}
+                           value=""
+                           {% endif %}>
+                </div>
+
+                <!-- Date -->
+                <div class="form-group">
+                    {{ form.date.label_tag }}
+                    {% if mode == 'view' %}
+                    <input type="date" readonly value="{{ attendance.date|date:'Y-m-d' }}">
+                    {% else %}
+                    {{ form.date }}
+                    {% endif %}
+                </div>
+
+                <!-- Check-in -->
+                <div class="form-group" id="check_in_group">
+                    {{ form.check_in.label_tag }}
+                    {% if mode == 'view' %}
+                    <input type="time" readonly value="{{ attendance.check_in|time:'H:i' }}">
+                    {% else %}
+                    {{ form.check_in }}
+                    {% endif %}
+                </div>
+
+                <!-- Check-out -->
+                <div class="form-group">
+                    {{ form.check_out.label_tag }}
+                    {% if mode == 'view' %}
+                    <input type="time" readonly value="{{ attendance.check_out|time:'H:i' }}">
+                    {% else %}
+                    {{ form.check_out }}
+                    {% endif %}
+                </div>
+
+                <!-- LOP Checkbox -->
+                <div class="form-group">
+                    <label for="id_lop">Loss of Pay</label>
+                    {% if mode == 'view' %}
+                    <input type="checkbox" disabled {% if attendance.lop %}checked{% endif %}>
+                    {% else %}
+                    {{ form.lop }}
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'employee_attendance_list' %}" class="btn-back-link">Back</a>
+
+                {% if mode != 'view' %}
+                <button type="submit" class="btn">
+                    {% if mode == 'edit' %}Update{% else %}Submit{% endif %}
+                </button>
+                {% endif %}
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .form-card {
+        background: #fff;
+        padding: 40px 50px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 30px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px 30px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+    .form-actions {
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background-color: #800000;
+        color: white;
+    }
+
+    .btn-back-link {
+        background-color: #800000;
+        color: #fff;
+        border: 1px solid #800000;
+        text-decoration: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
+    }
+
+        .btn-back-link:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .alert {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #f5c6cb;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<script>
+    function fetchEmployeeCode() {
+        const select = document.getElementById("id_employee");
+        const empId = select.value;
+        if (!empId) {
+            document.getElementById("emp_code").value = "";
+            return;
+        }
+        fetch(`/api/employee/${empId}/`)
+            .then(resp => resp.json())
+            .then(data => { document.getElementById("emp_code").value = data.emp_code || ""; });
+    }
+
+    function toggleCheckIn() {
+        const lopCheckbox = document.getElementById("id_lop");
+        const checkInGroup = document.getElementById("check_in_group");
+        if (lopCheckbox.checked) {
+            checkInGroup.style.display = "none";
+            const input = checkInGroup.querySelector("input");
+            if (input) input.required = false;
+        } else {
+            checkInGroup.style.display = "flex";
+            const input = checkInGroup.querySelector("input");
+            if (input) input.required = true;
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", function () {
+        const employeeSelect = document.getElementById("id_employee");
+        if (employeeSelect && employeeSelect.value) fetchEmployeeCode();
+        if (employeeSelect) employeeSelect.addEventListener("change", fetchEmployeeCode);
+
+        const lopCheckbox = document.getElementById("id_lop");
+        if (lopCheckbox) {
+            toggleCheckIn(); // initial toggle
+            lopCheckbox.addEventListener("change", toggleCheckIn);
+        }
+
+        const dateInput = document.getElementById("id_date");
+        const now = new Date();
+        const today = now.toISOString().slice(0, 10);
+        const currentTime = now.toTimeString().slice(0, 5);
+        const checkInInput = document.getElementById("id_check_in");
+        const checkOutInput = document.getElementById("id_check_out");
+
+        if (dateInput) {
+            dateInput.max = today;
+            dateInput.addEventListener("change", () => {
+                const selectedDate = dateInput.value;
+                if (selectedDate === today) {
+                    if (checkInInput) checkInInput.max = currentTime;
+                    if (checkOutInput) checkOutInput.max = currentTime;
+                } else {
+                    if (checkInInput) checkInInput.removeAttribute("max");
+                    if (checkOutInput) checkOutInput.removeAttribute("max");
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

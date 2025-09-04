@@ -1,0 +1,306 @@
+{% extends 'layout.html' %}
+{% block title %}Batch List{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px;
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .btn-add {
+        position: absolute;
+        right: 0;
+        background-color: #800000;
+        color: #fff;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-add:hover {
+            background-color: #a10000;
+        }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 1px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+   /* tr:hover {
+        background-color: #e9ecef;
+    }*/
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .alert {
+        color: #800000;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 10px 0;
+        text-align: center;
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 29px 24px 40px;
+        min-height: 100vh;
+    }
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og=="
+      crossorigin="anonymous" />
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <h2>Batch List</h2>
+        <a href="{% url 'academic_year_add' %}" class="btn-add">
+            <i class="fas fa-plus me-2"></i> Add Batch
+        </a>
+    </div>
+
+    {% if years %}
+    <table>
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year in years %}
+            <tr>
+                <td>{{ year.year }}</td>
+                <td>{{ year.is_active }}</td>
+                <td>
+                    <a href="{% url 'academic_year_edit' year.pk %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form id="academic-year-delete-form-{{ year.pk }}" method="POST" action="{% url 'academic_year_delete' year.pk %}" style="display: none;">{% csrf_token %}</form>
+                    <a href="#" class="icon-btn text-danger" title="Delete"
+                       onclick="confirmYearDelete('{{ year.pk }}', '{{ year.year }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert">No Batches found.</div>
+    {% endif %}
+</div>
+
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<div id="snackbar"></div>
+
+<script>
+    let deleteYearId = null;
+
+    function confirmYearDelete(id, year) {
+        deleteYearId = id;
+        document.getElementById('confirm-popup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${year}</b>?`;
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+        if (deleteYearId) {
+            document.getElementById(`academic-year-delete-form-${deleteYearId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+        document.getElementById('confirm-popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        deleteYearId = null;
+    });
+
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    // Django messages support
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock %}

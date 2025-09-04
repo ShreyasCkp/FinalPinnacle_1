@@ -1,0 +1,192 @@
+{% extends 'layout.html' %}
+{% block title %}Holiday Calendar{% endblock %}
+
+{% block content %}
+<style>
+    /* Using the same styles from your Batch List */
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        margin-left: 200px;
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .btn-add {
+        position: absolute;
+        right: 0;
+        background-color: #800000;
+        color: #fff;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-add:hover {
+            background-color: #a10000;
+        }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .alert {
+        color: #800000;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 10px 0;
+        text-align: center;
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 28px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <h2>Holiday Calendar</h2>
+        <a href="{% url 'holiday_create' %}" class="btn-add">
+            <i class="fas fa-plus"></i> Add Holiday
+        </a>
+    </div>
+
+    {% if holidays %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Working Day?</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for holiday in holidays %}
+            <tr>
+                <td>{{ holiday.name }}</td>
+                <td>{{ holiday.date }}</td>
+                <td>{{ holiday.holiday_type }}</td>
+                <td>{{ holiday.is_working_day|yesno:"Yes,No" }}</td>
+                <td>
+                    <a href="{% url 'holiday_edit' holiday.pk %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form id="holiday-delete-form-{{ holiday.pk }}" method="POST" action="{% url 'holiday_delete' holiday.pk %}" style="display:none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" class="icon-btn text-danger" title="Delete"
+                       onclick="confirmHolidayDelete('{{ holiday.pk }}', '{{ holiday.name }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert">No holidays found.</div>
+    {% endif %}
+</div>
+
+<div id="overlay" style="display:none;"></div>
+<div id="confirm-popup" style="display:none; text-align:center; background:#fff; padding:20px; border-radius:8px;">
+    <p id="confirm-popup-message"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<script>
+    let deleteHolidayId = null;
+
+    function confirmHolidayDelete(id, name) {
+        deleteHolidayId = id;
+        document.getElementById('confirm-popup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+        if (deleteHolidayId) {
+            document.getElementById(`holiday-delete-form-${deleteHolidayId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+        document.getElementById('confirm-popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        deleteHolidayId = null;
+    });
+</script>
+
+{% endblock %}

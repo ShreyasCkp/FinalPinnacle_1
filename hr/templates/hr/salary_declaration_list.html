@@ -1,0 +1,238 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block title %}Salary Declarations{% endblock %}
+{% block content %}
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px;
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .btn-add {
+        position: absolute;
+        right: 0;
+        background-color: #800000;
+        color: #fff;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-add:hover {
+            background-color: #a10000;
+        }
+
+    .search-form {
+        position: absolute;
+        left: 0;
+    }
+
+        .search-form input {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 200px;
+        }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 1px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+    }
+
+    td {
+        font-size: 10px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .content {
+        margin-left: 0px;
+        padding: 27px 20px 39px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <div class="search-form">
+            <input type="text" id="salarySearch" placeholder="Search declarations...">
+        </div>
+        <h2>Salary Declarations</h2>
+        <a href="{% url 'salary_declaration_create' %}" class="btn-add">
+            <i class="bi bi-plus-lg me-2"></i> Add New Declaration
+        </a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Emp Code</th>
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Employment Type</th>
+                <th>Category</th>
+                <th>Role</th>
+                <th>Basic Salary</th>
+                <th>HRA</th>
+                <th>Special Allowance</th>
+                <th>Total Earnings</th>
+                <th>PF</th>
+                <th>Professional Tax</th>
+                <th>LWF</th>
+                <th>Income Tax</th>
+                <th>Total Deductions</th>
+                <th>Net Pay</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dec in declarations %}
+            <tr>
+                <td>{{ dec.emp_code }}</td>
+                <td>{{ dec.name }}</td>
+                <td>{{ dec.designation }}</td>
+                <td>{{ dec.employment_type }}</td>
+                <td>{{ dec.category }}</td>
+                <td>{{ dec.role }}</td>
+                <td>{{ dec.basic_salary }}</td>
+                <td>{{ dec.hra }}</td>
+                <td>{{ dec.special_allowance }}</td>
+                <td>{{ dec.basic_salary|add:dec.hra|add:dec.special_allowance }}</td>
+                <td>{{ dec.pf_contribution }}</td>
+                <td>{{ dec.professional_tax }}</td>
+                <td>{{ dec.lwf_contribution }}</td>
+                <td>{{ dec.income_tax }}</td>
+                <td>{{ dec.total_deductions }}</td>
+                <td>{{ dec.net_pay }}</td>
+                <td>
+                    <a href="{% url 'view_payslip' dec.pk %}" class="icon-btn" title="View Payslip">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{% url 'salary_declaration_edit' dec.pk %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% if dec.payslip_url %}
+                    <a href="{% url 'download_payslip' dec.pk %}" class="icon-btn" title="Download Payslip">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    {% else %}
+                    <span class="text-muted">No Payslip</span>
+                    {% endif %}
+                    <form action="{% url 'salary_declaration_delete' dec.pk %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="icon-btn text-danger" onclick="return confirm('Are you sure you want to delete this declaration?');">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="17" class="text-center text-muted">No salary declarations found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById('salarySearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            const cells = Array.from(row.querySelectorAll("td"));
+            const isEmptyRow = cells.length === 1 && cells[0].colSpan;
+
+            if (isEmptyRow) {
+                row.style.display = 'none';
+                return;
+            }
+
+            const rowText = cells.map(cell => cell.textContent.toLowerCase()).join(" ");
+            row.style.display = rowText.includes(filter) ? '' : 'none';
+        });
+
+        const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+        const noDataRow = document.querySelector("table tbody tr td[colspan]");
+        if (noDataRow) {
+            noDataRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
+        }
+    });
+</script>
+
+{% endblock %}

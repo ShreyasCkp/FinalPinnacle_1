@@ -1,0 +1,199 @@
+{% extends 'lms/employee_layout.html' %}
+{% block title %}
+    {% if borrow_record.returned %}
+        Book Returned
+    {% else %}
+        Return Book
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        margin-left: 200px;
+        max-width: calc(100% - 200px);
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-top: 40px;
+        box-sizing: border-box;
+    }
+
+    .page-title {
+        text-align: center;
+        color: #800000;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 30px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
+
+    th, td {
+        padding: 10px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #800000;
+        color: white;
+        font-weight: 600;
+        width: 200px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .status-returned {
+        color: green;
+        font-weight: bold;
+    }
+
+    .status-pending {
+        color: #800000;
+        font-weight: bold;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .btn-action {
+        background-color: #800000;
+        color: #fff;
+        font-size: 14px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-action:hover {
+            background-color: #a10000;
+        }
+
+    .not-returned {
+        color: #a10000;
+        font-weight: bold;
+    }
+
+    .btn-group-outer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .left-btn,
+    .right-btn {
+        display: flex;
+    }
+
+    .left-btn {
+        justify-content: flex-start;
+    }
+
+    .right-btn {
+        justify-content: flex-end;
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 0px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="container">
+    <h2 class="page-title">
+        {% if borrow_record.returned %}
+        Book Returned
+        {% else %}
+        Return Book
+        {% endif %}
+    </h2>
+
+    <table>
+        <tr>
+            <th>Admission No:</th>
+            <td>{{ borrow_record.student.get_admission_no }}</td>
+        </tr>
+        <tr>
+            <th>Student Name:</th>
+            <td>{{ borrow_record.student.student_name }}</td>
+        </tr>
+        <tr>
+            <th>Course:</th>
+            <td>{{ borrow_record.student.course }}</td>
+        </tr>
+        <tr>
+            <th>Course Type:</th>
+            <td>{{ borrow_record.student.course_type }}</td>
+        </tr>
+        <tr>
+            <th>Book Title:</th>
+            <td>{{ borrow_record.book.title }}</td>
+        </tr>
+        <tr>
+            <th>Borrow Date:</th>
+            <td>{{ borrow_record.borrow_date }}</td>
+        </tr>
+        <tr>
+            <th>Due Date:</th>
+            <td>{{ borrow_record.return_due_date }}</td>
+        </tr>
+        <tr>
+            <th>Return Date:</th>
+            <td>
+                {% if borrow_record.return_date %}
+                {{ borrow_record.return_date }}
+                {% else %}
+                <span class="not-returned">Not Returned Yet</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Status:</th>
+            <td>
+                {% if borrow_record.returned %}
+                <span class="status-returned">Returned</span>
+                {% else %}
+                <span class="status-pending">Pending</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <div class="btn-group-outer">
+        <a href="{% url 'book_list' %}" class="btn-action left-btn">Back to Library Books</a>
+
+        {% if not borrow_record.returned %}
+        <form method="post" class="right-btn">
+            {% csrf_token %}
+            <button type="submit" class="btn-action">Mark as Returned</button>
+        </form>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

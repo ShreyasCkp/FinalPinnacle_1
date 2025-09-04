@@ -1,0 +1,616 @@
+﻿﻿{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Pinnacle School of Commerce and Management{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Reset and base font styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif !important;
+            font-size: 14px !important;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed; /* stay in place */
+            top: 0; /* align with top */
+            left: 0; /* stick to left edge */
+            width: 200px; /* or your current sidebar width */
+            height: 100vh; /* full height of screen */
+            overflow-y: auto; /* vertical scroll */
+            overflow-x: hidden; /* hide horizontal scroll */
+            background: #800000; /* keep your maroon color */
+            z-index: 1000;
+        }
+
+            .sidebar::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .sidebar::-webkit-scrollbar-thumb {
+                background-color: rgba(255, 255, 255, 0.4);
+                border-radius: 4px;
+            }
+
+        /*.main-content {
+            margin-left: 250px;*/ /* match sidebar width */
+        /*}*/
+
+
+        .sidebar-title {
+            padding: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+            .sidebar-title img {
+                width: 100%;
+                height: auto;
+                object-fit: contain;
+                display: block;
+            }
+
+
+        strong {
+            font-weight: 600;
+        }
+
+        .sidebar a,
+        .sidebar .dropdown-btn,
+        .sidebar .dropdown-container a {
+            font-size: 13.5px !important;
+            color: #fff !important;
+            text-decoration: none;
+            padding: 10px 12px !important;
+            display: flex !important;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500 !important;
+            background-color: #800000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+            .sidebar a i,
+            .sidebar .dropdown-btn i,
+            .sidebar .dropdown-container a i {
+                font-size: 15px !important;
+                width: 18px;
+            }
+
+            .sidebar a:hover,
+            .sidebar .dropdown-btn:hover,
+            .sidebar .dropdown-container a:hover {
+                background-color: #a50000;
+                border-left: 3px solid #fff;
+            }
+
+            /* Active menu item styles */
+            .sidebar a.active,
+            .sidebar .dropdown-btn.active,
+            .sidebar .dropdown-container a.active {
+                background-color: #a50000 !important;
+                border-left: 3px solid #fff !important;
+                color: #fff !important;
+                font-weight: 600 !important;
+            }
+
+                .sidebar a.active i,
+                .sidebar .dropdown-btn.active i,
+                .sidebar .dropdown-container a.active i {
+                    color: #fff !important;
+                }
+
+        /* Dropdown container */
+        .dropdown-container {
+            display: none;
+            padding-left: 0;
+        }
+
+        .show {
+            display: block;
+        }
+
+        /* Topbar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 200px;
+            right: 0;
+            height: 52px;
+            background: linear-gradient(135deg, #8B0000, #800000);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 12px;
+            z-index: 998;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+            .topbar a {
+                color: white !important;
+                font-weight: 500 !important;
+                text-decoration: none;
+                font-size: 14px !important;
+            }
+
+                .topbar a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Content area */
+        .main-area,
+        .content {
+            margin-left: 200px;
+            padding: 80px 26px 40px;
+            min-height: 100vh;
+        }
+
+        /* Footer */
+        .footer {
+            margin-left: 200px;
+            color: #8b0000;
+            text-align: center;
+            padding: 10px 0;
+            font-weight: 500;
+            margin-top: 50px;
+        }
+
+        /* Search suggestions */
+        #suggestions {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+            display: none;
+            position: absolute;
+            width: 100%;
+            z-index: 1000;
+        }
+
+            #suggestions div {
+                padding: 6px 10px;
+                cursor: pointer;
+            }
+
+                #suggestions div:hover,
+                #suggestions .active {
+                    background-color: #800000;
+                    color: white;
+                }
+
+        /* User dropdown */
+        #user-popup {
+            position: absolute;
+            top: 43px;
+            right: 0;
+            background: white;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 220px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 15px;
+            z-index: 1000;
+            text-align: center;
+            display: none;
+        }
+
+            #user-popup i {
+                font-size: 13px;
+                color: #ffffff;
+                margin-bottom: 10px;
+            }
+
+            #user-popup p {
+                margin: 0;
+                font-size: 15px;
+                color: #800000;
+            }
+
+            #user-popup a {
+                background: #800000;
+                color: white;
+                padding: 2px 8px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-size: 14px;
+                display: inline-block;
+                margin-top: 12px;
+            }
+
+        #sidebar-search {
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: none;
+            font-size: 13px;
+            color: #800000;
+            outline: none;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background: #121212;
+            color: #eee;
+        }
+
+            body.dark-mode .sidebar {
+                background: #2c2c2c;
+            }
+
+            body.dark-mode .topbar {
+                background: #1e1e1e;
+            }
+
+            body.dark-mode .sidebar a,
+            body.dark-mode .sidebar .dropdown-btn,
+            body.dark-mode .sidebar .dropdown-container a {
+                color: #ddd !important;
+            }
+
+                body.dark-mode .sidebar a:hover {
+                    background-color: #444;
+                }
+
+                body.dark-mode .sidebar a.active,
+                body.dark-mode .sidebar .dropdown-btn.active,
+                body.dark-mode .sidebar .dropdown-container a.active {
+                    background-color: #555 !important;
+                    border-left: 3px solid #fff !important;
+                }
+
+            body.dark-mode #user-popup {
+                background: #2c2c2c;
+                color: #fff;
+                border-color: #555;
+            }
+
+            body.dark-mode input,
+            body.dark-mode textarea,
+            body.dark-mode select {
+                background: #333;
+                color: #fff;
+                border: 1px solid #555;
+            }
+
+            body.dark-mode #suggestions div {
+                background: #2c2c2c;
+                color: #eee;
+            }
+
+            body.dark-mode .sidebar {
+                background: #1f1f1f;
+            }
+
+                body.dark-mode .sidebar a,
+                body.dark-mode .sidebar .dropdown-btn,
+                body.dark-mode .sidebar .dropdown-container a {
+                    background-color: #1f1f1f !important;
+                    color: #ddd !important;
+                }
+
+                    body.dark-mode .sidebar a:hover,
+                    body.dark-mode .sidebar .dropdown-btn:hover,
+                    body.dark-mode .sidebar .dropdown-container a:hover {
+                        background-color: #333 !important;
+                    }
+
+            body.dark-mode .sidebar-title {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+                body.dark-mode .sidebar-title img {
+                    filter: brightness(0.8);
+                }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-title">
+            <img src="{% static 'image/logo.png' %}" alt="Logo">
+        </div>
+
+        {% if custom_user %}
+        {% with custom_user.username|lower as uname %}
+        {% if 'dean' in uname %}
+        <a href="{% url 'dashboard_view' %}" class="{% if 'dashboard_view' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+        </a>
+        {% elif 'academic director' in uname %}
+        <a href="{% url 'dashboard_view2' %}" class="{% if 'dashboard_view2' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+        </a>
+        {% elif 'front office' in uname %}
+        <a href="{% url 'dashboard_view3' %}" class="{% if 'dashboard_view3' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+        </a>
+        {% elif 'employee' in uname %}
+        <a href="{% url 'dashboard_view4' %}" class="{% if 'dashboard_view4' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+        </a>
+        {% endif %}
+
+        {% if 'dean' in uname or 'academic director' in uname %}
+        <a href="{% url 'user_list' %}" class="{% if 'user_list' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-user"></i> Roles
+        </a>
+        {% endif %}
+
+        {% if 'dean' in uname %}
+        <a href="{% url 'user_rights_view' custom_user.id %}" class="{% if 'user_rights_view' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-key"></i> Role Permissions
+        </a>
+        {% endif %}
+        {% endwith %}
+        {% endif %}
+
+
+        {% if form_permissions.course_type.add or form_permissions.course_form.add or form_permissions.semester_form.add or form_permissions.subject_form.add or form_permissions.transport_form.add %}
+        <a href="{% url 'master_dashboard' %}" class="{% if 'master' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-sliders-h"></i> Master
+        </a>
+        {% endif %}
+
+        {% if form_permissions.enquiry_form.add %}
+        <a href="{% url 'enquiry_dashboard' %}" class="{% if 'enquiry' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-question-circle"></i> Enquiry
+        </a>
+        {% endif %}
+
+        {% if form_permissions.degree_admission_form.add %}
+        <a href="{% url 'admission_dashboard' %}" class="{% if 'admission' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-user-plus"></i> Admission
+        </a>
+        {% endif %}
+
+        {% if form_permissions.fee_declaration.add %}
+        <a href="{% url 'fee_dashboard' %}">
+            <i class="fa-solid fa-wallet"></i> Fee
+        </a>
+        {% endif %}
+
+        {% if form_permissions.communication_dashboard.access %}
+        <a href="{% url 'communication_dashboard' %}" class="{% if 'communication' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-comments"></i> Communication
+        </a>
+        {% endif %}
+
+        <!--<a href="{% url 'transport_home' %}" class="{% if 'transport' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-bus"></i> Transport
+        </a>-->
+        {% if form_permissions.employee_form.add %}
+        <a href="{% url 'employee_dashboard' %}" class="{% if 'employee' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-users"></i> Employee
+        </a>
+        {% endif %}
+
+        {% if form_permissions.student_database.access %}
+        <a href="{% url 'student_database' %}" class="{% if 'student_database' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-database"></i>All Students Information
+        </a>
+        {% endif %}
+
+
+        {% if form_permissions.promotion_history.access %}
+        <a href="{% url 'promotion_history' %}" class="{% if 'promotion_history' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-arrow-up"></i> Promotion History
+        </a>
+        {% endif %}
+
+        {% if form_permissions.timetable_form.add %}
+        <a href="{% url 'timetable_dashboard' %}" class="{% if 'timetable' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-table-list"></i> Timetable
+        </a>
+        {% endif %}
+
+        {% if form_permissions.student_attendance_form.add or form_permissions.employee_attendance_form.add %}
+        <a href="{% url 'attendance_dashboard' %}" class="{% if 'attendance' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-user-check"></i> Attendance
+        </a>
+        {% endif %}
+
+        {% if form_permissions.calendar_form.access %}
+        <a href="{% url 'calendar_form' %}" class="{% if 'calendar' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-calendar-days"></i> Calendar
+        </a>
+        {% endif %}
+
+
+
+        <a href="{% url 'employee_leave_list' %}" class="{% if 'employee_leave_list' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-file-pen"></i> Leaves
+
+        </a>
+
+
+
+        <a href="{% url 'employee_salary_dashboard' %}" class="{% if 'employee_salary_dashboard' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-file-pen"></i> payroll
+
+        </a>
+
+
+
+        <a href="{% url 'salary_declaration_list' %}" class="{% if 'salary_declaration_list' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-file-pen"></i> Salary declaration
+
+        </a>
+
+        {% if form_permissions.recent_activity_view.access %}
+        <a href="{% url 'recent_activity_view' %}" class="{% if 'recent_activity' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-clock-rotate-left"></i> Recent Activities
+        </a>
+        {% endif %}
+
+
+    </div>
+
+    <div class="topbar">
+        <div style="font-size: large; font-weight: 700;">Pinnacle School of Commerce and Management</div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <!-- Search Bar -->
+            {% if custom_user and custom_user.id == 1 or custom_user.id == 2 %}
+            <div style="position: relative;">
+                <input id="sidebar-search" type="text" placeholder="Search modules or pages..." style="padding: 2px 4px; border-radius: 4px; border: none; color: #800000;" />
+                <div id="suggestions" style="position: absolute; top: 19px; left: 0px; background: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); width: 170px; max-height: 200px; overflow-y: auto; display: none; font-size: 10px; color: black;"></div>
+            </div>
+            {% endif %}
+
+            <!-- User Icon and Popup -->
+            <div style="position: relative;">
+                <i class="fas fa-user-circle" id="user-icon" style="font-size: 24px; cursor: pointer;"></i>
+                <div id="user-popup" style="display: none; position: absolute; top: 43px; right: 0; background: white; color: #333; border: 1px solid #ccc; border-radius: 8px; width: 220px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 15px; z-index: 1000; text-align: center;">
+                    <i class="fas fa-user-circle" style="font-size: 60px; color: #800000; display: block; margin: 0 auto 10px;"></i>
+                    <p style="margin: 0; font-size: 15px; color: #800000; font-weight: 600;"><strong>Username:</strong> {{custom_user.username }}</p>
+                    <a href="{% url 'logout' %}" style="background: #800000; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 7px;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="footer">
+        Designed and Developed by CKP Software Technologies &copy; 2025. All rights reserved.
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const userIcon = document.getElementById("user-icon");
+            const userPopup = document.getElementById("user-popup");
+
+            userIcon.addEventListener("click", function (e) {
+                e.stopPropagation();
+                const isVisible = userPopup.style.display === "block";
+                userPopup.style.display = isVisible ? "none" : "block";
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!userPopup.contains(e.target) && e.target.id !== "user-icon") {
+                    userPopup.style.display = "none";
+                }
+            });
+
+            // Dropdown functionality
+            document.querySelectorAll(".dropdown-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const content = btn.nextElementSibling;
+                    if (content.classList.contains("dropdown-container")) {
+                        content.classList.toggle("show");
+                    }
+                });
+            });
+
+            // Search functionality
+            const items = [
+                { label: 'Dashboard', url: '{% url "dashboard_view" %}' },
+                { label: 'Master', url: '{% url "master_dashboard" %}' },
+                { label: 'User', url: '{% url "user_list" %}' },
+
+                { label: 'Enquiry', url: '{% url "enquiry_dashboard" %}' },
+                { label: 'Admission', url: '{% url "admission_dashboard" %}' },
+                { label: 'Communication', url: '{% url "upload_excel" %}' },
+                { label: 'Employee', url: '{% url "employee_dashboard" %}' },
+                { label: 'Attendance', url: '{% url "attendance_dashboard" %}' },
+                { label: 'Timetable', url: '{% url "timetable_dashboard" %}' },
+                { label: 'All Students Information', url: '{% url "student_database" %}' },
+                { label: 'Promotion History', url: '{% url "promotion_history" %}' },
+
+                { label: 'PU Application Form', url: '{% url "admission_form" %}' },
+                { label: 'BCOM Application Form', url: '{% url "degree_admission_form" %}' },
+                { label: 'PU Application List', url: '{% url "admission_list" %}' },
+                { label: 'BCOM Application List', url: '{% url "degree_admission_list" %}' },
+                { label: 'Pending Admissions', url: '{% url "pending_admissions" %}' },
+                { label: 'Confirmed Admissions', url: '{% url "confirmed_admissions" %}' },
+                { label: 'Reports', url: '{% url "reports" %}' },
+                { label: 'Enquiries Repository', url: '{% url "enquiry_list" %}' },
+                { label: 'Follow-up History', url: '{% url "follow_up_list" %}' },
+                { label: 'Attendance Reports', url: '{% url "attendance_report" %}' },
+                { label: 'Attendance Settings', url: '{% url "attendance_settings_view" %}' },
+                { label: 'Program Types', url: '{% url "course_type_list" %}' },
+                { label: 'Transport', url: '{% url "transport_form_list" %}' },
+                { label: 'Weekly Timetable', url: '{% url "weekly_timetable" course_id=1 semester_number=1 %}' },
+                { label: 'Faculty View', url: '{% url "faculty_classes_table" %}' }
+            ];
+
+            const searchInput = document.getElementById('sidebar-search');
+            const suggestionsBox = document.getElementById('suggestions');
+            let filtered = [];
+            let selectedIndex = -1;
+
+            function updateSuggestions() {
+                suggestionsBox.innerHTML = '';
+                filtered.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.textContent = item.label;
+                    div.style.padding = '4px 8px';
+                    div.style.cursor = 'pointer';
+                    div.style.backgroundColor = selectedIndex === index ? '#800000' : '';
+                    div.style.color = selectedIndex === index ? 'white' : 'black';
+                    if (selectedIndex === index) {
+                        setTimeout(() => div.scrollIntoView({ block: 'nearest' }), 0);
+                    }
+                    div.addEventListener('click', () => window.location.href = item.url);
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = filtered.length ? 'block' : 'none';
+            }
+
+            searchInput.addEventListener('input', () => {
+                const q = searchInput.value.trim().toLowerCase();
+                selectedIndex = -1;
+                filtered = items.filter(i => i.label.toLowerCase().includes(q));
+                updateSuggestions();
+            });
+
+            searchInput.addEventListener('keydown', e => {
+                if (filtered.length === 0) return;
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = (selectedIndex + 1) % filtered.length;
+                    updateSuggestions();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
+                    updateSuggestions();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (selectedIndex >= 0) {
+                        window.location.href = filtered[selectedIndex].url;
+                    } else if (filtered.length > 0) {
+                        window.location.href = filtered[0].url;
+                    }
+                }
+            });
+
+            document.addEventListener('click', e => {
+                if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+﻿{% extends 'layout.html' %}
+{% block title %}Campus Attendance{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-7">Campus Attendance Management</h2>
+
+   
+    <!-- Dashboard Summary Cards -->
+    <div class="row mb-5">
+        <!-- Overall Attendance Rate -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted"> Today's Attendace <i class="fas fa-calendar-check"></i></h6>
+                    <h3 class="fw-bold">{{ overall_attendance_rate }}%</h3>
+                    <h4 class="text">Overall attendance rate</h4>
+                    <p class="mb-1 text-muted" style="font-size: 12px;">
+                        Students: <strong class="text-dark">{{ student_attendance_rate }}%</strong>
+                    </p>
+                    <p class="mb-1 text-muted" style="font-size: 12px;">
+                        Staff: <strong class="text-dark">{{ staff_attendance_rate }}%</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Students Present -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Students Present <i class="fas fa-users"></i></h6>
+                    <h3 class="fw-bold">{{ student_present }}</h3>
+                    <h4 class="text">Out of {{ total_students }} Students</h4>
+                </div>
+            </div>
+        </div>
+        <!-- Students Absent -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Students Absent <i class="fas fa-users"></i></h6>
+                    <h3 class="fw-bold">{{ student_absent }}</h3>
+                    <h4 class="text">Out of {{ total_students }} Students</h4>
+                </div>
+            </div>
+        </div>
+        <!-- Employees Present -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Employees Present <i class="fas fa-users"></i></h6>
+                    <h3 class="fw-bold">{{ staff_present }}</h3>
+                    <h4 class="text">Out of {{ total_staff }} employees</h4>
+                </div>
+            </div>
+        </div>
+        <!-- Late Arrivals -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Late Arrivals <i class="fas fa-clock"></i></h6>
+                    <h3 class="fw-bold">{{ total_late }}</h3>
+                    <h4 class="text">Out of {{ total_staff }} employees</h4>
+                </div>
+            </div>
+        </div>
+        <!-- Employees Absent -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Employees Absent <i class="fas fa-users"></i></h6>
+                    <h3 class="fw-bold">{{ staff_absent }}</h3>
+                    <h4 class="text">Out of {{ total_staff }} employees</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-wrap gap-3 mb-4">
+       
+        {% if form_permissions.employee_attendance_form.add %}
+        <div><a href="{% url 'employee_attendance_list' %}" class="btn btn-maroon px-4 py-3"><i class="bi bi-card-list me-2"></i> Employee Attendance</a></div>
+        <div><a href="{% url 'attendance_report' %}" class="btn btn-maroon px-4 py-3"><i class="bi bi-card-list me-2"></i> Reports</a></div>
+        <div><a href="{% url 'attendance_settings_view' %}" class="btn btn-maroon px-4 py-3"><i class="bi bi-card-list me-2"></i> Settings</a></div>
+        {% endif %}
+    </div>
+
+    <!-- Low Attendance Alert -->
+    {% if low_attendance_students %}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-danger">📢 Low Attendance Alert</h5>
+            <p class="text-muted">Students with <strong>less than 75%</strong> attendance:</p>
+            <ul class="list-group list-group-flush">
+                {% for student in low_attendance_students %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ student.name }} (Roll No: {{ student.roll_no }})
+                    <span class="badge bg-danger rounded-pill">{{ student.percentage }}%</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Bootstrap CSS & Icons, same as your original -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Original style block preserved fully -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f8f8;
+        padding: 0;
+    }
+
+    .btn {
+        min-width: 178px;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+        padding: 12px;
+        font-size: 9px;
+    }
+
+    .fw-bold {
+        color: #800000;
+        font-size: 28px;
+    }
+
+    .btn-maroon {
+        color: #800000;
+        border: 2px solid #800000;
+        background-color: transparent;
+    }
+
+        .btn-maroon:hover {
+            background-color: #800000;
+            color: #fff;
+        }
+
+    .text-muted {
+        --bs-text-opacity: 1;
+        color: #8b0000 !important;
+        text-align: center;
+    }
+
+    .text {
+        --bs-text-opacity: 1;
+        color: #6c757d !important;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .mb-7 {
+        margin-bottom: 21px !important;
+        font-size: 25px;
+        text-align: center;
+        margin-top: -43px;
+        /* margin-left: -90px; */
+    }
+
+    h2 {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    /*.card h3 {
+                font-size: 28px;
+                color: #800000;
+            }*/
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .custom-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background-color: #fff;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    .gap-3 {
+        gap: 2rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 21px !important;
+        font-size: 14px;
+        text-align: center;
+        /* margin-left: -90px; */
+    }
+
+    .flex-wrap {
+        flex-wrap: wrap !important;
+    }
+
+    .py-5 {
+        padding-top: 2rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .mt-5 {
+        margin-top: 0rem !important;
+        margin-left: -111px;
+        text-align: center;
+        /* font-size: 12px; */
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem !important;
+        margin-left: -60px;
+    }
+
+    caption {
+        padding-top: .5rem;
+        padding-bottom: .5rem;
+        color: #6c757d;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    th {
+        background-color: #6c7ae0;
+        color: #fff;
+        border: 1px solid #dee2e6;
+        padding: 1px;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .card h3 {
+        font-size: 20px;
+        color: #8b0000;
+    }
+
+    td {
+        padding: 1px 7px;
+        border: 1px solid #ddd;
+        text-align: center;
+        font-size: 9px;
+    }
+
+    #form-container {
+        margin-top: -25px;
+        background-color: #f8f9fa;
+        border-radius: 9px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        animation: fadeIn 0.3s ease-in-out;
+        margin-left: 0;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+    /* .card h3 {
+                    font-size: 28px;
+                    color: #343a40;
+                }*/
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #form-container form label {
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    #form-container form input,
+    #form-container form select,
+    #form-container form textarea {
+        margin-bottom: 0px;
+        padding: 2px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    .form-card {
+        background: #fff;
+        padding: 0px 6px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    #form-container form button[type="submit"] {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: .0px .1px;
+        color: var(--bs-table-color-state, var(--bs-table-color-type, var(--bs-table-color)));
+        background-color: var(--bs-table-bg);
+        border-bottom-width: var(--bs-border-width);
+        box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+    }
+
+    .content {
+        padding: 60px 1px 8px;
+        flex-grow: 1;
+    }
+
+    .px-4 {
+        padding-right: 1.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+
+    .dropdown-item.active {
+        color: var(--bs-dropdown-link-active-color);
+        text-decoration: none;
+        background-color: #800000;
+    }
+
+    @media (min-width: 768px) {
+        .col-md-3 {
+            flex: 0 0 auto;
+            width: 20%;
+        }
+    }
+</style>
+{% endblock %}

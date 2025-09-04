@@ -1,0 +1,239 @@
+{% extends 'layout.html' %}
+ 
+{% block title %}Upload File & Select Template{% endblock %}
+ 
+{% block content %}
+ 
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WhatsApp Bulk Sender</title>
+<style>
+
+        body {
+
+            font-family: Arial;
+
+            padding: 20px;
+
+            background: #f5f5f5;
+
+        }
+
+        .content {
+
+            padding: 23px 26px 18px;
+
+            flex-grow: 1;
+
+        }
+ 
+        h2 {
+
+            color: #800;
+
+            font-size: medium;
+
+        }
+ 
+        table {
+
+            border-collapse: collapse;
+
+            width: 100%;
+
+            background: #fff;
+
+        }
+ 
+        table, th, td {
+
+            border: 1px solid #ccc;
+
+        }
+ 
+        td {
+
+            padding: 1px;
+
+            text-align: center;
+
+            font-size: 9px;
+
+        }
+ 
+        th {
+
+            padding: 1px;
+
+            text-align: center;
+
+            font-size: 12px;
+
+        }
+ 
+        .form-box {
+
+            background: #fff;
+
+            padding: 20px;
+
+            border-radius: 5px;
+
+            margin-bottom: 30px;
+
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+        }
+
+    .btn {
+        padding: 6px 11px;
+        border: none;
+        background: #800;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    .form-inline {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+        margin-top: 25px;
+    }
+        .btn-danger {
+
+            background: #dc3545;
+
+        }
+ 
+        .btn:hover {
+
+            opacity: 0.9;
+
+        }
+
+    select, input[type="file"], input[type="text"], textarea {
+        width: 24%;
+        padding: 2px;
+        margin-top: 5px;
+        margin-right: 239px;
+    }
+</style>
+ 
+    <style>
+
+        .form-inline {
+
+            display: flex;
+
+            justify-content: flex-start;
+
+            align-items: center;
+
+            gap: 10px;
+
+        }
+ 
+            .form-inline label {
+
+                margin-right: 5px;
+
+            }
+ 
+            .form-inline input,
+
+            .form-inline select {
+
+                margin: 0;
+
+            }
+ 
+            .form-inline select {
+
+                margin-left: auto;
+
+            }
+ 
+    </style>
+</head>
+<body>
+ 
+<div class="form-box">
+<h2>Upload File & Select Template</h2>
+<form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+ 
+      <div class="form-inline">
+<label for="file"><strong>File:</strong></label>
+<input type="file" name="file" id="file" required>
+ 
+        
+<select name="template_name" id="template_name" required>
+<option value="">-- Select Template --</option>
+<option value="admissions_open_2025_26_pscm" {% if message and message.template_name == "admissions_open_2025_26_pscm" %}selected{% endif %}>
+
+            Admissions Open 2025
+</option>
+</select>
+</div>
+ 
+        <br><br>
+ 
+        <button type="submit" class="btn">Upload & Preview</button>
+</form>
+ 
+ 
+{% if message and data_headers and data_rows %}
+ 
+<div class="form-box">
+
+ 
+        <form method="POST" action="{% url 'send_message' message.id %}">
+
+            {% csrf_token %}
+<input type="hidden" name="template_name" value="{{ message.template_name }}">
+<button type="submit" class="btn">Send WhatsApp Message</button>
+</form>
+</div>
+<br>
+ 
+        <table>
+<thead>
+<tr>
+
+                    {% for header in data_headers %}
+<th>{{ header }}</th>
+
+                    {% endfor %}
+</tr>
+</thead>
+<tbody>
+
+                {% for row in data_rows %}
+<tr>
+
+                    {% for value in row %}
+<td>{{ value }}</td>
+
+                    {% endfor %}
+</tr>
+
+                {% endfor %}
+</tbody>
+</table>
+</div>
+
+    {% endif %}
+ 
+</body>
+</html>
+
+{% endblock %}
+
+ 

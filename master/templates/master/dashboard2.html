@@ -1,0 +1,693 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<!--<style>
+  /* .stat-card {
+  align-items: flex-start;
+  text-align: left;
+} */
+.stat-card {
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* Center contents horizontally */
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background-color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card p {
+  font-size: 0.875rem; /* text-sm */
+  color: #6b7280; /* text-gray-500 */
+  margin-bottom: 0.25rem;
+}
+
+.stat-card h3 {
+  font-size: 1.875rem; /* text-2xl */
+  font-weight: 700;
+  color: #1f2937; /* text-gray-800 */
+  margin-bottom: 0.5rem;
+}
+
+.stat-card .text-xs {
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 220px;
+  margin-top: 0.5rem;
+}
+
+.stat-card .text-xs span {
+  flex: 1;
+}
+
+</style>-->
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f7fa;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+    .stat-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+    .students-card::after {
+        background-color: #3b82f6;
+    }
+
+    .enquiries-card::after {
+        background-color: #10b981;
+    }
+
+    .messages-card::after {
+        background-color: #8b5cf6;
+    }
+
+    .staff-card::after {
+        background-color: #ec4899;
+    }
+
+    .w-10 {
+        width: 3.5rem;
+    }
+
+    .fees-card::after {
+        background-color: #f59e0b;
+    }
+
+    .attendance-card::after {
+        background-color: #6366f1;
+    }
+
+    .progress-bar {
+        height: 6px;
+        border-radius: 3px;
+        background-color: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+    .p-4 {
+        padding: 7px;
+    }
+
+    @media (min-width: 1280px) {
+        .xl\:grid-cols-6 {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+    }
+
+    .min-h-screen {
+        min-height: 10vh;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 49px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<div x-data="{
+     open: false,
+     filter: '{{ filter_type }}' ,
+     allSections: ['students', 'enquiries' , 'messages' , 'faculties' ,'student_attendance', 'faculty_attendance' ],
+     sections: [],
+     init() {
+     const initialSections={{ selected_sections|default:'[]'|safe }} ;
+     this.sections=initialSections.length>
+    0 ? initialSections : [...this.allSections];
+    },
+
+    get visibleSections() {
+    return this.allSections;
+    },
+
+    isHighlighted(section) {
+    return this.sections.includes(section);
+    },
+
+    shouldShow: true,
+
+    applyFilters() {
+    this.shouldShow = true;
+    this.sections = [...new Set(this.sections)];
+    },
+
+    toggleSection(section) {
+    if (this.sections.includes(section)) {
+    this.sections = this.sections.filter(s => s !== section);
+    } else {
+    this.sections.push(section);
+    }
+    },
+
+    isAllSelected() {
+    return this.sections.length === this.allSections.length;
+    },
+
+    toggleAll() {
+    if (this.isAllSelected()) {
+    this.sections = [];
+    } else {
+    this.sections = [...this.allSections];
+    }
+    }
+    }" x-init="init()">
+
+
+
+
+    <form method="get">
+        <div class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://i.postimg.cc/nc6G7t2Q/image-1.png" class="h-10 w-10 rounded-md" />
+                <h1 class="ml-3 text-2xl font-bold text-gray-800">Education Management Dashboard</h1>
+            </div>
+
+            <div class="flex items-center space-x-4">
+
+                <!-- Notification Dropdown -->
+                <div x-data="{ showNotif: false }" class="relative">
+                    <button type="button" @click="showNotif = !showNotif"
+                            class="relative p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <!-- Bell Icon -->
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 17h5l-1.405-1.405C18.21 15.21 18 14.702 18 14V11a6 6 0 00-5-5.917V4a2 2 0 10-4 0v1.083A6 6 0 004 11v3c0 .702-.21 1.21-.595 1.595L2 17h5m4 0v1a3 3 0 006 0v-1m-6 0h6" />
+                        </svg>
+
+                        <!-- Red dot for notification -->
+                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-600"></span>
+                    </button>
+
+                    <!-- Dropdown -->
+                    <div x-show="showNotif" @click.away="showNotif = false" x-cloak
+                         class="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg z-50">
+                        <div class="p-4 border-b text-sm font-semibold text-gray-700">Notifications</div>
+                        <div class="max-h-64 overflow-y-auto divide-y">
+                            <!-- Static Leave Request Notification -->
+                            <a href="/hr/leaves/" class="block hover:bg-gray-100 p-2">
+                                <strong>Leave Requests</strong> – Click to view all applied leaves
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Button -->
+                <div class="relative">
+                    <button type="button"
+                            @click="sections = []; open = !open"
+                            class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
+                        Filter
+                        <svg class="ml-2 h-4 w-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <!-- Filter Dropdown -->
+                    <div x-show="open" @click.away="open = false"
+                         class="absolute right-0 z-50 mt-2 w-64 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 p-4 space-y-2"
+                         x-cloak>
+                        <!-- Section Selector -->
+                        <div class="text-sm font-medium text-gray-700 mb-1 flex justify-between items-center">
+                            <span>Select Sections</span>
+                            <label class="text-xs font-normal">
+                                <input type="checkbox" @change="toggleAll()" :checked="isAllSelected()" class="mr-1">
+                                All
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                            <template x-for="s in allSections" :key="s">
+                                <label>
+                                    <input type="checkbox" :value="s" name="sections" x-model="sections" class="mr-1">
+                                    <span x-text="{
+                                    'faculties': 'Employees',
+                                    'faculty_attendance': 'Employee Attendance',
+                                    'students': 'Students',
+                                    'student_attendance': 'Student Attendance',
+                                    'messages': 'Messages',
+                                    'enquiries': 'Enquiries',
+                                    'fees': 'Fees',
+                                    'quick_actions': 'Quick Actions'
+                                }[s] || s.replace('_', ' ')"></span>
+                                </label>
+                            </template>
+                        </div>
+
+                        <!-- Time Filter -->
+                        <div class="text-sm font-medium text-gray-700 mt-3">Time Filter</div>
+                        <div class="flex flex-col space-y-1 text-sm">
+                            <template x-for="t in ['day','week','month','year','all']">
+                                <label>
+                                    <input type="radio" name="filter" :value="t" x-model="filter" class="mr-2">
+                                    <span x-text="t.charAt(0).toUpperCase()+t.slice(1)"></span>
+                                </label>
+                            </template>
+                        </div>
+
+                        <!-- Hidden Inputs -->
+                        <template x-for="s in sections">
+                            <input type="hidden" name="sections" :value="s">
+                        </template>
+                        <input type="hidden" name="filter" :value="filter">
+                        <input type="hidden" name="should_show_cards" value="true">
+
+                        <!-- Submit Button -->
+                        <button type="submit"
+                                class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 mt-3">
+                            Apply Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Info -->
+                <div class="flex items-center">
+                    <span class="ml-2 text-sm font-medium text-gray-700">Academic Director</span>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+</div>
+<template x-if="shouldShow">
+    <div class="max-w-7xl mx-auto px-0 py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+
+
+        <!-- STUDENTS -->
+        <div x-show="visibleSections.includes('students')"
+             :class="isHighlighted('students') ? 'bg-white' : 'bg-gray-200 opacity-60'"
+             class="stat-card students-card rounded-lg p-4 transition-all transition-colors duration-300 ease-in-out">
+            <p class="text-sm text-gray-500">Total Students</p>
+            <h3 class="text-2xl font-bold text-gray-800 mt-1">{{ total_students }}</h3>
+            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                <span>PU: {{ total_pu_students }}</span>
+                <span>Degree: {{ total_degree_students }}</span>
+            </div>
+        </div>
+
+        <!-- ENQUIRIES -->
+        <div x-show="visibleSections.includes('enquiries')"
+             :class="isHighlighted('enquiries') ? 'bg-white' : 'bg-gray-200 opacity-60'"
+             class="stat-card enquiries-card rounded-lg p-4 transition-all transition-colors duration-300 ease-in-out">
+            <p class="text-sm text-gray-500">Total Enquiries</p>
+            <h3 class="text-2xl font-bold text-gray-800 mt-1">{{ total_enquiries }}</h3>
+            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                <span>PU: {{ total_pu_enquiries }}</span>
+                <span>Degree: {{ total_degree_enquiries }}</span>
+            </div>
+        </div>
+
+        <!-- MESSAGES -->
+        <div x-show="visibleSections.includes('messages')"
+             :class="isHighlighted('messages') ? 'bg-white' : 'bg-gray-200 opacity-60'"
+             class="stat-card messages-card rounded-lg p-4 transition-all transition-colors duration-300 ease-in-out">
+            <p class="text-sm text-gray-500">Messages Sent</p>
+            <h3 class="text-2xl font-bold text-gray-800 mt-1">{{ total_messages_sent }}</h3>
+            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                <span>Enquiry: {{ enquiries_whatsapp_sent }}</span>
+                <span>Admission: {{ admission_messages_sent }}</span>
+            </div>
+        </div>
+
+        <div x-show="visibleSections.includes('messages')"
+             :class="isHighlighted('messages') ? 'bg-white' : 'bg-gray-200 opacity-60'"
+             class="stat-card messages-card rounded-lg p-4 transition-all transition-colors duration-300 ease-in-out">
+            <p class="text-sm text-gray-500">Pending Messages</p>
+            <h3 class="text-2xl font-bold text-gray-800 mt-1">{{ pending_messages }}</h3>
+        </div>
+
+        <!-- FACULTIES -->
+        <div x-show="visibleSections.includes('faculties')"
+             :class="isHighlighted('faculties') ? 'bg-white' : 'bg-gray-200 opacity-60'"
+             class="stat-card staff-card rounded-lg p-4 transition-all transition-colors duration-300 ease-in-out">
+            <p class="text-sm text-gray-500">Total Employees</p>
+            <h3 class="text-2xl font-bold text-gray-800 mt-1">{{ total_employees }}</h3>
+            <div class="text-xs text-gray-500 mt-2">Faculties: {{ total_faculties }}</div>
+        </div>
+
+        <!-- FEES -->
+        <!-- <div
+          x-show="visibleSections.includes('fees')"
+          :class="isHighlighted('fees') ? 'bg-white' : 'bg-gray-200 opacity-60'"
+          class="stat-card fees-card rounded-lg p-4 transition-all transition-colors duration-300 ease-in-out"
+        >
+          <p class="text-sm text-gray-500">Total Fees</p>
+          <h3 class="text-2xl font-bold text-gray-800 mt-1">₹{{ total_declared_fee|floatformat:0 }}</h3>
+          <div class="text-xs text-gray-500 mt-2">Collected: ₹{{ total_collected_fee }}</div>
+          <div class="text-xs text-gray-500">Pending: ₹{{ total_pending_fees }}</div>
+        </div> -->
+        <!-- Add other cards like 'student_attendance' and 'faculty_attendance' similarly -->
+    </div>
+</template>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" x-data="{
+     open: false,
+     filter: '{{ filter_type }}' ,
+     allSections: ['students', 'enquiries' , 'messages' , 'faculties' , 'student_attendance' , 'faculty_attendance' ,'stduent_distribution','quick_actions'],
+     sections: [],
+     init() {
+     const initialSections={{ selected_sections|default:'[]'|safe }} ;
+     this.sections=initialSections.length>
+    0 ? initialSections : [...this.allSections];
+    },
+
+    isHighlighted(section) {
+    return this.sections.includes(section);
+    },
+
+    isFilterActive() {
+    return this.sections.length > 0 && this.sections.length < this.allSections.length;
+    },
+
+    shouldShow: true,
+
+    applyFilters() {
+    this.shouldShow = true;
+    this.sections = [...new Set(this.sections)];
+    },
+
+    toggleSection(section) {
+    if (this.sections.includes(section)) {
+    this.sections = this.sections.filter(s => s !== section);
+    } else {
+    this.sections.push(section);
+    }
+    },
+
+    isAllSelected() {
+    return this.sections.length === this.allSections.length;
+    },
+
+    toggleAll() {
+    if (this.isAllSelected()) {
+    this.sections = [];
+    } else {
+    this.sections = [...this.allSections];
+    }
+    }
+    }" x-init="init()">
+
+    <!-- Attendance Chart Card -->
+    <div class="card bg-white rounded-lg p-5 lg:col-span-2 transition duration-300"
+         :class="{
+    'filter grayscale opacity-50 pointer-events-none': isFilterActive() && !(isHighlighted('faculty_attendance') || isHighlighted('student_attendance'))
+  }">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">Attendance Overview</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Employees Attendance</span>
+                    <span class="text-sm font-bold text-indigo-600">{{ faculty_attendance_rate }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill bg-indigo-500" style="width: {{ faculty_attendance_rate }}%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Students Attendance</span>
+                    <span class="text-sm font-bold text-cyan-600">{{ student_attendance_rate }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill bg-cyan-500" style="width: {{ student_attendance_rate }}%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 h-64 transition duration-300">
+            <canvas id="attendanceChart"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Students Distribution Chart -->
+    <div class="card bg-white rounded-lg p-5 transition duration-300"
+         :class="isHighlighted('students') ? '' : 'filter grayscale opacity-50 pointer-events-none'">
+        <div class="bg-white rounded-lg p-4 shadow-sm">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">Students Distribution</h3>
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center">
+                    <div class="h-3 w-3 rounded-full bg-amber-500 mr-2"></div>
+                    <span class="text-sm text-gray-600">PU:</span>
+                    <span class="ml-1 font-semibold text-gray-800">{{ total_pu_students }}</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="h-3 w-3 rounded-full bg-sky-500 mr-2"></div>
+                    <span class="text-sm text-gray-600">Degree:</span>
+                    <span class="ml-1 font-semibold text-gray-800">{{ total_degree_students }}</span>
+                </div>
+            </div>
+            <canvas id="studentsChart" height="200"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Quick Actions Card -->
+    <!-- <div
+      class="card bg-white rounded-lg p-5 transition duration-300"
+      <!-- :class="{
+        'border-2 border-green-500': isHighlighted('quick_actions'),
+        'filter grayscale opacity-50 pointer-events-none': isFilterActive() && !isHighlighted('quick_actions')
+      }"
+    > -->
+    <!-- <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2> -->
+    <!--
+        <div class="space-y-3">
+          Send Bulk Message -->
+    <!-- <a href="{% url 'upload_excel' %}" class="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
+      <span class="text-blue-700 font-medium">Send Bulk Message</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+    </a> -->
+    <!--
+          <div x-data="{ open: false }" class="relative">
+            <button @click="open = !open"
+                    class="w-full flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition"
+                    type="button"
+                    aria-haspopup="true"
+                    :aria-expanded="open">
+              <span class="text-green-700 font-medium">Add New Student</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+            <div x-show="open"
+                 @click.away="open = false"
+                 class="absolute left-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+                 x-cloak>
+              <a href="{% url 'admission_form' %}" class="block px-4 py-2 text-sm text-green-700 hover:bg-green-50 rounded-t-md">PU</a>
+              <a href="{% url 'degree_admission_form' %}" class="block px-4 py-2 text-sm text-green-700 hover:bg-green-50 rounded-b-md">Degree</a>
+            </div> -->
+    <!-- </div>
+
+    <a href="{% url 'student_fee_form_add' %}" class="w-full flex items-center justify-between p-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition">
+      <span class="text-yellow-700 font-medium">Collect Fees</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    </a> -->
+</div>
+
+<!-- <div class="mt-6 bg-white rounded-lg shadow p-4"> -->
+<!-- <h3 class="text-sm font-semibold text-gray-700 mb-3">Recent Activity</h3>
+  <div class="space-y-2 max-h-60 overflow-y-auto">
+    {% if recent_activities %}
+      {% for activity in recent_activities %}
+      <div class="flex items-start space-x-2 text-sm text-gray-600">
+        <div class="p-1 bg-blue-50 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </div>
+        <div>
+          <p>
+            <span class="font-medium text-gray-800">{{ activity.user.username }}</span>
+            {{ activity.action }}
+            {{ activity.model_name }}
+            {% if activity.object_repr %} - {{ activity.object_repr }}{% endif %}
+          </p>
+          <p class="text-xs text-gray-400">{{ activity.timestamp|date:"d M Y, H:i" }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-sm text-gray-500">No recent activities found.</p>
+    {% endif %}
+  </div>
+</div> -->
+  </div>
+</div>
+
+
+
+<!-- Bottom Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6" x-data>
+
+    <!-- Fees Details Card -->
+    <!-- <div
+      class="card bg-white rounded-lg p-5 transition duration-300"
+      :class="isHighlighted('fees') ? '' : 'filter grayscale opacity-50 pointer-events-none'"
+    >
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Fees Collection</h2>
+      <div class="flex justify-between mb-6">
+        <div class="text-center">
+          <p class="text-sm text-gray-500">Total Collected</p>
+          <p class="text-2xl font-bold text-gray-800">₹{{ total_collected_fee|floatformat:0 }}</p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-gray-500">Pending Fees</p>
+          <p class="text-2xl font-bold text-red-600">₹{{ total_pending_fees }}</p>
+        </div>
+      </div>
+      <div class="h-64 transition duration-300"
+        :class="isHighlighted('fees') ? '' : 'filter grayscale opacity-50 pointer-events-none'">
+        <canvas id="feesChart"></canvas>
+      </div> -->
+</div>
+
+
+<canvas id="attendanceChart" width="400" height="200"></canvas>
+
+<script>
+  const labels = ['Present', 'Late', 'Absent'];
+  const staffData = [{{ staff_present }}, {{ staff_late }}, {{ staff_absent }}];
+  const studentData = [{{ student_present }}, {{ student_late }}, {{ student_absent }}];
+
+  new Chart(document.getElementById('attendanceChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Faculties',
+          data: staffData,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,0.1)',
+          tension: 0.4,
+          fill: true
+        },
+        {
+          label: 'Students',
+          data: studentData,
+          borderColor: '#06b6d4',
+          backgroundColor: 'rgba(6,182,212,0.1)',
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: {
+        y: { beginAtZero: true, stepSize: 5 }
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false
+      }
+    }
+  });
+
+
+
+
+
+  // Students Chart
+  const studentsCtx = document.getElementById('studentsChart').getContext('2d');
+  const studentsChart = new Chart(studentsCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['PU', 'Degree'],
+      datasets: [{
+        data: [{{ total_pu_students|default:0 }}, {{ total_degree_students|default:0 }}],
+        backgroundColor: ['#f59e0b', '#0ea5e9'], // Amber & Sky
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 12, padding: 15 }
+        }
+      }
+    }
+  });
+</script>
+
+<style>
+    /* Progress bar styling */
+    .progress-bar {
+        background-color: #e5e7eb; /* gray-200 */
+        height: 8px;
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 8px;
+        border-radius: 9999px;
+    }
+</style>
+{% endblock %}

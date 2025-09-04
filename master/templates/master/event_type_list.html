@@ -1,0 +1,337 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Event Types List{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px;
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .btn-add {
+        position: absolute;
+        right: 0;
+        background-color: #800000;
+        color: #fff;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-add:hover {
+            background-color: #a10000;
+        }
+
+    .search-input {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 220px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 0px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+    }
+
+    td {
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .content {
+        margin-left: 0px;
+        padding: 34px 24px 40px;
+        min-height: 100vh;
+    }
+
+    /* Confirmation Popup Styles */
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <input type="text" id="eventSearch" class="search-input" placeholder="Search Event Types...">
+        <h2>Event Types List</h2>
+
+        <a href="{% url 'event_type_add' %}" class="btn-add">
+            <i class="bi bi-plus-lg me-2"></i> Add Event Type
+        </a>
+    </div>
+
+    {% if event_types %}
+    <table class="table table-bordered table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th style="width: 150px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for type in event_types %}
+            <tr>
+                <td>{{ type.name }}</td>
+                <td>
+                    {% if type.is_active %}
+                    <span>Active</span>
+                    {% else %}
+                    <span >Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'event_type_view' type.pk %}" class="icon-btn" title="View">
+                        <i class="fas fa-eye"></i>
+                    </a>
+
+                    <a href="{% url 'event_type_edit' type.pk %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <form id="delete-form-{{ type.id }}" method="POST" action="{% url 'event_type_delete' type.pk %}" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" class="icon-btn text-danger" title="Delete"
+                       onclick="confirmDelete('{{ type.id }}', '{{ type.name }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted text-center mt-4">No event types found.</p>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom: 8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<!-- Scripts -->
+<script>
+    let deleteId = null;
+
+    function confirmDelete(id, name) {
+        deleteId = id;
+        document.getElementById('confirm-popup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+        if (deleteId) {
+            document.getElementById(`delete-form-${deleteId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+        document.getElementById('confirm-popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        deleteId = null;
+    });
+
+    // Search bar filter
+    document.getElementById('eventSearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const rowText = Array.from(cells).map(td => td.textContent.toLowerCase()).join(' ');
+            row.style.display = rowText.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+
+
+<div id="snackbar"></div>
+
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    // Django messages support
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+</script>
+{% endblock %}

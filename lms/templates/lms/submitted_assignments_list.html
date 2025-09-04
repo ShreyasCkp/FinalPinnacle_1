@@ -1,0 +1,377 @@
+{% extends 'lms/employee_layout.html' %}
+
+{% block title %}Submitted Assignments{% endblock %}
+{% block content %}
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px;
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .btn-add {
+        position: absolute;
+        right: 0;
+        background-color: #800000;
+        color: #fff;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-add:hover {
+            background-color: #a10000;
+        }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 1px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .alert {
+        color: #800000;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 10px 0;
+        text-align: center;
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 29px 24px 40px;
+        min-height: 100vh;
+    }
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .btn-back {
+        background-color: #800000;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background-color: #6e0000;
+            color: white;
+        }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og=="
+      crossorigin="anonymous" />
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <h2>Submitted Assignments List</h2>
+    </div>
+    <p><strong>Assignment:</strong> {{ assignment.title }} ({{ assignment.subject.name }})</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Sl No</th>
+                    <th>Student ID</th>
+                    <th>Submitted File</th>
+                    <th>Submitted On</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th>Score</th>
+                    <th>Remarks</th>
+                    <th>Rejection Reason</th>
+                </tr>
+            </thead>
+                            <tbody>
+                    {% for data in student_submissions %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ data.student.student_userid }}</td>
+
+                        <!-- Submitted File -->
+                        <td>
+                            {% if data.submission.submitted_file %}
+                                <a href="{{ data.submission.submitted_file.url }}" target="_blank">View</a>
+                            {% else %}
+                                Not Submitted
+                            {% endif %}
+                        </td>
+
+                        <!-- Submitted On -->
+                        <td>
+                            {% if data.submission.submitted_file %}
+                                {{ data.submission.submitted_on|date:"d M Y, H:i" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <!-- Student Status -->
+                        <td>{{ data.submission.get_faculty_status_display }}</td>
+                        <!-- Faculty Status & Actions -->
+                        <td>
+                            <label>
+                                <input type="radio" name="action_{{ data.submission.id }}" value="review"
+                                    {% if data.submission.faculty_status == 'review' %}checked{% endif %}
+                                    {% if data.submission.student_status != 'submitted' %}disabled{% endif %}>
+                                Accept
+                            </label><br>
+                            <label>
+                                <input type="radio" name="action_{{ data.submission.id }}" value="reject"
+                                    {% if data.submission.faculty_status == 'rejected' %}checked{% endif %}
+                                    {% if data.submission.student_status != 'submitted' %}disabled{% endif %}>
+                                Reject
+                            </label>
+                        </td>
+
+                        <!-- Score -->
+                        <td>
+                            <input type="number" name="score_{{ data.submission.id }}" step="0.01"
+                                   value="{{ data.submission.score|default_if_none:'' }}"
+                                   {% if data.submission.faculty_status == 'rejected' or data.submission.student_status != 'submitted' %}disabled{% endif %}>
+                        </td>
+
+                        <!-- Remarks -->
+                        <td>
+                            <input type="text" name="remarks_{{ data.submission.id }}"
+                                   value="{{ data.submission.remarks|default_if_none:'' }}"
+                                   {% if data.submission.faculty_status == 'rejected' or data.submission.student_status != 'submitted' %}disabled{% endif %}>
+                        </td>
+
+                        <!-- Rejection Reason -->
+                        <td>
+                            <input type="text" name="rejection_reason_{{ data.submission.id }}"
+                                   value="{{ data.submission.rejection_reason|default_if_none:'' }}"
+                                   {% if data.submission.faculty_status != 'rejected' %}disabled{% endif %}
+                                   placeholder="Required if rejected">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+
+        </table>
+        <div class="btn-container">
+            <a href="{% url 'assignment_list' %}" class="btn-back">Back</a>
+            <button type="submit" class="btn-save" id="submitBtn">
+                Save All
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Enable/disable fields based on action radio selection
+    document.querySelectorAll('input[type=radio][name^="action_"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            const id = this.name.split('_')[1];
+            const scoreInput = document.querySelector(`input[name="score_${id}"]`);
+            const remarksInput = document.querySelector(`input[name="remarks_${id}"]`);
+            const rejectionInput = document.querySelector(`input[name="rejection_reason_${id}"]`);
+
+            if (this.value === 'reject') {
+                scoreInput.disabled = true;
+                remarksInput.disabled = true;
+                rejectionInput.disabled = false;
+            } else {
+                scoreInput.disabled = false;
+                remarksInput.disabled = false;
+                rejectionInput.disabled = true;
+                rejectionInput.value = ''; // optional: clear rejection reason if switching to review
+            }
+        });
+    });
+
+    // Trigger change event on page load to set correct states
+    window.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('input[type=radio][name^="action_"]:checked').forEach(radio => {
+            radio.dispatchEvent(new Event('change'));
+        });
+    });
+</script>
+
+{% endblock %}

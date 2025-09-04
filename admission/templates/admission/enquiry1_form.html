@@ -1,0 +1,803 @@
+{% extends 'layout.html' %}
+
+{% block title %}PU Enquiry Form{% endblock %}
+
+{% block content %}
+
+<style>
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 2px;
+        display: none;
+    }
+
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        overflow-x: hidden;
+        padding: 0;
+    }
+
+    .form-card {
+        background: #fff;
+        padding: 40px 50px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .fixed-footer {
+        margin-left: 50px;
+        margin-top: -35px;
+    }
+
+    .left-button {
+        flex: 1;
+        text-align: left;
+    }
+
+    .form-title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr)); /* ensures safe shrinking */
+        gap: 16px 32px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+
+
+    /*
+      .form-group {
+          display: flex;
+          flex-direction: column;
+      }*/
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%; /* ✅ Ensure each field spans full grid cell */
+    }
+
+
+
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 12px;
+        }
+
+        .form-group input {
+            padding: 2px 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 9px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100% !important;
+        }
+
+
+        .form-group select {
+            padding: 2px 7px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .form-group textarea {
+            padding: 3px 7px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+    .btn {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 6px;
+        transition: background-color 0.3s ease;
+        border: none;
+        cursor: pointer;
+        margin-top: 76px;
+    }
+
+    .btn-primary {
+        background-color: #800000;
+        color: white;
+        padding: 5px;
+    }
+
+        .btn-primary:hover {
+            background-color: #800000;
+        }
+
+    .alert {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #f5c6cb;
+        font-size: 14px;
+        margin-top: 24px;
+    }
+
+    textarea#id_address {
+        height: 60px !important;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        padding: 12px 8px;
+        display: block;
+        font-weight: 500;
+    }
+
+    @media print {
+
+        .btn,
+        .alert,
+        .photo-upload input,
+        .edit-icon,
+        .no-print,
+        .sidebar,
+        .topbar {
+            display: none !important;
+        }
+
+        body {
+            background: white;
+        }
+
+        .form-card {
+            box-shadow: none;
+            border: none;
+        }
+
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .form-title {
+            font-size: 16pt;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+    }
+
+
+    @media (max-width: 600px) {
+        .form-card {
+            padding: 30px 20px;
+        }
+
+        .form-title {
+            font-size: 20px;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .form-grid {
+            gap: 12px;
+        }
+    }
+
+    .logo-container {
+        text-align: center;
+        margin-bottom: 2px;
+        margin-top: -37px;
+    }
+
+
+        .logo-container img {
+            max-width: 400px;
+            margin-bottom: -22px;
+            margin-top: -54px;
+            margin-left: 42px;
+        }
+
+        .logo-container h2 {
+            margin-top: -15px;
+            font-size: 28px;
+            font-weight: bold;
+            margin-left: 34px;
+        }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%; /* Ensures all form elements span full width of their grid cell */
+        box-sizing: border-box; /* Prevents padding from breaking the layout */
+        font-size: 13px; /* Adjust for consistency */
+    }
+
+
+    .content {
+        padding: 69px 112px 40px;
+        margin-left: 200px;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    #id_parent_phone {
+        border: 1px solid #ced4da;
+        padding: 6px;
+        border-radius: 4px;
+        font-size: 14px;
+        width: 100%;
+        height: 20px;
+    }
+
+        #id_parent_phone.error {
+            border-color: red;
+        }
+</style>
+
+
+<div style="width: 100vw; padding: 2rem;">
+    <div class="form-card mx-auto" style="width: 67%; max-width: 100%; margin-left: 2px; margin-top: -52px; ">
+
+        <!-- ✅ LOGO AND HEADING -->
+        <div class="logo-container">
+            <img src="https://i.postimg.cc/4xSpKtqg/college-logo-with-name-white-page-0001.jpg" alt="College Logo">
+            <h2>PU Enquiry Form</h2>
+        </div>
+
+        <!--{# Show success message if present #}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}"
+             style="color: green; font-weight: bold; margin-bottom: 10px;">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}-->
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Enquiry No:</label>
+                    <input type="text" value="{{ next_enquiry_no }}" readonly style="background:#eee;">
+                </div>
+                <div class="form-group">
+                    {{ form.enquiry_date.label_tag }} {{ form.enquiry_date }}
+                </div>
+
+
+                <div class="form-group">
+                    <label for="id_student_name">Student Name <span style="color:red">*</span></label>
+                    {{ form.student_name }}
+                </div>
+
+                <!--<div class="form-group">
+                    <label for="{{ form.academic_year.id_for_label }}">Academic Year</label>
+                    {{ form.academic_year }}
+                    <small id="academic-year-error" style="color: red; display: none;">Please enter a valid academic year (e.g., 2025-2026)</small>
+                </div>-->
+
+                <div class="form-group">
+                    {{ form.gender.label_tag }} {{ form.gender }}
+                </div>
+                <div class="form-group">
+
+                    {{ form.parent_relation.label_tag }} {{ form.parent_relation }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_parent_name" id="label_parent_name">Parent Name</label>
+
+                    {{ form.parent_name }}
+                </div>
+
+                <!-- ✅ Error placeholder below input -->
+                <div class="form-group">
+                    <label for="id_parent_phone" id="label_parent_phone">Parent Phone</label>
+                    {{ form.parent_phone }}
+                    <div id="error_id_parent_phone" class="error-message"></div>
+                </div>
+
+                <!--<div class="form-group">
+                    <label for="id_parent_phone" id="label_parent_phone">Parent Phone</label>
+
+                    {{ form.parent_phone }}
+                </div>-->
+                <div class="form-group" id="guardian_relation_group" style="display:none;">
+                    <label for="id_guardian_relation">Guardian Relation</label>
+                    {{ form.guardian_relation }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.course_type.id_for_label }}"> Program Type </label>
+                    {{ form.course_type }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.course.id_for_label }}">Combination</label>
+                    {{ form.course }}
+                </div>
+
+                <!--<div class="form-group">
+                    <label>Stream/Specialization:</label>
+                    <input type="text" value="{{ form.instance.course_type.name }}" readonly class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Combination:</label>
+                    <input type="text" value="{{ form.instance.course.name }}" readonly class="form-control">
+                </div>-->
+                <div class="form-group" id="percentage_10th_field">
+                    <label for="{{ form.percentage_10th.id_for_label }}">10th Marks/Percentage</label>
+                    {{ form.percentage_10th }}
+                </div>
+
+                <!--<div class="form-group" id="percentage_12th_field">
+                    <label for="{{ form.percentage_12th.id_for_label }}">12th Marks/Percentage</label>
+                    {{ form.percentage_12th }}
+                </div>-->
+
+
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">Email ID</label>
+                    {{ form.email }}
+                    <div id="error_id_email" class="error-message"></div>  <!-- 🔴 Error placeholder -->
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.source.id_for_label }}">How did you hear about us?</label>
+                    {{ form.source }}
+                </div>
+                <div class="form-group" id="other_source_group" style="display:none;">
+                    <label for="id_other_source">Other</label>
+                    {{ form.other_source }}
+                </div>
+
+
+                <div class="form-group">
+                    <label for="{{ form.permanent_address.id_for_label }}">Parent Address </label>
+                    {{ form.permanent_address }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.current_address.id_for_label }}">Local Address</label>
+                    {{ form.current_address }}
+                </div>
+                <div class="form-group">
+                    {{ form.city.label_tag }} {{ form.city }}
+                </div>
+                <div class="form-group">
+                    {{ form.pincode.label_tag }} {{ form.pincode }}
+                </div>
+                <div class="form-group">
+                    {{ form.state.label_tag }} {{ form.state }}
+                </div>
+            </div>
+
+
+            <div class="mt-4" style="margin-top: -42px; display: flex; justify-content: space-between; width: 100%;">
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="fa fa-print"></i> Print
+                </button>
+
+                {% if view_mode %}
+                <a href="{% url 'enquiry_list' %}" class="btn btn-primary btn-lg">Back</a>
+                {% elif edit_mode %}
+                <button type="submit" class="btn btn-primary btn-lg">Update</button>
+                {% else %}
+                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                {% endif %}
+
+            </div>
+
+            <!--<div class="mt-4" style=" margin-top: -42px; display: flex; justify-content: space-between; width: 100%;">
+                <button type="button" class="btn btn-secondary" onclick="window.print()">
+                    <i class="fa fa-print"></i> Print
+                </button>
+                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+
+
+            </div>-->
+        </form>
+
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const form = document.querySelector('form');
+
+        const parentPhoneInput = document.getElementById('id_parent_phone');
+
+        const parentPhoneError = document.getElementById('error_id_parent_phone');
+
+        // Enforce digits only, max length 10
+
+        parentPhoneInput.addEventListener('keypress', function (e) {
+
+            const char = e.key;
+
+            const isDigit = /^[0-9]$/.test(char);
+
+            if (!isDigit || this.value.length >= 10) {
+
+                e.preventDefault();
+
+            }
+
+        });
+
+        // On input (typing or paste), remove non-digits and trim to 10
+
+        parentPhoneInput.addEventListener('input', function () {
+
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+
+            validatePhoneLive();
+
+        });
+
+        // Validate on blur or during typing
+
+        function validatePhoneLive() {
+
+            const value = parentPhoneInput.value.trim();
+
+            if (value.length === 0) {
+
+                parentPhoneError.textContent = '';
+
+                parentPhoneInput.classList.remove('error');
+
+                return;
+
+            }
+
+            if (value.length === 1 && !/^[6-9]$/.test(value)) {
+
+                parentPhoneError.textContent = 'Enter valid 10-digit phone number starting with 6-9';
+
+                parentPhoneInput.classList.add('error');
+
+                return;
+
+            }
+
+            if (value.length === 10 && /^[6-9]\d{9}$/.test(value)) {
+
+                parentPhoneError.textContent = '';
+
+                parentPhoneInput.classList.remove('error');
+
+            } else if (value.length === 10) {
+
+                parentPhoneError.textContent = 'Enter valid 10-digit phone number starting with 6-9';
+
+                parentPhoneInput.classList.add('error');
+
+            } else {
+
+                parentPhoneError.textContent = '';
+
+                parentPhoneInput.classList.remove('error');
+
+            }
+
+        }
+
+        // Final check on submit
+
+        form.addEventListener('submit', function (e) {
+
+            const finalValue = parentPhoneInput.value.trim();
+
+            if (!/^[6-9]\d{9}$/.test(finalValue)) {
+
+                parentPhoneError.textContent = 'Enter valid 10-digit phone number starting with 6-9';
+
+                parentPhoneInput.classList.add('error');
+
+                e.preventDefault();  // stop form submission
+
+            }
+
+        });
+
+    });
+</script>
+
+
+
+
+<script>
+    $(window).on('load', function () {
+        const courseTypeSelect = $('#id_course_type');
+        const combinationSelect = $('#id_course');
+
+        // Ensure default placeholder option is always present
+        if (courseTypeSelect.find("option[value='']").length === 0) {
+            courseTypeSelect.prepend('<option value="">---------</option>');
+        }
+        if (combinationSelect.find("option[value='']").length === 0) {
+            combinationSelect.prepend('<option value="">---------</option>');
+        }
+
+        function loadCombinations(courseTypeId, selectedCombinationId = null) {
+            const url = "{% url 'ajax_load_courses_degree' %}";
+
+            $.ajax({
+                url: url,
+                data: {
+                    'course_type': courseTypeId
+                },
+                success: function (data) {
+                    combinationSelect.html('<option value="">---------</option>');
+                    $.each(data, function (index, course) {
+                        const isSelected = selectedCombinationId == course.id ? ' selected' : '';
+                        combinationSelect.append(
+                            '<option value="' + course.id + '"' + isSelected + '>' + course.name + '</option>'
+                        );
+                    });
+                }
+            });
+        }
+
+        // On course_type change
+        courseTypeSelect.change(function () {
+            const selectedCourseTypeId = $(this).val();
+            if (selectedCourseTypeId) {
+                loadCombinations(selectedCourseTypeId);
+            } else {
+                combinationSelect.html('<option value="">---------</option>');
+            }
+        });
+
+        // Auto-load combinations if already selected (Edit Mode)
+        const selectedCourseTypeId = courseTypeSelect.val();
+        const selectedCombinationId = combinationSelect.find("option[selected]").val();
+
+        if (selectedCourseTypeId) {
+            loadCombinations(selectedCourseTypeId, selectedCombinationId);
+        }
+    });
+</script>
+
+
+<script>
+
+
+    //// AJAX for dependent course dropdown
+    //$(function () {
+    //    var defaultCourseType = '2';  // your default course type
+
+    //    function loadCombinations(courseTypeId) {
+    //        var url = "{% url 'ajax_load_courses_degree' %}";
+
+    //        $.ajax({
+    //            url: url,
+    //            data: {
+    //                'course_type': courseTypeId
+    //            },
+    //            success: function (data) {
+    //                var courseSelect = $('#id_course');
+    //                courseSelect.html('<option value="">---------</option>');
+    //                $.each(data, function (index, course) {
+    //                    courseSelect.append('<option value="' + course.id + '">' + course.name + '</option>');
+    //                });
+    //            }
+    //        });
+    //    }
+
+    //    // Set default course_type and load combinations on page load
+    //    $('#id_course_type').val(defaultCourseType);
+    //    loadCombinations(defaultCourseType);
+
+    //    // Also bind change event to reload combinations
+    //    $('#id_course_type').change(function () {
+    //        var selectedCourseTypeId = $(this).val();
+    //        loadCombinations(selectedCourseTypeId);
+    //    });
+    //});
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const pincodeInput = document.getElementById('id_pincode');
+        const cityInput = document.getElementById('id_city');
+        const stateInput = document.getElementById('id_state');
+
+        function fetchPincodeData() {
+            const pincode = pincodeInput.value.trim();
+            if (pincode.length === 6 && /^\d+$/.test(pincode)) {
+                fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice.length > 0) {
+                            const postOffice = data[0].PostOffice[0];
+                            cityInput.value = postOffice.Block && postOffice.Block !== "NA"
+                                ? postOffice.Block
+                                : postOffice.District || '';
+                            stateInput.value = postOffice.State || '';
+                        } else {
+                            // Optionally clear or show error if pincode not found
+                            // cityInput.value = "";
+                            // stateInput.value = "";
+                            // alert("Invalid or unknown pincode.");
+                        }
+                    })
+                    .catch(err => {
+                        // Optionally handle API error
+                        // alert("Unable to fetch city/state for pincode.");
+                    });
+            }
+        }
+
+        if (pincodeInput && cityInput && stateInput) {
+            // On blur (when field loses focus)
+            pincodeInput.addEventListener('blur', function () {
+                fetchPincodeData();
+            });
+
+            // On Enter key
+            pincodeInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    fetchPincodeData();
+                }
+            });
+        }
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const pincodeInput = document.getElementById('id_pincode');
+        if (pincodeInput) {
+            pincodeInput.addEventListener('keydown', function (e) {
+                // Prevent form submission on Enter in pincode input
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Optionally: You could trigger your pincode lookup/ajax here if wanted
+                    // fetchPincodeData();
+                }
+            });
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const relationField = document.getElementById("id_parent_relation");
+        const nameLabel = document.getElementById("label_parent_name");
+        const phoneLabel = document.getElementById("label_parent_phone");
+
+        function updateLabels() {
+            const selected = relationField.value;
+            if (selected) {
+                nameLabel.textContent = selected + " Name";
+                phoneLabel.textContent = selected + " Phone";
+            } else {
+                nameLabel.textContent = "Parent Name";
+                phoneLabel.textContent = "Parent Phone";
+            }
+        }
+
+        relationField.addEventListener("change", updateLabels);
+        updateLabels();  // Initial call in case a default is selected
+    });
+
+
+
+    const parentRelationSelect = document.getElementById("id_parent_relation");
+    const guardianRelationGroup = document.getElementById("guardian_relation_group");
+
+    function toggleGuardianRelation() {
+        if (parentRelationSelect.value === "Guardian") {
+            guardianRelationGroup.style.display = "block";
+        } else {
+            guardianRelationGroup.style.display = "none";
+            document.getElementById("id_guardian_relation").value = "";
+        }
+    }
+
+    // Run on page load
+    toggleGuardianRelation();
+
+    // Listen for changes on dropdown
+    parentRelationSelect.addEventListener("change", toggleGuardianRelation);
+
+
+    const sourceSelect = document.getElementById("id_source");
+    const otherSourceGroup = document.getElementById("other_source_group");
+
+    function toggleOtherSource() {
+        if (sourceSelect.value === "Other") {
+            otherSourceGroup.style.display = "block";
+        } else {
+            otherSourceGroup.style.display = "none";
+            document.getElementById("id_other_source").value = "";
+        }
+    }
+
+    toggleOtherSource();
+    sourceSelect.addEventListener("change", toggleOtherSource);
+</script>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const emailInput = document.getElementById('id_email');
+        const errorDiv = document.getElementById('error_id_email');
+        const form = document.querySelector('form');
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        function validateEmailField() {
+            const value = emailInput.value.trim();
+
+            if (value.length === 0) {
+                errorDiv.textContent = '';
+                emailInput.classList.remove('error');
+                return true;  // Allow empty (if not required)
+            }
+
+            if (!emailPattern.test(value)) {
+                errorDiv.textContent = 'Enter a valid email (e.g., example@gmail.com).';
+                emailInput.classList.add('error');
+                return false;
+            } else {
+                errorDiv.textContent = '';
+                emailInput.classList.remove('error');
+                return true;
+            }
+        }
+
+        // Validate on input
+        emailInput.addEventListener('input', validateEmailField);
+
+        // Validate on form submit
+        form.addEventListener('submit', function (e) {
+            const valid = validateEmailField();
+            if (!valid) {
+                e.preventDefault(); // Stop form if invalid
+            }
+        });
+    });
+</script>
+
+
+{% endblock %}

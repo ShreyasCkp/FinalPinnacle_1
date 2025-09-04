@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% block content %}
+<a href="{% url 'stop_create' %}" class="btn btn-success mb-3">+ Add Stop</a>
+<table class="table table-bordered table-sm">
+    <thead class="table-light">
+        <tr>
+            <th>Route</th>
+            <th>Stop</th>
+            <th>Order</th>
+            <th>Pickup</th>
+            <th>Drop</th>
+            <th>Coordinates</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in stops %}
+        <tr>
+            <td>{{ s.route.route_name }}</td>
+            <td>{{ s.stop_name }}</td>
+            <td>{{ s.stop_order }}</td>
+            <td>{{ s.pickup_time }}</td>
+            <td>{{ s.drop_time }}</td>
+            <td>{{ s.latitude }}, {{ s.longitude }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

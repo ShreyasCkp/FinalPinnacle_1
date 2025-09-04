@@ -1,0 +1,339 @@
+{% extends 'layout.html' %}
+
+{% block title %}Communication{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Communication </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .dashboard-section {
+            display: flex;
+            gap: 0.5rem;
+            animation: fadeIn 0.5s ease-in-out;
+            flex-wrap: nowrap;
+        }
+
+        .py-5 {
+            padding-top: 0rem !important;
+            padding-bottom: 3rem !important;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h5, h2 {
+            font-size: 14px;
+        }
+
+        .mt-4 {
+            margin-top: 0.5rem !important;
+        }
+
+        .text-primary {
+            color: #8b0000 !important;
+            font-size: 21px;
+            margin-left: 315px;
+            margin-top: -16px;
+        }
+
+        .text-secondary {
+            color: #8b0000 !important;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .table-bordered > :not(caption) > * > * {
+            border-width: 0 var(--bs-border-width);
+            font-size: 12px;
+            text-align: center;
+            padding: 1px;
+        }
+
+        canvas {
+            max-height: 150px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 1rem;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+        }
+
+            .card:hover {
+                transform: scale(1.03);
+            }
+
+        .bg-gradient-green {
+            color: #1b4332;
+        }
+
+        .bg-gradient-blue {
+            color: #0c2d48;
+        }
+
+        .bg-gradient-purple {
+            color: #2e1065;
+        }
+
+        .bg-gradient-yellow {
+            color: #5c4700;
+        }
+
+        .text-white {
+            color: #8b0000 !important;
+            text-align: center;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.4em 0.6em;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+        }
+
+        .badge-danger {
+            background-color: #8b0000;
+        }
+
+        .bg-warning {
+            background-color: #8b0000 !important;
+        }
+
+        .col-md-4 {
+            flex: 0 0 auto;
+            width: 29.333333%;
+        }
+
+        .col-md-3 {
+            flex: 0 0 auto;
+        }
+
+        .plus-btn a {
+            font-size: 12px;
+            border-radius: 7px;
+            background: #800000;
+            padding: -1.5rem 1rem;
+        }
+
+        .scroll-table {
+            max-height: 250px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .dropdown-item.active {
+            color: var(--bs-dropdown-link-active-color);
+            text-decoration: none;
+            background-color: #800000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-primary">Communication</h2>
+            <div class="plus-btn">
+                <a href="{% url 'upload_excel' %}" class="btn btn-success" title="Upload Excel for Communication">
+                    <i class="bi bi-file-earmark-arrow-up"></i>Bulk Upload 
+                </a>
+            </div>
+        </div>
+        <!-- 🔽 Filter Dropdown -->
+        <!--<div class="mb-4 d-flex justify-content-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary px-4 py-2 dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <ul class="dropdown-menu" style=" width: 100%;     font-size: 10px;" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item {% if active_filter == 'day' %}active{% endif %}" href="?filter=day">Per Day</a></li>
+                    <li><a class="dropdown-item {% if active_filter == 'week' %}active{% endif %}" href="?filter=week">Per Week</a></li>
+                    <li><a class="dropdown-item {% if active_filter == 'month' %}active{% endif %}" href="?filter=month">Per Month</a></li>
+                    <li><a class="dropdown-item {% if active_filter == 'all' %}active{% endif %}" href="?filter=all">All</a></li>
+                </ul>
+            </div>
+        </div>-->
+        <!-- KPI Cards -->
+        <div class="row mb-4 dashboard-section">
+            <div class="col-md-3">
+                <div class="card bg-gradient-purple text-white p-3">
+                    <h5>Total Messages Sent</h5>
+                    <h2>{{ total_messages_sent }}</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-gradient-green text-white p-3">
+                    <h5>Enquiry WhatsApp Messages Sent</h5>
+                    <h2>{{ enquiry_total_sent }}</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-gradient-blue text-white p-3">
+                    <h5>Admission Open Messages Sent</h5>
+                    <h2>{{ sentmessage_sent }}</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-gradient-yellow text-white p-3">
+                    <h5>Pending Admission Messages</h5>
+                    <h2>{{ sentmessage_pending }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Messages Tables & Status Charts -->
+        <div class="row dashboard-section">
+            <!-- Enquiry Section -->
+            <div class="col-md-6">
+                <div class="card p-3 mb-3">
+                    <h5 class="text-secondary mb-3">Recent Enquiry WhatsApp Messages</h5>
+                    <div class="scroll-table">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Enquiry No</th>
+                                    <th>Student Name</th>
+                                    <th>Parent Phone</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for msg in recent_enquiry_msgs %}
+                                <tr>
+                                    <td>{{ msg.enquiry_no }}</td>
+                                    <td>{{ msg.student_name }}</td>
+                                    <td>{{ msg.parent_phone }}</td>
+                                    <td>
+                                        <span class="badge
+                                    {% if msg.whatsapp_status|lower == 'sent' %} badge-success
+                                    {% elif msg.whatsapp_status|lower == 'failed' %} badge-danger
+                                    {% else %} bg-warning
+                                    {% endif %}">
+                                            {{ msg.whatsapp_status|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center">No recent enquiry messages found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card p-3">
+                    <h5 class="text-secondary mb-3">Enquiry Open Messages Status Breakdown</h5>
+                    <canvas id="enquiryStatusChart" height="110"></canvas>
+                </div>
+            </div>
+
+            <!-- Admission Section -->
+            <div class="col-md-6">
+                <div class="card p-3 mb-3">
+                    <h5 class="text-secondary mb-3">Recent Admission WhatsApp Messages</h5>
+                    <div class="scroll-table">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Phone</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for msg in recent_sentmessage_msgs %}
+                                <tr>
+                                    <td>{{ msg.phone }}</td>
+                                    <td>
+                                        <span class="badge
+                                    {% if msg.status|lower == 'sent' %} badge-success
+                                    {% elif msg.status|lower == 'failed' %} badge-danger
+                                    {% else %} bg-warning
+                                    {% endif %}">
+                                            {{ msg.status|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center">No recent admission messages found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card p-3">
+                    <h5 class="text-secondary mb-3">Admission Open Messages Status Breakdown</h5>
+                    <canvas id="statusChart" height="110"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Status Chart Script -->
+    <script>
+    // Admission Chart
+    var ctx = document.getElementById('statusChart').getContext('2d');
+    var statusChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ status_labels|safe }},
+            datasets: [{
+                label: 'Message Count',
+                data: {{ status_counts|safe }},
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
+                borderColor: ['#218838', '#e0a800', '#c82333', '#343a40'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Enquiry Chart
+    var ctx2 = document.getElementById('enquiryStatusChart').getContext('2d');
+    var enquiryStatusChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: {{ enquiry_status_labels|safe }},
+            datasets: [{
+                label: 'Message Count',
+                data: {{ enquiry_status_counts|safe }},
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
+                borderColor: ['#218838', '#e0a800', '#c82333', '#343a40'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } },
+            plugins: { legend: { display: false } }
+        }
+    });
+    </script>
+</body>
+</html>
+{% endblock %}

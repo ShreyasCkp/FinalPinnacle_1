@@ -1,0 +1,248 @@
+{% extends 'lms/employee_layout.html' %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<style>
+    .calendar-container {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 9px;
+        margin-top: 16px;
+    }
+
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 5px;
+        color: #495057;
+        margin-top: 28px;
+        font-size: 13px;
+    }
+
+    .calendar-day {
+        min-height: 65px;
+        border: 1px solid #800; /* maroon border */
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 11px;
+        cursor: default;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative; /* for .fill positioning */
+        overflow: hidden; /* clip the fill inside */
+        background: transparent; /* no background at all */
+    }
+
+
+    .calendar-day .fill {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 10%;  /* tiny semi-fill */
+        border-radius: 8px 8px 0 0; /* only top corners rounded */
+        z-index: 0;   /* behind text */
+    }
+
+    /* Fill colors per status */
+    .present .fill {
+        background-color: darkgreen;
+    }    /* green */
+    .absent .fill { background-color: crimson; }    /* maroon */
+    .late .fill { background-color: #ffa500; }      /* orange */
+    .leave .fill {
+        background-color: #808080;
+    }     /* blue */
+    .holiday .fill {
+        background-color: black;
+    }   /* gray */
+
+
+    .attendance-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 20px 0;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .attendance-legend .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .attendance-legend .color-box {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        display: inline-block;
+        border: 1px solid #333;
+    }
+
+    .color-present {
+        background-color: darkgreen;
+    }
+    .color-absent { background-color: crimson; }
+    .color-late { background-color: #ffa500; }
+    .color-leave { background-color: #5A5A5A; }
+    .color-holiday { background-color: black; }
+
+
+    /* Text stays above fill */
+    .day-number, .day-status {
+        position: relative;
+        z-index: 1;
+    }
+
+
+    .empty-day { min-height: 65px; }
+
+    .form-select {
+        background-color: #800;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+    }
+    .dropdown {
+        margin-left: 20px;
+        margin-right: 38px;
+        padding: 30px 6px 7px;
+    }
+    .form-selectss {
+        background-color: #800;
+        color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        width: 74px;
+        height: 19px;
+        margin-left: 20px;
+    }
+    .mb-3 {
+        font-weight: 600;
+        color: #800;
+        font-size: 20px;
+        text-align: center;
+        margin-bottom: -28px;
+        margin-top: -21px;
+    }
+        /* Theme-based Attendance Colors */
+    /* Attendance Status Colors - Semi Shaded Theme */
+
+    /* Present → light greenish tint with maroon overlay */
+    /*.present {
+        background: linear-gradient(135deg, rgba(0,128,0,0.08), rgba(128,0,0,0.08));
+        color: #2e7d32;*/ /* dark green */
+    /*}*/
+
+    /* Absent → maroon shading */
+    /*.absent {
+        background: linear-gradient(135deg, rgba(128,0,0,0.15), rgba(128,0,0,0.25));
+        color: #800;*/ /* theme maroon */
+    /*}*/
+
+    /* Late → amber shade blended with maroon */
+    /*.late {
+        background: linear-gradient(135deg, rgba(255,165,0,0.15), rgba(128,0,0,0.1));
+        color: #e65100;*/ /* deep orange */
+    /*}*/
+
+    /* Leave → bluish with maroon tint */
+    /*.leave {
+        background: linear-gradient(135deg, rgba(30,144,255,0.12), rgba(128,0,0,0.08));
+        color: #0d47a1;*/ /* navy */
+    /*}*/
+
+    /* Holiday → neutral gray with maroon tint */
+    /*.holiday {
+        background: linear-gradient(135deg, rgba(200,200,200,0.15), rgba(128,0,0,0.08));
+        color: #800;*/ /* theme maroon */
+    /*}*/
+
+
+
+</style>
+
+<div class="container mt-4">
+     <h5 class="mb-3">View Attendance</h5>
+    <!-- Month & Year Selector -->
+    <div class="dropdown">
+        <form method="get" class="d-flex gap-2">
+            <select name="month" class="form-select" onchange="this.form.submit()">
+                {% for m in months %}
+                    <option value="{{ m.num }}" {% if m.num == selected_month %}selected{% endif %}>{{ m.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="year" class="form-selectss" onchange="this.form.submit()">
+                {% for y in year_list %}
+                    <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Weekday Headers -->
+    <div class="calendar-weekdays">
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+        <div>Sun</div>
+    </div>
+
+    <!-- Calendar Days -->
+    <div class="calendar-container">
+        {# Empty placeholders before 1st of month #}
+        {% for i in calendar_data.0.date.weekday|add:"0"|make_list %}
+        <div class="empty-day"></div>
+        {% endfor %}
+
+        {% for day in calendar_data %}
+        <div class="calendar-day
+            {% if day.status == 'Present' %}present
+            {% elif day.status == 'Late' %}late
+            {% elif day.status == 'Absent' %}absent
+            {% elif day.status == 'Leave' %}leave
+            {% elif day.status == 'Holiday' %}holiday{% endif %}">
+            <div class="fill" style="height: 10%;"></div> <!-- Semi fill from bottom -->
+            <div class="day-number">{{ day.date.day }}</div>
+            <div class="day-status">
+                {% if day.status == 'Present' %}✅ Present
+                {% elif day.status == 'Late' %}⏰ Late
+                {% elif day.status == 'Absent' %}❌ Absent
+                {% elif day.status == 'Leave' %}📝 {{ day.leave_type }}
+                {% elif day.status == 'Holiday' %}{{ day.icon }} {{ day.leave_type }}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+            <!-- Legend -->
+        <div class="attendance-legend">
+            <div class="legend-item">
+                <span class="color-box color-present"></span> Present
+            </div>
+            <div class="legend-item">
+                <span class="color-box color-absent"></span> Absent
+            </div>
+            <div class="legend-item">
+                <span class="color-box color-late"></span> Late
+            </div>
+            <div class="legend-item">
+                <span class="color-box color-leave"></span> Leave
+            </div>
+            <div class="legend-item">
+                <span class="color-box color-holiday"></span> Holiday
+            </div>
+        </div>
+</div>
+
+{% endblock %}

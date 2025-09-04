@@ -1,0 +1,299 @@
+{% extends 'lms/employee_layout.html' %}
+{% block title %}Assignments List{% endblock %}
+{% block content %}
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px;
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .btn-add {
+        position: absolute;
+        right: 0;
+        background-color: #800000;
+        color: #fff;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .btn-add:hover {
+            background-color: #a10000;
+        }
+
+    .search-form {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 200px;
+    }
+
+
+        .search-form input {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 200px;
+        }
+
+        .search-form button {
+            padding: 6px 10px;
+            border: none;
+            background-color: #800000;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+            .search-form button:hover {
+                background-color: #a10000;
+            }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 1px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+    thead {
+        background: linear-gradient(#8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    /* Snackbar */
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .content {
+        margin-left: 0px;
+        padding: 28px 26px 40px;
+        min-height: 100vh;
+    }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <!--<input type="text" id="bookSearch" class="search-form" placeholder="Search Books...">-->
+        <h2>Exam List</h2>
+        <a href="{% url 'create_exam' %}" class="btn-add"> Add New Exam</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Duration</th>
+                <th>Total Marks</th>
+                <th>Faculty</th>
+                <th>Subject</th>
+                <th>Course</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exam in exams %}
+            <tr>
+                <td>{{ exam.exam_type.title }}</td>
+                <td>{{ exam.exam_date }}</td>
+                <td>{{ exam.duration_minutes }}</td>
+                <td>{{ exam.marks }}</td>
+                <td>{{ exam.faculty.name }}</td>
+                <td>{{ exam.subject.name }}</td>
+                <td>{{ exam.course.name }}</td>
+                <td>
+                    <!-- View Icon -->
+                    <a href="{% url 'view_exam' exam.id %}" class="icon-btn" title="View">
+                        <i class="fas fa-eye"></i>
+                    </a>
+
+                    <!-- Edit Icon -->
+                    <a href="{% url 'edit_exam' exam.id %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <!-- Hidden Delete Form -->
+                    <form id="delete-form-{{ exam.id }}" method="POST" action="{% url 'delete_exam' exam.id %}" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+
+                    <!-- Delete Icon Trigger -->
+                    <a href="#" class="icon-btn text-danger" title="Delete"
+                       onclick="confirmDelete('{{ exam.id }}', '{{ exam.exam_title }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    function confirmDelete(id, name) {
+        if (confirm(`Are you sure you want to delete "${name}"?`)) {
+            document.getElementById(`delete-form-${id}`).submit();
+        }
+    }
+</script>
+
+    {% endblock %}

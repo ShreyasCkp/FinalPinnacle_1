@@ -1,0 +1,522 @@
+﻿{% extends 'layout.html' %}
+
+{% block title %}All Students Information{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px; /* Leave space for sidebar */
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .search-form {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 200px;
+    }
+
+    .filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+        .filters select,
+        .filters button {
+            font-size: 13px;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .filters button {
+            border: 1px solid #6c757d;
+            background-color: white;
+            color: black;
+            transition: background-color 0.3s ease;
+        }
+
+            .filters button:hover {
+                background-color: #800000;
+                color: white;
+            }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 1px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+    }
+
+    td {
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 2px 4px;
+        margin: 1px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    .content {
+        margin-left: 0px;
+        padding: 3px 15px 40px;
+        min-height: 100vh;
+    }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <input type="text" id="studentSearch" class="search-form" placeholder="Search Students...">
+        <h2>All Students Information</h2>
+
+    </div>
+
+    <!--<div style="margin-bottom: 7px;">
+    </div>-->
+
+
+    <form method="get" class="filters">
+        <select name="program_type" id="program_type" onchange="this.form.submit()">
+            <option value="">-- Select Program Type --</option>
+            <option value="all" {% if selected_program_type == 'all' %}selected{% endif %}>All</option>
+            {% for pt in program_type_list %}
+            <option value="{{ pt }}" {% if pt == selected_program_type %}selected{% endif %}>{{ pt }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="combination" id="combination">
+            <option value="">-- Select Combination --</option>
+            <option value="all" {% if selected_combination == 'all' %}selected{% endif %}>All</option>
+            {% for combo in combination_list %}
+            <option value="{{ combo }}" {% if combo == selected_combination %}selected{% endif %}>{{ combo }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Sln No</th>
+                <th>Admission No</th>
+                <th>Batch</th>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Program Type</th>
+                <th>Combination</th>
+                <th>Sem/Year</th>
+                <!--<th>Quota Type</th>-->
+                <th>Status</th>
+
+                <!--<th>Student Phone No</th>-->
+                <th>Father Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in students_with_promodate %}
+            {% with student=entry.student %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td data-admission-date="{{ student.admission_date|date:'Y-m-d H:i:s' }}">
+                    {% if student.pu_admission %}
+                    {{ student.pu_admission.admission_no }}
+                    {% elif student.degree_admission %}
+                    {{ student.degree_admission.admission_no }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+
+                <td>{{ student.academic_year }}</td>
+                <td>{{ student.student_userid|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'student_profile' student.id %}">
+                        {{ student.student_name }}
+                    </a>
+                </td>
+                <td>{{ student.course_type }}</td>
+                <td>{{ student.course.name }}</td>
+                <td>
+                    {{ student.course.name }}
+                    {% if student.course_type.name == "PUC Regular" %}
+                    {{ student.current_year }}
+                    {% else %}
+                    {{ student.semester }}
+                    {% endif %}
+                </td>
+
+                <!--<td>{{ student.quota_type }}</td>-->
+                <td>{{ student.status }}</td>
+
+                de
+
+                <!--<td>{{ student.student_phone_no|default:"-" }}</td>-->
+                lt
+                <td>{{ student.father_name|default:"-" }}</td>
+                <td data-promodate="{{ entry.promotion_end_date }}">
+                    <a href="{% url 'student_profile' student.id %}" class="icon-btn" title="View">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{% url 'master_student_edit' student.pk %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    {% if student.status == "Active" %}
+                    <form method="post" action="{% url 'promote_student' student.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="icon-btn promotion-btn" title="Promote" disabled>
+                            <i class="fas fa-level-up-alt"></i>
+                        </button>
+                    </form>
+                    {% else %}
+                    <button class="icon-btn" title="{{ student.status }}" disabled>
+                        <i class="fas fa-level-up-alt" style="color: grey;"></i>
+                    </button>
+                    {% endif %}
+                </td>
+
+
+            </tr>
+            {% endwith %}
+            {% empty %}
+            <tr>
+                <td colspan="11" class="text-center">No records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Promotion Confirmation Modal -->
+<div id="promotionModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <p>Are you sure you want to promote this student?</p>
+        <div class="modal-buttons">
+            <button id="confirmPromotion" class="confirm-btn">Yes</button>
+            <button id="cancelPromotion" class="cancel-btn">No</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .custom-modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px 30px;
+        border: 1px solid #888;
+        width: 300px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .confirm-btn, .cancel-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .confirm-btn {
+        background-color: #800000;
+        color: white;
+    }
+
+    .cancel-btn {
+        background-color: #ccc;
+        color: #333;
+    }
+</style>
+
+<script>
+    let selectedForm = null;
+
+    document.querySelectorAll('.promotion-btn').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();  // prevent immediate form submission
+            selectedForm = this.closest('form');  // store reference to form
+            document.getElementById('promotionModal').style.display = 'block';
+        });
+    });
+
+    document.getElementById('confirmPromotion').addEventListener('click', function () {
+        if (selectedForm) {
+            selectedForm.submit();
+        }
+        document.getElementById('promotionModal').style.display = 'none';
+    });
+
+    document.getElementById('cancelPromotion').addEventListener('click', function () {
+        selectedForm = null;
+        document.getElementById('promotionModal').style.display = 'none';
+    });
+
+    // Optional: Close modal when clicking outside
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('promotionModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+</script>
+
+
+<div id="snackbar"></div>
+
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    // Django message support
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+
+
+</script>
+<script>
+    document.getElementById('studentSearch').addEventListener('input', function () {
+        const filter = this.value.trim().toLowerCase();
+        const rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            const cells = Array.from(row.querySelectorAll("td"));
+            const isEmptyRow = cells.length === 1 && cells[0].colSpan;
+
+            if (isEmptyRow) {
+                // Hide "no records found" row for now
+                row.style.display = 'none';
+                return;
+            }
+
+            const rowText = cells.map(cell => cell.textContent.toLowerCase()).join(" ");
+            row.style.display = rowText.includes(filter) ? '' : 'none';
+        });
+
+        // Show/hide the "no records found" row
+        const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+        const noDataRow = document.querySelector("table tbody tr td[colspan]");
+        if (noDataRow) {
+            noDataRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('td[data-promodate]');
+
+        const today = new Date();
+        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // Strip time
+
+        rows.forEach(cell => {
+            const dateStr = cell.getAttribute('data-promodate');
+            if (!dateStr) return;
+
+            const endDate = new Date(dateStr);
+            const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+            const formButton = cell.querySelector('form button[type="submit"]');
+            const icon = formButton?.querySelector('i');
+
+            if (formButton) {
+                const enablePromotion = todayOnly > endDateOnly; // ✅ Enable only *after* end date
+
+                formButton.disabled = !enablePromotion;
+                formButton.title = enablePromotion ? "Promote" : "Promotion not allowed yet";
+                if (icon) {
+                    icon.style.color = enablePromotion ? "#800000" : "grey";
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
+
+<style>
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+{% endblock %}

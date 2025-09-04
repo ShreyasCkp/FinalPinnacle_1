@@ -1,0 +1,217 @@
+{% extends 'layout.html' %}
+{% block title %}        {% if action == 'edit' %}Edit Role{% elif action == 'view' %}View Role{% else %}Add New Role{% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        max-width: 400px;
+        margin: 40px auto;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 24px;
+        font-size: 22px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    input[type="text"],
+    select {
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    input[readonly] {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+
+    button[type="submit"] {
+        background-color: #800000;
+        color: white;
+        padding: 5px 9px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 12px;
+        width: 17%;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    /*  button[type="submit"]:hover {
+            background-color: #a10000;
+        }*/
+
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .back-button {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+    /* .back-button:hover {
+            background-color: #5a6268;
+        }*/
+
+    .submit-button {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .submit-button:hover {
+            background-color: #a10000;
+        }
+</style>
+
+<div class="container">
+    <h2>
+        {% if action == 'edit' %}Edit Role{% elif action == 'view' %}View Role{% else %}Add New Role{% endif %}
+    </h2>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Username -->
+        <label for="username">Rolename:</label>
+        <input type="text" name="username" id="username" placeholder="Rolename"
+               value="{{ user_instance.username|default:'' }}"
+               {% if action == 'view' %}readonly{% endif %}>
+
+        <!-- Password -->
+        <label for="password">Password:</label>
+        <input type="text" name="password" id="password" placeholder="Password"
+               value="{{ user_instance.password|default:'' }}"
+               {% if action == 'view' %}readonly{% endif %}>
+
+        {% if action == 'edit' %}
+        <!-- is_locked dropdown -->
+        <label for="is_locked">Is Blocked:</label>
+        <select name="is_locked" id="is_locked" {% if action == 'view' %}disabled{% endif %}>
+            <option value="True" {% if user_instance.is_locked %}selected{% endif %}>True</option>
+            <option value="False" {% if not user_instance.is_locked %}selected{% endif %}>False</option>
+        </select>
+
+        <!-- wrong_attempts readonly -->
+        <label for="wrong_attempts">Wrong Attempts:</label>
+        <input type="text" id="wrong_attempts" readonly value="{{ user_instance.wrong_attempts }}">
+        {% endif %}
+
+        <div class="form-buttons">
+            <a href="{% url 'user_list' %}" class="back-button">Back</a>
+
+            {% if action != 'view' %}
+            <button type="submit" class="submit-button">
+                {% if action == 'edit' %}Update{% else %}Save{% endif %}
+            </button>
+            {% endif %}
+        </div>
+
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const passwordInput = document.getElementById('password');
+
+        function validatePassword(password) {
+            // Password must:
+            // - Start with a capital letter
+            // - Include at least one special character from !@#$%^&*(),.?":{}|<>
+            // - End with a digit
+            // - Be 8-16 characters long
+            const pattern = /^[A-Z][a-z]*[!@#$%^&*(),.?":{}|<>][a-zA-Z0-9]*[0-9]$/;
+            return pattern.test(password) && password.length >= 8 && password.length <= 16;
+        }
+
+        function showError(message) {
+            let errorDiv = document.getElementById('error_password');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'error_password';
+                errorDiv.style.color = 'red';
+                errorDiv.style.marginTop = '4px';
+                passwordInput.parentNode.insertBefore(errorDiv, passwordInput.nextSibling);
+            }
+            errorDiv.textContent = message;
+        }
+
+        function clearError() {
+            const errorDiv = document.getElementById('error_password');
+            if (errorDiv) {
+                errorDiv.textContent = '';
+            }
+        }
+
+        form.addEventListener('submit', function (e) {
+            const password = passwordInput.value.trim();
+            if (!validatePassword(password)) {
+                e.preventDefault();
+                showError("Invalid password format. Password must:\n" +
+                    "- Start with a capital letter\n" +
+                    "- Include a special character\n" +
+                    "- End with a digit\n" +
+                    "- Be 8-16 characters long\n" +
+                    "- eg: Admin@12");
+                passwordInput.focus();
+            } else {
+                clearError();
+            }
+        });
+
+        // Optional: live feedback while typing
+        passwordInput.addEventListener('input', function () {
+            if (validatePassword(this.value.trim())) {
+                clearError();
+            }
+        });
+    });
+</script>
+
+{% endblock %}

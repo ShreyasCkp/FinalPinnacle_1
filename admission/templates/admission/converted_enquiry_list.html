@@ -1,0 +1,218 @@
+{% extends 'layout.html' %}
+
+{% block title %}Converted Enquiries List{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px; /* sidebar offset */
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 20px;
+        font-size: 22px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 0px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+    }
+
+    td {
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    /*tr:hover {
+        background-color: #e9ecef;
+    }*/
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .alert {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #f5c6cb;
+        font-size: 14px;
+        margin-top: 24px;
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 27px 24px 40px;
+        min-height: 100vh;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .search-input {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 220px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex" style="position: relative; margin-bottom: 20px;">
+        <input type="text" id="convertedEnquirySearch" placeholder="Search Enquiries..." class="search-input">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #800000; text-align: center; width: 100%;">
+            Converted Enquiries List
+        </h2>
+    </div>
+
+
+    <table class="table table-bordered table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Enquiry No</th>
+                <th>Admission No</th>
+                <th>Student Name</th>
+                <th>Type</th>
+                <th>Enquiry Converted_by</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enquiry in enquiries %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ enquiry.enquiry_no }}</td>
+                <td>{{ enquiry.admission_no }}</td>
+                <td>{{ enquiry.student_name }}</td>
+                <td>{{ enquiry.enquiry_type }}</td>
+                <td>{{ enquiry.created_by_username }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center alert">No enquiries found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+
+<script>
+    document.getElementById("convertedEnquirySearch").addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            if (row.querySelector("td")?.getAttribute("colspan")) return;
+
+            const enquiryNo = row.cells[1]?.textContent.toLowerCase() || '';
+            const admissionNo = row.cells[2]?.textContent.toLowerCase() || '';
+            const studentName = row.cells[3]?.textContent.toLowerCase() || '';
+            const type = row.cells[4]?.textContent.toLowerCase() || '';
+            const convertedBy = row.cells[5]?.textContent.toLowerCase() || '';
+
+            const match =
+                enquiryNo.includes(filter) ||
+                admissionNo.includes(filter) ||
+                studentName.includes(filter) ||
+                type.includes(filter) ||
+                convertedBy.includes(filter);
+
+            row.style.display = match ? '' : 'none';
+        });
+    });
+</script>
+
+
+{% endblock %}

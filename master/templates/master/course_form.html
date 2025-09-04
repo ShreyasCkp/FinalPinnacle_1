@@ -1,0 +1,332 @@
+﻿{% extends 'layout.html' %}
+{% load form_filters %}
+
+{% block title %}Add Combination{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 4px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+        width: 100%;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        background-color: #800000;
+        color: #fff;
+        border: 2px solid #800000;
+        padding: 2px 5px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-back:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .btn-save {
+        background-color: #800000;
+        font-weight: 600;
+        padding: 2px 4px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: white;
+        width: 59px;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn-save:hover {
+            background-color: #a10000;
+        }
+
+
+    .is-invalid {
+        border-color: red !important;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 3px 26px 40px;
+        min-height: 100vh;
+    }
+
+    @media (min-width: 768px) {
+        .col-md-6 {
+            flex: 0 0 auto;
+            width: 50%;
+        }
+    }
+</style>
+
+<div class="container form-container">
+    <h3>
+        {% if view_mode %}
+        View Combination
+        {% elif form.instance.pk %}
+        Edit Combination
+        {% else %}
+        Add Combination
+        {% endif %}
+    </h3>
+
+    <form method="post" id="combination-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="id_course_type" class="form-label">Program Type</label>
+                {{ form.course_type|add_class:"form-select" }}
+                <div class="text-danger">{{ form.course_type.errors }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <label for="{{ form.academic_year.id_for_label }}" class="form-label">Batch</label>
+                {{ form.academic_year|add_class:"form-control" }}
+                <div id="academic-year-error" class="text-danger mt-2" style="display: none;"></div>
+
+                <div class="text-danger">{{ form.academic_year.errors }}</div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label for="id_name" class="form-label">Combination Name</label>
+                {{ form.name|add_class:"form-control" }}
+                <div id="name-error" class="text-danger">{{ form.name.errors }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <label for="id_duration_years" class="form-label">Durations (Years)</label>
+                {{ form.duration_years|add_class:"form-control" }}
+                <div class="text-danger">{{ form.duration_years.errors }}</div>
+                <div id="duration_error" class="text-danger mt-2" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-6" id="semester-field">
+                <label for="id_total_semesters" class="form-label">Semesters</label>
+                {{ form.total_semesters|add_class:"form-control" }}
+                <div class="text-danger">{{ form.total_semesters.errors }}</div>
+            </div>
+        </div>
+
+        <div class="form-check mt-3">
+            <input type="radio" name="is_active" value="1" class="form-check-input"
+                   {% if form.instance.is_active %}checked{% endif %}
+                   {% if view_mode %}disabled{% endif %}>
+            <label class="form-check-label">Active</label>
+        </div>
+
+        <div class="form-check">
+            <input type="radio" name="is_active" value="0" class="form-check-input"
+                   {% if not form.instance.is_active %}checked{% endif %}
+                   {% if view_mode %}disabled{% endif %}>
+            <label class="form-check-label">Inactive</label>
+        </div>
+
+        <div class="btn-container d-flex justify-content-between mt-4">
+            <a href="{% url 'course_form_list' %}" class="btn-back">Back</a>
+
+            {% if not view_mode %}
+            <button type="submit" class="btn-save">
+                {% if form.instance.pk %}Update{% else %}Save{% endif %}
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('combination-form');
+    const nameInput = document.getElementById('id_name');
+    const courseTypeInput = document.getElementById('id_course_type');
+    const academicYearInput = document.getElementById('id_academic_year');
+    const durationInput = document.getElementById('id_duration_years');
+    const durationErrorBox = document.getElementById('duration_error');
+    const academicErrorBox = document.getElementById('academic-year-error');
+    const nameErrorBox = document.getElementById('name-error');
+    const semesterFieldDiv = document.getElementById('semester-field');
+
+    let isDuplicate = false;
+
+    // 🔁 Name + CourseType Duplicate Validation (AJAX)
+    function validateCombination(callback = null) {
+        const name = nameInput.value.trim();
+        const course_type = courseTypeInput.value;
+
+        if (name && course_type) {
+            fetch("{% url 'validate_course' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    name: name,
+                    course_type: course_type,
+                    course_id: "{{ form.instance.pk|default:'' }}"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                isDuplicate = data.exists;
+                if (data.exists) {
+                    nameErrorBox.innerText = data.message;
+                    nameInput.classList.add('is-invalid');
+                } else {
+                    nameErrorBox.innerText = "";
+                    nameInput.classList.remove('is-invalid');
+                }
+                if (callback) callback();
+            });
+        } else {
+            nameErrorBox.innerText = "";
+            isDuplicate = false;
+            nameInput.classList.remove('is-invalid');
+            if (callback) callback();
+        }
+    }
+
+    nameInput.addEventListener('input', () => validateCombination());
+    courseTypeInput.addEventListener('change', () => {
+        validateCombination();
+        validateCourseAndBatch();
+        toggleSemesterVisibility();
+    });
+
+    // ✅ Duration & Academic Year Validation
+    function validateCourseAndBatch() {
+        const courseText = courseTypeInput.options[courseTypeInput.selectedIndex]?.text.toLowerCase();
+        const academicText = academicYearInput.options[academicYearInput.selectedIndex]?.text;
+        const duration = parseInt(durationInput.value);
+
+        // Reset errors
+        durationErrorBox.style.display = "none";
+        durationErrorBox.textContent = "";
+        academicErrorBox.style.display = "none";
+        academicErrorBox.textContent = "";
+
+        // Only validate if user has selected something in academic year AND duration
+        const hasSelectedAcademicYear = academicYearInput.selectedIndex > 0;
+        const hasEnteredDuration = durationInput.value.trim() !== "";
+
+        if (!hasSelectedAcademicYear && !hasEnteredDuration) return;
+
+        let startYear, endYear, span = 0;
+        const match = academicText?.match(/(\d{4})\s*-\s*(\d{2,4})/);
+        if (match) {
+            startYear = parseInt(match[1]);
+            endYear = parseInt(match[2]);
+            if (endYear < 100) { // e.g., 25 becomes 2025
+                endYear = parseInt(String(startYear).slice(0, 2) + match[2]);
+            }
+            span = endYear - startYear;
+        }
+
+        if (courseText.includes("pu") || courseText.includes("puc")) {
+            if (hasEnteredDuration && duration !== 2) {
+                durationErrorBox.textContent = "PU courses must have a duration of 2 years.";
+                durationErrorBox.style.display = "block";
+            }
+            if (hasSelectedAcademicYear && span !== 2) {
+                academicErrorBox.textContent = "PU batch must span 2 academic years.";
+                academicErrorBox.style.display = "block";
+            }
+        } else if (courseText.includes("degree") || courseText.includes("school of commerce") || courseText.includes("ug")) {
+            if (hasEnteredDuration && duration !== 3) {
+                durationErrorBox.textContent = "Degree courses must have a duration of 3 years.";
+                durationErrorBox.style.display = "block";
+            }
+            if (hasSelectedAcademicYear && span !== 3) {
+                academicErrorBox.textContent = "Degree batch must span 3 academic years.";
+                academicErrorBox.style.display = "block";
+            }
+        }
+    }
+
+
+    academicYearInput.addEventListener('change', validateCourseAndBatch);
+    durationInput.addEventListener('input', validateCourseAndBatch);
+
+    // Show/hide semester field for PU
+    function toggleSemesterVisibility() {
+        const selectedText = courseTypeInput.options[courseTypeInput.selectedIndex]?.text.toLowerCase();
+        semesterFieldDiv.style.display = selectedText.includes("pu") ? "none" : "block";
+    }
+    toggleSemesterVisibility();
+
+    // Prevent duplicate submit
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        validateCombination(() => {
+            if (!isDuplicate) form.submit();
+        });
+    });
+});
+</script>
+
+{% endblock %}

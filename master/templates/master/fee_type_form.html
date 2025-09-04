@@ -1,0 +1,229 @@
+{% extends 'layout.html' %}
+{% load form_filters %}
+
+{% block title %} {% if mode == 'add' %}
+ Add Fee Type Name
+ {% elif mode == 'edit' %}
+ Edit Fee Type Name
+ {% elif mode == 'view' %}
+ View Fee Type Name
+ {% else %}
+ Fee Type
+ {% endif %}{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+
+    h3 {
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 4px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+        width: 100%;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        background-color: #800000;
+        color: #fff;
+        border: 2px solid #800000;
+        padding: 2px 5px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-back:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .btn-save {
+        background-color: #800000;
+        font-weight: 600;
+        padding: 2px 4px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: white;
+        width: 59px;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn-save:hover {
+            background-color: #a10000;
+        }
+
+
+    .is-invalid {
+        border-color: red !important;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 16px 26px 40px;
+        min-height: 100vh;
+    }
+
+    @media (min-width: 768px) {
+        .col-md-6 {
+            flex: 0 0 auto;
+            width: 50%;
+        }
+    }
+</style>
+
+<div class="container form-container">
+    <h3>
+        {% if mode == 'add' %}
+        Add Fee Type Name
+        {% elif mode == 'edit' %}
+        Edit Fee Type Name
+        {% elif mode == 'view' %}
+        View Fee Type Name
+        {% else %}
+        Fee Type Name
+        {% endif %}
+    </h3>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="mb-3">
+                <label for="id_name" class="form-label">Fee Type Name</label>
+                <div style="border-radius: 5px;">
+                    {% if mode == 'view' %}
+                    {{ form.name|add_class:"form-control" }}
+                    <script>document.getElementById("id_name").setAttribute("readonly", true);</script>
+                    {% else %}
+                    {{ form.name }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <span id="name-error" style="color:red; font-size: 13px;"></span>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+
+        <div class="col-md-6 mb-3">
+            <div class="form-check">
+                {% if mode == 'view' %}
+                {{ form.is_deductible|add_class:"form-check-input" }}
+                <script>document.getElementById("id_is_deductible").setAttribute("disabled", true);</script>
+                {% else %}
+                {{ form.is_deductible }}
+                {% endif %}
+                <label class="form-check-label" for="id_is_deductible">Is Deductible</label>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="form-check">
+                {% if mode == 'view' %}
+                {{ form.is_optional|add_class:"form-check-input" }}
+                <script>document.getElementById("id_is_optional").setAttribute("disabled", true);</script>
+                {% else %}
+                {{ form.is_optional }}
+                {% endif %}
+                <label class="form-check-label" for="id_is_optional">Is Optional</label>
+            </div>
+        </div>
+
+
+        <div class="btn-container">
+            <a href="{% url 'fee_type_list' %}" class="btn-back">Back</a>
+
+            {% if mode != 'view' %}
+            <button type="submit" class="btn-save">
+                {% if mode == 'edit' %}Update{% else %}Save{% endif %}
+            </button>
+            {% endif %}
+        </div>
+
+
+    </form>
+</div>
+
+<!-- Inside the form, below the name field -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#id_name').on('input', function () {
+            let name = $(this).val().trim();
+
+            // Auto-capitalize first letter
+            if (name.length > 0) {
+                name = name.charAt(0).toUpperCase() + name.slice(1);
+                $(this).val(name);
+            }
+
+            const $error = $('#name-error');
+
+            // AJAX check for uniqueness
+            $.get("{% url 'check_fee_type_name' %}", { name: name }, function (data) {
+                if (data.exists) {
+                    $error.text("This Fee Type already exists.");
+                } else {
+                    $error.text("");
+                }
+            });
+        });
+    });
+</script>
+
+
+{% endblock %}

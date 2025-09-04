@@ -1,0 +1,449 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payslip Form</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/payslip.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+
+
+        .top-table {
+            text-indent: 9px;
+            width: 100%;
+            border: 2px solid #000; /* Outer border */
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+            .top-table td {
+                border: none; /* No default borders */
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+
+                /* Vertical lines between columns */
+                .top-table td:nth-child(2),
+                .top-table td:nth-child(3),
+                .top-table td:nth-child(4) {
+                    border-left: 2px solid #000;
+                }
+
+
+        .tops-table {
+            width: 100%;
+            table-layout: fixed; /* Fixes column widths */
+            border: 2px solid #000; /* Outer border */
+            border-collapse: collapse;
+            background-color: white;
+            font-weight: normal;
+            font-size: 14px;
+        }
+
+            .tops-table td {
+                border: none; /* No default borders */
+                padding: 6px 10px;
+                font-size: 14px;
+                font-weight: normal;
+            }
+
+                /* Vertical lines between columns */
+                .tops-table td:nth-child(2),
+                .tops-table td:nth-child(3),
+                .tops-table td:nth-child(4) {
+                    border-left: 2px solid #000;
+                    text-indent: 9px; /* Shift the text to the right */
+                    font-weight: normal;
+                    font-size: 14px;
+                }
+
+            .tops-table th {
+                padding: 6px 10px;
+                font-size: 14px;
+                text-align: left;
+                font-weight: normal;
+                font-size: 14px;
+            }
+
+        .section-title {
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 2px solid #000;
+            margin-bottom: 34px;
+            font-weight: normal;
+        }
+
+        /* Vertical divider between EARNINGS & ALLOWANCES and DEDUCTIONS */
+        .tops-table th.section-title:first-child {
+            border-right: 2px solid #000;
+        }
+
+        .tops-table tr.bold td {
+            border-top: 2px solid #000;
+        }
+
+        .payslip-box {
+            border: 1px solid #000;
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+            font-size: 13px;
+        }
+
+        .center {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            margin-top: -126px;
+        }
+
+        .header-title {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+
+
+        .earnings-deductions,
+        .total-summary,
+        .bank-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+
+            .earnings-deductions td,
+            .earnings-deductions th,
+            .total-summary td,
+            .bank-table td {
+                border: 1px solid #000;
+                padding: 6px 8px;
+            }
+
+            .earnings-deductions th {
+                background: #f0f0f0;
+            }
+
+        .notes {
+            font-style: normal;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 11px;
+        }
+
+        .pay-summary {
+            margin-top: 10px;
+        }
+
+            .pay-summary td {
+                padding: 6px;
+            }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .no-border {
+            border: none !important;
+        }
+
+        .bt-logo {
+            float: right;
+            font-size: 20px;
+            border: 2px solid #000;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 36px;
+            color: #0000cc;
+        }
+
+        .address {
+            font-size: 11px;
+            margin-top: -29px;
+        }
+        /* Style the total row with a bold top border */
+
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+            .summary-table td {
+                border: 2px solid #000;
+                padding: 6px 10px;
+                text-align: left;
+            }
+
+            /* Make the top row match column layout with borders */
+            .summary-table .note {
+                font-style: normal;
+                text-align: center;
+                border-left: 2px solid #000;
+                border-right: 2px solid #000;
+                border-top: 2px solid #000;
+                border-bottom: none;
+                padding: 6px 10px;
+            }
+
+            /* Continue border line from note row to table rows below */
+            .summary-table tr:nth-child(2) td {
+                border-top: none;
+            }
+
+            /* Net Pay row bold */
+            .summary-table .bold-row td {
+                /* font-weight: bold;*/
+            }
+
+        .payslip-table {
+            width: 100%;
+            border: 2px solid #000;
+            border-collapse: collapse;
+            table-layout: fixed;
+            background-color: white;
+        }
+
+            .payslip-table td,
+            .payslip-table th {
+                border: none;
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+
+                /* Vertical dividers between columns */
+                .payslip-table td:nth-child(2),
+                .payslip-table td:nth-child(3),
+                .payslip-table td:nth-child(4) {
+                    border-left: 2px solid #000;
+                    text-indent: 9px;
+                }
+
+            /* Section titles */
+            .payslip-table .section-title {
+                text-align: start;
+                font-size: 13px;
+                border-bottom: 2px solid #000;
+                text-indent: 9px;
+            }
+
+            /* Bold total rows */
+            .payslip-table .bold,
+            .payslip-table .bold-row {
+                /*font-weight: bold;*/
+            }
+
+            /* Note row */
+            .payslip-table .note {
+                font-style: normal;
+                text-align: start;
+                padding: 10px;
+            }
+
+            .payslip-table .earnings-deductions-row {
+                border-top: 2px solid #000; /* Horizontal line above the row */
+            }
+
+        .earning-deductions-row {
+            border-top: 2px solid #000; /* Horizontal line above the row */
+        }
+
+
+        .no-column-lines td {
+            border-left: none !important;
+            border-right: none !important;
+        }
+
+        .with-border {
+            border-right: 1px solid black !important; /* This adds vertical line ONLY to '_______' cells */
+        }
+
+
+
+        .vertical-divider {
+            border-left: 2px solid #000;
+            padding-left: 10px; /* Optional: space after the border */
+        }
+
+        .tops-table th:nth-child(3) {
+            border-left: 2px solid #000;
+            padding-left: 19px;
+        }
+
+        .no-column-lines td:nth-child(2),
+        .no-column-lines td:nth-child(4) {
+            border-right: 2px solid black !important;
+        }
+
+        .no-column-lines th:nth-child(2),
+        .no-column-lines th:nth-child(4) {
+            border-right: 2px solid black !important;
+        }
+
+        .summary-table td:nth-child(3) {
+            border-left: none !important;
+        }
+
+        textarea {
+            border: none;
+            outline: none;
+            resize: none;
+            background: transparent;
+            width: 100%;
+            font-size: 14px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+
+
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <div class="payslip-box">
+            <div style="text-align: right; margin-bottom: 44px; margin-top: -16px;">
+
+                <img src="https://i.postimg.cc/1tFQqd6Y/image-2.png"
+                     alt="Company Logo" style=" height: 82px;">
+
+            </div>
+
+            <div class="center">
+                <p >Pinnacle School of Commerce & Management</p><br>
+                <div class="address">
+                  36/3 & 36/6, Sarjapur- chikkatirupath road, Gudigattanahalli, Bengaluru, Karnataka 562125
+               </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <div style="flex: 1; text-align: center;" class="header-title">
+                        Payslip for the month of {{ form.month }}
+                    </div>
+                    <div style="text-align: right; font-style: italic; color: #444; font-size: 8px; padding-right: 10px;">
+                        <!--Ideation to Creation--><!--Pinnacle School of Commerce & Management-->
+                    </div>
+                </div>
+
+            </div>
+
+            <table class="payslip-table">
+                <tr><td>Employee No.</td><td>{{ employee.emp_code }}</td><td>Employee Name</td><td>{{ employee.name }}</td></tr>
+                <tr><td>Location</td><td>{{ employee.location }}</td><td>UAN No.</td><td>{{ employee.uan_number }}</td></tr>
+                <tr><td>Designation</td><td>{{ employee.designation }}</td><td>PAN No.</td><td>{{ employee.pan_number }}</td></tr>
+                <tr><td>DOB</td><td>{{ employee.dob }}</td><td>Aadhaar No.</td><td>{{ employee.aadhaar_number }}</td></tr>
+                <tr><td>DOJ</td><td>{{ form.doj }}</td><td>PF Number</td><td>{{ employee.pf_number }}</td></tr>
+                <tr><td>Days Paid</td><td>{{ form.days_paid }}</td><td>Pension No.</td><td>{{ employee.pension_no }}</td></tr>
+                <tr><td>Days in Month</td><td>{{ form.days_in_month }}</td><td>ESI No.</td><td>{{ employee.esi_number }}</td></tr>
+                <tr><td>LWOP Days</td><td>{{ form.lwop_days }}</td></tr>
+
+
+                <tr class="tops-table">
+                    <th>EARNINGS & ALLOWANCES</th>
+                    <th>INR</th>
+                    <th>DEDUCTIONS</th>
+                    <th>INR</th>
+                </tr>
+
+                <tr class="no-column-lines">
+                    <td>Basic Salary</td>
+                    <td class="with-border">{{ declaration.basic_salary }}</td>
+                    <td>Employee PF contribu</td>
+                    <td class="with-border">{{ declaration.employee_pf_contribu }}</td>
+                </tr>
+                <tr class="no-column-lines">
+                    <td>HRA</td>
+                    <td class="with-border">{{ declaration.hra }}</td>
+                    <td>Prof Tax - Full Peri</td>
+                    <td class="with-border">{{ declaration.prof_tax_full_period }}</td>
+                </tr>
+                <tr class="no-column-lines">
+                    <td>Special Allowance</td>
+                    <td class="with-border">{{ declaration.special_allowance }}</td>
+                    <td>Ee LWF contribution</td>
+                    <td class="with-border">{{ declaration.ee_lwf_contribution }}</td>
+                </tr>
+                <tr class="no-column-lines">
+                    <td></td>
+                    <td></td>
+                    <td>Income Tax</td>
+                    <td class="with-border">{{ declaration.income_tax }}</td>
+                </tr>
+                <tr class="earnings-deductions-row no-column-lines">
+                    <th class="section-title">Total Payments</th>
+                    <th class="section-title">{{ declaration.total_payments }}</th>
+                    <th class="section-title">Total Deductions</th>
+                    <th class="section-title">{{ declaration.total_deductions }}</th>
+                </tr>
+
+                <tr class="earning-deductions-row">
+                    <th colspan="4" class="note section-title" style="background-image: linear-gradient(to right, transparent 49.9%, black 50%, transparent 50.1%);
+                        background-repeat: no-repeat; background-size: 100% 100%; text-indent: 1px;">
+                        (*) denotes back pay adjustment.
+                    </th>
+                </tr>
+
+                <tr>
+                    <th colspan="2" class="note section-title" style="border-right: 2px solid #000;">OTHERS</th>
+                    <th class="note section-title">PAY SUMMARY</th>
+                    <th class="note section-title">AMOUNT(INR)</th>
+                </tr>
+
+                <tr>
+                    <td colspan="2" class="note section-title"></td>
+                    <td class="note section-title">Net Pay</td>
+                    <td class="note section-title" style="border-left: none;">{{ declaration.net_pay }}</td>
+                </tr>
+
+                <tr class="summary-table ">
+                    <td style="border: none; padding: 4px;">Bank Name</td>
+                    <td style="border: none; padding: 4px;">IFSC Code</td>
+                    <td style="border: none; padding: 4px;"> Bank A /C Number</td>
+                    <td style="border: none; padding: 4px;">AMOUNT(INR)</td>
+                </tr>
+                <tr class="summary-table">
+                    <td style="border: none; padding: 4px;">{{ employee.bank_name }}</td>
+                    <td style="border: none; padding: 4px;">{{ employee.ifsc_code }}</td>
+                    <td style="border: none; padding: 4px;">{{ employee.bank_account_number }}</td>
+                    <td style="border: none; padding: 4px;">{{ employee.amount_inr }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Net Pay in Words : {{ form.net_pay_in_words }}</td>
+                </tr>
+            </table>
+
+            <div class="footer">
+                <p>This is computer generated. No Signature required</p>
+                <p>
+                    Please send your queries to CKP HR Helpdesk
+                    <span style="font-size: 12px; font-weight: bold;">hr@ckpsoftware.com</span>
+                </p>
+                <p>
+                    This document contains confidential information. If you are not the intended recipient,<br>
+                    You are not authorized to use or disclose it in any form. If you have received this in error,<br>
+                    Please destroy it along with any copies and notify the sender immediately.
+                </p>
+            </div>
+        </div>
+
+        <!--{% if not is_pdf %}
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="submit">Submit Payslip</button>
+        </div>
+        {% endif %}-->
+
+    </form>
+</body>
+</html>
+

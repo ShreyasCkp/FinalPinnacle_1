@@ -1,0 +1,508 @@
+{% extends 'layout.html' %}
+{% block title %}Employee Attendance Records List{% endblock %}
+
+{% block content %}
+<style>
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+        .icon-btn:hover {
+            background-color: #f3f3f3;
+        }
+
+
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-left: 91px;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 10px;
+        margin-left: -64px;
+        margin-right: 27px;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 24px;
+        margin-top: -17px;
+        font-size: 22px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        vertical-align: middle !important;
+        text-align: center;
+        padding: 1px;
+        border: 1px solid #dee2e6;
+    }
+
+    td {
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    /*  tr:hover {
+        background-color: #e9ecef;
+    }*/
+
+    .filter-btn {
+        text-decoration: none;
+        color: black;
+        border: 1px solid black;
+        background-color: transparent;
+        width: 200px;
+        height: 29px;
+        border-radius: 5px;
+    }
+
+
+    .alert {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #f5c6cb;
+        font-size: 14px;
+        margin-top: 24px;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        margin-top: -22px;
+    }
+
+        .filter-form input,
+        .filter-form select {
+            min-width: 180px;
+        }
+
+
+    .btn-add {
+        position: absolute;
+        right: 0;
+        background-color: #800000;
+        color: #fff;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-add:hover {
+            background-color: #800000;
+            color: #fff;
+            border-color: #800000;
+        }
+
+    /* Modal styles */
+    .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        z-index: 1001;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        display: none;
+        width: 300px;
+        text-align: center;
+    }
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: none;
+    }
+
+    .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        z-index: 1001;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        display: none;
+        width: 300px;
+        text-align: center;
+    }
+
+    #confirm-popup-message {
+        margin-bottom: 15px;
+        font-size: 13px;
+        color: #800000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .header-flex {
+        display: flex;
+        justify-content: center; /* center the heading */
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .content {
+        padding: 39px 0px 40px;
+        margin-left: 200px;
+    }
+
+    .search-form {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 200px;
+    }
+
+    .pagination-wrapper ul.pagination li {
+        display: inline-block;
+        margin: 0 3px;
+    }
+
+    .pagination-wrapper ul.pagination a, .pagination-wrapper ul.pagination strong {
+        color: #800000;
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    .pagination-wrapper ul.pagination strong {
+        background-color: #800000;
+        color: #fff;
+        border-color: #800000;
+    }
+
+</style>
+
+<div class="container mt-4">
+
+    <!-- Add Attendance Button -->
+    <div class="header-flex">
+        <input type="text" id="attendanceSearch" class="search-form" placeholder="Search...">
+        <h2>Employee Attendance Records List</h2>
+        {% if form_permissions.employee_attendance_form.add %}
+        <a href="{% url 'employee_attendance_form_add' %}" class="btn-add">
+            <i class="bi bi-plus-lg me-2"></i> Add Attendance
+        </a>
+        {% endif %}
+    </div>
+
+
+    <!-- Filter Form -->
+    <!--<form method="get" class="filter-form">
+        <input type="date" name="date" value="{{ request.GET.date }}" class="form-control" />
+        <select name="department" class="form-control">
+            <option value="">All Departments</option>
+            {% for dept in departments %}
+            <option value="{{ dept }}" {% if dept == request.GET.department %}selected{% endif %}>{{ dept }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn filter-btn">Filter</button>
+    </form>-->
+    <!-- Attendance Table -->
+    <table class="table table-bordered table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Emp ID</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in page_obj %}
+            <tr>
+                <td>{{ record.employee.emp_code }}</td>
+                <td>{{ record.employee.name }}</td>
+                <td>{{ record.date }}</td>
+                <td>{{ record.check_in }}</td>
+                <td>{{ record.check_out }}</td>
+                <td>{{ record.status }}</td>
+                <td>
+                    {% if form_permissions.employee_attendance_form.view %}
+                    <a href="{% url 'employee_attendance_form_view' record.id %}" class="icon-btn" title="View">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    {% endif %}
+                    {% if form_permissions.employee_attendance_form.edit %}
+                    <a href="{% url 'employee_attendance_form_edit' record.id %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+
+                    <!-- Hidden delete form -->
+                    {% if form_permissions.employee_attendance_form.delete %}
+                    <form id="attendance-delete-form-{{ record.id }}"
+                          method="POST"
+                          action="{% url 'employee_attendance_form_delete' record.id %}"
+                          style="display: none;">
+                        {% csrf_token %}
+                    </form>
+
+
+                    <a href="#" class="icon-btn" title="Delete"
+                       onclick="confirmAttendanceDelete({{ record.id }}, '{{ record.employee.name|escapejs }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center alert">No records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrapper" style="text-align: center; margin-top: 20px;">
+        <ul class="pagination justify-content-center" style="gap: 6px; list-style: none; padding: 0;">
+            {% with querystring=request.GET.urlencode %}
+            {% if page_obj.number > 1 %}
+            <li><a href="?page=1{% if querystring %}&{{ querystring|urlencode }}{% endif %}">first</a></li>
+            <li><a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring|urlencode }}{% endif %}">prev</a></li>
+            {% endif %}
+
+            {% for i in page_obj.paginator.page_range %}
+            {% if i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
+            {% if i == page_obj.number %}
+            <li><strong>{{ i }}</strong></li>
+            {% else %}
+            <li><a href="?page={{ i }}{% if querystring %}&{{ querystring|urlencode }}{% endif %}">{{ i }}</a></li>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring|urlencode }}{% endif %}">next</a></li>
+            <li><a href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring|urlencode }}{% endif %}">last</a></li>
+            {% endif %}
+            {% endwith %}
+        </ul>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Confirmation Popup -->
+<div id="confirm-popup" class="popup">
+    <p id="confirm-popup-message"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<!-- Overlay Background -->
+<div id="overlay"></div>
+
+<script>
+    let deleteAttendanceId = null;
+
+    function confirmAttendanceDelete(attendanceId, employeeName) {
+        deleteAttendanceId = attendanceId;
+        document.getElementById("confirm-popup").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+        document.getElementById("confirm-popup-message").innerHTML =
+            `Are you sure you want to delete attendance for <b>${employeeName}</b>?`;
+    }
+
+    document.getElementById("confirm-yes").addEventListener("click", function () {
+        if (deleteAttendanceId) {
+            document.getElementById(`attendance-delete-form-${deleteAttendanceId}`).submit();
+        }
+    });
+
+    document.getElementById("confirm-no").addEventListener("click", function () {
+        document.getElementById("confirm-popup").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+        deleteAttendanceId = null;
+    });
+</script>
+
+<script>
+    document.getElementById('attendanceSearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+
+
+<!-- Snackbar -->
+<style>
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+
+<div id="snackbar"></div>
+
+
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    // Django message integration
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+<style>
+    .term {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 3px solid transparent;
+        border-radius: 10px;
+        background-image: linear-gradient(#fff, #fff), linear-gradient(45deg, #ff19e6, #8200c7);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        height: 70vh;
+        position: relative;
+    }
+
+        .term h2, .term p {
+            text-align: center;
+        }
+
+        .term ul {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .term a {
+            text-decoration: none;
+        }
+
+    .back {
+        margin-top: 204px;
+        margin-left: 630px;
+    }
+
+        .back a {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff00cc, #3333ff);
+            /*background-color: #ff69b4;*/ /* Hot Pink */
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+            .back a:hover {
+                transform: scale(1.02);
+                opacity: 0.95;
+                /*background-color: #ff1493;*/ /* Deeper Pink */
+            }
+
+</style>
+
+<div class="term">
+    <div>
+        <h2>Terms and Conditions</h2>
+        <p>By using CKP Software Solutions, you agree to the following conditions:</p>
+        <ul>
+            <li>We are not responsible for any data loss or damage to your device while using our software.</li>
+            <li>The software is provided "as is" without warranty of any kind.</li>
+            <li>We reserve the right to modify these terms at any time, with updates posted on this page.</li>
+            <li>Your software will be terminated if these terms are violated.</li>
+        </ul>
+    </div>
+
+    <div class="back">
+        <a href="{% url 'license_check_view' %}">Back</a>
+
+    </div>
+
+</div>

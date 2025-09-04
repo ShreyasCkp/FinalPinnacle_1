@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+ 
+# Django secret settings
+*.env
+.env
+settings_secret.py
+ 
+# VS Code / IDE stuff
+.vscode/
+.idea/
+ 
+# OS files
+.DS_Store
+Thumbs.db
+obj/ 

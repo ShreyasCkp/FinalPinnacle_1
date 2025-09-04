@@ -1,0 +1,25 @@
+<!-- license/extend_license.html -->
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>Extend License Expiry Date</h2>
+
+<p>Current License Start Date: {{ license.start_date }}</p>
+<p>Current License Expiry Date: {{ license.end_date }}</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label for="extension_days">Extension (in days):</label>
+    <input type="number" name="extension_days" min="1" required><br><br>
+
+    <label for="new_start_date">New Start Date:</label>
+    <input type="date" name="new_start_date" value="{{ license.start_date|date:"Y-m-d" }}" required><br><br>
+
+    <label for="new_end_date">New End Date:</label>
+    <input type="date" name="new_end_date" value="{{ license.end_date|date:"Y-m-d" }}" required><br><br>
+
+    <button type="submit">Extend License</button>
+</form>
+
+{% endblock %}

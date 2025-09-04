@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Contents ({{ status_filter|title }})</h2>
+
+<a href="?status=active" class="btn btn-outline-success btn-sm">Show Active</a>
+<a href="?status=inactive" class="btn btn-outline-danger btn-sm">Show Inactive</a>
+<hr>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Chapter</th>
+            <th>Title</th>
+            <th>File</th>
+            <th>Video URL</th>
+            <th>Status</th>
+            <th>Toggle</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for content in contents %}
+        <tr>
+            <td>{{ content.chapter.name }}</td>
+            <td>{{ content.title }}</td>
+            <td>
+                {% if content.content_file %}
+                <a href="{{ content.content_file.url }}" target="_blank">Download</a>
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
+            <td>
+                {% if content.video_url %}
+                <a href="{{ content.video_url }}" target="_blank">Watch</a>
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
+            <td>{{ content.is_active|yesno:"Active,Inactive" }}</td>
+            <td>
+                <a href="{% url 'content_toggle' content.pk %}" class="btn btn-sm btn-warning">
+                    {% if content.is_active %}Deactivate{% else %}Activate{% endif %}
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No content found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'chapter_list' %}" class="btn btn-secondary">← Back to Chapters</a>
+{% endblock %}

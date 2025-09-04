@@ -1,0 +1,153 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-3">Confirm Payment</h2>
+    <form method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="admission_no" value="{{ admission_no }}">
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>Fee Name</th>
+                        <th>Due Date</th>
+                        <th>Total (₹)</th>
+                        <th>Paid (₹)</th>
+                        <th>Balance (₹)</th>
+                        <th>Mode</th>
+                        <th>Pay (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fee in selected_fees %}
+                    <tr class="text-center">
+                        <input type="hidden" name="fee_ids[]" value="{{ fee.id }}">
+                        <td>{{ fee.fee_type.fee_name }}</td>
+                        <td>{{ fee.fee_type.due_date|date:"d-m-Y" }}</td>
+                        <td>{{ fee.amount }}</td>
+                        <td>{{ fee.paid_amount }}</td>
+                        <td id="balance_{{ fee.id }}">{{ fee.balance_amount }}</td>
+                        <td>
+                            <select name="payment_mode_{{ fee.id }}" id="payment_mode_{{ fee.id }}"
+                                    class="form-select form-select-sm payment-mode" data-fee-id="{{ fee.id }}" required>
+                                <option value="">Select</option>
+                                <option value="Online">Online (QR/UPI)</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Card">Card</option>
+                                <option value="UPI">UPI</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number"
+                                   name="payment_amount_{{ fee.id }}"
+                                   id="payment_amount_{{ fee.id }}"
+                                   class="form-control form-control-sm text-end payment-amount"
+                                   step="0.01"
+                                   min="0"
+                                   max="{{ fee.balance_amount }}"
+                                   placeholder="0.00"
+                                   data-fee-id="{{ fee.id }}"
+                                   required>
+                        </td>
+                    </tr>
+                    <tr id="payment_info_{{ fee.id }}" style="display: none;">
+                        <td colspan="7">
+                            <div id="info_content_{{ fee.id }}"></div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-primary px-4">Record Payment</button>
+            <a href="{% url 'student_fee_list' %}" class="btn btn-secondary px-4 ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const collegeUpiId = "{{ college_upi_id|default:'9483508971@ybl' }}";
+    const collegeUpiName = "{{ college_upi_name|default:'Your College Name' }}";
+
+    function generateQR(feeId, mode) {
+        const paymentAmountInput = document.getElementById('payment_amount_' + feeId);
+        const amount = paymentAmountInput.value || 0;
+        const encodedURL = encodeURIComponent(`upi://pay?pa=${collegeUpiId}&pn=${collegeUpiName}&am=${amount}&cu=INR`);
+        const qrURL = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=${encodedURL}`;
+
+        const infoContent = document.getElementById('info_content_' + feeId);
+
+        let transactionField = '';
+        if (mode === 'UPI' || mode === 'Online') {
+            const txnFieldName = mode === 'UPI' ? 'upi_txn_id' : 'online_txn_id';
+            transactionField = `
+                <label class="mt-2">Enter ${mode} Transaction ID:</label>
+                <input type="text" name="${txnFieldName}_${feeId}" id="${txnFieldName}_${feeId}" class="form-control form-control-sm mt-1" placeholder="Enter ${mode} Reference ID" required>
+            `;
+        }
+
+        infoContent.innerHTML = `
+            <div class="text-center">
+                <p><strong>Scan to pay ₹${amount} via ${mode}:</strong></p>
+                <img src="${qrURL}" alt="${mode} QR Code" width="200" class="img-thumbnail mb-2">
+                <p>Or pay to UPI ID: <strong>${collegeUpiId}</strong></p>
+                ${transactionField}
+            </div>
+        `;
+    }
+
+    document.querySelectorAll('.payment-mode').forEach(select => {
+        select.addEventListener('change', function () {
+            const feeId = this.dataset.feeId;
+            const paymentInfoRow = document.getElementById('payment_info_' + feeId);
+            const infoContent = document.getElementById('info_content_' + feeId);
+
+            if (this.value === 'UPI' || this.value === 'Online') {
+                paymentInfoRow.style.display = '';
+                generateQR(feeId, this.value);
+            } else if (this.value === 'Bank Transfer') {
+                paymentInfoRow.style.display = '';
+                infoContent.innerHTML = `
+                    <p><strong>Bank Transfer Details:</strong></p>
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Account Name:</strong> Your College Name</li>
+                        <li><strong>Account Number:</strong> 1234567890</li>
+                        <li><strong>IFSC:</strong> ABCD0123456</li>
+                        <li><strong>Branch:</strong> Main Branch</li>
+                    </ul>
+                    <label class="mt-2">Enter Bank Transaction Reference ID:</label>
+                    <input type="text" name="bank_txn_id_${feeId}" id="bank_txn_id_${feeId}" class="form-control form-control-sm mt-1" placeholder="Enter Bank Reference ID" required>`;
+            } else if (this.value === 'Card') {
+                paymentInfoRow.style.display = '';
+                infoContent.innerHTML = `
+                    <label>Enter Card Transaction Reference:</label>
+                    <input type="text" name="card_txn_id_${feeId}" id="card_txn_id_${feeId}" class="form-control form-control-sm mt-1" placeholder="Enter Card Txn ID" required>`;
+            } else if (this.value === 'Cash') {
+                paymentInfoRow.style.display = '';
+                infoContent.innerHTML = `<p class="text-center"><strong>Collect cash at the counter and record in the system.</strong></p>`;
+            } else {
+                paymentInfoRow.style.display = 'none';
+                infoContent.innerHTML = '';
+            }
+        });
+    });
+
+    document.querySelectorAll('.payment-amount').forEach(input => {
+        input.addEventListener('input', function () {
+            const feeId = this.dataset.feeId;
+            const paymentModeSelect = document.getElementById('payment_mode_' + feeId);
+            if (paymentModeSelect.value === 'UPI' || paymentModeSelect.value === 'Online') {
+                generateQR(feeId, paymentModeSelect.value);
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

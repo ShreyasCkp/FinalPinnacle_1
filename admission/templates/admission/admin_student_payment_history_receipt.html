@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Student Payment Information</title>
+    <style>
+        body {
+            font-family: "Courier New", Courier, monospace;
+            background: #f9f9f9;
+            padding: 20px;
+        }
+
+        .receipt-container {
+            background: #fff;
+            border: 1px dashed #333;
+            padding: 20px;
+            max-width: 400px;
+            margin: auto;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+            .logo-container img {
+                max-width: 180px;
+                height: auto;
+            }
+
+        .heading {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        td {
+            padding: 4px 0;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-weight: bold;
+            padding-top: 10px;
+            text-decoration: underline;
+        }
+
+        .total-summary {
+            font-weight: bold;
+            border-top: 1px dashed #333;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="https://i.postimg.cc/4xSpKtqg/college-logo-with-name-white-page-0001.jpg" alt="College Logo">
+        </div>
+
+        <h1 class="heading">Student Payment Information</h1>
+
+        <table>
+            <!-- Student Info -->
+            <tr><td class="label">Admission No:</td><td>{{ payment.admission_no }}</td></tr>
+            <tr><td class="label">Name:</td><td>{{ payment.name }}</td></tr>
+            <tr><td class="label">Course:</td><td>{{ payment.course }}</td></tr>
+
+            <!-- Fee Details -->
+            <tr><td colspan="2" class="section-title">Tuition Fee</td></tr>
+            <tr><td>Total:</td><td>₹ {{ payment.tuition_fee }}</td></tr>
+            <tr><td>Paid:</td><td>₹ {{ payment.tuition_fee_paid }}</td></tr>
+            <tr><td>Pending:</td><td>₹ {{ payment.tuition_pending_fee }}</td></tr>
+
+            <tr><td colspan="2" class="section-title">Transport Fee</td></tr>
+            <tr><td>Total:</td><td>₹ {{ payment.transport_fee }}</td></tr>
+            <tr><td>Paid:</td><td>₹ {{ payment.transport_fee_paid }}</td></tr>
+            <tr><td>Pending:</td><td>₹ {{ payment.transport_pending_fee }}</td></tr>
+
+            <tr><td colspan="2" class="section-title">Hostel Fee</td></tr>
+            <tr><td>Total:</td><td>₹ {{ payment.hostel_fee }}</td></tr>
+            <tr><td>Paid:</td><td>₹ {{ payment.hostel_fee_paid }}</td></tr>
+            <tr><td>Pending:</td><td>₹ {{ payment.hostel_pending_fee }}</td></tr>
+
+            <tr><td colspan="2" class="section-title">Books Fee</td></tr>
+            <tr><td>Total:</td><td>₹ {{ payment.books_fee }}</td></tr>
+            <tr><td>Paid:</td><td>₹ {{ payment.books_fee_paid }}</td></tr>
+            <tr><td>Pending:</td><td>₹ {{ payment.books_pending_fee }}</td></tr>
+
+            <tr><td colspan="2" class="section-title">Uniform Fee</td></tr>
+            <tr><td>Total:</td><td>₹ {{ payment.uniform_fee }}</td></tr>
+            <tr><td>Paid:</td><td>₹ {{ payment.uniform_fee_paid }}</td></tr>
+            <tr><td>Pending:</td><td>₹ {{ payment.uniform_pending_fee }}</td></tr>
+
+            <!-- Summary -->
+            <tr><td colspan="2" class="section-title">Total Summary</td></tr>
+            <tr>
+                <td>Total Fee:</td>
+                <td>₹ {{ total_fee|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td>Pending Fee:</td>
+                <td>₹ {{ pending_fee|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td>Next Due Date:</td>
+                <td>{{ payment.next_due_date|date:"d M Y" }}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

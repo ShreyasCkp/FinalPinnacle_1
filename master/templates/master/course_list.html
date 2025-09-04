@@ -1,0 +1,373 @@
+{% extends 'layout.html' %}
+
+{% block title %}Combinations List{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px; /* sidebar offset */
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center; /* center horizontally */
+        align-items: center;
+        margin-bottom: 20px;
+        position: relative; /* for absolute positioning btn-add */
+    }
+
+        /* Center the h2 in header-flex */
+        .header-flex h2 {
+            font-weight: 700;
+            color: #800000;
+            font-size: 22px;
+            margin: 0;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+    /* Position the Add button to the right */
+    .btn-add {
+        background-color: #800000;
+        color: #fff;
+        border: none;
+        font-size: 13px;
+        padding: 6px 12px;
+        font-weight: bold;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+        text-decoration: none;
+        cursor: pointer;
+        position: absolute;
+        right: 0;
+    }
+
+        .btn-add:hover {
+            background-color: #a10000;
+        }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        vertical-align: middle !important;
+        text-align: center;
+        padding: 1px;
+        border: 1px solid #dee2e6;
+    }
+
+    td {
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    td:hover {
+        background-color: #e9ecef;
+    }
+
+    .action-links a {
+        color: #800000;
+        font-weight: 600;
+        text-decoration: none;
+        margin: 0 5px;
+        font-size: 11px;
+    }
+
+        .action-links a:hover {
+            text-decoration: underline;
+        }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+
+    .content {
+        margin-left: 0px;
+        padding: 27px 24px 40px;
+        min-height: 100vh;
+    }
+
+    .search-input {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 220px;
+    }
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <input type="text" id="comboSearch" class="search-input" placeholder="Search Combinations...">
+        <h2>Combinations List</h2>
+        {% if form_permissions.course_form.add %}
+        <a href="{% url 'course_form_add' %}" class="btn-add">Add Combination</a>
+        {% endif %}
+    </div>
+
+
+    <table class="table table-bordered table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Combinations</th>
+                <th>Program Type</th>
+                <th>Durations (Years)</th>
+                <th>Academic Cycle (Semester)</th>
+                <th>Status</th>
+
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.name }}</td>
+                <td>{{ course.course_type.name }}</td>
+                <td>{{ course.duration_years }}</td>
+                <td>
+                    {% if course.name|lower == "puc regular" or course.total_semesters == None %}
+                    NOT APPLICABLE
+                    {% else %}
+                    {{ course.total_semesters }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if course.is_active %}
+                    Active
+                    {% else %}
+                    Inactive
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if form_permissions.course_form.view %}
+                    <a href="{% url 'course_form_view' course.pk %}" class="icon-btn" title="View">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    {% endif %}
+                    {% if form_permissions.course_form.edit %}
+                    <a href="{% url 'course_form_edit' course.pk %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+                    {% if form_permissions.course_form.delete %}
+                    <form id="delete-form-{{ course.id }}" method="POST" action="{% url 'course_form_delete' course.pk %}" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" class="icon-btn text-danger" style=" margin-bottom: 8px; " title="Delete"
+                       onclick="confirmDelete('{{ course.id }}', '{{ course.name }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">No Combinations found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Delete Confirmation Modal -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message"  style=" margin-bottom: 8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<script>
+    let deleteId = null;
+
+    function confirmDelete(id, name) {
+        deleteId = id;
+        document.getElementById('confirm-popup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+        if (deleteId) {
+            document.getElementById(`delete-form-${deleteId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+        document.getElementById('confirm-popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        deleteId = null;
+    });
+</script>
+
+<script>
+    document.getElementById('comboSearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const rowText = Array.from(cells).map(td => td.textContent.toLowerCase()).join(' ');
+            row.style.display = rowText.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+
+
+<div id="snackbar"></div>
+
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    // Django messages support
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock %}

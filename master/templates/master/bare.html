@@ -1,0 +1,168 @@
+<!-- master/templates/bare.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Login{% endblock %}</title>
+    {% load static %}
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: url("{% static 'image/2-2.png' %}") no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-wrapper {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            width: 85%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+            .login-box img {
+                max-width: 70%;
+                height: auto;
+                margin-bottom: 12px;
+                transition: transform 0.5s ease;
+            }
+
+        .login-content {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.5s ease, max-height 0.5s ease;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .login-box:hover .login-content,
+        .login-box:focus-within .login-content {
+            opacity: 1;
+            max-height: 1000px;
+        }
+
+        .form-group {
+            width: 75%;
+            max-width: 200px;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+            .form-group label {
+                display: block;
+                font-size: 14px;
+                color: #444;
+                margin-bottom: 4px;
+            }
+
+        .input-field {
+            width: 62%;
+            padding: 8px 10px;
+            font-size: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .login-box form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .login-box button {
+            width: 75%;
+            max-width: 200px;
+            padding: 8px;
+            background: linear-gradient(135deg, #8B0000, #800000);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.3s ease;
+            box-sizing: border-box;
+        }
+
+            .login-box button:hover {
+                background: #600000;
+            }
+
+        .alert {
+            font-size: 13px;
+            width: 75%;
+            max-width: 200px;
+            text-align: center;
+            color: red;
+            margin-bottom: 12px;
+        }
+
+        a {
+            color: #8B0000;
+            text-decoration: none;
+            font-size: 13px;
+            margin-top: 8px;
+            display: block;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-box">
+            <!-- Logo -->
+            <img src="{% static 'image/Pinnacle-Main.png' %}" alt="Logo">
+
+            <div class="login-content">
+                {% block content %}
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if error %}
+                    <div class="alert">{{ error }}</div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="id_username">Username</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_password">Password</label>
+                        {{ form.password }}
+                    </div>
+
+                    <button type="submit">Login</button>
+
+                    <a href="{% url 'password_reset' %}">Forgot Password?</a>
+                </form>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

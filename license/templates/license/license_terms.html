@@ -1,0 +1,84 @@
+<!-- license_terms.html -->
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>License Terms</h2>
+<p>By using our software, you agree to the following terms:</p>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        background-color: #333;
+        color: white;
+        padding: 10px 0;
+        text-align: center;
+    }
+
+    nav ul {
+        list-style-type: none;
+    }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+            nav ul li a {
+                color: white;
+                text-decoration: none;
+            }
+
+    footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 5px 0;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+    }
+
+    main {
+        margin: 20px;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+    label {
+        margin: 10px 0;
+    }
+</style>
+<ul>
+    <li>The software is licensed, not sold.</li>
+    <li>You may not redistribute the software without permission.</li>
+    <li>We reserve the right to terminate the license if the terms are violated.</li>
+    <li>License is valid for a specific period as mentioned in the license key.</li>
+</ul>
+
+<form method="POST" action="{% url 'home' %}">
+    {% csrf_token %}
+    <label>
+        <input type="checkbox" name="agree_to_terms" required> I agree to the license terms
+    </label>
+    <br>
+    <button type="submit">I Agree and Continue</button>
+</form>
+
+<p><a href="{% url 'privacy_policy' %}">Click here to view Privacy Policy</a></p>
+{% endblock %}

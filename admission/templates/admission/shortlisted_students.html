@@ -1,0 +1,319 @@
+﻿{% extends 'layout.html' %}
+
+{% block title %}Shortlisted Students{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px;">Shortlisted Students</h2>
+
+<!-- Success message -->
+{% if messages %}
+<ul style="list-style:none; padding:0;">
+    {% for message in messages %}
+    <li style="color: green; font-weight: bold; margin-bottom: 10px;">
+        {{ message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<!-- Stream Filter -->
+<form method="get" style="margin-bottom: 20px;">
+    <label for="stream"><strong>Select Stream:</strong></label>
+    <select name="stream" id="stream" onchange="this.form.submit()" style="padding: 6px; font-size: 14px;">
+        <option value="PU" {% if selection == 'PU' %}selected{% endif %}>PU</option>
+        <option value="Degree" {% if selection == 'Degree' %}selected{% endif %}>Degree</option>
+    </select>
+</form>
+
+<!-- Students Table -->
+<table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+    <thead style="background-color: #f2f2f2;">
+        <tr>
+            <th>Admission No</th>
+            <th>Student Name</th>
+            <th>Quota Type</th>
+            <th>Status</th>
+            {% if selection == "PU" %}
+            <th>Fee Entry</th>
+            {% endif %}
+            <th>Admin Approval</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in shortlisted %}
+        <tr id="row-{{ student.id }}"
+            {% if student.admission_no in approved_ids %}
+            style="background-color: #d4edda;"
+            {% elif student.admission_no in not_approved_ids %}
+            style="background-color: #f8d7da;"
+            {% endif %}>
+            <td>{{ student.admission_no }}</td>
+            <td>{{ student.student_name }}</td>
+            <td>{{ student.quota_type|default:"-" }}</td>
+            <td>{{ student.status|default:"-" }}</td>
+
+            {% if selection == "PU" %}
+            <td>
+                {% if student.has_fee %}
+                <span style="color: green;">✅ Exists</span>
+                {% else %}
+                <a href="{% url 'create_fee' student.admission_no %}" style="color: red;">❌ Add Fee</a>
+                {% endif %}
+            </td>
+            {% endif %}
+
+            <td id="approval-cell-{{ student.id }}">
+                {% if student.admission_no in approved_ids %}
+                <span style="color: green; font-weight: bold;">Approved</span>
+                {% elif student.admission_no in not_approved_ids %}
+                <span style="color: red; font-weight: bold;">Not Approved</span>
+                {% else %}
+                <button onclick="confirmApproval('{{ selection }}', {{ student.id }})"
+                        style="background-color: #007bff; color: white; padding: 6px 12px; border: none; cursor: pointer; border-radius: 4px;">
+                    Approve
+                </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align: center;">No shortlisted students found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+function confirmApproval(stream, studentId) {
+    const userConfirmed = confirm("Do you want to approve this student?");
+    const approvalStatus = userConfirmed ? 1 : 0;
+    sendApproval(stream, studentId, approvalStatus);
+}
+
+function sendApproval(stream, studentId, approvalStatus) {
+    fetch(`/approve/${stream}/${studentId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ approved: approvalStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const cell = document.getElementById(`approval-cell-${studentId}`);
+        const row = document.getElementById(`row-${studentId}`);
+
+        if (data.status === 'success') {
+            if (approvalStatus === 1) {
+                cell.innerHTML = '<span style="color: green; font-weight: bold;">Approved</span>';
+                row.style.backgroundColor = '#d4edda';
+            } else {
+                cell.innerHTML = '<span style="color: red; font-weight: bold;">Not Approved</span>';
+                row.style.backgroundColor = '#f8d7da';
+            }
+        } else {
+            alert("Failed to update approval status: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Something went wrong.");
+    });
+}
+</script>
+
+<style>
+    .approved-row {
+        background-color: #d4edda !important;
+    }
+
+    .not-approved-row {
+        background-color: #cce5ff !important;
+    }
+
+    .approved-label {
+        color: green;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .btn-approve {
+        font-size: 10px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        background-color: #0274ee;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn-approve:hover {
+            background-color: #025fc1;
+        }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+        .modal-content button {
+            margin: 0 10px;
+            padding: 6px 14px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+    #confirmYes {
+        background-color: green;
+        color: white;
+    }
+
+    #confirmNo {
+        background-color: red;
+        color: white;
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        font-size: 12px;
+        background-color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+        .styled-table thead {
+            background-color: #0274ee;
+            color: white;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+            .styled-table thead th {
+                padding: 1px;
+                text-align: left;
+                border-right: 1px solid #ffffff44;
+                text-align: center;
+                font-size: 12px;
+            }
+
+                .styled-table thead th:last-child {
+                    border-right: none;
+                }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.2s ease;
+        }
+
+           /* .styled-table tbody tr:hover {
+                background-color: #f5faff;
+            }*/
+
+        .styled-table td {
+            padding: 1px 4px;
+            color: #333;
+            vertical-align: middle;
+            font-size: 9px;
+        }
+
+            .styled-table td:last-child {
+                text-align: center;
+            }
+
+    .sidebar {
+        width: 200px;
+        height: 100vh;
+        background: linear-gradient(135deg, #ff00cc, #3333ff);
+        color: white;
+        padding-top: 0px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 8px;
+            display: block;
+            font-weight: 500;
+        }
+
+    @media (max-width: 768px) {
+        .styled-table thead {
+            display: none;
+        }
+
+        .styled-table,
+        .styled-table tbody,
+        .styled-table tr,
+        .styled-table td {
+            display: block;
+            width: 100%;
+        }
+
+            .styled-table tr {
+                margin-bottom: 15px;
+                background-color: #f9f9f9;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            .styled-table td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+
+                .styled-table td::before {
+                    content: attr(data-label);
+                    position: absolute;
+                    left: 10px;
+                    top: 8px;
+                    font-weight: bold;
+                    text-align: left;
+                    font-size: 11px;
+                    color: #555;
+                }
+    }
+
+    .dropdown-btn {
+        background: none;
+        border: none;
+        color: white;
+        text-align: left;
+        padding: 10px 8px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: inherit;
+        display: block;
+        width: 100%;
+        font-size: 17px;
+    }
+</style>
+{% endblock %}

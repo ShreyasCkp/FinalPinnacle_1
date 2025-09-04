@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>🚍 Transport Dashboard</h2>
+    <ul class="list-group mt-3">
+        <li class="list-group-item"><a href="{% url 'master_transport_list' %}">Manage Vehicles</a></li>
+        <li class="list-group-item"><a href="{% url 'route_list' %}">Manage Routes</a></li>
+        <li class="list-group-item"><a href="{% url 'stop_list' %}">Manage Stops</a></li>
+        <li class="list-group-item"><a href="{% url 'mapping_list' %}">Assign Students to Transport</a></li>
+        <li class="list-group-item"><a href="{% url 'simulate_tracking' %}">🚐 Simulate Bus Location</a></li>
+        <li class="list-group-item"><a href="{% url 'arrival_logs' %}">📜 View Stop Arrival Logs</a></li>
+    </ul>
+</div>
+{% endblock %}

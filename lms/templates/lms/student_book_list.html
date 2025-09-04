@@ -1,0 +1,218 @@
+{% extends 'lms/student_layout.html' %}
+
+{% block title %}Library{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        max-width: 1000px;
+        margin: 40px auto;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h3 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .search-form {
+        position: absolute;
+        left: 0;
+    }
+
+        .search-form input {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 220px;
+        }
+
+    table {
+        width: 100%;
+        font-size: 13px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th {
+        /*padding: 8px 10px;*/
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+        font-size: 12px;
+    }
+
+    td {
+        /*padding: 8px 10px;*/
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(#8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    a.btn-link {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+        a.btn-link:hover {
+            text-decoration: underline;
+        }
+
+    .btn-icon {
+        /*border: 1px solid #dee2e6;*/
+        background-color: #fff;
+        /*padding: 4px 8px;*/
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        text-decoration: none;
+        color: #800000;
+    }
+
+        .btn-icon:hover {
+            background-color: #f1f1f1;
+        }
+
+    .btn-icon-outline {
+        /* color: #007bff;
+        border: 1px solid #007bff;
+        background: transparent;*/
+    }
+
+        .btn-icon-outline:hover {
+            /*background-color: #007bff;
+            color: #fff;*/
+        }
+
+    .btn-icon-green {
+        /*color: green;*/
+        /* border: 1px solid green; */
+        font-size: 12px;
+    }
+
+        .btn-icon-green:hover {
+            /* background-color: green;
+            color: white;*/
+        }
+
+    .text-muted {
+        color: #888;
+        font-style: italic;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 9px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="container">
+    <div class="header-flex">
+        <div class="search-form">
+            <input type="text" id="bookSearch" placeholder="Search Books...">
+        </div>
+        <h3>Available Books</h3>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Title</th>
+                <th>Authors</th>
+                <th>Category</th>
+                <th>Available Copies</th>
+                <th>e-book link</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ book.title }}</td>
+                <td>{{ book.authors }}</td>
+                <td>{{ book.category }}</td>
+                <td>{{ book.available_copies }}</td>
+                <td>
+                    {% if book.link_pass %}
+                    <a href="{{ book.link_pass }}" class="btn-icon btn-icon-green" target="_blank" title="Open Book Link">🔗</a>
+                    {% else %}
+                    <span class="text-muted">No link available for this book.</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'student_book_detail' book.pk %}" class="btn-icon btn-icon-outline">Details</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-muted text-center">No books available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById('bookSearch').addEventListener('input', function () {
+        const filter = this.value.trim().toLowerCase();
+        const rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            const cells = Array.from(row.querySelectorAll("td"));
+            const isEmptyRow = cells.length === 1 && cells[0].colSpan;
+
+            if (isEmptyRow) {
+                row.style.display = 'none';
+                return;
+            }
+
+            const rowText = cells.map(cell => cell.textContent.toLowerCase()).join(" ");
+            row.style.display = rowText.includes(filter) ? '' : 'none';
+        });
+
+        const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+        const noDataRow = document.querySelector("table tbody tr td[colspan]");
+        if (noDataRow) {
+            noDataRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
+        }
+    });
+</script>
+{% endblock %}

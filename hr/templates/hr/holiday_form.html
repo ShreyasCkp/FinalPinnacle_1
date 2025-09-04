@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+{% block title %}{% if holiday %}Edit{% else %}Add{% endif %} Holiday{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        margin-top: 0px;
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 6px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 16px;
+        width: 100%;
+    }
+
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .btn-back {
+        background-color: #800000;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background-color: #6e0000;
+            color: white;
+        }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .form-check {
+        margin-top: 10px;
+    }
+
+    .content {
+        padding: 25px 26px 40px;
+        margin-left: 200px;
+    }
+
+    /* Error message style */
+    .error-message {
+        color: red;
+        font-size: 13px;
+        margin-top: -12px;
+        margin-bottom: 12px;
+    }
+</style>
+
+<div class="container form-container">
+    <h3>{% if holiday %}Edit{% else %}Add{% endif %} Holiday</h3>
+
+    <form method="POST" id="holidayForm" novalidate>
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" value="{{ holiday.name|default:'' }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Date</label>
+            <input type="date" name="date" value="{{ holiday.date|date:'Y-m-d' }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Holiday Type</label>
+            <input type="text" name="holiday_type" value="{{ holiday.holiday_type|default:'' }}" class="form-control">
+        </div>
+
+        <div class="form-check">
+            <input type="checkbox" name="is_working_day" class="form-check-input"
+                   {% if holiday.is_working_day %}checked{% endif %}>
+            <label class="form-check-label">Is Working Day?</label>
+        </div>
+
+        <div class="btn-container">
+            <a href="{% url 'holiday_list' %}" class="btn-back">Back</a>
+            <button type="submit" class="btn-save">Save</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

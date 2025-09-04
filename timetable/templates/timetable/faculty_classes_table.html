@@ -1,0 +1,192 @@
+{% extends 'layout.html' %}
+{% block title %}Faculty Schedule Overview{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fa;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 16px;
+            margin-top: 29px;
+            /*margin-left: 68px;*/
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 7px 13px;
+            width: 210px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: box-shadow 0.2s;
+            align-items: center;
+        }
+
+            .card:hover {
+                box-shadow: 0 6px 18px rgba(60, 130, 255, 0.16);
+            }
+
+        .faculty-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #800;
+        }
+
+        .subject-name {
+            font-size: 12px;
+            margin-bottom: 11px;
+            color: #800;
+            text-align: center;
+        }
+
+        .class-count {
+            background: #e6f2ff;
+            color: #be2f2f;
+            padding: 4px 9px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .filter-form {
+            margin: 12px 75px;
+            /* align-items: center; */
+            /* text-align: center; */
+        }
+
+            .filter-form select {
+                padding: 2px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+            }
+
+            .filter-form button {
+                padding: 3px 10px;
+                border-radius: 5px;
+                border: black;
+                background: white;
+                color: black;
+            }
+
+                .filter-form button:hover {
+                    background: #800;
+                    color: white;
+                }
+
+        .content {
+            padding: 80px 26px 40px;
+            margin-left: 268px;
+        }
+    </style>
+</head>
+<body>
+<h2 style="text-align: center; font-size: 22px; margin-top: -12px; color: #800;">
+        Faculty Schedule Overview
+</h2>
+ 
+    <form method="get">
+<label for="course">Course:</label>
+<select name="course" id="course" onchange="this.form.submit()">
+<option value="">All Courses</option>
+            {% for course in courses %}
+<option value="{{ course.id }}" {% if course.id == selected_course_id %}selected{% endif %}>{{ course.name }}</option>
+            {% endfor %}
+</select>
+ 
+      
+<label for="semester">Semester:</label>
+<select name="semester" id="semester" onchange="this.form.submit()">
+<option value="">All Semesters</option>
+                {% for sem in semesters %}
+<option value="{{ sem.number }}" {% if sem.number == selected_semester %}selected{% endif %}>
+                        {{ sem.name }}
+</option>
+                {% endfor %}
+</select>
+ 
+   
+ 
+    </form>
+ 
+ 
+    <div class="cards-container" style="display: flex; flex-wrap: wrap; gap: 15px;">
+        {% with total=0 %}
+        {% for entry in faculty_subject_class_counts %}
+        {% with total=total|add:entry.class_count %}
+        {% endwith %}
+<div class="card" style="border: 1px solid #ccc; border-radius: 10px; padding: 15px; width: 220px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); background-color: #fdfdfd;">
+<div class="faculty-name" style="font-weight: bold; font-size: 16px; color: #800;">
+                {{ entry.faculty__name }}
+</div>
+<div class="subject-name" style="margin-top: 5px;">
+                {{ entry.subject__name }} <br>
+<small style="color: #800000;">({{ entry.subject__course__name }})</small>
+</div>
+<div class="class-count" style="margin-top: 8px; color: #800;">
+                {{ entry.class_count }} class{{ entry.class_count|pluralize:",es" }} / week
+</div>
+</div>
+        {% endfor %}
+ 
+        <!--{% if faculty_subject_class_counts %}
+<div style="width: 100%; text-align: center; margin-top: 30px;">
+<h3 style="color: #006400;">Total Classes Per Week: {{ total }}</h3>
+</div>
+            {% else %}
+<p style="text-align: center;">No data found.</p>
+            {% endif %}
+        {% endwith %}-->
+</div>
+</body>
+</html>
+ 
+<script>
+    $(document).ready(function () {
+    //    const courseSelect = $('#course');
+    //    const semesterSelect = $('#semester');
+ 
+    //    courseSelect.change(function () {
+    //        const courseId = $(this).val();
+ 
+    //        if (courseId) {
+    //            $.post("{% url 'get_semesters_by_course' %}", {
+    //                course_id: courseId,
+    //                csrfmiddlewaretoken: '{{ csrf_token }}'
+    //            }, function (data) {
+    //                semesterSelect.empty().append($('<option>', { value: '', text: 'All Semesters' }));
+ 
+    //                $.each(data.semesters, function (index, semester) {
+    //                    semesterSelect.append($('<option>', {
+    //                        value: semester.number,
+    //                        text: semester.name
+    //                    }));
+    //                });
+    //            });
+    //        } else {
+    //            semesterSelect.empty().append($('<option>', { value: '', text: 'All Semesters' }));
+    //        }
+    //    });
+ 
+    //    // Trigger initial population if course is already selected
+    //    if (courseSelect.val()) {
+    //        courseSelect.trigger('change');
+    //    }
+    //});
+ 
+</script>
+ 
+ 
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'layout.html' %}
+{% load form_filters %}
+
+{% block title %}
+  {% if view_mode %}
+    View Category
+  {% elif form.instance.pk %}
+    Edit Category
+  {% else %}
+    Add Category
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control {
+        font-size: 14px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+        width: 100%;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 13px;
+        margin-top: -8px;
+        margin-bottom: 12px;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        background-color: #800000;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 2px solid #800000;
+    }
+
+        .btn-back:hover {
+            background-color: #a10000;
+            color: white;
+        }
+
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .content {
+        padding: 25px 26px 40px;
+        margin-left: 200px;
+    }
+</style>
+
+<div class="form-container">
+    <h3>
+        {% if view_mode %}
+        View Category
+        {% elif form.instance.pk %}
+        Edit Category
+        {% else %}
+        Add Category
+        {% endif %}
+    </h3>
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="mb-3">
+            <label class="form-label" for="{{ form.name.id_for_label }}">Category Name</label>
+            {{ form.name|add_class:"form-control" }}
+            <div class="error-message">{{ form.name.errors }}</div>
+        </div>
+
+        {% if view_mode %}
+        <script>
+            // Disable all input/select/textarea fields if in view mode
+            document.addEventListener("DOMContentLoaded", function () {
+                const fields = document.querySelectorAll("input, select, textarea, button[type='submit']");
+                fields.forEach(field => {
+                    field.setAttribute("disabled", "disabled");
+                });
+            });
+        </script>
+        {% endif %}
+
+        <div class="btn-container">
+            <a href="{% url 'category_list' %}" class="btn-back">Back</a>
+
+            {% if not view_mode %}
+            <button type="submit" class="btn-save">
+                {% if form.instance.pk %}Update{% else %}Save{% endif %}
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

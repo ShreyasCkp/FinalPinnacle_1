@@ -1,0 +1,366 @@
+{% extends 'layout.html' %}
+{% block title %}Fee Declaration{% endblock %}
+{% block content %}
+<style>
+    /* Same styles as employee list (copy-pasted) */
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px;
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .btn-add {
+        position: absolute;
+        right: 0;
+        background-color: #800000;
+        color: #fff;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        white-space: nowrap;
+    }
+
+        .btn-add:hover {
+            background-color: #a10000;
+        }
+
+    .table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    th {
+        text-align: center;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+        padding: 1px 2px;
+        word-wrap: break-word;
+        font-size: 10px;
+    }
+
+    td {
+        text-align: center;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+        padding: 0px 0px;
+        word-wrap: break-word;
+        font-size: 11px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 2px 4px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        font-size:9px;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .search-form {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 200px;
+    }
+
+    /* Snackbar + overlay & popup styles reused */
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 30px 26px 40px;
+        min-height: 100vh;
+    }
+
+    .fee-detail-table {
+        background-color: #fafafa;
+        border: 1px solid #ddd;
+    }
+
+    /* Confirm popup styles */
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <input type="text" id="feeSearch" class="search-form" placeholder="Search Fee Declarations...">
+        <h2>Fee Declarations</h2>
+        <a href="{% url 'fee_declaration_add' %}" class="btn-add">
+            <i class="bi bi-plus-lg me-2"></i> Add 
+        </a>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th>Course Type</th>
+                <th>Course</th>
+                <th>Sem/Year</th>
+                <th>Fee Types</th>
+                <th>Amounts</th>
+                <th>Due Dates</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in declarations %}
+            <tr class="fee-row">
+                <td>{{ item.academic_year }}</td>
+                <td>{{ item.course_type }}</td>
+                <td>{{ item.course }}</td>
+                <td>{{ item.semester|default:item.current_year }}</td>
+
+                {% if item.fee_details.all %}
+                <td>
+                    {% for fee in item.fee_details.all %}
+                    <div>{{ fee.fee_type.name }}</div>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for fee in item.fee_details.all %}
+                    <div>{{ fee.amount }}</div>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for fee in item.fee_details.all %}
+                    <div>{{ fee.due_date|date:"d-m-Y" }}</div>
+                    {% endfor %}
+                </td>
+                {% else %}
+                <td colspan="3" class="text-muted">No fee details</td>
+                {% endif %}
+
+                <td>
+                    <a href="{% url 'fee_declaration_edit' item.id %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form id="delete-form-{{ item.id }}" action="{% url 'fee_declaration_delete' item.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" class="icon-btn text-danger" title="Delete"
+                       onclick="confirmFeeDelete('{{ item.id }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center text-muted">No fee declarations found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom: 8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<div id="snackbar"></div>
+
+<script>
+    // Reuse snackbar
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+
+    // Search logic
+    document.getElementById('feeSearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.fee-row');
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            let rowText = '';
+            cells.forEach(cell => {
+                rowText += cell.textContent.toLowerCase() + ' ';
+            });
+            row.style.display = rowText.includes(filter) ? '' : 'none';
+        });
+    });
+
+    // Delete confirmation
+    let deleteFeeId = null;
+    function confirmFeeDelete(id) {
+        deleteFeeId = id;
+        document.getElementById('confirm-popup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete this declaration?`;
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+        if (deleteFeeId) {
+            document.getElementById(`delete-form-${deleteFeeId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+        document.getElementById('confirm-popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        deleteFeeId = null;
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard4{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f7fa;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+    .progress-bar {
+        height: 6px;
+        border-radius: 3px;
+        background-color: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+
+    .min-h-screen {
+        min-height: 10vh;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 51px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="min-h-screen">
+    <!-- Header with Filter Dropdown -->
+    <div class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo + Title -->
+                <div class="flex items-center">
+                    <img src="https://i.postimg.cc/nc6G7t2Q/image-1.png" alt="Logo" class="h-10 w-10 rounded-md" />
+                    <h1 class="ml-3 text-2xl font-bold text-gray-800">Education Management Dashboard</h1>
+                </div>
+
+                <!-- Filter + Profile -->
+                <div class="flex items-center space-x-4">
+                    <!-- Filter Dropdown with Checkboxes -->
+                    <div x-data="{
+    open: false,
+    filter: '{{ selected_filter|default:"all" }}',
+    sections: [] }">
+                        <button @click="open = !open"
+                                class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
+                            Filter
+                            <!--<svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4 text-gray-600" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M19 9l-7 7-7-7" />
+                            </svg>-->
+                        </button>
+
+                        <!-- Dropdown Panel -->
+                        <div x-show="open" @click.away="open = false"
+                             class="absolute right-0 z-50 mt-2 w-64 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 p-4 space-y-2"
+                             x-cloak>
+                            <!-- Time Filters -->
+                            <div class="text-sm font-medium text-gray-700 mb-1">Time Filter</div>
+                            <div class="flex flex-col space-y-1 mb-3">
+                                <label><input type="radio" name="filter" value="day" x-model="filter" class="mr-2">Per Day</label>
+                                <label><input type="radio" name="filter" value="week" x-model="filter" class="mr-2">Per Week</label>
+                                <label><input type="radio" name="filter" value="month" x-model="filter" class="mr-2">Per Month</label>
+                                <label><input type="radio" name="filter" value="year" x-model="filter" class="mr-2">Per Year</label>
+                                <label><input type="radio" name="filter" value="all" x-model="filter" class="mr-2" checked>All</label>
+                            </div>
+
+                            <!-- Section Checkboxes -->
+                            <!--<div class="text-sm font-medium text-gray-700 mb-1">Select Data</div>
+                            <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-sm text-gray-700">
+                                <label><input type="checkbox" value="student_attendance" x-model="sections" class="mr-1">Student Attendance</label>
+                            </div>-->
+                            <!-- Submit Button -->
+                            <form method="get" class="mt-3">
+                                <input type="hidden" name="filter" :value="filter">
+                                <template x-for="section in sections" :key="section">
+                                    <input type="hidden" name="sections" :value="section">
+                                </template>
+                                <button type="submit"
+                                        class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                                    Apply Filter
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Admin Profile -->
+                    <div class="flex items-center">
+                        <!--<img src="https://i.postimg.cc/Pxy3zqmh/1742348220417.jpg" alt="Faculties"
+                             class="h-8 w-8 rounded-full" />-->
+                        <span class="ml-2 text-sm font-medium text-gray-700">Faculties</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Centered Attendance Chart -->
+<div class="flex justify-center mb-8 mt-10">
+    <div class="card bg-white rounded-lg p-5 w-full max-w-2xl">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">Attendance Overview</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Students Attendance</span>
+                    <span class="text-sm font-bold text-blue-600">{{ student_attendance_rate }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill bg-blue-500" style="width: {{ student_attendance_rate }}%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 h-64">
+            <canvas id="attendanceChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+
+<canvas id="attendanceChart" width="400" height="200"></canvas>
+
+<script>
+  const labels = ['Present', 'Late', 'Absent'];
+  const staffData = [{{ staff_present }}, {{ staff_late }}, {{ staff_absent }}];
+  const studentData = [{{ student_present }}, {{ student_late }}, {{ student_absent }}];
+
+  new Chart(document.getElementById('attendanceChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        //{
+        //  //label: 'Faculties',
+        //  data: staffData,
+        //  borderColor: '#6366f1',
+        //  backgroundColor: 'rgba(99,102,241,0.1)',
+        //  tension: 0.4,
+        //  fill: true
+        //},
+        {
+          label: 'Students',
+          data: studentData,
+          borderColor: '#06b6d4',
+          backgroundColor: 'rgba(6,182,212,0.1)',
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: {
+        y: { beginAtZero: true, stepSize: 5 }
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false
+      }
+    }
+  });
+</script>
+{% endblock %}
+

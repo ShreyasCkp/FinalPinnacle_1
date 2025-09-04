@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block content %}
+<a href="{% url 'route_create' %}" class="btn btn-success mb-3">+ Add Route</a>
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Route Name</th>
+            <th>Total Stops</th>
+            <th>Distance</th>
+            <th>Estimated Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in routes %}
+        <tr>
+            <td>{{ r.route_name }}</td>
+            <td>{{ r.total_stops }}</td>
+            <td>{{ r.distance_km }} km</td>
+            <td>{{ r.estimated_time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends 'layout.html' %}
+{% block title %}{% if readonly %}View Substitute{% else %}Assign Substitute{% endif %}{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 12px auto;
+        background: #ffffff;
+        padding: 19px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        margin-top: -14px;
+    }
+
+    h3 {
+        margin-top: 0px;
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 12px;
+        margin-bottom: -3px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 16px;
+        width: 100%;
+    }
+
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 1px;
+        font-size: 12px;
+        color: white;
+        border: none;
+        width: 8%;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .info-box {
+        background-color: #f1f1f1;
+        border-left: 4px solid #a23030;
+        padding: 10px;
+        margin-bottom: 16px;
+    }
+
+        .info-box p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+    .text-danger {
+        font-size: 13px;
+    }
+
+    .action-btn {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 12px;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        min-width: 80px;
+        text-align: center;
+    }
+
+        .action-btn:hover {
+            background-color: #8a1f1f;
+            color: white;
+            text-decoration: none;
+        }
+
+    .content {
+        margin-left: 200px;
+        padding: 64px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="container form-container">
+    <h3>{% if readonly %}View Substitute{% else %}Assign Substitute{% endif %}</h3>
+
+    <div class="info-box">
+        <p><strong>Date:</strong> {{ date }}</p>
+        <p><strong>Time:</strong> {{ entry.time_slot }}</p>
+        <p><strong>Day:</strong> {{ entry.day }}</p>
+        <p><strong>Faculty:</strong> {{ entry.faculty.name }}</p>
+        <p><strong>Subject:</strong> {{ entry.subject.name }}</p>
+        <p><strong>Room:</strong> {{ entry.room }}</p>
+    </div>
+
+    {% if readonly %}
+    <div class="row">
+        <div class="col-md-6">
+            <label class="form-label">Substitute Faculty</label>
+            <p>{{ free_faculties.0.name }}</p>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Subject</label>
+            <p>{{ subjects.0.name }}</p>
+        </div>
+    </div>
+    {% else %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label" for="faculty">Available Faculty</label>
+                <select name="faculty" id="faculty" class="form-select" required>
+                    <option value="">-- Select Faculty --</option>
+                    {% for faculty in free_faculties %}
+                    <option value="{{ faculty.id }}" data-department="{{ faculty.department }}">
+                        {{ faculty.name }}{% if faculty.role %} ({{ faculty.role }}){% endif %}
+                    </option>
+                    {% empty %}
+                    <option disabled>No faculty available</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="subject">Change Subject (Optional)</label>
+                <select name="subject" id="subject" class="form-select" required>
+                    <option value="{{ entry.subject.id }}">{{ entry.subject.name }}</option>
+                    {% for subject in subjects %}
+                    {% if subject.id != entry.subject.id %}
+                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'daily_timetable' %}" class="btn action-btn">Back</a>
+            <button type="submit" class="btn action-btn">Update</button>
+        </div>
+
+
+    </form>
+    {% endif %}
+</div>
+
+<script>
+    const facultySelect = document.getElementById('faculty');
+    const subjectSelect = document.getElementById('subject');
+
+    if (facultySelect && subjectSelect) {
+        facultySelect.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const department = selectedOption.getAttribute('data-department');
+
+            if (department) {
+                for (let i = 0; i < subjectSelect.options.length; i++) {
+                    const subjectText = subjectSelect.options[i].text.trim();
+                    if (subjectText.toLowerCase() === department.trim().toLowerCase()) {
+                        subjectSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

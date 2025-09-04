@@ -1,0 +1,112 @@
+{% extends 'lms/student_layout.html' %}
+
+{% block title %}Book Details{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        max-width: 600px;
+        margin: 40px auto;
+    }
+
+    h3 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 24px;
+        font-size: 22px;
+    }
+
+    .book-detail p {
+        margin-bottom: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #333;
+    }
+
+    .book-detail strong {
+        font-weight: 600;
+        color: #000;
+    }
+
+    .book-detail a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+        .book-detail a:hover {
+            text-decoration: underline;
+        }
+
+    .cover-image {
+        display: block;
+        margin: 20px auto;
+        max-width: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .back-button {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+        .back-button:hover {
+            background-color: #a10000;
+        }
+
+    .main-area, .content {
+        margin-left: 200px;
+        padding: 46px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="container">
+    <h3>{{ book.title }}</h3>
+
+    <div class="book-detail">
+        <p><strong>Author(s):</strong> {{ book.authors }}</p>
+        <p><strong>Category:</strong> {{ book.category }}</p>
+        <p><strong>Edition:</strong> {{ book.edition }}</p>
+        <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+        <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+        <p><strong>Available Copies:</strong> {{ book.available_copies }}</p>
+        <p><strong>Summary:</strong>{{ book.summary }}</p>
+
+        <p>
+            <strong>Book Link:</strong>
+            {% if book.link_pass %}
+            <a href="{{ book.link_pass }}" target="_blank" rel="noopener noreferrer">
+                {{ book.link_pass }}
+            </a>
+            {% else %}
+            <em>No link available</em>
+            {% endif %}
+        </p>
+
+        {% if book.cover_image %}
+        <img src="{{ book.cover_image.url }}" alt="Cover Image" class="cover-image">
+        {% endif %}
+    </div>
+
+    <a href="{% url 'student_book_list' %}" class="back-button">Back</a>
+</div>
+{% endblock %}

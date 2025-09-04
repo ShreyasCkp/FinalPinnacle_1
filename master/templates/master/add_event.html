@@ -1,0 +1,173 @@
+{% extends 'layout.html' %}
+{% block title %}Add Academic Event{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 19px;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+
+
+    input, textarea, select {
+        font-size: 10px;
+        width: 100%;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        padding: 3px 5px;
+        margin-top: -1px;
+        margin-bottom: 0rem !important;
+        line-height: 1.5;
+    }
+
+    .form-control {
+        font-size: 10px;
+        padding: 3px 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .form-select {
+        font-size: 10px;
+        padding: 3px 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .mb-3 {
+        margin-bottom: 0rem !important;
+        margin-top: -1px;
+    }
+
+    .btn-save {
+        background-color: #800;
+        font-weight: 500;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        color: white;
+        margin-top: 12px;
+    }
+
+        .btn-save:hover {
+            background-color: #8b0000;
+        }
+
+    .btn-cancel {
+        font-size: 11px;
+        padding: 5px 12px;
+        margin-left: 10px;
+        margin-top: 12px;
+        background: #800;
+    }
+
+    .content {
+        padding: 46px 26px 18px;
+        flex-grow: 1;
+    }
+
+    .px-4 {
+        padding-right: 1.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0rem !important;
+    }
+</style>
+
+<div class="container form-container">
+    <h3>Add Academic Event</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form %}
+            {% if field.name != 'description' %}
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Description moved to last -->
+            {% if form.description %}
+            <div class="col-md-12 mb-3">
+                <label class="form-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <div class="text-danger">{{ form.description.errors }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'calendar_form' %}" class="btn btn-secondary btn-cancel">Back</a>
+            <button type="submit" class="btn btn-save">Save</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const dateInput = document.querySelector("input[type='date']");
+        const timeInput = document.querySelector("input[type='time']");
+
+        const setMinTimeIfToday = () => {
+            const selectedDate = new Date(dateInput.value);
+            const now = new Date();
+
+            if (selectedDate.toDateString() === now.toDateString()) {
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                timeInput.min = `${hours}:${minutes}`;
+            } else {
+                timeInput.removeAttribute("min");
+            }
+        };
+
+        // Prevent past date
+        const todayStr = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute("min", todayStr);
+
+        // Update min time when date changes
+        dateInput.addEventListener("change", setMinTimeIfToday);
+
+        // Also run on page load
+        setMinTimeIfToday();
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,188 @@
+﻿{% extends 'layout.html' %}
+
+{% block title %}
+  {% if mode == 'edit' %}
+    Edit Class Teacher
+  {% elif mode == 'view' %}
+    View Class Teacher
+  {% else %}
+    Add Class Teacher
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        max-width: 400px;
+        margin: 40px auto;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 24px;
+        font-size: 22px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    select {
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: white;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    select:disabled {
+        background-color: #e9ecef;
+        cursor: not-allowed;
+        color: #495057;
+    }
+
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        display: inline-block;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .btn-back:hover {
+        background-color: #a10000;
+        text-decoration: none;
+        color: white;
+    }
+
+    .btn-submit {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-submit:hover {
+        background-color: #a10000;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 17px 26px 40px;
+        min-height: 100vh;
+    }
+
+    /* Disabled submit in view mode */
+    {% if mode == 'view' %}
+    .btn-submit {
+        display: none;
+    }
+    {% endif %}
+</style>
+
+<div class="container">
+    <h2>
+      {% if mode == 'edit' %}
+        Edit Class Teacher
+      {% elif mode == 'view' %}
+        View Class Teacher
+      {% else %}
+        Add Class Teacher
+      {% endif %}
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label for="program_type">Program Type:</label>
+        <select name="program_type" id="program_type" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+          <option value="">Select Program Type</option>
+          {% for pt in program_types %}
+            <option value="{{ pt.id }}" {% if selected.program_type == pt.id|stringformat:"s" %}selected{% endif %}>{{ pt.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="academic_year">Academic Year:</label>
+        <select name="academic_year" id="academic_year" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+          <option value="">Select Academic Year</option>
+          {% for ay in academic_years %}
+            <option value="{{ ay.id }}" {% if selected.academic_year == ay.id|stringformat:"s" %}selected{% endif %}>{{ ay.year }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="course">Course:</label>
+        <select name="course" id="course" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+          <option value="">Select Course</option>
+          {% for c in courses %}
+            <option value="{{ c.id }}" {% if selected.course == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="semester">Semester:</label>
+        <select name="semester" id="semester" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+          <option value="">Select Semester</option>
+          {% for s in semesters %}
+            <option value="{{ s.id }}" {% if selected.semester == s.id|stringformat:"s" %}selected{% endif %}>{{ s.label }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="faculty">Faculty:</label>
+        <select name="faculty" id="faculty" {% if mode == 'view' %}disabled{% endif %}>
+          <option value="">Select Faculty</option>
+          {% for f in faculties %}
+            <option value="{{ f.id }}" {% if selected.faculty == f.id|stringformat:"s" %}selected{% endif %}>{{ f.name }}</option>
+          {% endfor %}
+        </select>
+
+        <div class="form-buttons">
+            <a href="{% url 'class_teacher_list' %}" class="btn-back">Back</a>
+
+            {% if mode != 'view' %}
+            <button type="submit" class="btn-submit">
+                {% if mode == 'edit' %}Update{% else %}Save{% endif %}
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

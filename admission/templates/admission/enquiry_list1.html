@@ -1,0 +1,190 @@
+{% extends 'layout.html' %}
+
+{% block title %} Enquiries List{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px; /* space for sidebar, same as Users */
+        padding: 30px; /* same as Users */
+        max-width: calc(100% - 200px); /* same as Users */
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px; /* slightly increased for consistency */
+        box-sizing: border-box;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #333;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    th, td {
+        vertical-align: middle !important;
+        text-align: center;
+        padding: 2px;
+        border: 1px solid #dee2e6;
+    }
+
+    td {
+        font-size: 9px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    /* Highlight based on cell content */
+    td:contains("Pending Follow-up") {
+        color: red;
+        font-weight: bold;
+    }
+
+    td:contains("Follow-up Scheduled") {
+        color: orange;
+        font-weight: 600;
+    }
+
+    td:contains("Follow-up Required") {
+        color: gray;
+    }
+
+    .mb-4 {
+        color: #800000;
+        font-size: 20px;
+    }
+
+    .alert {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #f5c6cb;
+        font-size: 14px;
+        margin-top: 24px;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        table {
+            font-size: 11px;
+        }
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 24px 26px 40px;
+        min-height: 100vh;
+    }
+
+    .search-input {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 220px;
+    }
+
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex" style="position: relative; margin-bottom: 20px;">
+        <input type="text" id="enquirySearch" placeholder="Search enquiries..." class="search-input">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #800000; text-align: center; width: 100%;">
+            Total Enquiries List
+        </h2>
+    </div>
+
+
+    {% if selected_form %}
+    <div class="card mt-4 p-4">
+        <h5 class="mb-3">Viewing Enquiry: {{ enquiry_no }}</h5>
+        <form>
+            {{ selected_form.as_p }}
+            <a href="{% url 'enquiry_list' %}" class="btn btn-secondary mt-3">Close</a>
+        </form>
+    </div>
+    {% endif %}
+
+    <table class="table table-bordered table-striped table-hover mt-4">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Enquiry No</th>
+                <th>Student Name</th>
+                <th>Date</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Enquiry Created by</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enquiry in enquiries %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ enquiry.enquiry_no }}</td>
+                <td>{{ enquiry.student_name }}</td>
+                <td>{{ enquiry.enquiry_date }}</td>
+                <td>{{ enquiry.parent_phone }}</td>
+                <td>{{ enquiry.course_type.name }} - {{ enquiry.course.name }}</td>
+                <td>{{ enquiry.created_by_username }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="alert">No enquiries found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById("enquirySearch").addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            if (row.querySelector("td")?.getAttribute("colspan")) return; // skip 'no data' row
+
+            const enquiryNo = row.cells[1]?.textContent.toLowerCase() || '';
+            const studentName = row.cells[2]?.textContent.toLowerCase() || '';
+            const phone = row.cells[4]?.textContent.toLowerCase() || '';
+            const course = row.cells[5]?.textContent.toLowerCase() || '';
+            const createdBy = row.cells[6]?.textContent.toLowerCase() || '';
+
+            const match = enquiryNo.includes(filter)
+                || studentName.includes(filter)
+                || phone.includes(filter)
+                || course.includes(filter)
+                || createdBy.includes(filter);
+
+            row.style.display = match ? '' : 'none';
+        });
+    });
+</script>
+
+{% endblock %}

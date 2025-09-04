@@ -1,0 +1,460 @@
+{% extends 'lms/employee_layout.html' %}
+{% block title %} {% if is_edit %}Edit Student Exam{% else %}Add Student Exam{% endif %} {% endblock %}
+
+{% block content %}
+{% load form_tags %}
+
+<style>
+    .form-section {
+        background: #fff;
+        padding: 31px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 40px;
+        margin-left: 7px;
+        margin-top: 0px;
+        margin-right: 4px;
+        width: 1125px;
+    }
+
+    label {
+        font-weight: 600;
+        margin-right: -10px;
+        font-size: 12px;
+    }
+
+    select, input[type="date"] {
+        padding: 6px;
+        margin: 5px 10px 10px 0;
+        min-width: 180px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    input[readonly] {
+        background-color: #e9ecef;
+    }
+
+    .table-section {
+        margin-top: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+        /*        overflow-x: auto;
+    */ width: 100%;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        table-layout: fixed;
+    }
+
+    th {
+        padding: 8px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+        vertical-align: middle;
+        word-wrap: break-word;
+        /*        text-overflow: ellipsis;
+    */ white-space: nowrap;
+        max-width: 150px;
+    }
+
+    td {
+        border: 1px solid #dee2e6;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .table-responsive {
+        margin-top: 20px;
+    }
+
+    th {
+        background-color: #800000;
+        color: white;
+        padding: 4px;
+        font-size: 11px;
+    }
+
+    .btn-submit {
+        background-color: #800000;
+        color: white;
+        padding: 7px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        margin-top: 12px;
+        cursor: pointer;
+        text-decoration: none; /* remove underline */
+    }
+
+        .btn-submit:hover {
+            background-color: #660000;
+        }
+
+
+    .btn-container {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-container-fixed {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+
+
+    .firsts {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 12px;
+        margin: 20px;
+    }
+
+        .firsts select,
+        .firsts input[type="date"],
+        .firsts input[type="text"] {
+            min-width: 140px;
+            max-width: 200px;
+            font-size: 13px;
+            padding: 6px 8px;
+            flex-shrink: 0;
+        }
+
+    .content {
+        padding: 10px 26px 18px;
+        /* background-color: #EEE; */
+        margin-left: 128px;
+        flex-grow: 1;
+    }
+
+    td input[type="radio"] {
+        margin-bottom: 2px;
+    }
+
+    td label {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .status-options {
+        display: flex;
+        /* justify-content: center; */
+        gap: 13px;
+    }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="form-section">
+    <h4 style="text-align: center; font-size: 22px; color: #800; margin-top: -17px;">
+        {% if is_edit %}Edit Exam {% else %}Add Exam{% endif %}
+    </h4>
+
+    <!-- Filter Dropdowns -->
+    <form method="GET" action="">
+        <div class="firsts">
+            <!-- Program Type -->
+            <select name="program_type" onchange="this.form.submit()">
+                <option value=""> Program Type </option>
+                {% for pt in program_types %}
+                <option value="{{ pt.id }}" {% if pt.id|stringformat:"s" == selected.program_type %}selected{% endif %}>
+                    {{ pt.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Academic Year -->
+            <select name="academic_year" onchange="this.form.submit()">
+                <option value=""> Batch </option>
+                {% for year in academic_years %}
+                <option value="{{ year }}" {% if year|stringformat:"s" == selected.academic_year %}selected{% endif %}>
+                    {{ year }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Course -->
+            <select name="course" onchange="this.form.submit()">
+                <option value=""> Combination </option>
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if course.id|stringformat:"s" == selected.course %}selected{% endif %}>
+                    {{ course.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Semester -->
+            <select name="semester" onchange="this.form.submit()">
+                <option value=""> Sem/Year </option>
+                {% for sem in semesters %}
+                <option value="{{ sem.id }}" {% if sem.id|stringformat:"s" == selected.semester %}selected{% endif %}>
+                    {{ sem.label }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Subject -->
+            <select name="subject" onchange="this.form.submit()">
+                <option value=""> Subject </option>
+                {% for subject in subjects %}
+                <option value="{{ subject.id }}" {% if subject.id|stringformat:"s" == selected.subject %}selected{% endif %}>
+                    {{ subject.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        /*    .form-container {
+            max-width: 800px;
+            margin: 25px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        }*/
+
+        h3 {
+            font-weight: 600;
+            color: #8b0000;
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            font-size: 14px;
+            padding: 4px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 4px;
+            width: 100%;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .btn-back {
+            background-color: #800000;
+            color: #fff;
+            border: 2px solid #800000;
+            padding: 2px 5px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+            .btn-back:hover {
+                background-color: #800000;
+                color: white;
+            }
+
+        .btn-save {
+            background-color: #800000;
+            font-weight: 600;
+            padding: 2px 4px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: white;
+            width: 59px;
+            border: none;
+            cursor: pointer;
+        }
+
+            .btn-save:hover {
+                background-color: #a10000;
+            }
+
+
+        .is-invalid {
+            border-color: red !important;
+        }
+
+        .content {
+            margin-left: 190px;
+            padding: 52px 27px 35px;
+            min-height: 100vh;
+            background-color: white;
+        }
+
+        @media (min-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 auto;
+                width: 50%;
+            }
+        }
+
+        .custom-textarea {
+            height: 102px;
+            width: 49%;
+            resize: vertical;
+        }
+    </style>
+
+    <!-- Form Container -->
+    {% if view_mode %}
+    <div class="container form-container">
+        <h3 class="mb-4">View Exam</h3>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Title</label>
+                <div class="form-control">{{ exam.exam_title }}</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Date</label>
+                <div class="form-control">{{ exam.exam_date }}</div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Marks</label>
+                <div class="form-control">{{ exam.marks }}</div>
+
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Duration (in minutes)</label>
+                <div class="form-control">{{ exam.duration_minutes }}</div>
+            </div>
+
+            <!--<div class="col-md-6">
+                <label class="form-label">Faculty</label>
+                <div class="form-control">{{ exam.faculty.name }}</div>
+            </div>-->
+        </div>
+
+
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Exam Type</label>
+                <div class="form-control">{{ exam.exam_type.name }}</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Created At</label>
+                <div class="form-control">{{ exam.created_at }}</div>
+            </div>
+        </div>
+
+        <div class="btn-container mt-4">
+            <a href="{% url 'exam_list' %}" class="btn-back">Back</a>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Form Mode (Create/Edit) -->
+    <div class="container form-container">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Exam Type</label>
+                    {{ form.exam_type|add_class:"form-control" }}
+                </div>
+                <!--<div class="col-md-6">
+                    <label class="form-label">Title</label>
+                    {{ form.exam_title|add_class:"form-control" }}
+                </div>-->
+                <div class="col-md-6">
+                    <label class="form-label">Exam Date</label>
+
+                    {{ form.exam_date|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Marks</label>
+                    {{ form.marks|add_class:"form-control" }}
+
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Duration (in minutes)</label>
+                    {{ form.duration_minutes|add_class:"form-control" }}
+                </div>
+                <!--<div class="col-md-6">
+                    <label class="form-label">Faculty</label>
+                    {{ form.faculty|add_class:"form-control" }}
+                </div>-->
+
+
+            </div>
+
+
+
+            <!--<div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Exam Type</label>
+                    {{ form.exam_type|add_class:"form-control" }}
+                </div>
+            </div>-->
+
+            <div class="btn-container mt-4">
+                <a href="{% url 'exam_list' %}" class="btn-back">Back</a>
+                <button type="submit" class="btn-back">
+                    {% if edit_mode %}Update{% else %}Save{% endif %}
+                </button>
+            </div>
+        </form>
+
+        {% if form.errors %}
+        <div class="alert alert-danger mt-3">
+            <ul>
+                {% for field in form %}
+                {% for error in field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+            {% endblock %}

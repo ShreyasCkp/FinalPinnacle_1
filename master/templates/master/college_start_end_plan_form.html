@@ -1,0 +1,294 @@
+{% extends 'layout.html' %}
+{% block title %}
+    {% if mode == 'edit' %}
+        Edit College Start–End Plan
+    {% elif mode == 'view' %}
+        View College Start–End Plan
+    {% else %}
+        Add College Start–End Plan
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+
+
+
+<style>
+        .form-section {
+            background: #fff;
+            padding: 31px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            margin-top: 40px;
+            margin-left: 70px;
+            margin-top: 40px;            
+            margin-right: 4px;
+            width: 1011px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-right: -10px;
+            font-size: 12px;
+        }
+
+        select, input[type="date"] {
+            padding: 6px;
+            margin: 5px 10px 10px 0;
+            min-width: 180px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[readonly] {
+            background-color: #e9ecef;
+        }
+
+        .table-section {
+            margin-top: 20px;
+            margin-left: 10px;
+            margin-right: 10px;
+            /*        overflow-x: auto;
+    */ width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+
+        th {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            vertical-align: middle;
+            word-wrap: break-word;
+            /*        text-overflow: ellipsis;
+    */ white-space: nowrap;
+            max-width: 150px;
+        }
+
+        td {
+            border: 1px solid #dee2e6;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .table-responsive {
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #800000;
+            color: white;
+            padding: 4px;
+            font-size: 11px;
+        }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        background-color: #800000;
+        color: #fff;
+        border: 2px solid #800000;
+        padding: 2px 5px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .btn-back:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .btn-save {
+        background-color: #800000;
+        font-weight: 600;
+        padding: 2px 4px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: white;
+        width: 59px;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn-save:hover {
+            background-color: #a10000;
+        }
+
+
+
+
+        .firsts {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 12px;
+            margin: 20px;
+        }
+
+            .firsts select,
+            .firsts input[type="date"],
+            .firsts input[type="text"] {
+                min-width: 140px;
+                max-width: 200px;
+                font-size: 13px;
+                padding: 6px 8px;
+                flex-shrink: 0;
+            }
+
+        .content {
+            padding: 10px 26px 18px;
+            /* background-color: #EEE; */
+            margin-left: 128px;
+            flex-grow: 1;
+        }
+
+        td input[type="radio"] {
+            margin-bottom: 2px;
+        }
+
+        td label {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            font-size: 12px;
+            gap: 4px;
+        }
+
+        .status-options {
+            display: flex;
+            /* justify-content: center; */
+            gap: 13px;
+        }
+    /* Add this to your existing <style> section */
+    .small-date {
+        max-width: 150px; /* You can adjust this */
+        font-size: 12px;
+        padding: 4px 6px;
+    }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Filter Dropdowns -->
+<div class="form-section">
+    <h4 style="text-align: center; font-size: 22px; color: #800; font-weight: 600;">
+        {% if mode == 'edit' %}
+            Edit College Start–End Plan
+        {% elif mode == 'view' %}
+            View College Start–End Plan
+        {% else %}
+            Add College Start–End Plan
+        {% endif %}
+    </h4>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Filters -->
+        <div class="firsts">
+            <select name="program_type" class="form-control" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+                <option value="">Select Program Type</option>
+                {% for pt in program_types %}
+                    <option value="{{ pt.id }}" {% if selected.program_type == pt.id|stringformat:"s" %}selected{% endif %}>
+                        {{ pt.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="academic_year" class="form-control" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+                <option value="">Select Batch</option>
+                {% for ay in academic_years %}
+                    <option value="{{ ay }}" {% if selected.academic_year == ay %}selected{% endif %}>
+                        {{ ay }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="course" class="form-control" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+                <option value="">Select Combination</option>
+                {% for c in courses %}
+                    <option value="{{ c.id }}" {% if selected.course == c.id|stringformat:"s" %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="semester" class="form-control" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+                <option value="">Select Sem/Year</option>
+                {% for s in semesters %}
+                    <option value="{{ s.id }}" {% if selected.semester == s.id|stringformat:"s" %}selected{% endif %}>
+                        {{ s.label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Start/End Dates & Status -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>Start Date</label>
+                <input type="date"
+                       name="start_date"
+                       style="font-size: 12px !important;"
+                       class="form-control small-date"
+                       value="{{ request.POST.start_date|default:plan.start_date|date:'Y-m-d' }}" {% if mode == 'view' %}disabled{% endif %}>
+
+
+            </div>
+
+            <div class="col-md-3">
+                <label>End Date</label>
+                <input type="date"
+                       name="end_date"
+                       style="font-size: 12px !important;"
+                       class="form-control small-date"
+                       value="{{ request.POST.end_date|default:plan.end_date|date:'Y-m-d' }}" {% if mode == 'view' %}disabled{% endif %}>
+
+
+            </div>
+
+            <div class="col-md-3 mt-4">
+                <div class="d-flex align-items-center">
+                    <label for="is_active" class="me-2">Active</label>
+                    <input type="checkbox"
+                           name="is_active"
+                           id="is_active"
+                           class="form-check-input"
+                           value="1"
+                           {% if selected.is_active %}checked{% endif %} {% if mode == 'view' %}disabled{% endif %}>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Buttons -->
+        <div class="btn-container mt-4">
+            <a href="{% url 'college_start_end_plan_list' %}" class="btn-back">Back</a>
+
+            {% if mode == 'create' %}
+                <button type="submit" class="btn-back">Save</button>
+            {% elif mode == 'edit' %}
+                <button type="submit" class="btn-back">Update</button>
+            {% endif %}
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

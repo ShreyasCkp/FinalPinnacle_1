@@ -1,0 +1,66 @@
+{% extends 'lms/student_layout.html' %}
+{% load form_tags %}
+
+{% block title %}Submit Assignment - {{ assignment.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 600px;">
+    <h2 class="mb-4">Submit Assignment</h2>
+
+    <div class="card p-4 shadow-sm">
+        <h5>{{ assignment.title }}</h5>
+        <p><strong>Subject:</strong> {{ assignment.subject.name }}</p>
+        <p><strong>Due Date:</strong> {{ assignment.due_date|date:"M d, Y" }}</p>
+        <p><strong>Marks:</strong> {{ assignment.marks }}</p>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                {% if form.submitted_file %}
+                {{ form.submitted_file.label_tag }}
+                {{ form.submitted_file|add_class:"form-control" }}
+                {% if form.submitted_file.errors %}
+                <div class="text-danger small mt-1">
+                    {{ form.submitted_file.errors }}
+                </div>
+                {% endif %}
+                {% else %}
+                <p>No upload field available in the form.</p>
+                {% endif %}
+
+            </div>
+
+            {% if form.instance.submitted_file %}
+            <p>
+                Current file:
+                <a href="{{ form.instance.submitted_file.url }}" target="_blank">Download</a>
+            </p>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Submit Assignment</button>
+            <a href="{% url 'my_assignments_view' %}" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<style>
+    h2 {
+        color: #800000;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .card h5 {
+        color: #6c7ae0;
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+        width: 100%;
+    }
+</style>
+{% endblock %}

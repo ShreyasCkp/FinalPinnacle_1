@@ -1,0 +1,297 @@
+
+<style>
+    body {
+        font-family: "Times New Roman", serif;
+        background: #f0f0f5;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .certificate {
+        width: 210mm; /* ✅ A4 width */
+        min-height: 297mm; /* ✅ A4 height */
+
+        background: #ffffff;
+        border: 2px solid #000;
+        padding: 25px;
+        box-sizing: border-box;
+        text-align: center;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .logo {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+        .logo img {
+            width: 80px;
+            height: auto;
+        }
+
+    h1 {
+        font-size: 28px; /* increased for A4 */
+        margin: 10px 0 0 0;
+        color: #800000;
+    }
+
+    h2 {
+        margin-top: 5px;
+        font-size: 18px;
+        font-weight: normal;
+        color: #444;
+    }
+
+    .student-info {
+        margin: 30px 0 15px;
+        text-align: left;
+        font-size: 11px;
+        line-height: 1.8;
+    }
+
+        .student-info strong {
+            color: #333;
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 14px;
+        font-size: 9px; /* ✅ Font size set to 9px */
+        margin-top: 57px;
+    }
+
+    th, td {
+        border: 1px solid #444;
+        padding: 8px 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #800000;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .footer {
+        margin-top: 30px;
+        font-size: 13px;
+        text-align: left;
+        color: #555;
+    }
+
+    .actions {
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn {
+        font-size: 14px;
+        padding: 8px 14px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #800000;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #a00000;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .note {
+        font-size: 12px;
+        margin-top: 20px;
+        text-align: center;
+        color: #777;
+    }
+
+    @media print {
+        body {
+            background: #fff;
+            margin: 0;
+        }
+
+        .certificate {
+            border: none;
+            width: 210mm; /* ✅ A4 width */
+            min-height: 297mm; /* ✅ A4 height */
+            box-shadow: none;
+        }
+
+        .actions,
+        .no-print {
+            display: none !important;
+        }
+    }
+
+    .logo {
+        display: flex;
+        justify-content: space-between; /* left & right */
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .logo-left img {
+        width: 100px; /* adjust width */
+        height: auto; /* adjust height */
+    }
+
+    .logo-right img {
+        width: 623px;
+        height: 65px;
+        /*width: 120px;*/ /* adjust separately */
+        /*height: auto;*/
+    }
+
+    .student-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
+        gap: 10px 30px; /* row gap | column gap */
+        margin: 30px 0 15px;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+        .student-info p {
+            margin: 0;
+        }
+
+    .certificate {
+        width: 210mm; /* ✅ A4 width */
+        min-height: 297mm; /* ✅ A4 height */
+        background: #ffffff;
+        border: 2px solid #000;
+        padding: 25px;
+        box-sizing: border-box;
+        text-align: center;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+        /* ✅ Watermark effect */
+        .certificate::before {
+            content: "";
+            position: absolute;
+            top: 0; /* ✅ start at top */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("https://i.postimg.cc/90gyMsy3/only-circle-Chat-GPT-Image-Jun-27-2025-02-52-53-PM.png") no-repeat center center;
+            background-size: contain; /* ✅ scale to fit page */
+            opacity: 0.08;
+            z-index: 0;
+        }
+
+
+        /* ✅ Keep text above the watermark */
+        .certificate * {
+            position: relative;
+            z-index: 1;
+        }
+
+    .note {
+        font-size: 12px;
+        position: absolute;
+        bottom: 30px; /* distance from bottom */
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        color: #777;
+        width: 100%;
+    }
+</style>
+
+<!--<div class="text-end mb-3">
+    <a href="{% url 'student_marksheet_view' student.id %}" class="btn btn-secondary btn-sm">
+        Download
+    </a>
+</div>-->
+
+<div class="certificate">
+    <div class="logo">
+        <div class="logo-left">
+            <img src="https://i.postimg.cc/fTBC99Wj/Screenshot-2025-06-27-144955.png" alt="Left Logo">
+        </div>
+        <div class="logo-right">
+            <img src="https://i.postimg.cc/mgKTx0bq/de903bde-8b24-49ab-968e-3cf02755864c.png" alt="Right Logo">
+        </div>
+    </div>
+
+
+    <!--<h1>Pinnacle School of Commerce and Management</h1>-->
+
+
+    <div class="student-info">
+        <p><strong>Name:</strong> {{ student.student_name }}</p>
+        <p><strong>Student Id:</strong> {{ student.student_userid }}</p>
+        <p><strong>Program:</strong> {{ student.course_type }}</p>
+        <p><strong>Course:</strong> {{ student.course }}</p>
+        <p><strong>Batch:</strong> {{ student.academic_year }}</p>
+
+        {% if student.current_year %}
+        <p><strong>Current Year:</strong> {{ student.current_year }}</p>
+        {% elif student.semester %}
+        <p><strong>Semester:</strong> {{ student.course }} {{ student.semester }}</p>
+        {% endif %}
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <!--<th>Exam Type</th>-->
+                <th>Subject</th>
+                <th>Internal Marks</th>
+                <th>Internal Marks Obtained</th>
+                <th>External Marks</th>
+                <th>External Marks Obtained</th>
+                <th>Final Marks</th>
+                <th>Final Marks Obtained</th>
+                <!--<th>Grade</th>-->
+            </tr>
+        </thead>
+        <tbody>
+            {% for mark in exam_marks %}
+            <tr>
+                <td>{{ mark.subject.name }}</td>
+                <td>25</td>
+                <td>{{ mark.internal_obtained }}</td>
+                <td>{{ mark.max_marks }}</td>
+                <td>{{ mark.marks_obtained|default:"Awaiting" }}</td>
+                <td>100</td>
+                <td>{{ mark.final_obtained }}</td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+    <!--<div class="footer">
+        <p><strong>Generated on:</strong> {{ generated_date }}</p>
+    </div>-->
+
+    <div class="note">
+        This is a system-generated marksheet and does not require a physical signature.
+    </div>
+
+    <!--<div class="actions no-print">
+        <button class="btn btn-primary" onclick="window.history.back()">Back</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+    </div>-->
+</div>
+

@@ -1,0 +1,112 @@
+{% extends 'layout.html' %}
+{% block title %}Period List{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-left: 91px;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 10px;
+        margin-left: -64px;
+        margin-right: 27px;
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 22px;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
+
+    .btn-add {
+        float: right;
+        background-color: #800000;
+        color: white;
+        font-size: 13px;
+        padding: 6px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid #800000;
+    }
+
+    .btn-add:hover {
+        background-color: #a52a2a;
+        color: white;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 6px 8px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+        font-size: 11px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+   /* tr:hover {
+        background-color: #f1f1f1;
+    }*/
+
+    .content {
+        padding: 41px 26px 18px;
+        margin-left: 200px;
+    }
+</style>
+
+<div class="container">
+    <h2>Period List</h2>
+    <a href="{% url 'add_period' %}" class="btn-add">+ Add Period</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Is Extra?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for period in periods %}
+            <tr>
+                <td>{{ period.name }}</td>
+                <td>{{ period.start_time }}</td>
+                <td>{{ period.end_time }}</td>
+                <td>{{ period.is_extra|yesno:"Yes,No" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No periods found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

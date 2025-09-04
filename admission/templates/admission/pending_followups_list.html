@@ -1,0 +1,205 @@
+{% extends 'layout.html' %}
+
+{% block title %}Pending Follow-up List{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px; /* sidebar spacing */
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    h3.mb-4 {
+        text-align: center;
+        color: #800000;
+        font-weight: 700;
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 6px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+  /*  tr:hover {
+        background-color: #e9ecef;
+    }*/
+
+    .text-center {
+        font-style: italic;
+        color: #888;
+    }
+
+    /* Style for your reschedule link like a button */
+    .reschedule-btn {
+        color: #800000;
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid #800000;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 10px;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+
+        .reschedule-btn:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .content {
+        margin-left: 0px;
+        padding: 27px 26px 40px;
+        min-height: 100vh;
+    }
+
+    .search-input {
+        position: absolute;
+        left: 0;
+        font-size: 13px;
+        width: 220px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+</style>
+
+<div class="container">
+    <div class="header-flex" style="position: relative; margin-bottom: 20px;">
+        <input type="text" id="pendingSearch" placeholder="Search follow-ups..." class="search-input">
+        <h3 class="mb-4" style="margin: 0; font-size: 22px; font-weight: 700; color: #800000; text-align: center; width: 100%;">
+            {% if title %}
+            {{ title }}
+            {% else %}
+            Pending Follow-up List
+            {% endif %}
+        </h3>
+    </div>
+
+
+
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Enquiry No</th>
+                <th>Student Name</th>
+                <th>Follow-up Date</th>
+                <th>Priority</th>
+                <th>Follow-up Stage</th>
+                <th>Follow-up Type</th>
+                <th>Status</th>
+                <th>Reschedule </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in pending_followups %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    {% if f.pu_enquiry %}
+                    {{ f.pu_enquiry.enquiry_no }}
+                    {% else %}
+                    {{ f.degree_enquiry.enquiry_no }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if f.pu_enquiry %}
+                    {{ f.pu_enquiry.student_name }}
+                    {% else %}
+                    {{ f.degree_enquiry.student_name }}
+                    {% endif %}
+                </td>
+                <td>{{ f.follow_up_date|date:"Y-m-d H:i" }}</td>
+                <td>{{ f.priority }}</td>
+                <th>Overdue</th>
+                <td>{{ f.follow_up_type }}</td>
+                <td>{{ f.status }}</td>
+                <td>
+                    {% if f.pu_enquiry %}
+                    <a href="{% url 'schedule_follow_up_form_add' %}?enquiry_no={{ f.pu_enquiry.enquiry_no }}&student_name={{ f.pu_enquiry.student_name }}" class="reschedule-btn" title="Reschedule Follow-up">
+                        <i class="fas fa-calendar-alt"></i> Reschedule
+                    </a>
+                    {% else %}
+                    <a href="{% url 'schedule_follow_up_form_add' %}?enquiry_no={{ f.degree_enquiry.enquiry_no }}&student_name={{ f.degree_enquiry.student_name }}" class="reschedule-btn" title="Reschedule Follow-up">
+                        <i class="fas fa-calendar-alt"></i> Reschedule
+                    </a>
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No pending follow-ups found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById("pendingSearch").addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            if (row.querySelector("td")?.getAttribute("colspan")) return; // skip 'no records' row
+
+            const enquiryNo = row.cells[1]?.textContent.toLowerCase() || '';
+            const studentName = row.cells[2]?.textContent.toLowerCase() || '';
+            const followUpDate = row.cells[3]?.textContent.toLowerCase() || '';
+            const priority = row.cells[4]?.textContent.toLowerCase() || '';
+            const type = row.cells[6]?.textContent.toLowerCase() || '';
+            const status = row.cells[7]?.textContent.toLowerCase() || '';
+
+            const match =
+                enquiryNo.includes(filter) ||
+                studentName.includes(filter) ||
+                followUpDate.includes(filter) ||
+                priority.includes(filter) ||
+                type.includes(filter) ||
+                status.includes(filter);
+
+            row.style.display = match ? '' : 'none';
+        });
+    });
+</script>
+
+{% endblock %}

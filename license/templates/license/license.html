@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2 class="mb-4">Activate Your Software License</h2>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if form.errors %}
+<div class="alert alert-warning">
+    <ul>
+        {% for field in form %}
+        {% for error in field.errors %}
+        <li>{{ field.label }}: {{ error }}</li>
+        {% endfor %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="post" class="p-3 border rounded shadow-sm" style="max-width: 400px;">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>License Key:</label>
+        {{ form.license_key }}
+    </div>
+
+    <div class="form-check mb-3">
+        {{ form.agree_to_terms }} {{ form.agree_to_terms.label_tag }}
+    </div>
+
+    <button type="submit" class="btn btn-gradient">Activate</button>
+</form>
+
+{% if license %}
+<p><strong>License Start Date:</strong> {{ license.start_date }}</p>
+<p><strong>License End Date:</strong> {{ license.end_date }}</p>
+{% endif %}
+
+<p class="mt-4"><a href="{% url 'license_terms' %}">Click here to view License Terms</a></p>
+{% endblock %}

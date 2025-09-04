@@ -1,0 +1,223 @@
+{% extends 'layout.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 4px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+        width: 100%;
+    }
+
+    .btn-save {
+        background-color: #800000;
+        font-weight: 500;
+        padding: 5px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #a10000;
+        }
+
+    .btn-container {
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        background-color: #800000;
+        color: #fff;
+        border: 2px solid #800000;
+        padding: 2px 5px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background-color: #a10000;
+            color: white;
+        }
+</style>
+
+<div class="container form-container">
+    <h3>{{ title }}</h3>
+
+    <form method="post" id="feeForm">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label" for="id_fee_name">{{ form.fee_name.label }}</label>
+                {{ form.fee_name }}
+                <div class="text-danger">{{ form.fee_name.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="id_fee_amount">{{ form.fee_amount.label }}</label>
+                {{ form.fee_amount }}
+                <div class="text-danger">{{ form.fee_amount.errors }}</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Program Type -->
+            <div class="col-md-6">
+                <label class="form-label" for="id_program_type">{{ form.program_type.label }}</label>
+                {{ form.program_type }}
+                <div class="text-danger">{{ form.program_type.errors }}</div>
+            </div>
+
+            <!-- Combination -->
+            <div class="col-md-6">
+                <label class="form-label" for="id_combination">{{ form.combination.label }}</label>
+                {{ form.combination }}
+                <div class="text-danger">{{ form.combination.errors }}</div>
+            </div>
+        </div>
+
+        <!-- Semester Selection -->
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label" for="id_semester">Semester</label>
+                <select name="semester" id="id_semester" class="form-select" required>
+                    <option value="">Select Semester</option>
+                    {% for sem in semesters %}
+                    <option value="{{ sem.number }}"
+                            {% if sem.number|stringformat:"s" == selected_semester|stringformat:"s" %}selected{% endif %}>
+                        {{ sem.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Due Date -->
+            <div class="col-md-6">
+                <label class="form-label" for="id_due_date">{{ form.due_date.label }}</label>
+                {{ form.due_date }}
+                <div class="text-danger">{{ form.due_date.errors }}</div>
+            </div>
+            <!-- Academic Year -->
+            <div class="col-md-6">
+                <label class="form-label" for="id_academic_year">{{ form.academic_year.label }}</label>
+                {{ form.academic_year }}
+                <div class="text-danger">{{ form.academic_year.errors }}</div>
+            </div>
+        </div>
+
+        <div class="btn-container d-flex justify-content-between mt-4">
+            <a href="{% url 'fee_detail_list' %}" class="btn-back">Back</a>
+            {% if not view_mode %}
+            <button type="submit" class="btn-save">
+                {% if form.instance.pk %}Update{% else %}Save{% endif %}
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Load combinations when program type changes
+        $('#id_program_type').change(function () {
+            const programTypeId = $(this).val();
+            const url = "{% url 'ajax_load_combinations' %}";
+            $.ajax({
+                url: url,
+                data: {
+                    'program_type': programTypeId
+                },
+                success: function (data) {
+                    const combinationSelect = $('#id_combination');
+                    combinationSelect.empty();
+                    combinationSelect.append('<option value="">---------</option>');
+                    $.each(data, function (index, item) {
+                        combinationSelect.append('<option value="' + item.id + '">' + item.name + '</option>');
+                    });
+                    $('#id_semester').empty().append('<option value="">Select Semester</option>');
+                }
+            });
+        });
+
+        // Load semesters when combination changes
+        function loadSemesters(courseId, selectedSemester) {
+            const csrfToken = $('[name=csrfmiddlewaretoken]').val();
+            if (courseId) {
+                $.ajax({
+                    url: "{% url 'get_semesters_by_course' %}",
+                    method: "POST",
+                    data: {
+                        course_id: courseId,
+                        csrfmiddlewaretoken: csrfToken
+                    },
+                    success: function (data) {
+                        const semesterSelect = $('#id_semester');
+                        semesterSelect.empty().append('<option value="">Select Semester</option>');
+                        $.each(data.semesters, function (index, semester) {
+                            const selected = String(semester.number) === String(selectedSemester) ? 'selected' : '';
+                            semesterSelect.append(`<option value="${semester.number}" ${selected}>${semester.name}</option>`);
+                        });
+                    },
+                    error: function () {
+                        alert('Unable to fetch semesters.');
+                    }
+                });
+            }
+        }
+
+        $('#id_combination').change(function () {
+            loadSemesters($(this).val(), '');
+        });
+
+        // Preload semesters on edit
+        const selectedCourse = '{{ selected_course_id }}';
+        const selectedSemester = '{{ selected_semester }}';
+        if (selectedCourse && selectedSemester) {
+            loadSemesters(selectedCourse, selectedSemester);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,316 @@
+{% extends 'layout.html' %}
+
+{% block title %}Promotion History{% endblock %}
+
+{% block content %}
+<style>
+    .container {
+        margin-left: 200px;
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .search-form {
+        position: absolute;
+        left: 0;
+    }
+
+        .search-form input {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 200px;
+        }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 4px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+    }
+
+    td {
+        font-size: 10px;
+    }
+
+    thead {
+        background: linear-gradient(#8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    /* Delete confirmation popup */
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 25px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex">
+        <input type="text" id="historySearch" class="search-form" placeholder="Search Students...">
+        <h2>Promotion History</h2>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Admission No</th>
+                <th>Student Name</th>
+                <th>Promotion Cycle(Year/Sem)</th>
+                <th>From Year</th>
+                <th>To Year</th>
+                <th>From Sem</th>
+                <th>To Sem</th>
+                <th>Promotion Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for history in promotion_histories %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ history.admission_no }}</td>
+                <td>{{ history.student_name }}</td>
+                <td>{{ history.promotion_cycle }}</td>
+                <td>{{ history.from_year|default:"-" }}</td>
+                <td>{{ history.to_year|default:"-" }}</td>
+                <td>{{ history.from_semester|default:"-" }}</td>
+                <td>{{ history.to_semester|default:"-" }}</td>
+                <td>{{ history.promotion_date }}</td>
+                <td>
+                    <a href="{% url 'promotion_history_edit' history.id %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form id="promotion-delete-form-{{ history.id }}" method="POST" action="{% url 'promotion_history_delete' history.id %}" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" class="icon-btn text-danger" title="Delete"
+                       onclick="confirmPromotionDelete('{{ history.id }}', '{{ history.student_name }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" class="text-center text-muted">No promotion history found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="overlay"></div>
+<div id="confirm-popup">    
+    <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<div id="snackbar"></div>
+
+<script>
+    document.getElementById('historySearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+
+        rows.forEach(row => {
+            const admission = row.children[1]?.textContent.toLowerCase();
+            const name = row.children[2]?.textContent.toLowerCase();
+            const cycle = row.children[3]?.textContent.toLowerCase();
+
+            if (admission.includes(filter) || name.includes(filter) || cycle.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+
+    let deleteHistoryId = null;
+
+    function confirmPromotionDelete(id, studentName) {
+        deleteHistoryId = id;
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${studentName}</b>'s promotion history?`;
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('confirm-popup').style.display = 'block';
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+        if (deleteHistoryId) {
+            document.getElementById(`promotion-delete-form-${deleteHistoryId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+        deleteHistoryId = null;
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('confirm-popup').style.display = 'none';
+    });
+
+    document.getElementById('overlay').addEventListener('click', () => {
+        deleteHistoryId = null;
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('confirm-popup').style.display = 'none';
+    });
+</script>
+{% endblock %}

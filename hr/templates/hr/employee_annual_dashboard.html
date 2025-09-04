@@ -1,0 +1,297 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Annual Payslips</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 18px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Left KPI cards */
+        .employee-card {
+            flex: 1.5;
+            min-width: 400px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-height: 750px;
+            overflow-y: auto;
+        }
+
+        .kpi-card {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .kpi-header h4 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: #800000;
+        }
+
+        .kpi-values {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .kpi-item {
+            background: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+            .kpi-item strong {
+                font-size: 14px;
+                margin-bottom: 4px;
+                display: block;
+            }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            text-decoration: none;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        .btn-download {
+            background: #007bff;
+        }
+
+        .btn-view {
+            background: #28a745;
+        }
+
+        /* Right charts */
+        .analytics {
+            flex: 1;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .analytics-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 220px !important;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Annual Employee Payslips - {{ year }}</h2>
+    <h3>{{ employee.name }} ({{ employee.designation }})</h3>
+
+    <div class="dashboard-container">
+
+        <!-- Left KPI Cards -->
+        <div class="employee-card">
+            {% for month in months_data %}
+            <div class="kpi-card">
+                <div class="kpi-header"><h4>{{ month.month_name }}</h4></div>
+                <div class="kpi-values">
+                    <div class="kpi-item"><strong>{{ month.present_days }}</strong>Present</div>
+                    <div class="kpi-item"><strong>{{ month.lop_days }}</strong>LWOP</div>
+                    <div class="kpi-item"><strong>{{ month.total_deductions|floatformat:2 }}</strong>Deductions</div>
+                    <div class="kpi-item"><strong>{{ month.net_pay|floatformat:2 }}</strong>Net Pay</div>
+                    <div class="kpi-item"><strong>{{ month.basic_salary|floatformat:2 }}</strong>Basic Salary</div>
+                    <div class="kpi-item"><strong>{{ month.final_salary|floatformat:2 }}</strong>Final Salary</div>
+                </div>
+                <div class="actions">
+                    <a href="{% url 'download_payslip' year=year month=month.month %}?employee_id={{ employee.id }}" class="btn btn-download" target="_blank">Download</a>
+                    <a href="{% url 'employee_salary_slip_view' %}?month={{ month.month }}&year={{ year }}&employee_id={{ employee.id }}" class="btn btn-view" target="_blank">View</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Right Charts -->
+        <div class="analytics">
+            <div class="analytics-card">
+                <h4 style="font-size:16px; text-align:center;">Payroll Analytics (Actual Salary vs Deductions)</h4>
+                <canvas id="payrollChart"></canvas>
+            </div>
+
+            <div class="analytics-card">
+                <h4 style="font-size:16px; text-align:center;">Declared Salary Distribution</h4>
+                <canvas id="avgChart" style="height:200px;"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+const monthsData = [
+    {% for month in months_data %}
+    {
+        month_name: "{{ month.month_name }}",
+        final_salary: {{ month.final_salary|floatformat:2 }},
+        total_deductions: {{ month.total_deductions|floatformat:2 }}
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+const labels = monthsData.map(m => m.month_name);
+const finalSalary = monthsData.map(m => m.final_salary);
+const deductions = monthsData.map(m => m.total_deductions);
+
+// Payroll Line Chart
+new Chart(document.getElementById("payrollChart"), {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Actual Salary',
+                data: finalSalary,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0,123,255,0.2)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            },
+            {
+                label: 'Deductions',
+                data: deductions,
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220,53,69,0.2)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false
+        },
+        plugins: {
+            legend: { labels: { font: { size: 12 } } },
+            tooltip: {
+                enabled: true,
+                displayColors: true,
+                bodyFont: { size: 14, weight: 'bold' },
+                titleFont: { size: 14, weight: 'bold' },
+                padding: 10,
+                callbacks: {
+                    label: function(context) {
+                        return context.dataset.label + ': ₹' + context.raw.toLocaleString();
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) { return '₹' + value.toLocaleString(); },
+                    font: { size: 12 }
+                }
+            }
+        }
+    }
+});
+
+// Declared Salary Pie Chart (show tooltip only when hovering slice)
+const avgDeclared = {
+    basic: {{ declaration.basic_salary|floatformat:2 }},
+    hra: {{ declaration.hra|floatformat:2 }},
+    special_allowance: {{ declaration.special_allowance|floatformat:2 }},
+    pf: {{ declaration.pf_contribution|floatformat:2 }},
+    professional_tax: {{ declaration.professional_tax|floatformat:2 }},
+    lwf: {{ declaration.lwf_contribution|floatformat:2 }},
+    income_tax: {{ declaration.income_tax|floatformat:2 }}
+};
+
+const avgLabels = Object.keys(avgDeclared).map(k => k.replace('_',' ').toUpperCase());
+const avgValues = Object.values(avgDeclared);
+
+new Chart(document.getElementById("avgChart"), {
+    type: 'pie',
+    data: {
+        labels: avgLabels,
+        datasets: [{
+            data: avgValues,
+            backgroundColor: ['#007bff','#6f42c1','#28a745','#ffc107','#dc3545','#20c997','#fd7e14']
+        }]
+    },
+    options: {
+        responsive: true,
+        interaction: {
+            mode: 'nearest',
+            intersect: true
+        },
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12, padding: 6 } },
+            tooltip: {
+                enabled: true,
+                displayColors: true,
+                bodyFont: { size: 14, weight: 'bold' },
+                titleFont: { size: 14, weight: 'bold' },
+                padding: 10,
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ₹' + context.raw.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+    </script>
+
+</body>
+</html>

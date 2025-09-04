@@ -1,0 +1,239 @@
+﻿﻿{% extends 'lms/employee_layout.html' %}
+{% block title %}Borrow Book{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        max-width: 500px;
+        margin: 40px auto;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 24px;
+        font-size: 22px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    input[type="text"],
+    select,
+    input[type="date"],
+    input[type="number"] {
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    /* Error styling */
+    .text-danger {
+        font-size: 13px;
+        margin-top: -10px;
+        margin-bottom: 10px;
+        color: #d9534f;
+    }
+
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .back-button {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        cursor: pointer;
+        text-align: center;
+        display: inline-block;
+        width: 45%;
+    }
+
+        .back-button:hover {
+            background-color: #5a0000;
+            color: white;
+            text-decoration: none;
+        }
+
+    .submit-button {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 45%;
+    }
+
+        .submit-button:hover {
+            background-color: #a10000;
+        }
+
+    /* Modal popup styles */
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 9998;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        display: none;
+        z-index: 9999;
+        max-width: 350px;
+        text-align: center;
+        font-size: 16px;
+        color: #333;
+    }
+
+        #confirm-popup button {
+            margin: 10px 15px 0 15px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+    #confirm-yes {
+        background-color: #800000;
+        color: white;
+    }
+
+        #confirm-yes:hover {
+            background-color: #a10000;
+        }
+
+    #confirm-no {
+        background-color: #ccc;
+        color: #333;
+    }
+
+        #confirm-no:hover {
+            background-color: #aaa;
+        }
+</style>
+
+<div class="container">
+    <h2>Borrow a Book</h2>
+    <form method="post" novalidate id="borrow-form">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+        <div class="text-danger">{{ field.errors|striptags }}</div>
+        {% endif %}
+        {% endfor %}
+
+        <div class="form-buttons">
+            <a href="{% url 'book_list' %}" class="back-button">Back </a>
+            <button type="submit" class="submit-button">Submit</button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal popup HTML -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message"></p>
+    <button id="confirm-ok" style="background:#800000; color:white;">OK</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const borrowedData = {{ borrowed_data|safe }};
+        const form = document.getElementById('borrow-form');
+        const bookField = form.querySelector('select[name="book"]');
+        const studentField = form.querySelector('select[name="student"]');
+
+        // Elements for modal popup
+        const overlay = document.getElementById('overlay');
+        const popup = document.getElementById('confirm-popup');
+        const popupMessage = document.getElementById('confirm-popup-message');
+        const popupOkBtn = document.getElementById('confirm-ok');
+
+        function showPopup(message) {
+            popupMessage.textContent = message;
+            overlay.style.display = 'block';
+            popup.style.display = 'block';
+        }
+
+        function hidePopup() {
+            overlay.style.display = 'none';
+            popup.style.display = 'none';
+        }
+
+        popupOkBtn.addEventListener('click', function () {
+            hidePopup();
+        });
+
+        overlay.addEventListener('click', function () {
+            hidePopup();
+        });
+
+        form.addEventListener('submit', function (e) {
+            const bookId = bookField.value;
+            const studentId = studentField.value;
+
+            if (bookId && studentId) {
+                const borrowedStudents = borrowedData[bookId] || [];
+                if (borrowedStudents.includes(parseInt(studentId))) {
+                    e.preventDefault();
+                    showPopup("This student has already borrowed the selected book and hasn't returned it yet.");
+                    return false;
+                }
+            }
+        });
+    // ✅ Disable past dates
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    dateInputs.forEach(input => {
+        input.setAttribute('min', today);
+    });
+    });
+</script>
+{% endblock %}

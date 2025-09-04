@@ -1,0 +1,568 @@
+﻿{% extends 'lms/student_layout.html' %}
+{% load static %}
+{% load form_tags %}
+
+{% block title %}My Assignments{% endblock %}
+
+{% block content %}
+
+
+<!-- JS & CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- STYLES -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f8f8;
+    }
+
+
+    .btn {
+        min-width: 178px;
+        font-weight: 600;
+        padding: 12px;
+        font-size: 9px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .fw-bold {
+        color: #800000;
+        font-size: 28px;
+    }
+
+    .btn-maroon {
+        color: #800000;
+        border: 2px solid #800000;
+        background-color: transparent;
+    }
+
+        .btn-maroon:hover {
+            background-color: #800000;
+            color: #fff;
+        }
+
+    .text-muted {
+        color: #8b0000 !important;
+        text-align: center;
+    }
+
+    .text-mute {
+        color: #373b3e !important;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .mb-7 {
+        margin-bottom: 21px !important;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .icon-font {
+        margin-left: 10px;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .custom-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background-color: #fff;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .px-4 {
+        padding-right: 1.5rem !important;
+        padding-left: 0.5rem 8px !important;
+    }
+
+    .py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    .gap-3 {
+        gap: 5rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 21px !important;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .py-5 {
+        padding-top: 0rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .mt-5 {
+        margin-top: 0rem !important;
+        margin-left: -111px;
+        text-align: center;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem !important;
+        margin-left: -60px;
+    }
+
+    caption {
+        font-size: 16px;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    th {
+        background-color: #6c7ae0;
+        color: #fff;
+        border: 1px solid #dee2e6;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    td {
+        padding: 1px 7px;
+        border: 1px solid #ddd;
+        text-align: center;
+        font-size: 9px;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            color: #8b0000;
+        }
+
+    #form-container {
+        margin-top: -25px;
+        background-color: #f8f9fa;
+        border-radius: 9px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .btn.show {
+        color: var(--bs-btn-active-color);
+        background-color: #800000;
+        border-color: #800000;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #form-container form label {
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    #form-container form input,
+    #form-container form select,
+    #form-container form textarea {
+        margin-bottom: 0px;
+        padding: 2px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    #form-container form button[type="submit"] {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: .0px .1px;
+        background-color: var(--bs-table-bg);
+        border-bottom-width: var(--bs-border-width);
+    }
+
+    .dropdown-item.active {
+        color: var(--bs-dropdown-link-active-color);
+        text-decoration: none;
+        background-color: #800000;
+    }
+</style>
+
+<div class="container py-5">
+    <h2 class="fw-bold mb-7">{{ logged_in_student.student_name }} Assignments</h2>
+
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-0">Pending Assignments</h6>
+                    <h2 class="fw-bold">{{ pending }}</h2>
+                    <h6 class="text-mute">Due soon</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-0">Submitted Assignments</h6>
+                    <h2 class="fw-bold">{{ submitted }}</h2>
+                    <h6 class="text-mute">Awaiting grading</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-0">Graded Assignments</h6>
+                    <h2 class="fw-bold">{{ graded }}</h2>
+                    <h6 class="text-mute">Reviewed by instructors</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-0">Percentage </h6>
+                    <h2 class="fw-bold">{{ percentage }}%</h2>
+                    <h6 class="text-mute">Across graded assignments</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+
+                    <!-- Centered Assignment List Table -->
+                    {% if assignments %}
+                    <div class="table-responsive" style="max-width: 900px; margin: 0 auto;">
+                        <table class="table table-bordered table-hover text-center align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Subject</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Marks</th>
+                                    <th>Remarks</th>
+                                    <th>Attachment</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assignment in assignments %}
+                                <tr>
+                                    <td>{{ assignment.title }}</td>
+                                    <td>{{ assignment.subject.name }}</td>
+                                    <td>{{ assignment.due_date|date:"M d, Y" }}</td>
+                                    <td id="status-{{ assignment.id }}">
+                                        {% with submissions_dict|dict_get:assignment.id as sub %}
+                                        {% if sub %}
+                                        {% if sub.student_status == 'graded' %}
+                                        <span class="badge bg-success">Graded</span>
+                                        {% elif sub.student_status == 'submitted' %}
+                                        <span class="badge bg-primary">Submitted</span>
+                                        {% elif sub.student_status == 'review' %}
+                                        <span class="badge bg-info text-white">Under Review</span>
+                                        {% elif sub.student_status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                        {% elif sub.student_status == 'in_progress' %}
+                                        <span class="badge bg-secondary">In Progress</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                        {% endwith %}
+                                    </td>
+
+
+                                    <td>
+                                        {% with submissions_dict|dict_get:assignment.id as sub %}
+                                        {% if sub and sub.score is not None %}
+                                        {{ sub.score }}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                        {% endwith %}
+                                    </td>
+
+                                    <td>
+                                        {% with submissions_dict|dict_get:assignment.id as sub %}
+                                        {% if sub %}
+                                        {% if sub.status == 'rejected' and sub.rejection_reason %}
+                                        <span title="{{ sub.rejection_reason }}">{{ sub.rejection_reason|truncatechars:30 }}</span>
+                                        {% elif sub.remarks %}
+                                        {{ sub.remarks }}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                        {% endwith %}
+                                    </td>
+
+                                    <td>
+                                        {% if assignment.attachment %}
+                                        <!--<a href="{% url 'download_assignment' assignment.id %}" class="btn btn-sm btn-outline-primary">
+                                            Download
+                                        </a>-->
+                                        <a href="#"
+                                           onclick="startAssignment('{% url 'mark_in_progress' assignment.id %}', '{% url 'download_assignment' assignment.id %}', {{ assignment.id }}); return false;"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Download
+                                        </a>
+
+                                        {% else %}
+                                        N/A
+                                        {% endif %}
+                                    </td>
+
+
+                                    <td>
+                                        {% if assignment.due_date >= today %}
+                                        {% if assignment.id in submitted_assignment_ids %}
+                                        <a href="{% url 'submit_assignment' assignment.id %}"
+                                           class="btn btn-sm btn-outline-secondary upload-btn"
+                                           data-assignment-id="{{ assignment.id }}" disabled>
+                                            Update Submission
+                                        </a>
+                                        {% else %}
+                                        <a href="{% url 'submit_assignment' assignment.id %}"
+                                           class="btn btn-sm btn-outline-secondary upload-btn"
+                                           data-assignment-id="{{ assignment.id }}" disabled>
+                                            Upload Assignment
+                                        </a>
+                                        {% endif %}
+                                        {% else %}
+                                        <span class="text-muted">Closed</span>
+                                        {% endif %}
+                                    </td>
+
+
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted mt-5">No assignments available for your semester and course.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Styles -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f8f8;
+    }
+
+    .fw-bold {
+        color: #800000;
+        font-size: 28px;
+    }
+
+    .text-muted {
+        color: #8b0000 !important;
+        text-align: center;
+    }
+
+    .text-mute {
+        color: #373b3e !important;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    h2 {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .card-body h3 {
+        font-size: 20px;
+        color: #8b0000;
+    }
+
+    .row.gap-3 {
+        gap: 2rem !important;
+    }
+
+    table {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        font-size: 14px;
+    }
+
+    th {
+        background-color: #6c7ae0;
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 10px 15px;
+    }
+
+    td {
+        border-top: 1px solid #dee2e6;
+        padding: 8px 12px;
+        vertical-align: middle;
+    }
+
+    .btn-sm {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+
+    .badge {
+        font-size: 0.85em;
+        padding: 0.4em 0.7em;
+        border-radius: 0.4rem;
+    }
+
+        .badge.bg-success {
+            background-color: #198754;
+            color: #fff;
+        }
+
+        .badge.bg-primary {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        .badge.bg-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .row.gap-3 {
+        gap: 1.5rem !important; /* slightly smaller gap to match */
+    }
+
+    .card-col {
+        max-width: 160px; /* match exact width from dashboard */
+    }
+
+    .card-body h2.fw-bold {
+        font-size: 30px;
+        color: #8b0000; /* dark red */
+    }
+
+    .card-body h6.text-muted {
+        color: #8b0000 !important;
+        font-size: 14px;
+        margin-bottom: 0;
+    }
+
+    .card-body h6.text-mute {
+        color: #373b3e !important;
+        font-size: 12px;
+        margin-top: 5px;
+        text-align: center;
+    }
+</style>
+
+
+
+
+
+<script>
+    function startAssignment(statusUrl, downloadUrl, assignmentId) {
+        // Step 1: Mark status via AJAX
+        fetch(statusUrl, { method: "POST", headers: { "X-CSRFToken": getCookie("csrftoken") } })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // ✅ Update status instantly
+                    document.getElementById("status-" + assignmentId).innerHTML =
+                        '<span class="badge bg-secondary">In Progress</span>';
+
+                    const uploadBtn = document.querySelector(`.upload-btn[data-assignment-id="${assignmentId}"]`);
+                    if (uploadBtn) {
+                        uploadBtn.removeAttribute("disabled");
+                        uploadBtn.classList.remove("btn-outline-secondary");
+                        uploadBtn.classList.add("btn-primary");
+                        // don't overwrite the text, keep "Upload Assignment" or "Update Submission"
+                    }
+
+                }
+
+                // Step 2: Trigger file download normally
+                window.location.href = downloadUrl;
+            })
+            .catch(err => alert("Error: " + err.message));
+    }
+
+    // 🔹 Helper for CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+
+</script>
+
+                {% endblock %}

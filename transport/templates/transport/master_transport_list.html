@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>All Vehicles</h2>
+<a href="{% url 'master_transport_create' %}" class="btn btn-success mb-2">Add Vehicle</a>
+<table class="table">
+    <tr>
+        <th>Vehicle No</th>
+        <th>Driver</th>
+        <th>Phone</th>
+        <th>Route</th>
+        <th>Actions</th>
+    </tr>
+    {% for v in transports %}
+    <tr>
+        <td>{{ v.vehicle_no }}</td>
+        <td>{{ v.driver_name }}</td>
+        <td>{{ v.driver_phone }}</td>
+        <td>{{ v.route_name }}</td>
+        <td><!-- Edit/Delete here later --></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

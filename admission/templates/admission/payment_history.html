@@ -1,0 +1,244 @@
+{% extends 'layout.html' %}
+
+{% block title %}Student Payment History{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-left: 91px;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 10px;
+        margin-left: -64px;
+        margin-right: 27px;
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 22px;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+        .search-bar input[type="text"],
+        .search-bar input[type="date"],
+        .search-bar select {
+            padding: 5px 5px;
+            font-size: 9px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 187px;
+        }
+
+        .search-bar button {
+            padding: 10px 61px;
+            font-size: 12px;
+            border-radius: 5px;
+            border: 1px solid #6c757d;
+            background-color: white;
+            color: black;
+            transition: background-color 0.3s ease;
+        }
+
+            .search-bar button:hover {
+                background-color: #800000;
+                color: white;
+            }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 2px 5px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+        font-size: 11px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+   /* tr:hover {
+        background-color: #f1f1f1;
+    }*/
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn:hover {
+            background-color: #f3f3f3;
+        }
+
+    .pagination {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 15px;
+        font-size: 11px;
+        margin-right: 428px;
+    }
+
+        .pagination a {
+            margin: 0 5px;
+            padding: 4px 8px;
+            color: #800000;
+            border: 1px solid #800000;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+            .pagination a:hover {
+                background-color: #800000;
+                color: white;
+            }
+
+        .pagination span {
+            margin: 0 8px;
+            font-weight: bold;
+        }
+
+    .info-message {
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+
+    .export-btn {
+        float: right;
+        margin-bottom: 10px;
+    }
+
+        .export-btn a {
+            background-color: #800000;
+            color: #fff;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+            .export-btn a:hover {
+                background-color: #a10000;
+            }
+
+    .content {
+        margin-left: 200px;
+        padding: 35px 0px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="container">
+    <h2>Student Payment History</h2>
+
+    <div class="export-btn">
+        <a href="{% url 'export_payments_excel' %}">Export Payments to Excel</a>
+    </div>
+
+    <form method="get" class="search-bar">
+        <input type="text" name="search" placeholder="Enter Admission No or Name" value="{{ search_query }}">
+        <input type="date" name="due_date" value="{{ due_date }}">
+        <button type="submit">Filter</button>
+    </form>
+
+    {% if not search_query and not filter_status and not due_date %}
+    <div class="info-message">
+        Please search by Admission Number or Name to view the payment history.
+    </div>
+    {% endif %}
+
+    {% if history %}
+    <table>
+        <thead>
+            <tr>
+                <th>Admission No</th>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Tuition Fees</th>
+                <th>Tuition Paid</th>
+                <th>Tuition Pending</th>
+                <th>Paid On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in history %}
+            <tr>
+                <td>{{ record.admission_no }}</td>
+                <td>{{ record.name }}</td>
+                <td>{{ record.course }}</td>
+                <td>{{ record.tuition_fee }}</td>
+                <td>{{ record.tuition_fee_paid }}</td>
+                <td>{{ record.tuition_pending_fee }}</td>
+                <td>{{ record.receipt_date|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'download_student_receipt' record.id %}" class="icon-btn" title="Print Receipt" target="_blank">
+                        <i class="fas fa-print"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1&search={{ search_query }}&due_date={{ due_date }}">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&due_date={{ due_date }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&due_date={{ due_date }}">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}&due_date={{ due_date }}">Last</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="text-center mt-4">No records found.</div>
+    {% endif %}
+</div>
+
+{% endblock %}

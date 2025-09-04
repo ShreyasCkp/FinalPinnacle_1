@@ -1,0 +1,14 @@
+{% extends 'master/bare.html' %}
+{% block title %}Choose Passcode{% endblock %}
+{% block content %}
+<h2>Choose a Passcode</h2>
+{% if error %}
+<div class="alert">{{ error }}</div>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    <label for="passcode">Passcode (at least 4 digits):</label>
+    <input type="password" name="passcode" id="passcode" minlength="4" maxlength="10" pattern="\d{4,10}" required autofocus>
+    <button type="submit">Set Passcode</button>
+</form>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h4>Stop Arrival Logs</h4>
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Stop</th>
+            <th>Reached At</th>
+            <th>Alert Sent</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.student.name }}</td>
+            <td>{{ log.stop.stop_name }}</td>
+            <td>{{ log.reached_at }}</td>
+            <td>
+                {% if log.message_sent %}
+                ✅
+                {% else %}
+                ❌
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

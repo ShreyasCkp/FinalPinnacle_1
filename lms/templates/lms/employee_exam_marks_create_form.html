@@ -1,0 +1,377 @@
+{% extends 'lms/employee_layout.html' %}
+{% block title %}
+  {% if mode == 'create' %}
+    Add Exam Marks
+  {% elif mode == 'edit' %}
+    Edit Exam Marks
+  {% else %}
+    View Exam Marks
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .form-section {
+        background: #fff;
+        padding: 31px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 40px;
+        margin-left: 101px;
+        margin-right: 27px;
+        width: 904px;
+    }
+
+    label {
+        font-weight: 600;
+        margin-right: -10px;
+        font-size: 12px;
+    }
+
+    select, input[type="date"] {
+        padding: 6px;
+        margin: 5px 10px 10px 0;
+        min-width: 180px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    input[readonly] {
+        background-color: #e9ecef;
+    }
+
+    .table-section {
+        margin-top: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        table-layout: fixed;
+    }
+
+    th {
+        padding: 8px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+        vertical-align: middle;
+        word-wrap: break-word;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 150px;
+    }
+
+    td {
+        border: 1px solid #dee2e6;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .table-responsive {
+        margin-top: 20px;
+    }
+
+    th {
+        background-color: #800000;
+        color: white;
+        padding: 4px;
+        font-size: 11px;
+    }
+
+    .btn-submit {
+        background-color: #800000;
+        color: white;
+        padding: 7px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        margin-top: 12px;
+        cursor: pointer;
+        text-decoration: none; /* remove underline */
+    }
+
+        .btn-submit:hover {
+            background-color: #660000;
+        }
+
+
+    .btn-container {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-container-fixed {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+
+
+    .firsts {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 12px;
+        margin: 20px;
+    }
+
+        .firsts select,
+        .firsts input[type="date"],
+        .firsts input[type="text"] {
+            min-width: 140px;
+            max-width: 200px;
+            font-size: 13px;
+            padding: 6px 8px;
+            flex-shrink: 0;
+        }
+
+    .content {
+        padding: 10px 26px 18px;
+        /* background-color: #EEE; */
+        margin-left: 128px;
+        flex-grow: 1;
+    }
+
+    td input[type="radio"] {
+        margin-bottom: 2px;
+    }
+
+    td label {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .status-options {
+        display: flex;
+        /* justify-content: center; */
+        gap: 13px;
+    }
+</style>
+
+<div class="form-section">
+    <h4 style="text-align: center; font-size: 22px; color: #800; margin-top: -17px;">
+        {% if mode == 'create' %}
+        Add Exam Marks
+        {% elif mode == 'edit' %}
+        Edit Exam Marks
+        {% else %}
+        View Exam Marks
+        {% endif %}
+    </h4>
+
+    {% if mode == 'create' %}
+    <!-- FILTER FORM (GET method) -->
+    <form method="GET">
+        <div class="firsts">
+
+            <!-- Program Type -->
+            <select name="program_type" class="form-control mr-2" onchange="this.form.submit()">
+                <option value=""> Program Type </option>
+                {% for pt in program_types %}
+                <option value="{{ pt.id }}" {% if pt.id|stringformat:"s" == selected.program_type %}selected{% endif %}>
+                    {{ pt.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Academic Year -->
+            <select name="academic_year" class="form-control mr-2" onchange="this.form.submit()">
+                <option value=""> Batch </option>
+                {% for year in academic_years %}
+                <option value="{{ year }}" {% if year|stringformat:"s" == selected.academic_year %}selected{% endif %}>
+                    {{ year }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Course -->
+            <select name="course" class="form-control mr-2" onchange="this.form.submit()">
+                <option value=""> Combination </option>
+                {% for course in courses %}
+                {% if not selected.program_type or course.course_type.id|stringformat:"s" == selected.program_type %}
+                <option value="{{ course.id }}" {% if course.id|stringformat:"s" == selected.course %}selected{% endif %}>
+                    {{ course.name }}
+                </option>
+                {% endif %}
+                {% endfor %}
+            </select>
+
+            <!-- Semester -->
+            <select name="semester" class="form-control mr-2" onchange="this.form.submit()">
+                <option value="">Sem/Year</option>
+                {% for sem in semesters %}
+                <option value="{{ sem.id }}" {% if sem.id|stringformat:"s" == selected.semester %}selected{% endif %}>
+                    {{ sem.label }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Subject -->
+            <select name="subject" class="form-control mr-2" onchange="this.form.submit()">
+                <option value=""> Subject </option>
+                {% for subject in subjects %}
+                <option value="{{ subject.id }}" {% if subject.id|stringformat:"s" == selected.subject %}selected{% endif %}>
+                    {{ subject.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+  
+
+    </form>
+
+    <!-- MARKS SUBMISSION FORM (POST method) -->
+    {% if students %}
+    <form method="POST" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        <input type="hidden" name="form_action" value="submit_marks">
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <select name="exam_type_id" id="exam_type_id" class="form-control" required>
+                    <option value="">Select Exam Type</option>
+                    {% for etype in exam_types %}
+                    <option value="{{ etype.id }}"
+                            {% if request.POST.exam_type_id|stringformat:"s" == etype.id|stringformat:"s" %}selected{% endif %}>
+                        {{ etype.title }}
+                    </option>
+                    {% empty %}
+                    <option value="">No exam types available</option>
+                    {% endfor %}
+                </select>
+
+            </div>
+
+            <!--<div class="col-md-4">
+                <label for="max_marks">Max Marks</label>
+                <input type="number" name="max_marks" id="max_marks" class="form-control" value="100" min="0" step="0.01" />
+            </div>-->
+        </div>
+
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Student Name</th>
+                    <th>Student ID</th>
+                    <th>Marks Obtained</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.student_name }}</td>
+                    <td>{{ student.student_userid }}</td>
+                    <td>
+                        <input type="hidden" name="student_ids[]" value="{{ student.id }}">
+                        <input type="number" name="marks_{{ student.id }}" class="form-control" min="0" step="0.01" />
+                    </td>
+                    <td>
+                        <input type="text" name="remarks_{{ student.id }}" class="form-control" />
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-success px-4">
+                <i class="bi bi-save"></i> Save Marks
+            </button>
+            <a href="{% url 'exam_marks_list' %}" class="btn btn-secondary ms-2">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </form>
+    {% else %}
+    <p class="text-muted">Please select filters to load students and enter marks.</p>
+    {% endif %}
+
+    {% else %}
+    <!-- EDIT and VIEW Mode Form -->
+    <form method="POST" class="card p-4 shadow-sm">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label>Student Name:</label>
+            <input type="text" class="form-control" value="{{ mark.student.student_name }}" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Student ID:</label>
+            <input type="text" class="form-control" value="{{ mark.student.student_userid }}" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Subject:</label>
+            <input type="text" class="form-control" value="{{ mark.subject.name }}" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Exam Type:</label>
+            <input type="text" class="form-control" value="{{ mark.mark_type.title }}" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Max Marks:</label>
+            <input type="number"
+                   name="max_marks"
+                   class="form-control"
+                   value="{{ mark.max_marks }}"
+                   min="0"
+                   step="0.01"
+                   {% if mode == 'view' %}disabled{% endif %} />
+        </div>
+
+        <div class="mb-3">
+            <label>Marks Obtained:</label>
+            <input type="number"
+                   name="marks_obtained"
+                   class="form-control"
+                   value="{{ mark.marks_obtained }}"
+                   min="0"
+                   step="0.01"
+                   {% if mode == 'view' %}disabled{% endif %}
+                   required />
+        </div>
+
+        <div class="mb-3">
+            <label>Remarks:</label>
+            <input type="text"
+                   name="remarks"
+                   class="form-control"
+                   value="{{ mark.remarks }}"
+                   {% if mode == 'view' %}disabled{% endif %} />
+        </div>
+        <div class="btn-container-fixed">
+            <a href="{% url 'exam_marks_list' %}" class="btn-submit">Back</a>
+
+            {% if mode != 'view' %}
+            <button type="submit"
+                    class="btn-submit"
+                    {% comment %} You can add onclick if needed like your example {% endcomment %}>
+                {% if mode == 'edit' %}Update{% else %}Submit{% endif %}
+            </button>
+            {% endif %}
+        </div>
+
+
+    </form>
+    {% endif %}
+</div>
+
+{% endblock %}

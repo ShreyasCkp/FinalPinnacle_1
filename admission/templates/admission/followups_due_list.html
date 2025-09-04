@@ -1,0 +1,310 @@
+{% extends 'layout.html' %}
+
+{% block title %}Follow-ups List{% endblock %}
+
+{% block content %}
+<style>
+    /* Reuse styles from Users page for consistency */
+
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px; /* space for sidebar */
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    h3.mb-4 {
+        text-align: center;
+        color: #800000;
+        font-weight: 700;
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 6px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+/*    tr:hover {
+        background-color: #e9ecef;
+    }*/
+
+    .text-center {
+        font-style: italic;
+        color: #888;
+    }
+
+    /* Action icon button style — same as Users page */
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+        .icon-btn:hover {
+            background-color: #e9ecef;
+        }
+
+    /* Confirm popup styling */
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .content {
+        margin-left: 0px;
+        padding: 26px 26px 40px;
+        min-height: 100vh;
+    }
+
+    #followUpSearch {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h3 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .search-input {
+        position: absolute;
+        left: 0;
+        font-size: 13px;
+        width: 220px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+</style>
+
+<div class="container">
+    <div class="header-flex">
+        <input type="text" id="followUpSearch" placeholder="Search follow-ups..." class="search-input">
+        <h3 class="mb-4">
+            {% if title %}
+            {{ title }}
+            {% else %}
+            Follow-up List
+            {% endif %}
+        </h3>
+    </div>
+
+
+
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Enquiry No</th>
+                <th>Student Name</th>
+                <th>Follow-up Date</th>
+                <th>Priority</th>
+                <th>Follow-up Stage</th>
+                <th>Follow-up Type</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in followups %}
+            {% if f.type == 'scheduled' %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    {% if f.data.pu_enquiry %}
+                    {{ f.data.pu_enquiry.enquiry_no }}
+                    {% else %}
+                    {{ f.data.degree_enquiry.enquiry_no }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if f.data.pu_enquiry %}
+                    {{ f.data.pu_enquiry.student_name }}
+                    {% else %}
+                    {{ f.data.degree_enquiry.student_name }}
+                    {% endif %}
+                </td>
+                <td>{{ f.data.follow_up_date|date:"Y-m-d H:i" }}</td>
+                <td>{{ f.data.priority }}</td>
+                <td>Scheduled</td>
+                <td>{{ f.data.follow_up_type }}</td>
+                <td>{{ f.data.status }}</td>
+
+            </tr>
+            {% elif f.type == 'required' %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ f.data.enquiry_no }}</td>
+                <td>{{ f.data.student_name }}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>Required</td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+            {% endif %}
+            {% empty %}
+            <tr>
+                <td colspan="9" class="text-center">No follow-up records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+<script>
+    let currentFollowUpId = null;
+
+    function confirmFollowUpDelete(followupId, studentName) {
+        currentFollowUpId = followupId;
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete the follow-up for <b>${studentName}</b>?`;
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('confirm-popup').style.display = 'block';
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', function () {
+        if (currentFollowUpId) {
+            document.getElementById(`followup-delete-form-${currentFollowUpId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', function () {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('confirm-popup').style.display = 'none';
+        currentFollowUpId = null;
+    });
+</script>
+
+<script>
+    document.getElementById("followUpSearch").addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            if (row.querySelector("td")?.getAttribute("colspan")) return; // skip "no records" row
+
+            const enquiryNo = row.cells[1]?.textContent.toLowerCase() || '';
+            const studentName = row.cells[2]?.textContent.toLowerCase() || '';
+            const followUpDate = row.cells[3]?.textContent.toLowerCase() || '';
+            const priority = row.cells[4]?.textContent.toLowerCase() || '';
+            const stage = row.cells[5]?.textContent.toLowerCase() || '';
+            const type = row.cells[6]?.textContent.toLowerCase() || '';
+            const status = row.cells[7]?.textContent.toLowerCase() || '';
+
+            const match =
+                enquiryNo.includes(filter) ||
+                studentName.includes(filter) ||
+                priority.includes(filter) ||
+                stage.includes(filter) ||
+                type.includes(filter) ||
+                status.includes(filter) ||
+                followUpDate.includes(filter);
+
+            row.style.display = match ? '' : 'none';
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'layout.html' %}
+{% block title %}Recent Activity{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-color: #800000;
+        --primary-light: #a32020;
+        --background: #fff;
+        --border: #eaeaea;
+        --text-main: #2d2b47;
+        --text-muted: #888;
+        --avatar-bg: #f6f6f6;
+    }
+
+    .activities-container {
+        max-width: 750px;
+        margin: 50px auto;
+        background: var(--background);
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+        padding: 35px 30px;
+        overflow: hidden;
+    }
+
+    .activities-header {
+        text-align: center;
+        font-size: 1.9em;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+    }
+
+    .activity-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .activity-item {
+        display: flex;
+        gap: 16px;
+        padding: 18px 0;
+        border-bottom: 1px solid var(--border);
+        align-items: flex-start;
+        transition: background 0.2s ease;
+    }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+    .activity-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--avatar-bg);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1em;
+        text-transform: uppercase;
+        flex-shrink: 0;
+        border: 2px solid var(--primary-color);
+    }
+
+    .activity-details {
+        flex: 1;
+    }
+
+    .activity-text {
+        color: var(--text-main);
+        font-size: 1.05em;
+        line-height: 1.5;
+    }
+
+    .activity-action {
+        display: inline-block;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 2px 10px;
+        font-size: 0.92em;
+        border-radius: 12px;
+        margin: 0 5px;
+    }
+
+    .activity-time {
+        font-size: 0.9em;
+        color: var(--text-muted);
+        margin-top: 5px;
+        display: block;
+    }
+
+    .no-activities {
+        text-align: center;
+        font-size: 1.05em;
+        color: var(--text-muted);
+        padding: 40px 0;
+    }
+
+    @media (max-width: 600px) {
+        .activities-container {
+            padding: 20px 15px;
+        }
+
+        .activities-header {
+            font-size: 1.5em;
+        }
+
+        .activity-text {
+            font-size: 1em;
+        }
+    }
+
+    .pagination li {
+        display: inline-block;
+        margin: 0 3px;
+    }
+
+    .pagination a, .pagination strong {
+        color: #800000;
+        text-decoration: none;
+        padding: 4px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 12px;
+    }
+
+    .pagination strong {
+        background-color: #800000;
+        color: #fff;
+        border-color: #800000;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 0px 0px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="activities-container">
+    <div class="activities-header">Recent Activities</div>
+
+    {% if activities %}
+    <ul class="activity-list">
+        {% for activity in activities %}
+        <li class="activity-item">
+            <div class="activity-avatar">
+                {{ activity.username|slice:":1" }}
+            </div>
+            <div class="activity-details">
+                <div class="activity-text">
+                    User <strong>{{ activity.username }}</strong>
+                    <span class="activity-action">{{ activity.get_action_display }}</span>
+                    {{ activity.model_name|default_if_none:"item" }}
+                    {% if activity.object_repr %}
+                    <strong>{{ activity.object_repr }}</strong>
+                    {% endif %}
+                </div>
+                <span class="activity-time">on {{ activity.timestamp|date:"Y-m-d H:i" }}</span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="no-activities">No activities yet.</div>
+    {% endif %}
+
+    {% if page_obj.has_other_pages %}
+    <div style="text-align: center; margin-top: 20px;">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center" style="gap: 6px; list-style: none; padding: 0;">
+                {% if page_obj.number > 1 %}
+                <li><a href="?page=1">first</a></li>
+                <li><a href="?page={{ page_obj.previous_page_number }}">prev</a></li>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                {% if i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
+                {% if i == page_obj.number %}
+                <li><strong>{{ i }}</strong></li>
+                {% else %}
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li><a href="?page={{ page_obj.next_page_number }}">next</a></li>
+                <li><a href="?page={{ page_obj.paginator.num_pages }}">last</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+
+
+{% endblock %}

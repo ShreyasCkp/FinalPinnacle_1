@@ -1,0 +1,187 @@
+{% extends 'master/bare.html' %}
+{% block title %}Employee Login{% endblock %}
+
+{% block content %}
+<h2>
+    {% if reset and passcode_verified %}Set New Password
+    {% elif reset %}Reset Password
+    {% else %}Employee Login
+    {% endif %}
+</h2>
+
+{% if error %}
+<div class="alert" style="color: red; margin-bottom: 15px;">{{ error }}</div>
+{% endif %}
+
+{% if success_message %}
+<div class="alert" style="color: green; margin-bottom: 15px;">{{ success_message }}</div>
+{% endif %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {# Login form or Forgot password step 1 (ask userid/passcode) #}
+    {% if not reset %}
+    <label for="employee_userid">Employee User ID</label>
+    <input type="text"
+           name="employee_userid"
+           id="employee_userid"
+           class="input-field"
+           placeholder="Employee User ID"
+           required
+           value="{{ selected_user|default:'' }}"
+           autocomplete="username">
+
+    <label for="password">Password</label>
+    <input type="password"
+           name="password"
+           id="password"
+           placeholder="Password"
+           class="input-field"
+           required
+           autocomplete="current-password">
+
+    <button type="submit">Login</button>
+
+    <div style="margin-top: 10px;">
+        <a id="forgot-link" href="{% url 'employee_password_reset_view' %}" style="color: red;">Forgot Password?</a>
+    </div>
+
+    {% elif reset and not passcode_verified %}
+    <input type="text"
+           name="employee_userid"
+           id="employee_userid"
+           class="input-field"
+           placeholder="Employee User ID"
+           readonly
+           value="{{ selected_user|default:'' }}">
+
+    <input type="password"
+           name="passcode"
+           class="input-field"
+           placeholder="Enter 4-digit passcode"
+           required
+           pattern="\d{4}"
+           title="Enter your 4-digit passcode.">
+
+    <button type="submit" name="verify_passcode">Verify Passcode</button>
+    <a href="{% url 'employee_login_view' %}?employee_userid={{ selected_user }}">Back to Login</a>
+
+    {% elif reset and passcode_verified %}
+    <input type="text"
+           name="employee_userid"
+           class="input-field"
+           readonly
+           value="{{ selected_user|default:'' }}">
+
+    <input type="password" name="new_password" placeholder="Enter New Password"
+           class="input-field" required
+           pattern="^[A-Z][a-z]*[!@#$%^&*(),.?\" :{}|<>][a-zA-Z0-9]*[0-9]+$"
+    minlength="8" maxlength="16"
+    title="Start with capital letter, then lowercase, include one special character, and one number. Length 8-16.">
+
+    <input type="password" name="confirm_password" placeholder="Confirm New Password" class="input-field" required>
+
+    <input type="hidden" name="password_reset_submit" value="1">
+    <button type="submit">Set New Password</button>
+    <a href="{% url 'employee_login_view' %}?employee_userid={{ selected_user }}">Back to Login</a>
+    {% endif %}
+</form>
+
+<!-- Popup -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
+    <button id="confirm-yes-login">OK</button>
+</div>
+
+<script>
+    document.getElementById('forgot-link')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const employee_userid = document.getElementById('employee_userid').value;
+        if (employee_userid) {
+            window.location.href = "{% url 'employee_password_reset_view' %}?employee_userid=" + encodeURIComponent(employee_userid);
+        } else {
+            document.getElementById('confirm-popup-message').innerText = "Please enter your Employee User ID first.";
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('confirm-popup').style.display = 'block';
+        }
+    });
+
+    document.getElementById('confirm-yes-login').addEventListener('click', function () {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('confirm-popup').style.display = 'none';
+    });
+</script>
+
+<style>
+    .input-field {
+        display: block;
+        width: 100%;
+        max-width: 320px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 8px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+        #confirm-popup button {
+            margin: 0 5px;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: transparent;
+            color: #800000;
+            font-weight: 600;
+            border: 2px solid #800000;
+            transition: all 0.2s ease;
+        }
+
+            #confirm-popup button:hover {
+                background-color: #800000;
+                color: white;
+            }
+</style>
+
+{% endblock %}

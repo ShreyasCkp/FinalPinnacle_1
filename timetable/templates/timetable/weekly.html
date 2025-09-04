@@ -1,0 +1,302 @@
+{% extends 'layout.html' %}
+{% load utils %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 12px;
+    }
+
+    .content {
+        padding: 42px 37px 3px;
+        flex-grow: 1;
+        margin-left: 75px;
+    }
+
+    input, select, textarea, .form-select, .form-control {
+        font-size: 12px !important;
+        padding: 4px 8px;
+        height: auto;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+
+    .heading {
+        color: #800000;
+        font-size: 22px;
+        text-align: center;
+        margin-bottom: 15px;
+        margin-top: 10px;
+    }
+
+    .filter-form .form-select {
+        display: inline-block;
+        width: auto;
+        min-width: 220px;
+        margin: 8px;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+        padding: 4px;
+        font-size: 12px;
+    }
+
+    .subject-box {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        padding: 3px 5px;
+        text-align: left;
+    }
+
+    .subject-name {
+        font-weight: 600;
+    }
+
+    .faculty-name {
+        color: #555;
+    }
+
+    .room-badge {
+        background: #d0ebff;
+        color: #084298;
+        font-size: 11px;
+        border-radius: 4px;
+        padding: 2px 4px;
+    }
+
+    .table thead th {
+        background: #800000;
+        color: #fff;
+        text-align: center;
+    }
+</style>
+
+<div class="container mt-5" style="margin-left: 119px;">
+    <h2 class="heading">Weekly Timetable</h2>
+
+            <form method="get" id="filter-form">
+                {% csrf_token %}
+                <!-- Course Type -->
+                <label for="id_program_type">Program Type:</label>
+                <select name="program_type" id="id_program_type">
+                    <option value="">-- Select Course Type --</option>
+                    {% for ct in program_types %}
+                    <option value="{{ ct.id }}" {% if ct.id|stringformat:"s" == selected_program_type %}selected{% endif %}>
+                        {{ ct.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <!-- Academic Year -->
+                <label for="id_academic_year">Batch:</label>
+                <select name="academic_year" id="id_academic_year">
+                    <option value="">-- Select Batch --</option>
+                    {% for ay in academic_years %}
+                    <option value="{{ ay.id }}" {% if ay.id|stringformat:"s" == selected_academic_year %}selected{% endif %}>
+                        {{ ay.year }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <!-- Course -->
+                <label for="id_course">Combination:</label>
+                <select name="course" id="id_course">
+                    <option value="">-- Select Combination --</option>
+                    {% for course in courses %}
+                    <option value="{{ course.id }}" {% if course.id|stringformat:"s" == selected_course_id %}selected{% endif %}>
+                        {{ course.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <!-- Semester -->
+                <label for="id_semester">Sem/Year:</label>
+                <select name="semester" id="id_semester" onchange="this.form.submit()">
+                    <option value="">-- Select Sem/Year --</option>
+                    {% for sem in semesters %}
+                    <option value="{{ sem.number }}" {% if sem.number|stringformat:"s" == selected_semester_number %}selected{% endif %}>
+                        {{ sem.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+
+
+    <!--<button type="submit" class="btn btn-primary mt-2">View</button>
+    </form>-->
+    <!-- Timetable Table -->
+    {% if time_slots %}
+    <div class="card shadow border-0 mt-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            {% for day in week_days %}
+                            <th>{{ day }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for time in time_slots %}
+                        <tr>
+                            <td>{{ time }}</td>
+                            {% for day in week_days %}
+                            <td>
+                                {% with entries=timetable|dict_get:day %}
+                                {% for entry in entries %}
+                                {% if entry.time_slot == time %}
+                                <div class="subject-box">
+                                    <div class="subject-name">{{ entry.subject.name }}</div>
+                                    <div class="faculty-name">{{ entry.faculty.name }}</div>
+                                    <div class="faculty-name">{{ entry.faculty.role }}</div>
+                                    <div><span class="room-badge">{{ entry.room }}</span></div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                                {% endwith %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% elif selected_course and selected_semester %}
+    <div class="alert alert-warning text-center mt-4">
+        No timetable entries found for the selected course and semester.
+    </div>
+    {% endif %}
+</div>
+
+<!-- AJAX Semester Loader -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        const programTypeSelect = $('#id_program_type');
+        const academicYearSelect = $('#id_academic_year');
+        const courseSelect = $('#id_course');
+        const semesterSelect = $('#id_semester');
+
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                program_type: params.get("program_type"),
+                academic_year: params.get("academic_year"),
+                course: params.get("course"),
+                semester: params.get("semester")
+            };
+        }
+
+        const initialValues = getQueryParams();
+        console.log("Initial values from URL:", initialValues);
+
+        function loadAcademicYearsAndCourses(programTypeId, callback) {
+            $.get("{% url 'get_courses_and_years_by_program_type' %}", {
+                program_type_id: programTypeId
+            }, function (data) {
+                academicYearSelect.find('option:not(:first)').remove();
+                courseSelect.find('option:not(:first)').remove();
+
+                $.each(data.academic_years, function (_, year) {
+                    academicYearSelect.append($('<option>', {
+                        value: year.id,
+                        text: year.year
+                    }));
+                });
+
+                $.each(data.courses, function (_, course) {
+                    courseSelect.append($('<option>', {
+                        value: course.id,
+                        text: course.name
+                    }));
+                });
+
+                // Explicitly set selected values AFTER options are loaded
+                if (initialValues.academic_year) {
+                    academicYearSelect.val(initialValues.academic_year);
+                }
+                if (initialValues.course) {
+                    courseSelect.val(initialValues.course);
+                }
+
+                if (callback) callback();
+            });
+        }
+
+        function loadSemesters(courseId, callback = null) {
+            $.post("{% url 'get_semesters_by_course' %}", {
+                course_id: courseId,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function (data) {
+                semesterSelect.find('option:not(:first)').remove();
+
+                $.each(data.semesters, function (_, semester) {
+                    semesterSelect.append($('<option>', {
+                        value: semester.number,
+                        text: semester.name
+                    }));
+                });
+
+                // Explicitly set selected semester
+                if (initialValues.semester) {
+                    semesterSelect.val(initialValues.semester);
+                }
+
+                if (callback) callback();
+            });
+        }
+
+        // Load everything if redirected with params
+        if (initialValues.program_type) {
+            programTypeSelect.val(initialValues.program_type);
+
+            loadAcademicYearsAndCourses(initialValues.program_type, function () {
+                if (initialValues.course) {
+                    loadSemesters(initialValues.course);
+                }
+            });
+        }
+
+        // Dynamic changes
+        programTypeSelect.change(function () {
+            const programTypeId = $(this).val();
+            academicYearSelect.find('option:not(:first)').remove();
+            courseSelect.find('option:not(:first)').remove();
+            semesterSelect.find('option:not(:first)').remove();
+
+            if (!programTypeId) return;
+            loadAcademicYearsAndCourses(programTypeId);
+        });
+
+        courseSelect.change(function () {
+            const courseId = $(this).val();
+            semesterSelect.find('option:not(:first)').remove();
+
+            if (!courseId) return;
+            loadSemesters(courseId);
+        });
+
+        semesterSelect.change(function () {
+            const program_type = programTypeSelect.val();
+            const academic_year = academicYearSelect.val();
+            const course = courseSelect.val();
+            const semester = semesterSelect.val();
+
+            if (program_type && academic_year && course && semester) {
+                const url = `?program_type=${program_type}&academic_year=${academic_year}&course=${course}&semester=${semester}`;
+                window.location.href = url;
+            }
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,1023 @@
+{% extends 'lms/employee_layout.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+ 
+    .form-section {
+
+        background: #fff;
+
+        padding: 31px;
+
+        border-radius: 12px;
+
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+        margin-top: 40px;
+
+        margin-left: 179px;
+
+        margin-right: 4px;
+
+        width: 1037px;
+
+    }
+ 
+    label {
+
+        font-weight: 600;
+
+        margin-right: -10px;
+
+        font-size: 12px;
+
+    }
+ 
+    select, input[type="date"] {
+
+        padding: 6px;
+
+        margin: 5px 10px 10px 0;
+
+        min-width: 180px;
+
+        border: 1px solid #ccc;
+
+        border-radius: 4px;
+
+    }
+ 
+    input[readonly] {
+
+        background-color: #e9ecef;
+
+    }
+ 
+    .table-section {
+
+        margin-top: 20px;
+
+        margin-left: 10px;
+
+        margin-right: 10px;
+
+        /*        overflow-x: auto;
+ 
+    */ width: 100%;
+
+    }
+ 
+    table {
+
+        width: 100%;
+
+        border-collapse: collapse;
+
+        font-size: 12px;
+
+        table-layout: fixed;
+
+    }
+ 
+    th {
+
+        padding: 8px;
+
+        border: 1px solid #dee2e6;
+
+        text-align: center;
+
+        vertical-align: middle;
+
+        word-wrap: break-word;
+
+        /*        text-overflow: ellipsis;
+ 
+    */ white-space: nowrap;
+
+        max-width: 150px;
+
+    }
+ 
+    td {
+
+        border: 1px solid #dee2e6;
+
+        text-align: center;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+
+    }
+ 
+    .table-responsive {
+
+        margin-top: 20px;
+
+    }
+ 
+    th {
+
+        background-color: #800000;
+
+        color: white;
+
+        padding: 4px;
+
+        font-size: 11px;
+
+    }
+ 
+    .btn-submit {
+
+        background-color: #800000;
+
+        color: white;
+
+        padding: 7px 20px;
+
+        border: none;
+
+        border-radius: 6px;
+
+        font-size: 12px;
+
+        margin-top: 12px;
+
+        cursor: pointer;
+
+        text-decoration: none; /* remove underline */
+
+    }
+ 
+        .btn-submit:hover {
+
+            background-color: #660000;
+
+        }
+ 
+ 
+    .btn-container {
+
+        display: flex;
+
+        justify-content: flex-end;
+
+    }
+ 
+    .btn-container-fixed {
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        margin-top: 20px;
+
+        width: 100%;
+
+    }
+ 
+ 
+    .firsts {
+
+        display: flex;
+
+        flex-wrap: nowrap;
+
+        align-items: center;
+
+        gap: 12px;
+
+        margin: 20px;
+
+    }
+ 
+        .firsts select,
+
+        .firsts input[type="date"],
+
+        .firsts input[type="text"] {
+
+            min-width: 140px;
+
+            max-width: 185px;
+
+            font-size: 13px;
+
+            padding: 6px 8px;
+
+            flex-shrink: 0;
+
+        }
+ 
+    .content {
+
+        padding: 10px 26px 18px;
+
+        /* background-color: #EEE; */
+ 
+        margin-left: 128px;
+
+        flex-grow: 1;
+
+    }
+ 
+    td input[type="radio"] {
+
+        margin-bottom: 2px;
+
+    }
+ 
+    td label {
+
+        display: flex;
+
+        flex-direction: row;
+
+        align-items: center;
+
+        font-size: 12px;
+
+        gap: 4px;
+
+    }
+ 
+    .status-options {
+
+        display: flex;
+
+        /* justify-content: center; */
+ 
+        gap: 13px;
+
+    }
+</style>
+ 
+<style>
+
+    body {
+
+        background-color: #f0f2f5;
+
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+        margin: 0;
+
+        padding: 0;
+
+    }
+ 
+    .container {
+
+        margin-left: 200px;
+
+        padding: 30px;
+
+        max-width: calc(100% - 200px);
+
+        background: #fff;
+
+        border-radius: 12px;
+
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+        margin-top: 20px;
+
+        box-sizing: border-box;
+
+    }
+ 
+    .header-flex {
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        position: relative;
+
+        margin-bottom: 20px;
+
+    }
+ 
+        .header-flex h2 {
+
+            flex-grow: 1;
+
+            margin: 0;
+
+            font-weight: 700;
+
+            font-size: 22px;
+
+            color: #800000;
+
+            text-align: center;
+
+        }
+ 
+    .btn-add {
+
+        position: absolute;
+
+        right: 0;
+
+        background-color: #800000;
+
+        color: #fff;
+
+        font-size: 13px;
+
+        padding: 6px 12px;
+
+        border: none;
+
+        border-radius: 4px;
+
+        font-weight: bold;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+    }
+ 
+        .btn-add:hover {
+
+            background-color: #a10000;
+
+        }
+ 
+    .search-form {
+
+        position: absolute;
+
+        left: 0;
+
+        padding: 6px 10px;
+
+        border: 1px solid #ccc;
+
+        border-radius: 4px;
+
+        font-size: 13px;
+
+        width: 200px;
+
+    }
+ 
+ 
+        .search-form input {
+
+            padding: 6px 10px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 4px;
+
+            font-size: 13px;
+
+            width: 200px;
+
+        }
+ 
+        .search-form button {
+
+            padding: 6px 10px;
+
+            border: none;
+
+            background-color: #800000;
+
+            color: #fff;
+
+            border-radius: 4px;
+
+            font-size: 13px;
+
+            cursor: pointer;
+
+            margin-left: 5px;
+
+        }
+ 
+            .search-form button:hover {
+
+                background-color: #a10000;
+
+            }
+ 
+    table {
+
+        width: 100%;
+
+        font-size: 12px;
+
+        border-collapse: collapse;
+
+        margin-top: 10px;
+
+    }
+ 
+    th, td {
+
+        padding: 1px;
+
+        text-align: center;
+
+        border: 1px solid #dee2e6;
+
+        vertical-align: middle;
+
+    }
+ 
+    thead {
+
+        background: linear-gradient(#8B0000, #800000);
+
+        color: white;
+
+    }
+ 
+    tr:nth-child(even) {
+
+        background-color: #f8f9fa;
+
+    }
+ 
+    /* Snackbar */
+
+    #snackbar {
+
+        visibility: hidden;
+
+        min-width: 250px;
+
+        background-color: #800000;
+
+        color: #fff;
+
+        text-align: center;
+
+        border-radius: 4px;
+
+        padding: 14px 24px;
+
+        position: fixed;
+
+        z-index: 9999;
+
+        left: 50%;
+
+        bottom: 30px;
+
+        transform: translateX(-50%);
+
+        font-size: 14px;
+
+    }
+ 
+        #snackbar.show {
+
+            visibility: visible;
+
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+
+        }
+ 
+    #overlay {
+
+        position: fixed;
+
+        top: 0;
+
+        left: 0;
+
+        width: 100vw;
+
+        height: 100vh;
+
+        background: rgba(0,0,0,0.5);
+
+        display: none;
+
+        z-index: 1000;
+
+    }
+ 
+    #confirm-popup {
+
+        position: fixed;
+
+        top: 50%;
+
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+
+        background: #fff;
+
+        padding: 20px;
+
+        border-radius: 8px;
+
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+
+        display: none;
+
+        z-index: 1001;
+
+        text-align: center;
+
+    }
+ 
+    #confirm-yes, #confirm-no {
+
+        margin: 0 5px;
+
+        padding: 6px 12px;
+
+        font-size: 12px;
+
+        border-radius: 4px;
+
+        cursor: pointer;
+
+        background: transparent;
+
+        color: #800000;
+
+        font-weight: 600;
+
+        border: 2px solid #800000;
+
+        transition: all 0.2s ease;
+
+    }
+ 
+        #confirm-yes:hover, #confirm-no:hover {
+
+            background-color: #800000;
+
+            color: white;
+
+        }
+ 
+    .icon-btn {
+
+        border: 1px solid #dee2e6;
+
+        background-color: #fff;
+
+        padding: 3px 5px;
+
+        margin: 2px;
+
+        border-radius: 6px;
+
+        cursor: pointer;
+
+        transition: background-color 0.2s;
+
+        display: inline-block;
+
+        text-decoration: none;
+
+    }
+ 
+        .icon-btn i {
+
+            font-size: 11px;
+
+            color: #800000;
+
+        }
+ 
+        .icon-btn.text-danger i {
+
+            color: #b30000;
+
+        }
+ 
+    .content {
+
+        margin-left: 0px;
+
+        padding: 28px 26px 40px;
+
+        min-height: 100vh;
+
+    }
+ 
+    @keyframes fadein {
+
+        from {
+
+            bottom: 0;
+
+            opacity: 0;
+
+        }
+ 
+        to {
+
+            bottom: 30px;
+
+            opacity: 1;
+
+        }
+
+    }
+ 
+    @keyframes fadeout {
+
+        from {
+
+            bottom: 30px;
+
+            opacity: 1;
+
+        }
+ 
+        to {
+
+            bottom: 0;
+
+            opacity: 0;
+
+        }
+
+    }
+ 
+    .btn-save {
+
+        background-color: #800;
+
+        font-weight: 500;
+
+        padding: 5px 16px;
+
+        font-size: 14px;
+
+        color: white;
+
+        border: none;
+
+        border-radius: 8px;
+
+    }
+ 
+        .btn-save:hover {
+
+            background-color: #660000;
+
+        }
+ 
+    .btn-back {
+
+        background-color: #800000;
+
+        color: #fff;
+
+        border: 2px solid #800000;
+
+        padding: 4px 10px;
+
+        border-radius: 6px;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        text-decoration: none;
+
+        transition: all 0.2s ease;
+
+    }
+ 
+        .btn-back:hover {
+
+            background-color: #660000;
+
+        }
+ 
+    .table thead.table-dark th {
+
+        background-color: #800 !important;
+
+        color: #fff !important;
+
+    }
+
+    input[readonly] {
+
+        background-color: #fff;
+
+        border: none;
+
+        text-align: center;
+
+        outline: none;
+
+        appearance: none;
+
+        -moz-appearance: textfield;
+
+         width: 100%;
+
+    }
+
+    .btn-success {
+
+        --bs-btn-color: #fff !important;
+
+        --bs-btn-bg: #800 !important;
+
+        --bs-btn-border-color: #800 !important;
+
+        --bs-btn-hover-color: #fff !important;
+
+        --bs-btn-hover-bg: #660000 !important;
+
+        --bs-btn-hover-border-color: #660000 !important;
+
+        --bs-btn-focus-shadow-rgb: 128, 0, 0 !important;
+
+        --bs-btn-active-color: #fff !important;
+
+        --bs-btn-active-bg: #660000 !important;
+
+        --bs-btn-active-border-color: #660000 !important;
+
+        --bs-btn-disabled-color: #fff !important;
+
+        --bs-btn-disabled-bg: #800 !important;
+
+        --bs-btn-disabled-border-color: #800 !important;
+
+    }
+
+    .btn-maroon-outline {
+
+        --bs-btn-color: #fff; /* white text */
+
+        --bs-btn-border-color: #800; /* maroon border */
+
+        --bs-btn-hover-color: #fff; /* text stays white on hover */
+
+        --bs-btn-hover-bg: #800; /* background stays maroon */
+
+        --bs-btn-hover-border-color: #800;
+
+        --bs-btn-focus-shadow-rgb: 128, 0, 0;
+
+        --bs-btn-active-color: #fff; /* text stays white when active */
+
+        --bs-btn-active-bg: #660000; /* darker maroon when clicked */
+
+        --bs-btn-active-border-color: #660000;
+
+        /* Remove all transitions */
+
+        transition: none !important;
+
+        background-color: #800 !important; /* always maroon */
+
+        border-color: #800 !important; /* always maroon */
+
+        color: #fff !important; /* always white */
+
+    }
+ 
+        /* Also override hover/focus/active to keep background & text consistent */
+
+        .btn-maroon-outline:hover,
+
+        .btn-maroon-outline:focus,
+
+        .btn-maroon-outline:active {
+
+            background-color: #800 !important;
+
+            border-color: #800 !important;
+
+            color: #fff !important;
+
+            box-shadow: none !important;
+
+        }
+
+    .btn-small {
+
+        padding: 0.25rem 0.5rem !important; /* !important ensures it overrides Bootstrap */
+
+        font-size: 11px !important;
+
+    }
+ 
+ 
+</style>
+
+ 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+ 
+<div class="form-section">
+<h4 class="text-center" style="font-size: 22px; color: #800; margin-top: -17px;">
+        Student Marks Entry
+</h4>
+ 
+    <!-- ?? Filter Dropdowns -->
+<form method="get" class="row g-3 align-items-center mb-4">
+<!-- Program Type -->
+<div class="col-md-3">
+<label for="course_type" class="form-label fw-bold">Program Type:</label>
+<select name="course_type" id="course_type" class="form-select" onchange="this.form.submit()">
+<option value="">-- Select Program Type --</option>
+                {% for ct in course_types %}
+<option value="{{ ct.id }}" {% if ct.id|stringformat:"s" == selected.program_type %}selected{% endif %}>
+                    {{ ct.name }}
+</option>
+                {% endfor %}
+</select>
+</div>
+ 
+        <!-- Academic Year -->
+<div class="col-md-3">
+<label for="academic_year" class="form-label fw-bold">Academic Year:</label>
+<select name="academic_year" id="academic_year" class="form-select" onchange="this.form.submit()">
+<option value="">Batch</option>
+                {% for year in academic_years %}
+<option value="{{ year }}" {% if year == selected.academic_year %}selected{% endif %}>
+                    {{ year }}
+</option>
+                {% endfor %}
+</select>
+</div>
+ 
+        <!-- Course -->
+<div class="col-md-3">
+<label for="course" class="form-label fw-bold">Course:</label>
+<select name="course" id="course" class="form-select" onchange="this.form.submit()">
+<option value="">-- Select Course --</option>
+                {% for c in courses %}
+<option value="{{ c.id }}" {% if c.id|stringformat:"s" == selected.course %}selected{% endif %}>
+                    {{ c.name }}
+</option>
+                {% endfor %}
+</select>
+</div>
+ 
+        <!-- Semester -->
+<div class="col-md-3">
+<label for="semester" class="form-label fw-bold">Semester / Year:</label>
+<select name="semester" id="semester" class="form-select" onchange="this.form.submit()">
+<option value="">-- Select Semester / Year --</option>
+                {% for sem in semesters %}
+<option value="{{ sem.id }}" {% if sem.id|stringformat:"s" == selected.semester|stringformat:"s" %}selected{% endif %}>{{ sem.label }}</option>
+                {% endfor %}
+</select> <!-- moved properly -->
+ 
+ 
+        </div>
+ 
+                <!-- Subject -->
+<div class="col-md-3">
+<label for="subject" class="form-label fw-bold">Subject:</label>
+<select name="subject" id="subject" class="form-select" onchange="this.form.submit()">
+<option value="">-- Select Subject --</option>
+                {% for sub in subjects %}
+<option value="{{ sub.id }}" {% if sub.id|stringformat:"s" == selected.subject|stringformat:"s" %}selected{% endif %}>{{ sub.name }}</option>
+                {% endfor %}
+</select>
+</div>
+ 
+    </form>
+<!-- ?? End Filters -->
+ 
+    <!-- Assignment Selection -->
+    {% if assignments and assignments|length > 1 %}
+<form method="get" class="mb-3 d-flex justify-content-center">
+<label for="assignment" class="me-2 fw-bold">Select Class:</label>
+<select name="assignment" id="assignment" class="form-select w-auto me-2" onchange="this.form.submit()">
+<option value="">-- Select Class --</option>
+            {% for assign in assignments %}
+<option value="{{ assign.id }}" {% if assignment and assignment.id == assign.id %}selected{% endif %}>
+                {{ assign.course.name }} - Semester {{ assign.semester }}
+</option>
+            {% endfor %}
+</select>
+<noscript><button type="submit" class="btn btn-primary">Proceed</button></noscript>
+</form>
+    {% endif %}
+ 
+    <!-- Students Table -->
+    {% if students %}
+<form method="post">
+        {% csrf_token %}
+<div class="table-responsive">
+<table class="table table-bordered table-hover mt-3 align-middle text-center">
+<thead class="table-dark">
+<tr>
+<th>Roll No</th>
+<th>Student Name</th>
+<th>Academic Year</th>
+<th>Course / Semester</th>
+<th>Subject</th>
+<th>Internal Max</th>
+<th>Internal Obtained</th>
+<th>Final Max</th>
+<th>Final Obtained</th>
+</tr>
+</thead>
+<tbody>
+                    {% for pair in student_form_pairs %}
+<tr>
+<td>{{ pair.student.student_userid }}</td>
+<td>{{ pair.student.student_name }}</td>
+<td>{{ pair.student.academic_year }}</td>
+<td>
+                        {{ pair.student.course }} -
+                        {% if pair.student.semester %}{{ pair.student.semester }}{% else %}{{ pair.student.current_year }}{% endif %}
+</td>
+<td>
+                        {% if pair.subject %}{{ pair.subject.name }}{% else %}-{% endif %}
+</td>
+ 
+                    <!-- Internal Max (readonly from DB or calculated) -->
+<td>
+                        {{ pair.internal_max|default:"-" }}
+</td>
+ 
+                    <!-- Internal Obtained (calculated best 2 of 3) -->
+<td>
+                        {{ pair.internal_obtained|default:"0.0" }}
+</td>
+ 
+                    <td>
+<input type="number" name="max_marks_{{ pair.student.id }}" value="{{ pair.form.initial.max_marks }}" readonly>
+</td>
+<td>
+<div class="marks-input">
+<input type="number" 
+                                   name="marks_obtained_{{ pair.student.id }}" 
+                                   value="{{ pair.form.initial.marks_obtained }}" 
+                                   min="0" 
+                                   max="{{ pair.form.initial.max_marks }}" 
+                                   style="width:88px;">
+<div class="error-message" style="color:red; font-size:9px; display:none;"></div>
+</div>
+</td>
+ 
+ 
+                </tr>
+ 
+                    {% endfor %}
+</tbody>
+</table>
+</div>
+<div class="d-flex justify-content-between mt-4">
+<a href="{% url 'student_marks_list' %}" class="btn btn-maroon-outline btn-small">
+<i class="bi bi-arrow-left"></i> Back
+</a>
+ 
+            <button type="submit" class="btn btn-success btn-small">
+<i class="bi bi-save"></i> Save Marks
+</button>
+</div>
+</form>
+    {% elif assignments and not students %}
+<div class="alert alert-warning mt-3 text-center fw-bold">
+        ?? No students found for your class.
+</div>
+    {% endif %}
+</div>
+ 
+<script>
+document.addEventListener("input", function(e) {
+    if (e.target.name.startsWith("marks_obtained_")) {
+        let max = parseFloat(e.target.getAttribute("max"));
+        let val = parseFloat(e.target.value);
+        let errorDiv = e.target.parentElement.querySelector(".error-message");
+ 
+        if (val > max) {
+            errorDiv.innerText = "marks below (" + max + ")";
+            errorDiv.style.display = "block";
+        } else if (val < 0) {
+            errorDiv.innerText = "Marks cannot be negative";
+            errorDiv.style.display = "block";
+        } else {
+            errorDiv.innerText = "";
+            errorDiv.style.display = "none";
+        }
+    }
+});
+</script>
+
+{% endblock %}

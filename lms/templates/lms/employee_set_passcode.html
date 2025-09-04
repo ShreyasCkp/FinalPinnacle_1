@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+</body>
+</html>{% extends 'master/bare.html' %}
+{% block title %}Set Passcode{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        max-width: 400px;
+        margin: 40px auto;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 24px;
+        font-size: 22px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    input[type="password"] {
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    button[type="submit"] {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        width: 100%;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        button[type="submit"]:hover {
+            background-color: #a10000;
+        }
+
+    a {
+        display: inline-block;
+        margin-top: 10px;
+        color: #800000;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+        a:hover {
+            text-decoration: underline;
+            color: #a10000;
+        }
+
+    .alert {
+        font-weight: 600;
+        color: red;
+        margin-bottom: 15px;
+    }
+
+    #error_passcode {
+        color: red;
+        margin-top: -12px;
+        margin-bottom: 15px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container">
+    <h2>Set Passcode</h2>
+
+    {% if error %}
+    <div class="alert">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <label for="passcode">Passcode</label>
+        <input type="password"
+               name="passcode"
+               id="passcode"
+               placeholder="Enter Passcode (min 4 digits)"
+               required
+               pattern="\d{4,}"
+               title="Passcode must be at least 4 digits."
+               autocomplete="off">
+
+        <button type="submit">Set Passcode</button>
+        <a href="{% url 'employee_login_view' %}">Back to Login</a>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const passcodeInput = document.getElementById('passcode');
+
+        function validatePasscode(code) {
+            return /^\d{4,}$/.test(code);
+        }
+
+        function showError(message) {
+            let errorDiv = document.getElementById('error_passcode');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'error_passcode';
+                passcodeInput.parentNode.insertBefore(errorDiv, passcodeInput.nextSibling);
+            }
+            errorDiv.textContent = message;
+        }
+
+        function clearError() {
+            const errorDiv = document.getElementById('error_passcode');
+            if (errorDiv) {
+                errorDiv.textContent = '';
+            }
+        }
+
+        form.addEventListener('submit', function (e) {
+            const code = passcodeInput.value.trim();
+            if (!validatePasscode(code)) {
+                e.preventDefault();
+                showError("Passcode must be at least 4 digits and numeric only.");
+                passcodeInput.focus();
+            } else {
+                clearError();
+            }
+        });
+
+        passcodeInput.addEventListener('input', function () {
+            if (validatePasscode(this.value.trim())) {
+                clearError();
+            }
+        });
+    });
+</script>
+{% endblock %}

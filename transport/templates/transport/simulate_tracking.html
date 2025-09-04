@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>📍 Live Location Tracker (Driver)</h3>
+    <p id="status" class="text-info">⏳ Waiting for GPS...</p>
+
+    <script>
+        const transportId = 1;  // Replace with actual ID from backend if needed
+
+        function sendLocation(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            fetch("{% url 'update_location_api' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    transport_id: transportId,
+                    latitude: lat,
+                    longitude: lng
+                })
+            }).then(response => response.json())
+              .then(data => {
+                  const status = document.getElementById("status");
+                  if (data.status === "success") {
+                      status.innerText = `✅ Sent location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                      status.className = "text-success";
+                  } else {
+                      status.innerText = `❌ Server error: ${data.message}`;
+                      status.className = "text-danger";
+                  }
+              }).catch(err => {
+                  document.getElementById("status").innerText = `❌ Network error: ${err}`;
+              });
+        }
+
+        function errorHandler(error) {
+            document.getElementById("status").innerText = "❌ Location access denied or unavailable.";
+        }
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.watchPosition(sendLocation, errorHandler, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            });
+        } else {
+            document.getElementById("status").innerText = "❌ Geolocation not supported in this brow
+<a href="simulate_tracking.html">simulate_tracking.html</a>ser.";
+        }
+    </script>
+</div>
+{% endblock %}

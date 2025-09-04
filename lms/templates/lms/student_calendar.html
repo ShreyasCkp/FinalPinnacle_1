@@ -1,0 +1,482 @@
+{% extends 'lms/student_layout.html' %}
+{% block title %}Student Calendar{% endblock %}
+{% block content %}
+
+<!-- Ensure Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .calendar-container {
+        display: flex;
+        flex-wrap: nowrap; /* make boxes stay side by side */
+        gap: 2rem;
+        padding: 7px;
+        margin-top: 25px;
+        justify-content: center; /* center the row */
+    }
+
+    .calendar-box {
+        flex: 0 0 60%; /* takes 60% width */
+        padding: 10px;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+        .calendar-header h2 {
+            color: #8b0000;
+            font-weight: 700;
+            font-size: 25px;
+            margin: 0;
+            /*margin-left: 387px;
+            margin-top: -25px;*/
+        }
+
+    .month-year {
+        color: #8b0000;
+        font-weight: 700;
+        font-size: 16px;
+        margin-bottom: 1px;
+    }
+
+    .btn-add {
+        background-color: #8b0000;
+        color: white;
+        border: none;
+        padding: 6px 3px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 13px;
+        transition: background-color 0.3s ease;
+        margin-right: 41px;
+        margin-top: 4px;
+    }
+
+    .bg-info {
+        --bs-bg-opacity: 1;
+        background-color: #8b0000 !important;
+        padding: 6px;
+    }
+
+    .border-warning {
+        --bs-border-opacity: 1;
+        border-color: #fff !important;
+    }
+
+    /* .btn-add:hover {
+            background-color: #5e35b1;
+        }*/
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        margin-right: 0px;
+    }
+
+    .calendar-day-name {
+        font-weight: 500;
+        background-color: #8b0000;
+        color: white;
+        padding: 2px 0;
+        border-radius: 6px;
+        font-size: 11px;
+    }
+
+    .calendar-day {
+        background-color: #ffffff;
+        border: 1px solid #d1c4e9;
+        padding: 4px 0;
+        border-radius: 8px;
+        color: #333;
+        font-size: 12px;
+        transition: background-color 0.2s ease;
+        text-align: center;
+        cursor: pointer;
+    }
+
+        .calendar-day:hover {
+            background-color: #ede7f6;
+        }
+
+        .calendar-day.today {
+            background-color: #8b0000;
+            color: #fff;
+            border: 2px solid #8b0000;
+            font-weight: bold;
+        }
+
+    .bg-warning {
+        --bs-bg-opacity: 1;
+        background-color: #dc3545 !important;
+    }
+
+    .bg-primary {
+        --bs-bg-opacity: 1;
+        background-color: #8b0000 !important;
+        padding: 6px;
+    }
+
+    .btn:hover {
+        color: var(--bs-btn-hover-color);
+        background-color: #8b0000;
+        border-color: #8b0000;
+    }
+
+    .event-box {
+        flex: 0 0 35%; /* takes 35% width */
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        max-height: 470px;
+        overflow-y: auto;
+    }
+
+        /* Optional: Style the scrollbar */
+        .event-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .event-box::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 3px;
+        }
+
+        .event-box::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+
+
+        .event-box h3 {
+            color: #8b0000;
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 19px;
+            margin-top: -26px;
+        }
+
+    .event-item {
+        background-color: #fff;
+        padding: 14px 6px;
+        border: 2px solid #8b0000;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        transition: transform 0.2s;
+        color: #8b0000;
+    }
+
+    h5 {
+        font-size: 18px;
+    }
+
+    .event-item:hover {
+        transform: scale(1.02);
+    }
+
+    .event-item h4 {
+        margin: 0;
+        font-size: 16px;
+        color: #8b0000;
+    }
+
+    .event-item small {
+        color: #8b0000;
+        font-size: 13px;
+    }
+
+    .badge {
+        margin-top: 6px;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .btn-add {
+        background-color: #8b0000;
+        color: white;
+        border: none;
+        padding: 6px 3px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 13px;
+        transition: background-color 0.3s ease;
+        margin-right: 41px;
+        margin-top: 4px;
+    }
+
+    .modal-footer {
+        display: flex;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        /* padding: calc(var(--bs-modal-padding) - var(--bs-modal-footer-gap) * .5); */
+        background-color: var(--bs-modal-footer-bg);
+        border-top: var(--bs-modal-footer-border-width) solid var(--bs-modal-footer-border-color);
+        border-bottom-right-radius: var(--bs-modal-inner-border-radius);
+        border-bottom-left-radius: var(--bs-modal-inner-border-radius);
+    }
+
+    .modal-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 52%;
+        color: var(--bs-modal-color);
+        pointer-events: auto;
+        background-color: var(--bs-modal-bg);
+        background-clip: padding-box;
+        border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
+        border-radius: var(--bs-modal-border-radius);
+        outline: 0;
+        margin-left: 341px;
+        /* margin-right: -45px; */
+    }
+
+    .p-3 {
+        padding: 0rem !important;
+    }
+
+    .modal-body {
+        position: relative;
+        flex: 1 1 auto;
+        padding: var(--bs-modal-padding);
+        font-size: 14px;
+    }
+
+    .px-4 {
+        /*padding-right: 6.5rem !important;*/
+        padding-left: 0.5rem !important;
+    }
+
+    .custom-modal-size {
+        max-width: 700px; /* Adjust as needed */
+        width: 100%;
+    }
+
+    .holiday-highlight {
+        background-color: #fff0f0 !important;
+        border: 2px solid #dc3545;
+        color: #8b0000 !important;
+        font-weight: bold;
+    }
+
+    .fee-due-day {
+        background-color: #ff4d4d;
+        color: white;
+        font-weight: bold;
+    }
+
+    .assignment‑due‑day {
+        background-color: orange;
+        color: black;
+        font-weight: bold;
+    }
+
+    .library‑return‑day {
+        background-color: rebeccapurple;
+        color: white;
+        font-weight: bold;
+    }
+
+    .tooltip-custom {
+        position: absolute;
+        background: #8b0000;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        white-space: pre-line;
+        z-index: 10;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .calendar-day:hover .tooltip-custom {
+        opacity: 1;
+    }
+</style>
+
+<div class="calendar-header">
+    <a href="{% url 'student_leave_list' %}" class="btn-add">View Leave Request's</a>
+
+    <h2>Student Calendar</h2>
+    <a href="{% url 'student_leave_create' %}" class="btn-add">Apply Leave</a>
+</div>
+
+{{ events_json|json_script:"event-data" }}
+{{ gov_holidays_json|json_script:"gh-data" }}
+
+<div class="container calendar-container">
+    <!-- Calendar -->
+    <div class="calendar-box">
+        <div class="calendar-header" style="justify-content: center; gap:10px; margin-bottom:15px;">
+            <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn btn-sm btn-outline-secondary">&lt;</a>
+            <div class="month-year">{{ month_name }} {{ year }}</div>
+            <a href="?month={{ next_month }}&year={{ next_year }}" class="btn btn-sm btn-outline-secondary">&gt;</a>
+        </div>
+
+        <!-- Days -->
+        <div class="calendar-grid">
+            {% for day in weekdays %}
+            <div class="calendar-day-name">{{ day }}</div>
+            {% endfor %}
+            {% for week in month_days %}
+            {% for day in week %}
+            {% if day == 0 %}
+            <div class="calendar-day"></div>
+            {% else %}
+            <div class="calendar-day {% if today.day == day and today.month == month and today.year == year %}today{% endif %}"
+                 data-date="{{ year }}-{{ month|stringformat:'02d' }}-{{ day|stringformat:'02d' }}">
+                {{ day }}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </div>
+
+        {% if month_holidays %}
+        <div style="margin-top: 12px; text-align:center;">
+            <strong>Government Holidays:</strong><br>
+            {% for h in month_holidays %}
+            {{ h.date|date:"d-M" }} - {{ h.name }}<br>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="event-box">
+        <h5>📅 Upcoming Due Dates</h5>
+
+        {% if combined_events %}
+        {% for e in combined_events %}
+        {% if e.event_type in due_date_types %}
+        <div class="event-item">
+            <h4>{{ e.title }}</h4>
+            <small>Due: {{ e.date }}{% if e.time %} at {{ e.time }}{% endif %}</small><br>
+            <span class="badge
+                            {% if e.event_type == " AssignmentDue" %}bg-warning text-dark
+                  {% elif e.event_type == "LibraryReturn" %}bg-info text-white
+                  {% elif e.event_type == "FeeDue" %}bg-danger text-white
+                  {% else %}bg-secondary text-white
+                  {% endif %}">
+                {{ e.event_type }}
+            </span>
+            {% if e.event_type == "LibraryReturn" %}
+            <div class="mt-2 text-danger small">Timely return of library materials is appreciated to avoid any overdue charges.</div>
+            {% elif e.url %}
+            <div style="margin-top: 8px;">
+                <a href="{{ e.url }}" class="btn btn-sm btn-outline-danger view-btn" data-event-type="{{ e.event_type }}" data-url="{{ e.url }}">View</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        <p class="text-muted">No upcoming due dates.</p>
+        {% endif %}
+    </div>
+
+    <!-- Day Event Modal -->
+    <div class="modal fade" id="dayEventModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered custom-modal-size">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">Events on <span id="selectedDate"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="dayEventContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Library Book Message -->
+    <div class="modal fade" id="libraryReturnModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">Library Reminder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Please return the book on time in library.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ✅ JavaScript to handle click interception -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const viewButtons = document.querySelectorAll('.view-btn');
+        viewButtons.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                const eventType = btn.getAttribute('data-event-type');
+                const url = btn.getAttribute('data-url');
+
+                if (eventType === 'LibraryReturn') {
+                    e.preventDefault(); // Stop the redirect
+                    const libraryModal = new bootstrap.Modal(document.getElementById('libraryReturnModal'));
+                    libraryModal.show();
+                } else {
+                    // Let it redirect
+                    window.location.href = url;
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const events = JSON.parse(document.getElementById('event-data').textContent);
+        const uniqueEventsByDate = {};
+
+        // Group events by date
+        events.forEach(evt => {
+            (uniqueEventsByDate[evt.date] ||= []).push(evt);
+        });
+
+        // Apply classes to dates
+        document.querySelectorAll('.calendar-day[data-date]').forEach(dayEl => {
+            const date = dayEl.getAttribute('data-date');
+            const todaysEvents = uniqueEventsByDate[date];
+            if (!todaysEvents) return;
+
+            // Priority: FeeDue > AssignmentDue > LibraryReturn
+            if (todaysEvents.some(e => e.event_type === 'FeeDue')) {
+                dayEl.classList.add('fee-due-day');
+            } else if (todaysEvents.some(e => e.event_type === 'AssignmentDue')) {
+                dayEl.classList.add('assignment-due-day');
+            } else if (todaysEvents.some(e => e.event_type === 'LibraryReturn')) {
+                dayEl.classList.add('library-return-day');
+            }
+
+            // Set tooltip to summarize event titles
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip-custom';
+            tooltip.innerText = todaysEvents.map(e => e.title).join('\n');
+            dayEl.appendChild(tooltip);
+        });
+    });
+</script>
+
+{% endblock %}

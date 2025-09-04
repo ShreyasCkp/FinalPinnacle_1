@@ -1,0 +1,234 @@
+{% extends 'layout.html' %}
+{% block title %}Add Timetable{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+    }
+
+    .form-container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    }
+
+    h3 {
+        font-weight: 600;
+        color: #8b0000;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 22px;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    select, input, textarea {
+        font-size: 14px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 12px;
+        width: 100%;
+    }
+
+    .btn-save {
+        background-color: #a23030;
+        color: white;
+        font-weight: 500;
+        border: none;
+        border-radius: 5px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .text-danger {
+        font-size: 13px;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 12px 26px 40px;
+        min-height: 100vh;
+    }
+
+    .btn-save {
+        background-color: #a23030;
+        color: white;
+        font-weight: 500;
+        border: none;
+        border-radius: 5px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+</style>
+
+<div class="container form-container">
+    <h3>Add Timetable</h3>
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="row">
+            {% for field in form %}
+            <div class="col-md-6">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Button Row -->
+<div class="d-flex justify-content-between mt-3">
+    <!-- Back Button -->
+    <a href="{% url 'timetable_dashboard' %}" class="btn btn-save">Back</a>
+
+    <!-- Save Button -->
+    <button type="submit" class="btn btn-save">Save</button>
+</div>
+
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    const courseSelect = $('#id_course');
+    const semesterSelect = $('#id_semester_number');
+    const subjectSelect = $('#id_subject');
+    const facultySelect = $('#id_faculty');
+    const academicYearSelect = $('#id_academic_year');
+
+    $('#id_course_type').change(function () {
+        const programTypeId = $(this).val();
+
+        if (programTypeId) {
+            $.get("{% url 'get_courses_and_years_by_program_type' %}", {
+                program_type_id: programTypeId
+            }, function (data) {
+                academicYearSelect.empty().append($('<option>', {
+                    value: '',
+                    text: 'Select Batch'
+                }));
+                $.each(data.academic_years, function (index, year) {
+                    academicYearSelect.append($('<option>', {
+                        value: year.id,
+                        text: year.year
+                    }));
+                });
+
+                courseSelect.empty().append($('<option>', {
+                    value: '',
+                    text: 'Select Combination'
+                }));
+                $.each(data.courses, function (index, course) {
+                    courseSelect.append($('<option>', {
+                        value: course.id,
+                        text: course.name
+                    }));
+                });
+
+                semesterSelect.empty().append($('<option>', { value: '', text: 'Select Sem/Year' }));
+                subjectSelect.empty().append($('<option>', { value: '', text: 'Select Subject' }));
+                facultySelect.empty().append($('<option>', { value: '', text: 'Select Faculty' }));
+            });
+        }
+    });
+
+    courseSelect.change(function () {
+        const courseId = $(this).val();
+
+        if (courseId) {
+            $.post("{% url 'get_semesters_by_course' %}", {
+                course_id: courseId,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function (data) {
+                semesterSelect.empty().append($('<option>', { value: '', text: 'Select Sem/Year' }));
+                $.each(data.semesters, function (index, semester) {
+                    semesterSelect.append($('<option>', {
+                        value: semester.number,
+                        text: semester.name
+                    }));
+                });
+
+                subjectSelect.empty().append($('<option>', { value: '', text: 'Select Subject' }));
+                facultySelect.empty().append($('<option>', { value: '', text: 'Select Faculty' }));
+            });
+        }
+    });
+
+    semesterSelect.change(function () {
+        const courseId = courseSelect.val();
+        const semester = $(this).val();
+
+        if (courseId && semester) {
+            $.post("{% url 'get_subjects_by_course_and_semester' %}", {
+                course_id: courseId,
+                semester: semester,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function (data) {
+                subjectSelect.empty().append($('<option>', { value: '', text: 'Select Subject' }));
+                $.each(data.subjects, function (index, subject) {
+                    subjectSelect.append($('<option>', {
+                        value: subject.id,
+                        text: subject.name
+                    }));
+                });
+
+                facultySelect.empty().append($('<option>', { value: '', text: 'Select Faculty' }));
+            });
+        }
+    });
+
+    subjectSelect.change(function () {
+        const subjectId = $(this).val();
+
+        if (subjectId) {
+            $.get("{% url 'get_faculty_by_subject' %}", { subject_id: subjectId }, function (data) {
+                facultySelect.empty();
+
+                if (data.faculty && data.faculty.length > 0) {
+                    $.each(data.faculty, function (index, faculty) {
+                        const isSelected = faculty.id === data.default ? 'selected' : '';
+                        facultySelect.append('<option value="' + faculty.id + '" ' + isSelected + '>' + faculty.name + '</option>');
+                    });
+                } else {
+                    facultySelect.append('<option value="">No faculty assigned</option>');
+                }
+            });
+        } else {
+            facultySelect.empty().append('<option value="">Select Subject First</option>');
+        }
+    });
+});
+</script>
+
+
+
+
+{% endblock %}

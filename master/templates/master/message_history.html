@@ -1,0 +1,202 @@
+﻿{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<style>
+    .student-data-container {
+        max-width: 976px;
+        margin: 50px auto;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .tab-card {
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        padding: 11px;
+        margin-top: 20px;
+    }
+
+    table {
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+
+    .table thead {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        padding: 2px;
+        font-size: 10px;
+    }
+
+    th {
+        font-size: 13px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        border-radius: 8px;
+        padding: 3px 11px;
+        font-size: 10px;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .filter-form label {
+        margin-right: 5px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .filter-form select {
+        margin-right: 15px;
+        font-size: 9px;
+        padding: 1px;
+    }
+
+    h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #333;
+        text-align: center;
+    }
+
+    .content {
+        padding: 13px 26px 18px;
+    }
+
+    .sidebar {
+        width: 200px;
+        height: 100vh;
+        background: linear-gradient(135deg, #8B0000, #800000); /* Maroon gradient */
+
+        color: white;
+        padding-top: 0px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 7px 8px;
+            display: block;
+            font-weight: 500;
+        }
+</style>
+
+<div class="student-data-container">
+    <h2>Sent Messages</h2>
+
+    <div class="tab-card">
+        <!-- Filter Form -->
+        <form method="get" class="form-inline filter-form mb-3 justify-content-center">
+            <label for="channel">Channel:</label>
+            <select name="channel" class="form-control mx-2" id="channel">
+                <option value="">All</option>
+                <option value="sms" {% if request.GET.channel == 'sms' %}selected{% endif %}>SMS</option>
+                <option value="whatsapp" {% if request.GET.channel == 'whatsapp' %}selected{% endif %}>WhatsApp</option>
+            </select>
+
+
+            <label for="status">Status:</label>
+            <select name="status" class="form-control mx-2" id="status">
+                <option value="">All</option>
+                <option value="delivered" {% if request.GET.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+            </select>
+
+            <label for="department">Department:</label>
+            <select name="department" class="form-control mx-2" id="department">
+                <option value="">All</option>
+                {% for dept in departments %}
+                <option value="{{ dept }}" {% if request.GET.department == dept %}selected{% endif %}>{{ dept }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+
+        <!-- Table will come after filters -->
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Department</th>
+                        <th>Student</th>
+                        <th>Phone No</th>
+                        <th>Sent Via</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in messages %}
+                    <tr>
+                        <td>{{ msg.subject }}</td>
+                        <td>{{ msg.department }}</td>
+                        <td>{{ msg.student_name }}</td>
+                        <td>{{ msg.guardian_phone_no }}</td>
+
+                        <td>
+                            {% if msg.send_sms %}
+                            <i class="fas fa-sms" style="color: #007bff;"></i>
+                            {% endif %}
+                            {% if msg.send_whatsapp %}
+                            <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+                            {% endif %}
+                        </td>
+                        <td>{{ msg.sent_at|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            {% if msg.send_sms %}
+                            {% if msg.sms_status_display == "Delivered" %}
+                            <i class="fas fa-check-circle" title="SMS Delivered" style="color: green;"></i>
+                            {% else %}
+                            <i class="fas fa-times-circle" title="SMS Not Delivered" style="color: red;"></i>
+                            {% endif %}
+                            {% endif %}
+
+                            {% if msg.send_whatsapp %}
+                            {% if msg.whatsapp_status_display == "Delivered" %}
+                            <i class="fas fa-check-circle" title="WhatsApp Delivered" style="color: green; margin-left: 6px;"></i>
+                            {% else %}
+                            <i class="fas fa-times-circle" title="WhatsApp Not Delivered" style="color: red; margin-left: 6px;"></i>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if msg.status_display == "Not Delivered" or msg.sms_status_display != "Delivered" or msg.whatsapp_status_display != "Delivered" %}
+                            <a href="{% url 'resend_message' msg.id %}">Resend</a>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

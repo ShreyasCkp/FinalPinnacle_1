@@ -1,0 +1,595 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .container {
+        max-width: 950px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+        font-weight: 600;
+        color: #8b0000;
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 22px;
+    }
+
+    label,
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 6px;
+        color: #333;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    .form-control,
+    .form-select {
+        font-size: 14px;
+        padding: 6px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 16px;
+        width: 100%;
+        background-color: #fff;
+    }
+
+    input[readonly] {
+        background-color: #f5f5f5;
+        pointer-events: none;
+        border-color: #ddd;
+    }
+
+    .section-heading,
+    h5 {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-weight: 600;
+        color: #8b0000;
+        font-size: 16px;
+        border-left: 4px solid #8b0000;
+        padding-left: 10px;
+    }
+
+    .btn-success,
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 8px 20px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .btn-success:hover,
+    .btn-save:hover {
+        background-color: #8a1f1f;
+    }
+
+    .input-group > button {
+        padding: 6px 14px;
+        border-radius: 5px;
+        background-color: #a23030;
+        color: white;
+        border: none;
+        font-size: 13px;
+        margin-left: 10px;
+    }
+
+    .input-group > button:hover {
+        background-color: #8a1f1f;
+    }
+
+    .alert {
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+
+    #qr-code-section img {
+        border: 1px solid #ddd;
+        padding: 5px;
+        margin-top: 10px;
+        border-radius: 4px;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 19px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2>Student Fee Entry</h2>
+    <form method="POST" id="studentForm">
+        {% csrf_token %}
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-warning mt-2" style="font-size: 13px;">
+            {{ message|safe }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Admission No -->
+        <div class="mb-3">
+            <label for="admission_no" class="form-label">
+                Number <span style="color: red;">*</span>
+            </label>
+            <div class="input-group">
+                <input type="text" name="admission_no" id="admission_no" class="form-control"
+                       required aria-required="true" value="{{ student.admission_no }}">
+                <button type="button" class="btn btn-primary" id="fetchData">Fetch</button>
+            </div>
+        </div>
+
+        <!-- Name & Course -->
+        <div class="mb-3"><label>Name</label><input type="text" name="name" id="name" class="form-control" readonly value="{{ student.name }}"></div>
+        <div class="mb-3"><label>Course</label><input type="text" name="course" id="course" class="form-control" readonly value="{{ student.course }}"></div>
+
+        <!-- Tuition Fee -->
+        <h5 class="mt-4">Tuition Fee Details</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <label>Tuition Fee</label>
+                <input type="number" step="0.01" name="tuition_fee" id="tuition_fee" class="form-control" readonly value="{{ student.tuition_fee }}">
+            </div>
+            <div class="col-md-4">
+                <label>Scholarship</label>
+                <input type="number" step="0.01" name="scholarship" id="scholarship" class="form-control" readonly value="{{ student.scholarship }}">
+            </div>
+            <div class="col-md-4">
+                <label>Advance Paid</label>
+                <input type="number" step="0.01" name="tuition_advance_amount" id="tuition_advance_amount" class="form-control" readonly value="{{ student.tuition_advance_amount }}">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-4">
+                <label>Final Fee After Caution Deposit</label>
+                <input type="number" step="0.01" name="final_fee_after_advance" id="final_fee_after_advance" class="form-control" readonly value="{{ student.final_fee_after_advance }}">
+            </div>
+            <div class="col-md-4">
+                <label>Tuition Received</label>
+                <input type="number" step="0.01" name="tuition_fee_paid" id="tuition_fee_paid" class="form-control" readonly value="{{ student.tuition_fee_paid }}">
+            </div>
+            <div class="col-md-4">
+                <label>Tuition Pending</label>
+                <input type="number" step="0.01" name="tuition_pending_fee" id="tuition_pending_fee" class="form-control" readonly value="{{ student.tuition_pending_fee }}">
+            </div>
+            <div class="col-md-4 ">
+                <label>Tuition Due Date</label>
+                <input type="date" name="tuition_due_date" class="form-control" value="{{ student.tuition_due_date|date:'Y-m-d' }}">
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label>Tuition Amount (Now Paying)</label>
+                <!-- Do not pre-populate tuition_amount, always show blank for user -->
+                <input type="number" step="0.01" name="tuition_amount" id="tuition_amount" class="form-control" value="">
+            </div>
+        </div>
+
+        <!-- Transport -->
+        <h5 class="mt-4">Transport Fee</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <label>Transport Fee</label>
+                <input type="number" name="transport_fee" id="transport_fee" class="form-control" readonly value="{{ student.transport_fee }}">
+            </div>
+            <div class="col-md-4">
+                <label>Transport Paid</label>
+                <input type="number" name="transport_fee_paid" id="transport_fee_paid" class="form-control" readonly value="{{ student.transport_fee_paid }}">
+            </div>
+            <div class="col-md-4">
+                <label>Transport Pending</label>
+                <input type="number" name="transport_pending_fee" id="transport_pending_fee" class="form-control" readonly value="{{ student.transport_pending_fee }}">
+            </div>
+
+
+            <div class="col-md-4">
+                <label>Transport Due Date</label>
+                <input type="date" name="transport_due_date" class="form-control" value="{{ student.transport_due_date|date:'Y-m-d' }}">
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label>Transport Amount</label>
+                <input type="number" step="0.01" name="transport_amount" id="transport_amount" class="form-control" value="">
+            </div>
+        </div>
+
+        <!-- Hostel -->
+        <h5 class="mt-4">Hostel Fee</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <label>Hostel Fee</label>
+                <input type="number" name="hostel_fee" id="hostel_fee" class="form-control" readonly value="{{ student.hostel_fee }}">
+            </div>
+            <div class="col-md-4">
+                <label>Hostel Paid</label>
+                <input type="number" name="hostel_fee_paid" id="hostel_fee_paid" class="form-control" readonly value="{{ student.hostel_fee_paid }}">
+            </div>
+            <div class="col-md-4">
+                <label>Hostel Pending</label>
+                <input type="number" name="hostel_pending_fee" id="hostel_pending_fee" class="form-control" readonly value="{{ student.hostel_pending_fee }}">
+            </div>
+            <div class="col-md-4">
+                <label>Hostel Due Date</label>
+                <input type="date" name="hostel_due_date" class="form-control" value="{{ student.hostel_due_date|date:'Y-m-d' }}">
+            </div>
+        </div>
+
+
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label>Hostel Amount</label>
+                <input type="number" step="0.01" name="hostel_amount" id="hostel_amount" class="form-control" value="">
+            </div>
+        </div>
+
+        <!-- Books -->
+        <h5 class="mt-4">Books Fee</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <label>Books Fee</label>
+                <input type="number" name="books_fee" id="books_fee" class="form-control" readonly value="{{ student.books_fee }}">
+            </div>
+            <div class="col-md-4">
+                <label>Books Paid</label>
+                <input type="number" name="books_fee_paid" id="books_fee_paid" class="form-control" readonly value="{{ student.books_fee_paid }}">
+            </div>
+            <div class="col-md-4">
+                <label>Books Pending</label>
+                <input type="number" name="books_pending_fee" id="books_pending_fee" class="form-control" readonly value="{{ student.books_pending_fee }}">
+            </div>
+        </div>
+        <div class="col-md-6 form-group">
+            <label>Books Due Date</label>
+            <input type="date" name="books_due_date" class="form-control" value="{{ student.books_due_date|date:'Y-m-d' }}">
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label>Books Amount</label>
+                <input type="number" step="0.01" name="books_amount" id="books_amount" class="form-control" value="">
+            </div>
+        </div>
+        <!-- Uniform -->
+        <h5 class="mt-4">Uniform Fee</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <label>Uniform Fee</label>
+                <input type="number" name="uniform_fee" id="uniform_fee" class="form-control" readonly value="{{ student.uniform_fee }}">
+            </div>
+            <div class="col-md-4">
+                <label>Uniform Paid</label>
+                <input type="number" name="uniform_fee_paid" id="uniform_fee_paid" class="form-control" readonly value="{{ student.uniform_fee_paid }}">
+            </div>
+            <div class="col-md-4">
+                <label>Uniform Pending</label>
+                <input type="number" name="uniform_pending_fee" id="uniform_pending_fee" class="form-control" readonly value="{{ student.uniform_pending_fee }}">
+            </div>
+            <div class="col-md-4">
+                <label>Uniform Due Date</label>
+                <input type="date" name="uniform_due_date" class="form-control" value="{{ student.uniform_due_date|date:'Y-m-d' }}">
+            </div>
+
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label>Uniform Amount</label>
+                <input type="number" step="0.01" name="uniform_amount" id="uniform_amount" class="form-control" value="">
+            </div>
+        </div>
+        <!-- Other -->
+        <h5 class="mt-4">Other Fee</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <label>Other Fee Name</label>
+                <input type="text" name="other_fee" id="other_fee" class="form-control" value="{{ student.other_fee }}">
+            </div>
+            <!--<div class="col-md-6 form-group">
+                <label>Other Due Date</label>
+                <input type="date" name="other_due_date" class="form-control" value="{{ student.other_due_date|date:'Y-m-d' }}">
+            </div>-->
+        </div>
+        <div class="col-md-6">
+            <label>Other Amount</label>
+            <input type="number" name="other_amount" id="other_amount" class="form-control" value="{{ student.other_amount }}">
+        </div>
+
+
+        <!-- Additional Info -->
+        <!--<h5 class="mt-4">Additional Info</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <label>Next Installment</label>
+                <input type="number" name="next_installment" class="form-control" value="{{ student.next_installment }}">
+            </div>
+            <div class="col-md-6">
+                <label>Next Due Date</label>
+                <input type="date" name="student.next_due_date" class="form-control" value="{{ student.next_due_date|date:'Y-m-d' }}">
+            </div>
+        </div>-->
+        <!--receipt number-->
+
+        <div class="row">
+            <div class="col-md-6">
+                <label>Receipt Number</label>
+                <input type="text" name="receipt_no" id="receipt_no" class="form-control" readonly value="{{ next_receipt_no }}">
+            </div>
+            <div class="col-md-6">
+                <label>Receipt Date</label>
+                <input type="date" name="receipt_date" id="receipt_date" class="form-control" readonly value="{{ today_date }}">
+            </div>
+
+            <!-- Status -->
+            <input type="hidden" name="status" value="Paid">
+
+            <!-- Payment Method -->
+            <label for="payment_method" class="form-label">
+                Payment Method <span style="color: red;">*</span>
+            </label>
+            <select name="payment_method" id="payment_method" class="form-control" required aria-required="true">
+                <option value="">Select</option>
+                <option value="Cash" {% if student.payment_method == 'Cash' %}selected{% endif %}>Cash</option>
+                <option value="Online" {% if student.payment_method == 'Online' %}selected{% endif %}>Online</option>
+            </select>
+
+            <!-- QR Code Display Section -->
+            <div id="qr-code-section" class="mt-3" style="display: none;">
+                <label>Scan to Pay (QR Code)</label><br>
+                <img id="qr-code-img" src="" alt="QR Code" width="180" height="180" class="border p-2">
+            </div>
+            <!-- Submit -->
+            <button type="submit" class="btn btn-success">Save</button>
+    </form>
+</div>
+<script>
+    function validateForm() {
+        const admissionNo = document.getElementById("admission_no").value.trim();
+        if (!admissionNo) {
+            alert("Admission Number is required.");
+            document.getElementById("admission_no").focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const paymentMethod = document.getElementById("payment_method");
+
+        const qrSection = document.getElementById("qr-code-section");
+
+        const qrImg = document.getElementById("qr-code-img");
+
+        // All fee amount fields to be tracked
+
+        const amountFields = [
+
+            "tuition_amount",
+
+            "transport_amount",
+
+            "hostel_amount",
+
+            "books_amount",
+
+            "uniform_amount",
+
+            "other_amount"
+
+        ].map(id => document.getElementById(id));
+
+        function calculateTotalAmount() {
+
+            return amountFields.reduce((total, field) => {
+
+                const value = parseFloat(field.value) || 0;
+
+                return total + value;
+
+            }, 0).toFixed(2);
+
+        }
+
+        function updateQR() {
+
+            const method = paymentMethod.value.trim().toLowerCase();
+
+            const totalAmount = calculateTotalAmount();
+
+            if (method === "online" && totalAmount > 0) {
+
+                qrSection.style.display = "block";
+
+                qrImg.src = `/generate_qr_dynamic?amount=${totalAmount}`;
+
+            } else {
+
+                qrSection.style.display = "none";
+
+                qrImg.src = "";
+
+            }
+
+        }
+
+        // Trigger on any change in payment method or amount fields
+
+        paymentMethod.addEventListener('change', updateQR);
+
+        amountFields.forEach(field => field.addEventListener('input', updateQR));
+
+    });
+</script>
+
+
+<!-- jQuery for fetch button -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#fetchData').on('click', function () {
+        var admissionNo = $('#admission_no').val().trim();
+        if (admissionNo !== '') {
+            $.ajax({
+                url: "{% url 'get_student_details' %}",
+                data: { 'admission_no': admissionNo },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.error) {
+                        alert("No data found!");
+                    } else {
+                        $('#name').val(data.student_name);
+                        $('#course').val(data.course);
+                        $('#tuition_fee').val(data.tuition_fee);
+                        $('#scholarship').val(data.scholarship);
+                        $('#tuition_advance_amount').val(data.tuition_advance_amount);
+                        $('#final_fee_after_advance').val(data.final_fee_after_advance);
+                        $('#tuition_fee_paid').val(data.tuition_fee_paid);
+                        $('#tuition_pending_fee').val(data.tuition_pending_fee);
+                        $('#tuition_amount').val(data.tuition_amount);
+
+                        $('#transport_fee').val(data.transport_fee);
+                        $('#transport_fee_paid').val(data.transport_fee_paid);
+                        $('#transport_pending_fee').val(data.transport_pending_fee);
+                        $('#transport_amount').val(data.transport_amount);
+
+                        $('#hostel_fee').val(data.hostel_fee);
+                        $('#hostel_fee_paid').val(data.hostel_fee_paid);
+                        $('#hostel_pending_fee').val(data.hostel_pending_fee);
+                        $('#hostel_amount').val(data.hostel_amount);
+
+                        $('#books_fee').val(data.books_fee);
+                        $('#books_fee_paid').val(data.books_fee_paid);
+                        $('#books_pending_fee').val(data.books_pending_fee);
+                        $('#books_amount').val(data.books_amount);
+
+                        $('#uniform_fee').val(data.uniform_fee);
+                        $('#uniform_fee_paid').val(data.uniform_fee_paid);
+                        $('#uniform_pending_fee').val(data.uniform_pending_fee);
+                        $('#uniform_amount').val(data.uniform_amount);
+
+                        $('#other_fee').val(data.other_fee);
+                        $('#other_amount').val(data.other_amount);
+                    }
+                },
+                error: function () {
+                    alert("Fetch failed. Check server.");
+                }
+            });
+        }
+    });
+</script>
+<script>
+    function calculateFees() {
+        // Get input values
+        var tuitionFee = parseFloat($('#tuition_fee').val()) || 0;
+        var scholarship = parseFloat($('#scholarship').val()) || 0;
+        var advance = parseFloat($('#tuition_advance_amount').val()) || 0;
+
+        // Calculate final tuition after deductions
+        var finalTuition = tuitionFee - scholarship - advance;
+        $('#final_fee_after_advance').val(finalTuition.toFixed(2));
+
+        // Tuition Calculation
+        var origTuitionPaid = parseFloat($('#tuition_fee_paid').attr('data-orig')) || 0;
+        var tuitionNowPaying = parseFloat($('#tuition_amount').val()) || 0;
+        var totalTuitionPaid = origTuitionPaid + tuitionNowPaying;
+        var tuitionPending = finalTuition - totalTuitionPaid;
+
+        $('#tuition_fee_paid').val(totalTuitionPaid.toFixed(2));
+        $('#tuition_pending_fee').val(tuitionPending.toFixed(2));
+
+        // Other fees calculation
+        ['transport', 'hostel', 'books', 'uniform'].forEach(function (section) {
+            var fee = parseFloat($('#' + section + '_fee').val()) || 0;
+            var origPaid = parseFloat($('#' + section + '_fee_paid').attr('data-orig')) || 0;
+            var payingNow = parseFloat($('#' + section + '_amount').val()) || 0;
+            var newPaid = origPaid + payingNow;
+            var newPending = fee - newPaid;
+
+            $('#' + section + '_fee_paid').val(newPaid.toFixed(2));
+            $('#' + section + '_pending_fee').val(newPending.toFixed(2));
+        });
+    }
+
+    $(document).ready(function () {
+        // Initialize data-orig on load if not set
+        ['tuition', 'transport', 'hostel', 'books', 'uniform'].forEach(function (section) {
+            var paidField = $('#' + section + '_fee_paid');
+            if (!paidField.attr('data-orig')) {
+                paidField.attr('data-orig', parseFloat(paidField.val()) || 0);
+            }
+        });
+
+        // Initial calculation
+        calculateFees();
+
+        // Event listeners
+        $('#tuition_amount, #tuition_fee, #scholarship, #tuition_advance_amount').on('input', calculateFees);
+
+        ['transport', 'hostel', 'books', 'uniform'].forEach(function (section) {
+            $('#' + section + '_amount').on('input', calculateFees);
+        });
+
+        // AJAX to fetch student data
+        $('#admission_no').on('change', function () {
+            var admissionNo = $(this).val();
+            if (!admissionNo) return;
+
+            $.ajax({
+                url: '/get_student_details/',
+                method: 'GET',
+                data: { admission_no: admissionNo },
+                success: function (data) {
+                    if (data.error) {
+                        alert("No data found!");
+                    } else {
+                        for (const key in data) {
+                            if (key === 'tuition_amount') continue; // Don't overwrite tuition_amount!
+                            var el = $('#' + key);
+                            el.val(data[key]);
+                            if (key.endsWith('_fee_paid')) {
+                                el.attr('data-orig', parseFloat(data[key]) || 0);
+                            }
+                        }
+                        calculateFees();
+                    }
+                },
+                error: function () {
+                    alert("Failed to fetch student data.");
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}
+

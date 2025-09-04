@@ -1,0 +1,182 @@
+﻿{% extends 'layout.html' %}
+{% block title %}Confirmed Admissions – Fee Entry{% endblock %}
+{% block content %}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-left: 200px;
+        margin-top: 0;
+    }
+
+    .container {
+        background-color: #ffffff;
+        padding: 20px;
+        margin-top: 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        max-width: 100%;
+    }
+
+    .form-title {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 20px;
+        margin-top: -10px;
+    }
+
+    form select {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: #fff;
+        cursor: pointer;
+        margin: 0 10px 12px 10px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border: 1px solid #dee2e6;
+        padding: 6px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+   /* tr:hover {
+        background-color: #e9ecef;
+    }*/
+
+    .text-center {
+        font-style: italic;
+        color: #888;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background: #fff;
+        padding: 0px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+    }
+
+    .icon-btn i {
+        color: #800000;
+        font-size: 13px;
+    }
+
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
+
+    .icon-btn:hover {
+        background-color: #f3f3f3;
+    }
+
+    .alert {
+        color: #800000;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 10px 0;
+    }
+
+    @media (max-width: 768px) {
+        table, th, td {
+            font-size: 10px;
+        }
+    }
+
+    .content {
+        padding: 21px 26px 40px;
+        margin-left: 0px;
+    }
+</style>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og=="
+      crossorigin="anonymous" />
+
+<div class="container mt-4">
+    <h3 class="form-title">Confirmed Admissions – Fee Entry</h3>
+
+    <!-- Stream & Course Type Selection Form -->
+    <form method="get" action="{% url 'shortlist_display' %}" class="text-center">
+        <label for="type"><strong>Select Type:</strong></label>
+        <select name="type" id="type" onchange="this.form.submit()">
+            <option value="PU" {% if selection == 'PU' %}selected{% endif %}>PU</option>
+            <option value="Degree" {% if selection == 'Degree' %}selected{% endif %}>Degree</option>
+        </select>
+
+        <label for="course_type"><strong>Course Type:</strong></label>
+        <select name="course_type" id="course_type" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for ct in course_types %}
+            <option value="{{ ct.id }}" {% if ct.id == selected_course_type %}selected{% endif %}>
+                {{ ct.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Admission No</th>
+                <th>Student Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in shortlisted %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.admission_no }}</td>
+                <td>{{ item.student_name }}</td>
+                <td>
+                    {% if selection == 'PU' %}
+                    <a href="{% url 'pu_fee_detail_form' item.id %}" class="icon-btn">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    {% elif selection == 'Degree' %}
+                    <a href="{% url 'degree_fee_detail_form' item.id %}" class="icon-btn">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center alert">No confirmed admissions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+

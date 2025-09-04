@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- Reports Heading -->
+<h2 style="color: #800000; font-weight: bold; margin-top: -30px; margin-bottom: -30px; margin-left: -189px;">Reports</h2>
+
+<div style="display: flex; gap: 24px; margin-top: 51px; margin-left: -199px;">
+    <!-- Course-wise Admissions Card -->
+    <div style="flex: 1; background: #f3f6fa; border-radius: 10px; box-shadow: 0 2px 8px #e1e5ee; padding: 28px;">
+        <h4 style="margin-bottom: 18px; color: #800000;">Course-wise Admissions</h4>
+        <div style="font-size: 17px;">
+            <div>PU Admissions: <b>{{ pu_count }}</b></div>
+            <div>Degree Admissions: <b>{{ degree_count }}</b></div>
+        </div>
+    </div>
+    <!-- Admission Statistics Card -->
+    <div style="flex: 2; background: #f3f6fa; border-radius: 10px; box-shadow: 0 2px 8px #e1e5ee; padding: 28px;">
+        <h4 style="margin-bottom: 18px; color: #800000;">Admission Statistics</h4>
+        <div style="display: flex; flex-wrap: wrap; gap: 24px;">
+            <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 4px #e1e5ee; padding: 20px; flex: 1;">
+                <div style="font-size: 15px; color: #666;">Total Admissions</div>
+                <div style="font-size: 28px; font-weight: bold; color: #2e7d32;">{{ total_admissions }}</div>
+            </div>
+            <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 4px #e1e5ee; padding: 20px; flex: 1;">
+                <div style="font-size: 15px; color: #666;">Confirmed Admissions</div>
+                <div style="font-size: 28px; font-weight: bold; color: #1565c0;">{{ confirmed_admissions }}</div>
+            </div>
+            <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 4px #e1e5ee; padding: 20px; flex: 1;">
+                <div style="font-size: 15px; color: #666;">Pending Admissions</div>
+                <div style="font-size: 28px; font-weight: bold; color: #f9a825;">{{ pending_admissions }}</div>
+            </div>
+            <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 4px #e1e5ee; padding: 20px; flex: 1;">
+                <div style="font-size: 15px; color: #666;">Rejected Admissions</div>
+                <div style="font-size: 28px; font-weight: bold; color: #c62828;">{{ rejected_admissions }}</div>
+            </div>
+            <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 4px #e1e5ee; padding: 20px; flex: 1;">
+                <div style="font-size: 15px; color: #666;">Admissions Under Review</div>
+                <div style="font-size: 28px; font-weight: bold; color: #6c7ae0;">{{ review_admissions }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .caption {
+        caption-side: top;
+        font-size: 1.5em;
+        margin-bottom: -29px;
+        font-weight: bold;
+        color: #800000 !important;
+        margin-top: -29px;
+        margin-left: 216px;
+    }
+
+    .caption {
+        caption-side: top;
+        font-size: 1.5em;
+        margin-bottom: -29px;
+        font-weight: bold;
+        color: #800000 !important;
+        margin-top: -29px;
+        margin-left: 216px;
+    }
+</style>
+{% endblock %}

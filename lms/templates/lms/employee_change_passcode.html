@@ -1,0 +1,98 @@
+{% extends 'master/bare.html' %}
+{% block title %}Change Passcode{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        max-width: 400px;
+        margin: 40px auto;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 24px;
+        font-size: 22px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    input[type="text"] {
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    button[type="submit"] {
+        background-color: #800000;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        width: 100%;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        button[type="submit"]:hover {
+            background-color: #a10000;
+        }
+
+    .alert {
+        font-weight: 600;
+        color: red;
+        margin-bottom: 15px;
+    }
+
+    .success {
+        font-weight: 600;
+        color: green;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="container">
+    <h2>Change Passcode</h2>
+
+    {% if error %}
+    <div class="alert">{{ error }}</div>
+    {% endif %}
+    {% if success %}
+    <div class="success">{{ success }}</div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="old_passcode">Current Passcode</label>
+        <input type="text" name="old_passcode" id="old_passcode" required maxlength="6" pattern="\d+">
+
+        <label for="new_passcode">New Passcode</label>
+        <input type="text" name="new_passcode" id="new_passcode" required maxlength="6" pattern="\d+">
+
+        <label for="confirm_passcode">Confirm New Passcode</label>
+        <input type="text" name="confirm_passcode" id="confirm_passcode" required maxlength="6" pattern="\d+">
+
+        <button type="submit">Update Passcode</button>
+    </form>
+</div>
+{% endblock %}

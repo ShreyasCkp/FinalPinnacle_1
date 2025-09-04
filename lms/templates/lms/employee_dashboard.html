@@ -1,0 +1,220 @@
+{% extends 'lms/employee_layout.html' %}
+{% block title %}Employee Dashboard{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f7fa;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+    .progress-bar {
+        height: 6px;
+        border-radius: 3px;
+        background-color: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 51px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<!-- Header -->
+<div class="min-h-screen">
+    <div class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://i.postimg.cc/nc6G7t2Q/image-1.png" alt="Logo" class="h-10 w-10 rounded-md" />
+                <h1 class="ml-3 text-2xl font-bold text-gray-800">Employee Dashboard</h1>
+            </div>
+
+            <div style="position: relative;">
+                <i class="fa-solid fa-bell" id="notification-icon" style="font-size: 20px; cursor: pointer;"></i>
+                {% if notification_count > 0 %}
+                <span style="position: absolute; top: -6px; right: -6px; background: red; color: white; border-radius: 50%; font-size: 11px; padding: 2px 5px;">
+                    {{ notification_count }}
+                </span>
+                {% endif %}
+                <div id="notification-popup" style="display: none; position: absolute; top: 30px; right: 0; background: white; border: 1px solid #ccc; border-radius: 8px; width: 280px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000;">
+                    <div style="padding: 10px; font-weight: bold; background: #800000; color: white; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                        Notifications
+                    </div>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        {% if notifications %}
+                        {% for note in notifications %}
+                        <a href="{{ note.url }}" style="display: block; padding: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #800000;">
+                            <i class="fa-solid {% if note.type == 'task' %}fa-tasks{% else %}fa-calendar-alt{% endif %}" style="margin-right: 8px;"></i>
+                            {{ note.title }}
+                        </a>
+                        {% endfor %}
+                        {% else %}
+                        <div style="padding: 10px; text-align: center; color: #800000;">No new notifications</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Filters -->
+            <div x-data="{ open: false, filter: '{{ selected_filter|default:"all" }}', sections: [] }" class="relative">
+                <button @click="open = !open" class="bg-gray-100 px-4 py-2 rounded-md text-sm hover:bg-gray-200">
+                    Filter
+                </button>
+
+                <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg p-4 z-50" x-cloak>
+                    <div class="text-sm font-medium text-gray-700 mb-1">Time Filter</div>
+                    <div class="flex flex-col space-y-1 mb-3">
+                        <label><input type="radio" name="filter" value="day" x-model="filter" class="mr-2">Per Day</label>
+                        <label><input type="radio" name="filter" value="week" x-model="filter" class="mr-2">Per Week</label>
+                        <label><input type="radio" name="filter" value="month" x-model="filter" class="mr-2">Per Month</label>
+                        <label><input type="radio" name="filter" value="year" x-model="filter" class="mr-2">Per Year</label>
+                        <label><input type="radio" name="filter" value="all" x-model="filter" class="mr-2" checked>All</label>
+                    </div>
+
+                    <form method="get">
+                        <input type="hidden" name="filter" :value="filter">
+                        <template x-for="section in sections" :key="section">
+                            <input type="hidden" name="sections" :value="section">
+                        </template>
+                        <button type="submit" class="w-full bg-blue-600 text-white px-3 py-2 rounded-md text-sm hover:bg-blue-700">
+                            Apply Filter
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="max-w-7xl mx-auto px-4 mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card bg-white p-5 rounded">
+            <h3 class="text-gray-600 text-sm mb-2">Classes Today</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ num_classes_today }}</p>
+        </div>
+        <div class="card bg-white p-5 rounded">
+            <h3 class="text-gray-600 text-sm mb-2">Assignments Created</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ total_assignments }}</p>
+        </div>
+        <div class="card bg-white p-5 rounded">
+            <h3 class="text-gray-600 text-sm mb-2">Study Materials Uploaded</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ total_study_materials }}</p>
+        </div>
+    </div>
+
+    <!-- Attendance Chart -->
+    <div class="flex justify-center mt-10">
+        <div class="card bg-white rounded-lg p-5 w-full max-w-4xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Attendance Overview</h2>
+                <span class="text-sm font-bold text-blue-600">{{ student_attendance_rate }}%</span>
+            </div>
+            <div class="progress-bar mb-6">
+                <div class="progress-fill bg-blue-500" style="width: {{ student_attendance_rate }}%"></div>
+            </div>
+            <canvas id="attendanceChart" height="50"></canvas>
+        </div>
+    </div>
+
+    <!-- Today's Classes -->
+    <div class="max-w-5xl mx-auto px-4 mt-10 bg-white card p-6 rounded-lg shadow">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Today's Class Schedule</h2>
+        {% if classes_today %}
+        <ul class="space-y-3">
+            {% for cls in classes_today %}
+            <li class="border p-4 rounded bg-gray-50 flex justify-between items-center">
+                <div>
+                    <p class="font-semibold text-gray-700">{{ cls.subject.name }}</p>
+                    <p class="text-sm text-gray-500">{{ cls.course.name }} - {{ cls.course.name }} {{ cls.semester_number }}</p>
+
+                </div>
+                <div class="text-sm text-gray-600 text-right">
+                    <p>Time: {{ cls.time_slot.start_time }} - {{ cls.time_slot.end_time }}</p>
+                    <p>Room: {{ cls.room }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-600">No classes scheduled today.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.getElementById('user-icon')?.addEventListener('click', function () {
+        const popup = document.getElementById('user-popup');
+        popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
+    });
+    window.addEventListener('click', function (e) {
+        const popup = document.getElementById('user-popup');
+        const icon = document.getElementById('user-icon');
+        if (!popup.contains(e.target) && e.target !== icon) {
+            popup.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const bell = document.getElementById('notification-icon');
+        const popup = document.getElementById('notification-popup');
+        bell.addEventListener('click', function () {
+            if (popup.style.display === 'none' || popup.style.display === '') {
+                popup.style.display = 'block';
+            } else {
+                popup.style.display = 'none';
+            }
+        });
+    });
+</script>
+<!-- Chart Script -->
+<script>
+    const labels = ['Present', 'Late', 'Absent'];
+    const studentData = [{{ student_present }}, {{ student_late }}, {{ student_absent }}];
+
+    new Chart(document.getElementById('attendanceChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Students',
+                data: studentData,
+                borderColor: '#06b6d4',
+                backgroundColor: 'rgba(6,182,212,0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: true } },
+            scales: {
+                y: { beginAtZero: true, stepSize: 5 }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            }
+        }
+    });
+</script>
+{% endblock %}

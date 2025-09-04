@@ -1,0 +1,441 @@
+﻿{% extends 'layout.html' %}
+
+{% block title %}B.com Application List{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-left: 200px; /* space for sidebar */
+        padding: 30px;
+        max-width: calc(100% - 200px);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 0px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+    }
+
+    td {
+        font-size: 9px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    /*   tr:hover {
+        background-color: #e9ecef;
+    }*/
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+        .icon-btn i {
+            font-size: 11px;
+            color: #800000;
+        }
+
+        .icon-btn.text-danger i {
+            color: #b30000;
+        }
+
+    .action-btn {
+        font-size: 9px;
+        padding: 3px 8px;
+        border: none;
+        background-color: #800000;
+        color: white;
+        border-radius: 4px;
+        margin: 0 2px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s;
+    }
+
+        .action-btn:hover {
+            background-color: #a52a2a;
+        }
+
+    .content {
+        margin-left: 0px;
+        padding: 5px 24px 40px;
+        min-height: 100vh;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+    #confirm-yes, #confirm-no {
+        margin: 0 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        border: 2px solid #800000;
+        transition: all 0.2s ease;
+    }
+
+        #confirm-yes:hover, #confirm-no:hover {
+            background-color: #800000;
+            color: white;
+        }
+
+    .search-input {
+        position: absolute;
+        left: 0;
+        font-size: 13px;
+        width: 220px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="header-flex" style="position: relative; margin-bottom: 20px;">
+        <input type="text" id="degreeSearch" placeholder="Search applications..." class="search-input"
+               style="position: absolute; left: 0; font-size: 13px; width: 220px; padding: 6px 10px;
+         border: 1px solid #ccc; border-radius: 4px;">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #800000; text-align: center; width: 100%;">
+            BCOM Application List
+        </h2>
+    </div>
+
+
+    <table class="table table-bordered table-striped table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Enquiry No</th>
+                <th>Application No</th>
+                <th>Student Name</th>
+                <th>Gender</th>
+                <th>Combination</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Admission Source</th>
+                <th>Actions</th>
+                <th>Application Fee Receipt</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for admission in admissions %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ admission.enquiry_no }}</td>
+                <td>{{ admission.admission_no }}</td>
+                <td>{{ admission.student_name }}</td>
+                <td>{{ admission.gender }}</td>
+                <td>{{ admission.course }}</td>
+
+
+                <td>{{ admission.student_phone_no }}</td>
+                <td>{{ admission.status }}</td>
+                <td>{{ admission.get_admission_source_display }}</td>
+
+
+                <td>
+                    {% if admission.pk %}
+                    <a href="{% url 'view_degree_admission' admission.pk %}" class="icon-btn" title="View">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{% url 'edit_degree_admission' admission.pk %}" class="icon-btn" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form id="degree-delete-form-{{ admission.pk }}" method="POST" action="{% url 'delete_degree_admission' admission.pk %}" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" class="icon-btn text-danger" title="Delete"
+                       onclick="confirmDegreeDelete('{{ admission.pk }}', '{{ admission.student_name }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+
+                    {% if deleted_id == admission.pk|stringformat:"s" %}
+                    <div style="color: green; font-size: 10px; margin-top: 4px;">
+                        Deleted successfully
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <span class="text-muted">No ID</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'degree_admission_fee_receipt' admission.admission_no %}" class="action-btn" title="Print Receipt" target="_blank">
+                        <i class="fas fa-print"></i>
+                    </a>
+                </td>
+
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="12" class="text-center text-muted">No admissions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<script>
+    let deleteDegreeId = null;
+
+    function confirmDegreeDelete(admissionId, studentName) {
+        deleteDegreeId = admissionId;
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete admission for <b>${studentName}</b>?`;
+        document.getElementById('confirm-popup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', function () {
+        if (deleteDegreeId) {
+            document.getElementById(`degree-delete-form-${deleteDegreeId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', function () {
+        document.getElementById('confirm-popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        deleteDegreeId = null;
+    });
+</script>
+
+<script>
+    // ... existing confirm delete script ...
+
+    document.getElementById('degreeSearch').addEventListener('keyup', function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+</script>
+
+<!-- FONT AWESOME -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+<div id="snackbar"></div>
+
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    // Django message support
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+</script>
+
+<style>
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    // Trigger snackbar message based on GET param ?success=
+    {% if request.GET.success == "add" %}
+    showSnackbar("Admission added successfully!");
+    {% elif request.GET.success == "edit" %}
+    showSnackbar("Admission updated successfully!");
+    {% elif request.GET.success == "delete" %}
+    showSnackbar(" Admission deleted successfully!");
+    {% elif request.GET.success == "fail" %}
+    showSnackbar(" Failed to save admission!");
+    {% endif %}
+</script>
+<style>
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+</style>
+
+<!-- Snackbar Script -->
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    {% if request.GET.success == "add" %}
+    showSnackbar("✅ Admission added successfully!");
+    {% elif request.GET.success == "edit" %}
+    showSnackbar("✏️ Admission updated successfully!");
+    {% elif request.GET.success == "delete" %}
+    showSnackbar("🗑️ Admission deleted successfully!");
+    {% elif request.GET.success == "fail" %}
+    showSnackbar("❌ Failed to save admission!");
+    {% endif %}
+</script>
+        {% endblock %}

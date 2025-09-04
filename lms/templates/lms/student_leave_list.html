@@ -1,0 +1,283 @@
+﻿﻿<!-- student_leave_list.html -->
+{% extends 'lms/student_layout.html' %}
+{% block title %}My Leave Requests{% endblock %}
+{% block content %}
+<style>
+    .leave-list-container {
+        margin: 20px auto;
+        background-color: #fdfdfd;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+        .leave-list-container h2 {
+            color: #800000;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+    table.leave-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        table.leave-table thead {
+            background-color: #800000;
+            color: white;
+        }
+
+        table.leave-table th, table.leave-table td {
+            padding: 1px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 9px;
+        }
+
+        table.leave-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+    .status-approved {
+        color: green;
+        font-weight: bold;
+    }
+
+    .status-rejected {
+        color: red;
+        font-weight: bold;
+    }
+
+    .status-pending {
+        color: #ff9800;
+        font-weight: bold;
+    }
+
+    .action-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 9px;
+        margin: 0 3px;
+    }
+
+    .icon-edit {
+        color: #f0ad4e;
+    }
+
+    .icon-cancel {
+        color: #d9534f;
+    }
+
+    .icon-disabled {
+        color: gray;
+        cursor: not-allowed;
+    }
+
+    .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .custom-modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #800000;
+        width: 300px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .custom-modal h4 {
+        color: #800000;
+        margin-bottom: 15px;
+    }
+
+    .modal-btn {
+        margin: 5px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .btn-confirm {
+        background-color: #800000;
+        color: white;
+    }
+
+    .btn-cancel {
+        background-color: #ccc;
+        color: #333;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .header-flex h2 {
+            flex-grow: 1;
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+            color: #800000;
+            text-align: center;
+        }
+
+    .search-form {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 200px;
+    }
+
+    .content {
+        margin-left: 200px;
+        padding: 11px 26px 40px;
+        min-height: 100vh;
+    }
+</style>
+
+<div class="leave-list-container">
+    <div class="header-flex">
+        <input type="text" id="leaveSearch" class="search-form" placeholder="Search Leaves...">
+        <h2>My Leave Request's</h2>
+    </div>
+    <table class="leave-table">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Reason</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>Applied On</th>
+                <th>Remarks</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for leave in leaves %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ leave.reason }}</td>
+                <td>{{ leave.from_date }}</td>
+                <td>{{ leave.to_date }}</td>
+                <td>
+                    <span class="status-{{ leave.status }}">
+                        {{ leave.get_status_display }}
+                    </span>
+                </td>
+                <td>{{ leave.applied_on|date:"d M Y, H:i" }}</td>
+                <td>{{ leave.remarks|default:"-" }}</td>
+                <td>
+                    {% if leave.from_date > today %}
+                    {% if leave.status == 'approved' or leave.status == 'pending' %}
+
+                    <a href="{% url 'student_leave_edit' leave.id %}" title="Edit">
+                        <button class="action-icon icon-edit" type="button">✏️</button>
+                    </a>
+
+                    <button class="action-icon icon-cancel"
+                            title="Cancel"
+                            data-cancel-url="{% url 'student_leave_cancel' leave.id %}"
+                            onclick="openModal(this)">
+                        ❌
+                    </button>
+                    {% elif leave.status == 'rejected' %}
+                    <button class="action-icon icon-disabled" title="Rejected Leave - Cannot Cancel" disabled>❎</button>
+                    {% elif leave.status == 'cancelled' %}
+                    <button class="action-icon icon-disabled" title="Already Cancelled" disabled>🚫</button>
+                    {% endif %}
+                    {% else %}
+                    <button class="action-icon icon-disabled" title="Past leave - Cannot cancel/edit" disabled>⛔</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center;">No leave requests submitted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Cancel Modal -->
+<div id="cancelModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <h4>Confirm Cancellation</h4>
+        <p>Are you sure you want to cancel this leave?</p>
+        <form id="cancelForm" method="post" action="">
+            {% csrf_token %}
+            <button type="submit" class="modal-btn btn-confirm">Yes, Cancel</button>
+            <button type="button" class="modal-btn btn-cancel" onclick="closeModal()">No</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal(button) {
+        const cancelUrl = button.getAttribute('data-cancel-url');
+        document.getElementById('cancelForm').action = cancelUrl;
+        document.getElementById('cancelModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('cancelModal').style.display = 'none';
+    }
+
+    window.onclick = function (event) {
+        const modal = document.getElementById('cancelModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+<script>
+    document.getElementById('leaveSearch').addEventListener('input', function () {
+        const filter = this.value.trim().toLowerCase();
+        const rows = document.querySelectorAll(".leave-table tbody tr");
+
+        rows.forEach(row => {
+            const cells = Array.from(row.querySelectorAll("td"));
+            const isEmptyRow = cells.length === 1 && cells[0].colSpan;
+
+            if (isEmptyRow) {
+                row.style.display = 'none';
+                return;
+            }
+
+            const rowText = cells.map(cell => cell.textContent.toLowerCase()).join(" ");
+            row.style.display = rowText.includes(filter) ? '' : 'none';
+        });
+
+        const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+        const noDataRow = document.querySelector(".leave-table tbody tr td[colspan]");
+        if (noDataRow) {
+            noDataRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
+        }
+    });
+</script>
+
+
+{% endblock %}

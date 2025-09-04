@@ -1,0 +1,206 @@
+{% extends 'layout.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .form-card {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #800000;
+            margin-bottom: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .form-group label {
+                font-weight: 500;
+                margin-bottom: 6px;
+                color: #333;
+                font-size: 13px;
+            }
+
+            .form-group input, .form-group select {
+                padding: 8px 10px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                font-size: 13px;
+            }
+
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn, .btn-back-link {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background-color: #800000;
+            color: white;
+            text-align: center;
+        }
+
+        .btn-back-link {
+            text-decoration: none;
+            border: 1px solid #800000;
+            display: inline-block;
+        }
+
+            .btn:hover, .btn-back-link:hover {
+                background-color: #660000;
+                color: white;
+            }
+
+        .content {
+            margin-left: 200px;
+            padding: 0px 26px 40px;
+            min-height: 100vh 585.333px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <h2 class="form-title">{{ title }}</h2>
+        <form method="post" id="salaryForm">
+            {% csrf_token %}
+            <div class="form-grid">
+                <!-- Employee selection -->
+                <div class="form-group">
+                    <label for="id_employee">Employee (Emp Code)</label>
+                    {{ form.employee }}
+                </div>
+
+                <!-- Auto-filled fields -->
+                <div class="form-group"><label>Emp Code</label><input type="text" id="emp_code" value="{{ form.instance.emp_code }}" readonly></div>
+                <div class="form-group"><label>Name</label><input type="text" id="name" value="{{ form.instance.name }}" readonly></div>
+                <div class="form-group"><label>Designation</label><input type="text" id="designation" value="{{ form.instance.designation }}" readonly></div>
+                <div class="form-group"><label>Employment Type</label><input type="text" id="employment_type" value="{{ form.instance.employment_type }}" readonly></div>
+                <div class="form-group"><label>Category</label><input type="text" id="category" value="{{ form.instance.category }}" readonly></div>
+                <div class="form-group"><label>Role</label><input type="text" id="role" value="{{ form.instance.role }}" readonly></div>
+
+                <!-- Salary fields -->
+                <div class="form-group"><label>Basic Salary</label>{{ form.basic_salary }}</div>
+                <div class="form-group"><label>HRA (40%)</label><input type="text" id="hra_calc" value="{{ form.instance.hra }}" readonly></div>
+                <div class="form-group"><label>PF Contribution (12%)</label><input type="text" id="pf_calc" value="{{ form.instance.pf_contribution }}" readonly></div>
+
+                <div class="form-group"><label>Special Allowance</label>{{ form.special_allowance }}</div>
+                <div class="form-group"><label>Professional Tax</label>{{ form.professional_tax }}</div>
+                <div class="form-group"><label>LWF Contribution</label>{{ form.lwf_contribution }}</div>
+                <div class="form-group"><label>Income Tax</label>{{ form.income_tax }}</div>
+                <div class="form-group"><label>Gross Salary (Auto)</label><input type="text" id="gross_salary_calc" value="{{ form.instance.gross_salary }}" readonly></div>
+                <div class="form-group"><label>Total Deductions (Auto)</label><input type="text" id="total_deductions_calc" value="{{ form.instance.total_deductions }}" readonly></div>
+                <div class="form-group"><label>Net Pay (Auto)</label><input type="text" id="net_pay_calc" value="{{ form.instance.net_pay }}" readonly></div>
+            </div>
+
+            <!-- Hidden fields -->
+            <input type="hidden" name="hra" id="id_hra" value="{{ form.instance.hra }}">
+            <input type="hidden" name="pf_contribution" id="id_pf_contribution" value="{{ form.instance.pf_contribution }}">
+            <input type="hidden" name="gross_salary" id="id_gross_salary" value="{{ form.instance.gross_salary }}">
+            <input type="hidden" name="total_deductions" id="id_total_deductions" value="{{ form.instance.total_deductions }}">
+            <input type="hidden" name="net_pay" id="id_net_pay" value="{{ form.instance.net_pay }}">
+
+            <div class="form-actions">
+                <a href="{% url 'salary_declaration_list' %}" class="btn-back-link">Cancel</a>
+                <button type="submit" class="btn">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            function fetchEmployeeData(empId) {
+                if (empId) {
+                    $.ajax({
+                        url: "{% url 'get_employee_data' %}",
+                        data: { 'employee_id': empId },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (!data.error) {
+                                $('#emp_code').val(data.emp_code);
+                                $('#name').val(data.name);
+                                $('#designation').val(data.designation);
+                                $('#employment_type').val(data.employment_type);
+                                $('#category').val(data.category);
+                                $('#role').val(data.role);
+                            }
+                        }
+                    });
+                }
+            }
+
+            function calculateSalary() {
+                var basic = parseFloat($('#id_basic_salary').val()) || 0;
+                var specialAllowance = parseFloat($('#id_special_allowance').val()) || 0;
+                var pt = parseFloat($('#id_professional_tax').val()) || 0;
+                var lwf = parseFloat($('#id_lwf_contribution').val()) || 0;
+                var it = parseFloat($('#id_income_tax').val()) || 0;
+
+                var hra = basic * 40 / 100;
+                var pf = basic * 12 / 100;
+                var grossSalary = basic + hra + specialAllowance;
+                var totalDeductions = pf + pt + lwf + it;
+                var netPay = grossSalary - totalDeductions;
+
+                $('#hra_calc').val(hra.toFixed(2));
+                $('#pf_calc').val(pf.toFixed(2));
+                $('#gross_salary_calc').val(grossSalary.toFixed(2));
+                $('#total_deductions_calc').val(totalDeductions.toFixed(2));
+                $('#net_pay_calc').val(netPay.toFixed(2));
+
+                $('#id_hra').val(hra.toFixed(2));
+                $('#id_pf_contribution').val(pf.toFixed(2));
+                $('#id_gross_salary').val(grossSalary.toFixed(2));
+                $('#id_total_deductions').val(totalDeductions.toFixed(2));
+                $('#id_net_pay').val(netPay.toFixed(2));
+            }
+
+            // 🔹 On dropdown change, fetch employee details
+            $('#id_employee').change(function () {
+                fetchEmployeeData($(this).val());
+            });
+
+            // 🔹 Run once on page load (edit mode)
+            fetchEmployeeData($('#id_employee').val());
+            calculateSalary();
+
+            // 🔹 Recalculate whenever salary fields change
+            $('#id_basic_salary, #id_special_allowance, #id_professional_tax, #id_lwf_contribution, #id_income_tax')
+                .on('input', calculateSalary);
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,463 @@
+<!--<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Student Marksheet</title>
+    <style>
+        body {
+            font-family: "Times New Roman", serif;
+            background: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .certificate {
+            width: 148mm; /* A5 width */
+            min-height: 210mm; /* A5 height */
+            background: #fff;
+            border: 2px solid #000;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 0;
+            font-size: 20px;
+        }
+
+        h2 {
+            margin-top: 5px;
+            font-weight: normal;
+            font-size: 16px;
+        }
+
+        .student-info {
+            margin: 15px 0;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: center;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .signature {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .actions {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+            .actions button {
+                padding: 8px 15px;
+                margin: 0 5px;
+                border: none;
+                border-radius: 4px;
+                background: #333;
+                color: #fff;
+                cursor: pointer;
+            }
+
+                .actions button:hover {
+                    background: #555;
+                }
+
+        @media print {
+            body {
+                background: #fff;
+                margin: 0;
+            }
+
+            .certificate {
+                border: none;
+                width: 148mm;
+                min-height: 210mm;
+                page-break-after: always;
+            }
+
+            .actions,
+            .no-print { /* 👈 hide all elements with no-print */
+                display: none !important;
+            }
+        }
+    </style>
+    <style>
+        .mt-4 {
+            margin-top: -42px;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .btn {
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+
+        .btn-primary {
+            background-color: #800000;
+            color: white;
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background-color: #a00000;
+            }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 3px 7px;
+            font-size: 14px;
+            background: #800000;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="certificate">
+        <h1>Pinnacle School of Commerce and Management</h1>
+        <h2>Internal Mark Sheet</h2>
+
+        <div class="student-info">
+            <p><strong>Name:</strong> {{ student.student_name }}</p>
+            <p><strong>Admission No:</strong> {{ student.student_userid }}</p>
+            <p><strong>Program:</strong> {{ student.course_type.name }}</p>
+            <p><strong>Course:</strong> {{ student.course.name }}</p>
+            <p><strong>Batch:</strong> {{ student.academic_year }}</p>
+            {% if student.current_year %}
+            <p><strong>Current Year:</strong> {{ student.current_year }}</p>
+            {% elif student.semester %}
+            <p><strong>Semester:</strong> {{ student.semester }}</p>
+            {% endif %}
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Max Marks</th>
+                    <th>Marks Obtained</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mark in exam_marks %}
+                <tr>
+                    <td>{{ mark.mark_type.title }}</td>
+                    <td>{{ mark.subject.name }}</td>
+                    <td>{{ mark.max_marks }}</td>
+                    <td>
+                        {% if mark.marks_obtained %}
+                        {{ mark.marks_obtained }}
+                        {% else %}
+                        Awaiting
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {% for sub in assignments %}
+                <tr>
+                    <td>{{ sub.assignment.subject.name }}</td>
+                    <td>Assignment</td>
+                    <td>{{ sub.assignment.marks }}</td>
+                    <td>{{ sub.score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p style="margin-top:20px; font-size:12px;">Generated on: {{ generated_date }}</p>
+    </div>-->
+<!-- ✅ Buttons directly below certificate -->
+<!--<div class="actions">
+    <button onclick="window.history.back()">⬅️ Back</button>
+    <button onclick="window.print()">🖨️ Print / Download PDF</button>
+</div>-->
+<!--<div class="mt-4" style="margin-top: -42px; display: flex; justify-content: space-between; width: 100%;">
+        <button class="btn btn-primary btn-lg no-print"
+               onclick="window.history.back()">Back
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm no-print" onclick="window.print()">
+
+            <i class="fa fa-print"></i> 🖨️ Print
+        </button>
+    </div>
+
+
+
+</body>
+</html>-->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Marksheet</title>
+    <style>
+
+        body {
+            font-family: "Times New Roman", serif;
+            background: #f0f0f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .certificate {
+            width: 148mm; /* A5 width */
+
+            min-height: 210mm; /* A5 height */
+
+            background: #ffffff;
+            border: 2px solid #000;
+            padding: 25px;
+            box-sizing: border-box;
+            text-align: center;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+            .logo img {
+                width: 80px;
+                height: auto;
+            }
+
+        h1 {
+            font-size: 20px;
+            margin: 10px 0 0 0;
+            color: #800000;
+        }
+
+        h2 {
+            margin-top: 5px;
+            font-size: 15px;
+            font-weight: normal;
+            color: #444;
+        }
+
+        .student-info {
+            margin: 20px 0 10px;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+            .student-info strong {
+                color: #333;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 12.5px;
+        }
+
+        th, td {
+            border: 1px solid #444;
+            padding: 6px 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #800000;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: left;
+            color: #555;
+        }
+
+        .actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #800000;
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background-color: #a00000;
+            }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .note {
+            font-size: 11px;
+            margin-top: 15px;
+            text-align: center;
+            color: #777;
+        }
+
+        @media print {
+
+            body {
+                background: #fff;
+                margin: 0;
+            }
+
+            .certificate {
+                border: none;
+                width: 148mm;
+                min-height: 210mm;
+                box-shadow: none;
+            }
+
+            .actions,
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="certificate">
+        <!--<div class="logo">
+        <img src="https://i.postimg.cc/0yCM67zJ/Pinnacle-logo.png" alt="University Logo">
+        </div>-->
+        <h1>Pinnacle School of Commerce and Management</h1>
+        <h2>Internal Assessment Mark Sheet</h2>
+
+        <div class="student-info">
+            <p><strong>Name:</strong> {{ student.student_name }}</p>
+            <p><strong>Admission No:</strong> {{ student.student_userid }}</p>
+            <p><strong>Program:</strong> {{ student.course_type.name }}</p>
+            <p><strong>Course:</strong> {{ student.course.name }}</p>
+            <p><strong>Batch:</strong> {{ student.academic_year }}</p>
+
+            {% if student.current_year %}
+            <p><strong>Current Year:</strong> {{ student.current_year }}</p>
+
+            {% elif student.semester %}
+            <p><strong>Semester:</strong> {{ student.course.name }} {{ student.semester }}</p>
+
+            {% endif %}
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Max Marks</th>
+                    <th>Marks Obtained</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for mark in exam_marks %}
+                <tr>
+                    <td>{{ mark.mark_type.title }}</td>
+                    <td>{{ mark.subject.name }}</td>
+                    <td>{{ mark.max_marks }}</td>
+                    <td>
+
+                        {% if mark.marks_obtained %}
+
+                        {{ mark.marks_obtained }}
+
+                        {% else %}
+
+                        Awaiting
+
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+                {% for sub in assignments %}
+                <tr>
+                    <td>Assignment</td>
+                    <td>{{ sub.assignment.subject.name }}</td>
+                    <td>{{ sub.assignment.marks }}</td>
+                    <td>{{ sub.score }}</td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p><strong>Generated on:</strong> {{ generated_date }}</p>
+        </div>
+
+        <div class="note">
+
+            This is a system-generated marksheet and does not require a physical signature.
+        </div>
+
+        <div class="actions no-print">
+            <button class="btn btn-primary" onclick="window.history.back()"> Back</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+        </div>
+    </div>
+
+</body>
+</html>
+

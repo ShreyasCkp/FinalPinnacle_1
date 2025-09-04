@@ -1,0 +1,324 @@
+{% extends 'lms/student_layout.html' %}
+{% block title %}My Fees & Payments{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-7">My Fees & Payments</h2>
+
+    <!-- Dashboard Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Fees</h6>
+                    <h3 class="fw-bold">{{ total_fees }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Collected</h6>
+                    <h3 class="fw-bold">{{ collected }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Pending</h6>
+                    <h3 class="fw-bold">{{ pending }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Overdue</h6>
+                    <h3 class="fw-bold">{{ overdue }}</h3>
+                    {% if overdue_fee_types %}
+                    <small class="d-block mt-2 text-danger">
+                        Overdue Fee Types:
+                        <ul class="list-unstyled mb-0">
+                            {% for fee_type in overdue_fee_types %}
+                            <li>{{ fee_type }}</li>
+                            {% endfor %}
+                        </ul>
+                    </small>
+                    {% else %}
+                    <small class="d-block mt-2 text-success">No overdue fees</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card1 shadow-sm border-0">
+                <div class="card1-body">
+
+                    <!-- Fees Details Table -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <h5 class="text-center mb-4 fw-bold">Fees Details</h5>
+
+                            <thead>
+                                <tr>
+                                    <th>Fee Type</th>
+                                    <th>Amount</th>
+                                    <th>Paid Amount</th>
+                                    <th>Balance Amount</th>
+                                    <th>Discount</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fee in fee_collections %}
+                                <tr>
+                                    <td>{{ fee.fee_type.name }}</td>
+                                    <td>{{ fee.amount }}</td>
+                                    <td>{{ fee.paid_amount }}</td>
+                                    <td>{{ fee.balance_amount }}</td>
+                                    <td>{{ fee.applied_discount }}</td>
+                                    <td>{{ fee.due_date|date:"M d, Y" }}</td>
+                                    <td>{{ fee.status }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7">No fee records found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS & CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- STYLES -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f8f8;
+    }
+
+
+    .btn {
+        min-width: 178px;
+        font-weight: 600;
+        padding: 12px;
+        font-size: 9px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .fw-bold {
+        color: #800000;
+        font-size: 28px;
+    }
+
+    .btn-maroon {
+        color: #800000;
+        border: 2px solid #800000;
+        background-color: transparent;
+    }
+
+        .btn-maroon:hover {
+            background-color: #800000;
+            color: #fff;
+        }
+
+    .text-muted {
+        color: #8b0000 !important;
+        text-align: center;
+    }
+
+    .text-mute {
+        color: #373b3e !important;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .mb-7 {
+        margin-bottom: 21px !important;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .icon-font {
+        margin-left: 10px;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .custom-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background-color: #fff;
+        border-radius: 6px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .px-4 {
+        padding-right: 1.5rem !important;
+        padding-left: 0.5rem 8px !important;
+    }
+
+    .py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    .gap-3 {
+        gap: 5rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 21px !important;
+        font-size: 14px;
+        text-align: center;
+        color: #800000;
+    }
+
+    .py-5 {
+        padding-top: 0rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .mt-5 {
+        margin-top: 0rem !important;
+        margin-left: -111px;
+        text-align: center;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem !important;
+        margin-left: -60px;
+    }
+
+    caption {
+        font-size: 16px;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    th {
+        background-color: #6c7ae0;
+        color: #fff;
+        border: 1px solid #dee2e6;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    td {
+        padding: 1px 7px;
+        border: 1px solid #ddd;
+        text-align: center;
+        font-size: 9px;
+    }
+
+    .card {
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            color: #8b0000;
+        }
+
+    .card1 {
+        border-radius: 12px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card1:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card1 h3 {
+            font-size: 20px;
+            color: #8b0000;
+        }
+
+    #form-container {
+        margin-top: -25px;
+        background-color: #f8f9fa;
+        border-radius: 9px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .btn.show {
+        color: var(--bs-btn-active-color);
+        background-color: #800000;
+        border-color: #800000;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #form-container form label {
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    #form-container form input,
+    #form-container form select,
+    #form-container form textarea {
+        margin-bottom: 0px;
+        padding: 2px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    #form-container form button[type="submit"] {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: .0px .1px;
+        background-color: var(--bs-table-bg);
+        border-bottom-width: var(--bs-border-width);
+        color: #800000;
+    }
+
+    .dropdown-item.active {
+        color: var(--bs-dropdown-link-active-color);
+        text-decoration: none;
+        background-color: #800000;
+    }
+</style>
+                {% endblock %}

@@ -1,0 +1,120 @@
+{% extends 'master/bare.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h2>{% if reset %}Reset Password{% else %}Login{% endif %}</h2>
+
+{% if error %}
+<div class="alert">{{ error }}</div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <select name="username" id="username" class="input-field" required {% if reset %}readonly{% endif %}>
+        <option value="">Select User</option>
+        {% for user in users %}
+        <option value="{{ user.username }}" {% if selected_user == user.username %}selected{% endif %}>{{ user.username }}</option>
+        {% endfor %}
+    </select>
+
+    {% if reset %}
+    <input type="password" name="new_password" placeholder="Enter
+           " class="input-field" required
+           pattern="^[A-Z][a-z]*[!@#$%^&*(),.?\" :{}|<>][a-zA-Z0-9]*[0-9]+$"
+    minlength="8" maxlength="16"
+    title="Start with capital letter, then lowercase, include one special character, and one number. Length 8-16.">
+    <input type="password" name="confirm_password" placeholder="Confirm New Password" class="input-field" required>
+    <input type="hidden" name="password_reset_submit" value="1">
+    <button type="submit">Set New Password</button>
+    <a href="?username={{ selected_user }}">Back to Login</a>
+    {% else %}
+    <input type="password" name="password" placeholder="Password" class="input-field" required>
+    <button type="submit">Login</button>
+
+    <!-- Forgot Password link correctly placed below Login button -->
+    <div style="margin-top: 10px;">
+        <a id="forgot-link" href="{% url 'password_reset_view' %}" style="color: red;">Forgot Password?</a>
+    </div>
+    {% endif %}
+</form>
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
+    <button id="confirm-yes-login">OK</button>
+</div>
+
+
+{% if success_message and request.POST.password_reset_submit %}
+<script>
+    alert("{{ success_message }}");
+</script>
+{% endif %}
+
+<script>
+    document.getElementById('forgot-link').addEventListener('click', function (e) {
+        e.preventDefault();
+        var username = document.getElementById('username').value;
+
+        if (username) {
+            window.location.href = "{% url 'password_reset_view' %}?username=" + encodeURIComponent(username);
+        } else {
+            document.getElementById('confirm-popup-message').innerHTML = "Please select a username first.";
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('confirm-popup').style.display = 'block';
+        }
+    });
+
+    document.getElementById('confirm-yes-login').addEventListener('click', function () {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('confirm-popup').style.display = 'none';
+    });
+</script>
+
+<style>
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+    }
+
+        #confirm-popup button {
+            margin: 0 5px;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: transparent;
+            color: #800000;
+            font-weight: 600;
+            border: 2px solid #800000;
+            transition: all 0.2s ease;
+        }
+
+            #confirm-popup button:hover {
+                background-color: #800000;
+                color: white;
+            }
+</style>
+
+{% endblock %}

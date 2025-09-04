@@ -1,0 +1,28 @@
+<!-- templates/exam_type_form.html -->
+{% extends 'layout.html' %}
+{% block title %}
+    {% if form_type == 'create' %}Create Exam Type{% elif form_type == 'edit' %}Edit Exam Type{% elif form_type == 'view' %}View Exam Type{% else %}Delete Exam Type{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>
+    {% if form_type == 'create' %}Create Exam Type{% elif form_type == 'edit' %}Edit Exam Type{% elif form_type == 'view' %}View Exam Type{% else %}Delete Exam Type{% endif %}
+</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {% if form_type != 'view' and form_type != 'delete' %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save</button>
+    {% elif form_type == 'view' %}
+    <p><strong>Title:</strong> {{ exam_type.title }}</p>
+    <p><strong>Active:</strong> {{ exam_type.is_active }}</p>
+    <p><strong>Created At:</strong> {{ exam_type.created_at }}</p>
+    <a href="{% url 'exam_type_list' %}" class="btn btn-secondary">Back</a>
+    {% elif form_type == 'delete' %}
+    <p>Are you sure you want to delete "<strong>{{ exam_type.title }}</strong>"?</p>
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    <a href="{% url 'exam_type_list' %}" class="btn btn-secondary">Cancel</a>
+    {% endif %}
+</form>
+{% endblock %}

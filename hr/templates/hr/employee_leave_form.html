@@ -1,0 +1,266 @@
+﻿{% extends 'lms/employee_layout.html' %}
+{% block content %}
+{% load static %}
+ 
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+ 
+    .form-card {
+        background: #fff;
+        padding: 40px 50px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        max-width: 900px;
+        margin: 40px auto;
+    }
+ 
+    .form-title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 30px;
+    }
+ 
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px 30px;
+    }
+ 
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+ 
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 13px;
+        }
+ 
+        .form-group input, .form-group select {
+            padding: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+ 
+            .form-group input[readonly] {
+                background-color: #e9ecef;
+                color: #495057;
+            }
+ 
+    .form-actions {
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-between;
+    }
+ 
+    .btn, .btn-back-link {
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background-color: #800000;
+        color: white;
+        text-align: center;
+    }
+ 
+    .btn-back-link {
+        text-decoration: none;
+        border: 1px solid #800000;
+        display: inline-block;
+    }
+ 
+        .btn:hover, .btn-back-link:hover {
+            background-color: #660000;
+            color: white;
+        }
+ 
+    /* Custom Popup */
+    .custom-popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+ 
+    .popup-content {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        text-align: center;
+        width: 350px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+ 
+        .popup-content h3 {
+            color: #800000;
+            margin-bottom: 10px;
+        }
+ 
+        .popup-content p {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+ 
+    .popup-close {
+        background: #800000;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+ 
+        .popup-close:hover {
+            background: #660000;
+        }
+</style>
+ 
+<div class="form-card">
+<h2 class="form-title">{{ title }}</h2>
+ 
+    <!-- Main Leave Form -->
+<form method="post">
+        {% csrf_token %}
+<h2 style="text-align: center; color: #8b0000; font-weight: 600; margin-top: -41px;">Leave Form</h2>
+<div class="form-grid">
+ 
+            {% for field in form %}
+<div class="form-group">
+<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+<div style="color: red; font-size: 12px;">{{ field.errors }}</div>
+                {% endif %}
+</div>
+            {% endfor %}
+ 
+        </div>
+ 
+        <div class="form-actions">
+<a href="{% url 'employee_calendar' %}" class="btn btn-secondary">Back</a>
+<button type="submit" class="btn">Save</button>
+</div>
+</form>
+ 
+    <!-- Cancel Leave Form (separate form, not nested) -->
+    {% if edit_leave %}
+<form method="POST" action="{% url 'edit_leave_cancel' edit_leave.id %}" style="margin-top: 10px;">
+        {% csrf_token %}
+<button type="submit" class="btn btn-secondary">Cancel Leave</button>
+</form>
+    {% endif %}
+</div>
+ 
+ 
+<!-- Custom Popup -->
+<div class="custom-popup" id="leavePopup">
+<div class="popup-content">
+<h3>⚠ Leave Conflict</h3>
+<p id="popupMessage"></p>
+<button class="popup-close" onclick="closePopup()">Close</button>
+</div>
+</div>
+ 
+<script>
+    // Disable past dates
+    document.addEventListener("DOMContentLoaded", function () {
+        let today = new Date().toISOString().split('T')[0];
+        document.getElementById("id_start_date").setAttribute("min", today);
+        document.getElementById("id_end_date").setAttribute("min", today);
+    });
+ 
+    function calculateLeave() {
+        let startDateInput = document.getElementById('id_start_date');
+        let endDateInput = document.getElementById('id_end_date');
+        let leaveDaysInput = document.getElementById('id_leave_days');
+        let nextDayInput = document.getElementById('id_next_working_day');
+ 
+        let startDate = new Date(startDateInput.value);
+        let endDate = new Date(endDateInput.value);
+ 
+        if (startDate && endDate && endDate >= startDate) {
+            let timeDiff = endDate - startDate;
+            let daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+            leaveDaysInput.value = daysDiff;
+ 
+            let nextDay = new Date(endDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            while (nextDay.getDay() === 0 || nextDay.getDay() === 6) {
+                nextDay.setDate(nextDay.getDate() + 1);
+            }
+            nextDayInput.value = nextDay.toISOString().split('T')[0];
+        } else {
+            leaveDaysInput.value = '';
+            nextDayInput.value = '';
+        }
+    }
+ 
+    document.getElementById('id_start_date').addEventListener('change', calculateLeave);
+    document.getElementById('id_end_date').addEventListener('change', calculateLeave);
+</script>
+ 
+<script>
+    let existingLeaves = {{ existing_leaves|safe }};
+    let editingLeaveId = "{{ edit_leave.id|default:'null' }}";
+</script>
+ 
+ 
+<script>
+    function showPopup(message) {
+        document.getElementById('popupMessage').innerText = message;
+        document.getElementById('leavePopup').style.display = 'flex';
+    }
+ 
+    function closePopup() {
+        document.getElementById('leavePopup').style.display = 'none';
+    }
+ 
+    function checkExistingLeave() {
+        let startDate = document.getElementById('id_start_date').value;
+        let endDate = document.getElementById('id_end_date').value;
+ 
+        if (!startDate || !endDate) return;
+ 
+        let start = new Date(startDate);
+        let end = new Date(endDate);
+ 
+        for (let leave of existingLeaves) {
+            if (editingLeaveId && leave.id == editingLeaveId) {
+                continue; // ✅ skip self
+            }
+ 
+            let leaveStart = new Date(leave.start_date);
+            let leaveEnd = new Date(leave.end_date);
+ 
+            if ((start <= leaveEnd) && (end >= leaveStart)) {
+                showPopup(`Leave already exists on this date!\nType: ${leave.leave_type}`);
+                document.getElementById('id_start_date').value = "";
+                document.getElementById('id_end_date').value = "";
+                return false;
+            }
+        }
+ 
+        return true;
+    }
+ 
+    document.getElementById('id_start_date').addEventListener('change', checkExistingLeave);
+    document.getElementById('id_end_date').addEventListener('change', checkExistingLeave);
+</script>
+ 
+{% endblock %}

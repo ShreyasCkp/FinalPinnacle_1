@@ -1,0 +1,263 @@
+{% extends 'layout.html' %}
+{% load form_filters %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        margin-top: 0px;
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 6px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 16px;
+        width: 100%;
+    }
+
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .btn-back {
+        background-color: #800000;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background-color: #6e0000;
+            color: white;
+        }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .form-check {
+        margin-top: 10px;
+    }
+
+    .content {
+        padding: 25px 26px 40px;
+        margin-left: 200px;
+    }
+
+    /* Error message style */
+    .error-message {
+        color: red;
+        font-size: 13px;
+        margin-top: -12px;
+        margin-bottom: 12px;
+    }
+</style>
+
+<div class="container form-container">
+    <h3>{{ title }}</h3>
+
+    <form method="post" id="academicYearForm" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+        {% if field.name != 'is_active' %}
+        <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field.errors }}
+            {{ field|add_class:"form-control" }}
+
+            {% if field.name == 'year' %}
+            <div id="year-error" class="error-message"></div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        <div class="form-check">
+            <input type="radio" name="is_active" value="1" class="form-check-input"
+                   {% if form.instance.is_active %}checked{% endif %}>
+            <label class="form-check-label">Active</label>
+        </div>
+
+        <div class="form-check">
+            <input type="radio" name="is_active" value="0" class="form-check-input"
+                   {% if not form.instance.is_active %}checked{% endif %}>
+            <label class="form-check-label">Inactive</label>
+        </div>
+
+        <div class="btn-container">
+            <a href="{% url 'academic_year_list' %}" class="btn-back">Back</a>
+            <button type="submit" class="btn-save" id="submitBtn">
+                {% if form.instance.pk %}Update{% else %}Save{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    const form = document.getElementById('academicYearForm');
+    const yearInput = form.querySelector('input[name="year"]');
+    const errorDiv = document.getElementById('year-error');
+
+    const pattern = /^\d{4}-\d{2}$/;
+
+    function validateYear() {
+        const value = yearInput.value.trim();
+        if (!pattern.test(value)) {
+            errorDiv.textContent = 'Please enter the batch in the format YYYY-YY, e.g., 2025-26.';
+            return false;
+        }
+
+        const [startFull, endShort] = value.split('-');
+        const startYear = parseInt(startFull, 10);
+        const endYear = parseInt(endShort, 10);
+        const startLastTwo = startYear % 100;
+
+        // Rule 1: Start year must be >= 2025
+        if (startYear < 2025) {
+            errorDiv.textContent = `Academic year cannot start before 2025.`;
+            return false;
+        }
+
+        // Rule 2: End year (short) must be greater than last two digits of start year
+        if (endYear <= startLastTwo) {
+            errorDiv.textContent = `End year (${endYear}) must be greater than start year (${startLastTwo}).`;
+            return false;
+        }
+
+        errorDiv.textContent = '';
+        return true;
+    }
+
+    yearInput.addEventListener('input', validateYear);
+
+    form.addEventListener('submit', function (event) {
+        if (!validateYear()) {
+            event.preventDefault();
+            yearInput.focus();
+        }
+    });
+</script>
+
+
+
+
+<!--<script>
+    const form = document.getElementById('academicYearForm');
+    const yearInput = form.querySelector('input[name="year"]'); // adjust if needed
+    const errorDiv = document.getElementById('year-error');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const pattern = /^\d{4}-\d{2}$/;
+
+    function validateYear() {
+        const value = yearInput.value.trim();
+        const currentYear = new Date().getFullYear();
+
+        if (!pattern.test(value)) {
+            errorDiv.textContent = 'Please enter the Batch in the format YYYY-YY, e.g., 2025-26.';
+            return false;
+        }
+
+        const startYear = parseInt(value.split('-')[0]);
+
+        if (startYear < currentYear) {
+            errorDiv.textContent = `Academic year cannot start before ${currentYear}.`;
+            return false;
+        }
+
+        errorDiv.textContent = '';
+        return true;
+    }
+
+    // Live feedback
+    yearInput.addEventListener('input', validateYear);
+
+    // Final check on submit
+    form.addEventListener('submit', function (event) {
+        if (!validateYear()) {
+            event.preventDefault();
+            yearInput.focus();
+        }
+    });
+</script>-->
+
+<script>
+    const form = document.getElementById('academicYearForm');
+    const yearInput = form.querySelector('input[name="year"]'); // adjust if your field name differs
+    const errorDiv = document.getElementById('year-error');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Regex for format like 2025-26
+    const pattern = /^\d{4}-\d{2}$/;
+
+    function validateYear() {
+        const value = yearInput.value.trim();
+        if (!pattern.test(value)) {
+            errorDiv.textContent = 'Please enter the year in the format YYYY-YY, e.g., 2025-26.';
+            return false;
+        } else {
+            errorDiv.textContent = '';
+            return true;
+        }
+    }
+
+    // Real-time validation on input event
+    yearInput.addEventListener('input', validateYear);
+
+    // Final validation on submit
+    form.addEventListener('submit', function (event) {
+        if (!validateYear()) {
+            event.preventDefault();
+            yearInput.focus();
+        }
+    });
+</script>
+{% endblock %}
