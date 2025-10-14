@@ -200,792 +200,844 @@ Photo
             </div>-->
 
 
-            <form method="POST" enctype="multipart/form-data" style="flex: 1; display: flex; flex-direction: column;">
-                {% csrf_token %}
+        <form method="POST" enctype="multipart/form-data" style="flex: 1; display: flex; flex-direction: column;">
+            {% csrf_token %}
 
-                <div class="form-group">
-                    <label class="form-label">Application Number</label>
-                    {% if view_mode or edit_mode %}
-                    {{ form.admission_no }}
-                    {% else %}
-                    <input type="text" class="form-control bg-light" value="{{ next_admission_no }}" readonly>
-                    {{ form.admission_no.as_hidden }}
-                    {% endif %}
+            <div class="form-group">
+                <label class="form-label">Application Number</label>
+                {% if view_mode or edit_mode %}
+                {{ form.admission_no }}
+                {% else %}
+                <input type="text" class="form-control bg-light" value="{{ next_admission_no }}" readonly>
+                {{ form.admission_no.as_hidden }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label class="form-label">Application Date:</label>
+                {{ form.admission_date }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">Enquiry Number:</label>
+                <input type="text" id="id_enquiry_no" name="enquiry_no" maxlength="20" autocomplete="off" class="form-control" value="{{ form.enquiry_no.value|default:'' }}" {% if view_mode %}readonly disabled{% endif %} />
+
+                <small id="enquiry-error" style="color: red; display: none;">Enquiry number not found or not for PU</small>
+            </div>
+            <!-- PERSONAL DETAILS -->
+
+
+
+            <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
+
+            <h4 class="mt-4 mb-3 text-uppercase text-primary"
+                style="text-align: center; margin-top: -5px; margin-bottom: 11px;">
+                Student Details
+            </h4>
+
+            <div class="form-group">
+                <label for="id_student_name" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Name of the Student as entered in SSLC marks card
+                </label>
+                {{ form.student_name }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Date of Birth</label>
+                {{ form.dob }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_gender" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Gender
+                </label>
+                {{ form.gender }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_birthplace" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Place of Birth
+                </label>
+                {{ form.birthplace }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Nationality</label>
+                {{ form.nationality }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Religion</label>
+                {{ form.religion }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Caste</label>
+                {{ form.caste }}
+                {% if form.caste.errors %}
+                <div class="text-danger small">{{ form.caste.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Sub Caste</label>
+                {{ form.sub_caste }}
+                {% if form.sub_caste.errors %}
+                <div class="text-danger small">{{ form.sub_caste.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                <div class="text-danger small">{{ form.category.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Student Mobile No</label>
+                {{ form.student_phone_no }}
+                {% if form.student_phone_no.errors %}
+                <div class="text-danger small">{{ form.student_phone_no.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_student_aadhar_no" style="font-size: 12px; font-weight: 500;">
+                    Student Aadhar No
+                </label>
+                {{ form.student_aadhar_no }}
+                <div id="error_id_student_aadhar_no" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Student e-Mail ID</label>
+                {{ form.student_email }}
+                <div id="error_id_student_email" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Blood Group</label>
+                {{ form.blood_group }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_emergency_contact" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Emergency Contact No <span style="color: red;">*</span>
+                </label>
+                {{ form.emergency_contact }}
+                <div id="error_id_emergency_contact" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_emergency_contact_name" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Emergency Contact Person Name
+                </label>
+                {{ form.emergency_contact_name }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_emergency_contact_relation" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Emergency Contact Person's relationship with Student
+                </label>
+                {{ form.emergency_contact_relation }}
+            </div>
+
+
+
+
+            <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
+
+            <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; margin-bottom: 10px;">Parent Details</h4>
+
+            <div class="form-group">
+                <label class="form-label">Name of the Father</label>
+                {{ form.father_name }}
+                {% if form.father_name.errors %}
+                <div class="text-danger">{{ form.father_name.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_father_mobile_no" style="font-size: 12px; font-weight: 500;">
+                    Father Mobile No
+                </label>
+                {{ form.father_mobile_no }}
+                <div id="error_id_father_mobile_no" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_aadhar_no" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Father Aadhar No
+                </label>
+                {{ form.aadhar_no }}
+                <div id="error_id_aadhar_no" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Father e-Mail ID</label>
+                {{ form.father_email }}
+                <div id="error_id_father_email" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_parent_mobile_no" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Father Occupation
+                </label>
+                {{ form.father_occupation }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Father Annual Income</label>
+                {{ form.annual_income }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Name of the Mother</label>
+                {{ form.mother_name }}
+                {% if form.mother_name.errors %}
+                <div class="text-danger small">{{ form.mother_name.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_mother_phone_no" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Mother Mobile No
+                </label>
+                {{ form.mother_phone_no }}
+                <div id="error_id_mother_phone_no" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_mother_aadhar_no" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Mother Aadhar No
+                </label>
+                {{ form.mother_aadhar_no }}
+                <div id="error_id_mother_aadhar_no" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_mother_email" class="form-label">Mother e-Mail ID</label>
+                {{ form.mother_email }}
+                <div id="error_id_mother_email" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_parent_mobile_no" style="font-size: 12px; font-weight: 500; color: #333;">
+                    Mother Occupation
+                </label>
+                {{ form.mother_occupation }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mother Annual Income</label>
+                {{ form.mother_annual_income }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Name of the Guardian</label>
+                {{ form.guardian_name }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="primary_guardian">Select the parent for the parent login</label>
+                {{ form.primary_guardian }}
+            </div>
+
+            <div class="form-group" id="guardian_fields" style="display: none;">
+                <label class="form-label" for="guardian_email">Guardian Email</label>
+                {{ form.guardian_email }}
+
+                <label class="form-label mt-2" for="guardian_phone_no">Guardian Phone Number</label>
+                {{ form.guardian_phone_no }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Address of the Guardian</label>
+                {{ form.guardian_address }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Total Annual Income</label>
+                {{ form.total_annual_income }}
+            </div>
+
+
+
+            <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
+
+            <h4 class="mt-4 mb-3 text-uppercase text-primary" 
+    style="text-align: center; margin-top: -5px; margin-bottom: 10px;">
+  Address Details
+</h4>
+
+<div class="form-group">
+  <label class="form-label">Local Address</label>
+  {{ form.current_address }}
+  {% if form.current_address.errors %}
+    <div class="text-danger small">{{ form.current_address.errors.0 }}</div>
+  {% endif %}
+</div>
+
+<div class="form-group">
+  <label for="id_permanent_address" style="font-size: 12px; font-weight: 500; color: #333;">
+    Permanent Address
+  </label>
+  {{ form.permanent_address }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Taluk</label>
+  {{ form.city }}
+</div>
+
+<div class="form-group">
+  <label for="id_district" style="font-size: 12px; font-weight: 500; color: #333;">
+    District
+  </label>
+  {{ form.district }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">State</label>
+  {{ form.state }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Country</label>
+  {{ form.country }}
+</div>
+
+<hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
+
+<h4 class="mt-4 mb-3 text-uppercase text-primary" 
+    style="text-align: center; margin-top: -5px; margin-bottom: 10px;">
+  Educational Details of Previous Year
+</h4>
+
+<div class="form-group">
+  <label class="form-label">SATS Number</label>
+  <input type="text" name="sats_number" class="form-control bg-light" placeholder="Enter SATS Number" />
+</div>
+
+<div class="form-group">
+  <label class="form-label">Name of the School last Studied</label>
+  {{ form.college_last_attended }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Address of the School last Studied</label>
+  {{ form.college_addresslaststudied }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">SSLC Registration No</label>
+  {{ form.sslc_reg_no }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">SSLC Percentage</label>
+  {{ form.sslc_percentage }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Year of Passing (MM-YYYY)</label>
+  {{ form.year_of_passing }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">PU College Name</label>
+  {{ form.pu_college_name }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">PU Register No</label>
+  {{ form.register_no_course }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Month & Year Passed</label>
+  {{ form.month_year_passed }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Medium</label>
+  {{ form.medium }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">First Language</label>
+  {{ form.first_language }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Second Language</label>
+  {{ form.second_language }}
+</div>
+
+<div class="form-group">
+  <label for="id_education_boards" style="font-size: 12px; font-weight: 500; color: #333;">
+    Education Boards Attended
+  </label>
+  {{ form.education_boards }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Conversion Fee</label>
+  {{ form.converstion_fee }}
+</div>
+
+<hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
+
+<h4 class="mt-4 mb-3 text-uppercase text-primary" 
+    style="text-align: center; margin-top: -5px; margin-bottom: 10px;">
+  Admission Details
+</h4>
+
+<div class="form-group">
+  <label for="id_course_type" class="form-label">
+    Program Type
+  </label>
+  <select name="course_type" id="id_course_type" class="form-select" {% if view_mode %}disabled{% endif %}>
+    <option value="">Select Course Type</option>
+    {% for ct in form.fields.course_type.queryset %}
+      <option value="{{ ct.id }}"
+        {% if form.initial.course_type and ct.id == form.initial.course_type %}
+          selected
+        {% endif %}>
+        {{ ct.name }}
+      </option>
+    {% endfor %}
+  </select>
+</div>
+
+<div class="form-group">
+  <label for="id_course" class="form-label">
+    Course
+  </label>
+  <select name="course" id="id_course" class="form-select" {% if view_mode %}disabled{% endif %}>
+    <option value="">Select Course</option>
+    {% for c in form.fields.course.queryset %}
+      <option value="{{ c.id }}"
+        {% if form.instance.course_id == c.id %}
+          selected
+        {% endif %}>
+        {{ c.name }}
+      </option>
+    {% endfor %}
+  </select>
+</div>
+
+<div class="form-group">
+  <label class="form-label">Medium of Instruction in BCOM Course</label>
+  {{ form.medium_of_instruction }}
+</div>
+
+<div class="form-group">
+  <label class="form-label">Quota</label>
+  {{ form.quota_type }}
+</div>
+
+
+
+
+            <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
+
+            <h4 class="mt-4 mb-3 text-uppercase text-primary" style="text-align: center; margin-bottom: 10px;">Undertaking Details</h4>
+
+            <!-- Declaration Container -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+
+                <!-- Parent's Declaration Section -->
+                <h5 class="mt-4">Parent's/Guardian's Undertaking</h5>
+
+                <p style="font-style: normal; color: #333; font-size: 10px; ">
+                    I, Mr./Mrs./Ms.
+                    <span {% if view_mode %}contenteditable="false" {% else %}contenteditable="true" {% endif %} style="border-bottom: 1px dotted #333; min-width: 150px; display: inline-block;"></span>,
+                    Parent/Guardian of Master/Kumari
+                    <span id="studentNameInsert" {% if view_mode %}contenteditable="false" {% else %}contenteditable="true" {% endif %} style="border-bottom: 1px dotted #333; min-width: 150px; display: inline-block;"></span>,
+                    hereby agree to take full responsibility for my ward in all academic, co-curricular, and disciplinary matters during the course of study at the institution.
+                </p>
+
+                <p style="font-style: normal; color: #333; font-size: 10px; ">
+                    I permit my ward to participate in co-curricular and extra-curricular activities organized by the institution. I understand necessary safety measures will be ensured and I support their involvement in such activities.
+                    If my ward has participated at Taluk, District, or State level events, I will submit a copy of the supporting documents in the documents section below.
+                </p>
+
+
+                <!-- Parent Date, Place, Signature -->
+                <div class="form-grid mt-3">
+                    <div class="form-group">
+                        <label class="form-label">Date </label>
+                        {{ form.parent_declaration_date }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Place </label>
+                        {{ form.parent_declaration_place }}
+                    </div>
+                    <div class="form-group mt-4" style="display: flex; justify-content: flex-end;">
+                        <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
+                            <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
+                            <small>Father/Mother/Guardian Signature</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Application Date:</label>
-                    {{ form.admission_date }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Enquiry Number:</label>
-                    <input type="text" id="id_enquiry_no" name="enquiry_no" maxlength="20" autocomplete="off" class="form-control" value="{{ form.enquiry_no.value|default:'' }}" {% if view_mode %}readonly disabled{% endif %} />
+                <div class="mt-4" style="font-size: 15px; line-height: 1.6; color: #333;">
 
-                    <small id="enquiry-error" style="color: red; display: none;">Enquiry number not found or not for PU</small>
-                </div>
-                <!-- PERSONAL DETAILS -->
-
-
-
-                <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
-
-                <h4 class="mt-4 mb-3 text-uppercase text-primary" style="text-align: center; margin-top: -5px; margin-bottom: 10px; ">Student Details</h4>
-
-                <div class="form-group">
-                    <label for="id_student_name" style="font-size: 12px; font-weight: 500; color: #333; ">Name of the Student as entered in SSLC marks card<span style="color:red">*</span></label>
-                    {{ form.student_name }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Date of Birth</label>
-                    {{ form.dob }}
-                </div>
-
-                <div class="form-group">
-                    <label for="id_gender" style="font-size: 12px; font-weight: 500; color: #333; ">Gender <span style="color:red">*</span></label>
-                    {{ form.gender }}
-                </div>
-                <div class="form-group">
-                    <label for="id_birthplace" style="font-size: 12px; font-weight: 500; color: #333;">Place of Birth<span style="color:red">*</span></label>
-                    {{ form.birthplace }}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Nationality</label>
-                    {{ form.nationality }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Religion</label>
-                    {{ form.religion }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label required">Caste <span class="text-danger"></span></label>
-                    {{ form.caste }}
-                    {% if form.caste.errors %}
-                    <div class="text-danger small">{{ form.caste.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label required">Sub Caste <span class="text-danger"></span></label>
-                    {{ form.sub_caste }}
-                    {% if form.sub_caste.errors %}
-                    <div class="text-danger small">{{ form.sub_caste.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-
-                <div class="form-group">
-                    <label class="form-label required">Category <span class="text-danger"></span></label>
-                    {{ form.category }}
-                    {% if form.category.errors %}
-                    <div class="text-danger small">{{ form.category.errors.0 }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label class="form-label required text-danger">Student Mobile No <span class="text-danger"></span></label>
-                    {{ form.student_phone_no }}
-                    {% if form.student_phone_no.errors %}
-                    <div class="text-danger small">{{ form.student_phone_no.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-
-                <div class="form-group">
-                    <label for="id_student_aadhar_no" style="font-size: 12px; font-weight: 500;">
-                        Student Aadhar No <span style="color: red;">*</span>
-                    </label>
-                    {{ form.student_aadhar_no }}
-                    <div id="error_id_student_aadhar_no" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Student e-Mail ID</label>
-                    {{ form.student_email }}
-                    <div id="error_id_student_email" class="error-message"></div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Blood Group</label>
-                    {{ form.blood_group }}
-                </div>
-                <div class="form-group">
-                    <label for="id_emergency_contact" style="font-size: 12px; font-weight: 500; color: #333;">
-                        Emergency Contact No <span style="color: red;">*</span>
-                    </label>
-                    {{ form.emergency_contact }}
-                    <div id="error_id_emergency_contact" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_emergency_contact_name" style="font-size: 12px; font-weight: 500; color: #333; ">Emergency Contact Person Name  <span style="color:red">*</span></label>
-                    {{ form.emergency_contact_name }}
-                </div>
-                <div class="form-group">
-                    <label for="id_emergency_contact_relation" style="font-size: 12px; font-weight: 500; color: #333; ">Emenrgency Contact Person's relationship with Student <span style="color:red">*</span></label>
-                    {{ form.emergency_contact_relation }}
-                </div>
-
-
-                <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
-
-                <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; margin-bottom: 10px;">Parent Details</h4>
-
-                <!-- Parent DETAILS -->
-                <div class="form-group">
-                    <label class="form-label required">Name of the Father <span class="text-danger"></span></label>
-                    {{ form.father_name }}
-                    {% if form.father_name.errors %}
-                    <div class="text-danger">{{ form.father_name.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="id_father_mobile_no" style="font-size: 12px; font-weight: 500;">
-                        Father Mobile No <span style="color: red;">*</span>
-                    </label>
-                    {{ form.father_mobile_no }}
-                    <div id="error_id_father_mobile_no" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_aadhar_no" style="font-size: 12px; font-weight: 500; color: #333;">
-                        Father Aadhar No <span style="color:red">*</span>
-                    </label>
-                    {{ form.aadhar_no }}
-                    <div id="error_id_aadhar_no" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Father e-Mail ID</label>
-                    {{ form.father_email }}
-                    <div id="error_id_father_email" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_parent_mobile_no" style="font-size: 12px; font-weight: 500; color: #333; ">Father Occupation <span style="color:red">*</span></label>
-                    {{ form.father_occupation }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Father Annual Income</label>
-                    {{ form.annual_income }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label required">Name of the Mother <span class="text-danger"></span></label>
-                    {{ form.mother_name }}
-                    {% if form.mother_name.errors %}
-                    <div class="text-danger small">{{ form.mother_name.errors.0 }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="id_mother_phone_no" style="font-size: 12px; font-weight: 500; color: #333;">
-                        Mother Mobile No <span style="color:red">*</span>
-                    </label>
-                    {{ form.mother_phone_no }}
-                    <div id="error_id_mother_phone_no" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_mother_aadhar_no" style="font-size: 12px; font-weight: 500; color: #333;">
-                        Mother Aadhar No <span style="color:red">*</span>
-                    </label>
-                    {{ form.mother_aadhar_no }}
-                    <div id="error_id_mother_aadhar_no" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_mother_email" class="form-label">Mother e-Mail ID</label>
-                    {{ form.mother_email }}
-                    <div id="error_id_mother_email" class="error-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_parent_mobile_no" style="font-size: 12px; font-weight: 500; color: #333; ">Mother Occupation <span style="color:red">*</span></label>
-                    {{ form.mother_occupation }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Mother Annual Income</label>
-                    {{ form.mother_annual_income }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Name of the Guardian</label>
-                    {{ form.guardian_name }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Address of the Guardian</label>
-                    {{ form.guardian_address }}
-                </div>
-
-
-                <div class="form-group">
-                    <label class="form-label"> Total Annual Income</label>
-                    {{ form.total_annual_income }}
-                </div>
-
-
-
-                <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
-
-                <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; margin-bottom: 10px;">Address Details</h4>
-                <!--<div class="form-group">
-                    <label class="form-label">Student Address</label>
-                    {{ form.student_address }}
-                </div>-->
-                
-
-                <div class="form-group">
-                    <label class="form-label required">Local Address <span class="text-danger"></span></label>
-                    {{ form.current_address }}
-                    {% if form.current_address.errors %}
-                    <div class="text-danger small">{{ form.current_address.errors.0 }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="id_permanent_address" style="font-size: 12px; font-weight: 500; color: #333; ">Permanent Address <span style="color:red">*</span></label>
-                    {{ form.permanent_address }}
-                </div>
-                <!--<div class="form-group">
-                    <label class="form-label">Pincode</label>
-                    {{ form.pincode }}
-                </div>-->
-                
-                <div class="form-group">
-                    <label class="form-label">Taluk</label>
-                    {{ form.city }}
-                </div>
-                <div class="form-group">
-                    <label for="id_district" style="font-size: 12px; font-weight: 500; color: #333;">
-                        District
-                    </label>
-                    {{ form.district }}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">State</label>
-                    {{ form.state }}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Country</label>
-                    {{ form.country }}
-                </div>
-
-                <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
-
-                <!--<h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; ">Emergency Contact Number</h4>-->
-                <!--<hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />-->
-
-                <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; margin-bottom:10px;">Educational Details of Previous Year </h4>
-
-                <!-- ACADEMIC DETAILS -->
-
-                <div class="form-group">
-                    <label class="form-label">SATS Number</label>
-                    <input type="text" name="sats_number" class="form-control bg-light" placeholder="Enter SATS Number" />
-                </div>
-
-
-
-                <div class="form-group">
-                    <label class="form-label">Name of the School last Studied</label>
-                    {{ form.college_last_attended }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Address of the School last Studied</label>
-                    {{ form.college_addresslaststudied }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">SSLC Registration No</label>
-                    {{ form.sslc_reg_no }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">SSLC Percentage</label>
-                    {{ form.sslc_percentage }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Year of Passing (MM-YYYY)</label>
-                    {{ form.year_of_passing }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">PU College Name</label>
-                    {{ form.pu_college_name }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">PU Register No</label>
-                    {{ form.register_no_course }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Month & Year Passed</label>
-                    {{ form.month_year_passed }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Medium</label>
-                    {{ form.medium }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">First Language</label>
-                    {{ form.first_language }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Second Language</label>
-                    {{ form.second_language }}
-                </div>
-                <div class="form-group">
-                    <label for="id_education_boards" style="font-size: 12px; font-weight: 500; color: #333;">
-                        Education Boards Attended
-                    </label>
-                    {{ form.education_boards }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Converstion Fee</label>
-                    {{ form.converstion_fee }}
-                </div>
-
-
-                <!-- Last Studied Course Details -->
-                <!--<div class="form-group">
-                    <label>Student User ID:</label>
-                    {{ form.student_userid }}
-                </div>-->
-
-
-
-                <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
-
-                <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; margin-bottom: 10px;">Admission Details</h4>
-
-                <!-- COURSE DETAILS -->
-
-                <div class="form-group">
-                    <label for="id_course_type" class="form-label">
-                        Program Type <span style="color:red">*</span>
-                    </label>
-                    <select name="course_type" id="id_course_type" class="form-select" required {% if view_mode %}disabled{% endif %}>
-                        <option value="">Select Course Type</option>
-                        {% for ct in form.fields.course_type.queryset %}
-                        <option value="{{ ct.id }}"
-                                {% if form.initial.course_type and ct.id == form.initial.course_type %}
-                                selected
-                                {% endif %}>
-                            {{ ct.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-
-                <!-- COURSE -->
-                <div class="form-group">
-                    <label for="id_course" class="form-label">
-                        Course <span style="color:red">*</span>
-                    </label>
-                    <select name="course" id="id_course" class="form-select" required {% if view_mode %}disabled{% endif %}>
-                        <option value="">Select Course</option>
-                        {% for c in form.fields.course.queryset %}
-                        <option value="{{ c.id }}"
-                                {% if form.instance.course_id == c.id %}
-                                selected
-                                {% endif %}>
-                            {{ c.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-
-
-
-                <div class="form-group">
-                    <label class="form-label">Medium of Instruction in BCOM Course</label>
-                    {{ form.medium_of_instruction }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Quota </label>
-                    {{ form.quota_type }}
-                </div>
-
-
-
-                <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
-
-                <h4 class="mt-4 mb-3 text-uppercase text-primary" style="text-align: center; margin-bottom: 10px;">Undertaking Details</h4>
-
-                <!-- Declaration Container -->
-                <div class="form-group" style="grid-column: 1 / -1;">
-
-                    <!-- Parent's Declaration Section -->
-                    <h5 class="mt-4">Parent's/Guardian's Undertaking</h5>
+                    <!-- Student's Declaration Section -->
+                    <!--<h5 class="mt-4" style="text-align: center; margin-bottom: 10px; margin-top: 15px;">Student's Undertaking</h5>
 
                     <p style="font-style: normal; color: #333; font-size: 10px; ">
-                        I, Mr./Mrs./Ms.
-                        <span {% if view_mode %}contenteditable="false" {% else %}contenteditable="true" {% endif %} style="border-bottom: 1px dotted #333; min-width: 150px; display: inline-block;"></span>,
-                        Parent/Guardian of Master/Kumari
-                        <span id="studentNameInsert" {% if view_mode %}contenteditable="false" {% else %}contenteditable="true" {% endif %} style="border-bottom: 1px dotted #333; min-width: 150px; display: inline-block;"></span>,
-                        hereby agree to take full responsibility for my ward in all academic, co-curricular, and disciplinary matters during the course of study at the institution.
+                        I hereby declare that I will abide by all the rules and regulations of the University, the State Government, and the college regarding my admission, attendance, conduct, and academics. I understand that my admission is subject to eligibility verification and submission of all original documents as prescribed.
                     </p>
 
                     <p style="font-style: normal; color: #333; font-size: 10px; ">
-                        I permit my ward to participate in co-curricular and extra-curricular activities organized by the institution. I understand necessary safety measures will be ensured and I support their involvement in such activities.
-                        If my ward has participated at Taluk, District, or State level events, I will submit a copy of the supporting documents in the documents section below.
+                        I agree to follow the fee payment policies of the institution. I acknowledge that fee payment is my responsibility and that delayed payments may attract fines. I understand that fees once paid are non-refundable.
                     </p>
 
+                    <p style="font-style: normal; color: #333; font-size: 10px; ">
+                        I also undertake not to engage in any form of ragging, eve-teasing, substance abuse, or any anti-social activity.
+                    </p>
 
-                    <!-- Parent Date, Place, Signature -->
-                    <div class="form-grid mt-3">
+                    <p style="font-style: normal; color: #333; font-size: 10px; ">
+                        I accept that failure to adhere to these rules will result in disciplinary action by the institution.
+                    </p>
+
+                    <p style="font-style: normal; color: #333; font-size: 10px; ">
+                        I agree to comply with the prescribed dress code and maintain discipline throughout my course of study.
+                    </p>-->
+
+                    <!-- Student Date, Place, Signature -->
+                    <!--<div class="form-grid mt-3">
                         <div class="form-group">
-                            <label class="form-label">Date </label>
-                            {{ form.parent_declaration_date }}
+                            <label class="form-label required">Date <span class="text-danger"></span></label>
+                            {{ form.student_declaration_date }}
+                            {% if form.student_declaration_date.errors %}
+                            <div class="text-danger small">{{ form.student_declaration_date.errors.0 }}</div>
+                            {% endif %}
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Place </label>
-                            {{ form.parent_declaration_place }}
+                            <label class="form-label required">Place <span class="text-danger"></span></label>
+                            {{ form.student_declaration_place }}
+                            {% if form.student_declaration_place.errors %}
+                            <div class="text-danger small">{{ form.student_declaration_place.errors.0 }}</div>
+                            {% endif %}
                         </div>
                         <div class="form-group mt-4" style="display: flex; justify-content: flex-end;">
                             <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
                                 <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
-                                <small>Father/Mother/Guardian Signature</small>
+                                <small>Student's Signature</small>
                             </div>
                         </div>
-                    </div>
-                    <div class="mt-4" style="font-size: 15px; line-height: 1.6; color: #333;">
-                        <hr class="my-4">
-
-                        <!-- Student's Declaration Section -->
-                        <h5 class="mt-4" style="text-align: center; margin-bottom: 10px; margin-top: 15px;">Student's Undertaking</h5>
-
-                        <p style="font-style: normal; color: #333; font-size: 10px; ">
-                            I hereby declare that I will abide by all the rules and regulations of the University, the State Government, and the college regarding my admission, attendance, conduct, and academics. I understand that my admission is subject to eligibility verification and submission of all original documents as prescribed.
-                        </p>
-
-                        <p style="font-style: normal; color: #333; font-size: 10px; ">
-                            I agree to follow the fee payment policies of the institution. I acknowledge that fee payment is my responsibility and that delayed payments may attract fines. I understand that fees once paid are non-refundable.
-                        </p>
-
-                        <p style="font-style: normal; color: #333; font-size: 10px; ">
-                            I also undertake not to engage in any form of ragging, eve-teasing, substance abuse, or any anti-social activity.
-                        </p>
-
-                        <p style="font-style: normal; color: #333; font-size: 10px; ">
-                            I accept that failure to adhere to these rules will result in disciplinary action by the institution.
-                        </p>
-
-                        <p style="font-style: normal; color: #333; font-size: 10px; ">
-                            I agree to comply with the prescribed dress code and maintain discipline throughout my course of study.
-                        </p>
-
-                        <!-- Student Date, Place, Signature -->
-                        <div class="form-grid mt-3">
-                            <div class="form-group">
-                                <label class="form-label required">Date <span class="text-danger"></span></label>
-                                {{ form.student_declaration_date }}
-                                {% if form.student_declaration_date.errors %}
-                                <div class="text-danger small">{{ form.student_declaration_date.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label required">Place <span class="text-danger"></span></label>
-                                {{ form.student_declaration_place }}
-                                {% if form.student_declaration_place.errors %}
-                                <div class="text-danger small">{{ form.student_declaration_place.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="form-group mt-4" style="display: flex; justify-content: flex-end;">
-                                <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
-                                    <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
-                                    <small>Student's Signature</small>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
+                    </div>-->
 
                 </div>
 
-                <!-- Full-width horizontal line OUTSIDE the grid -->
-                <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
 
-                <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; margin-bottom: 10px;">For Office Use Only</h4>
+            </div>
 
+            <!-- Full-width horizontal line OUTSIDE the grid -->
+            <hr class="mt-4" style="border: 1px solid #000; width: 100%; margin: 2rem auto;" />
 
-                <div class="form-group" style="grid-column: 1/-1;">
-                    <label class="form-label">Program Choosen</label>
-                    {{ form.admitted_to }}
-                </div>
-
-                <!-- REQUIRED DOCUMENTS SECTION -->
-                <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: 15px; margin-bottom: 8px;">Documents Required</h4>
-                <div class="form-group checkbox-inline">
-                    <label class="form-label">
-                        {{ form.doc_aadhar }}
-                        Aadhar Card
-                    </label>
-                </div>
-                <div class="form-group checkbox-inline">
-                    <label class="form-label">
-                        {{ form.doc_marks_card }}
-                        Marks Card (Grade 10 CBSE, ICSE, IGCSE)
-                    </label>
-                </div>
-                <div class="form-group checkbox-inline">
-                    <label class="form-label">
-                        {{ form.doc_caste_certificate }}
-                        Caste Certificate
-                    </label>
-                </div>
-                <div class="form-group checkbox-inline">
-                    <label class="form-label">
-                        {{ form.doc_income_certificate }}
-                        Income Certificate
-                    </label>
-                </div>
-                <div class="form-group checkbox-inline">
-                    <label class="form-label">
-                        {{ form.doc_transfer }}
-                        Transfer Certificate
-                    </label>
-                </div>
-                <div class="form-group checkbox-inline">
-                    <label class="form-label">
-                        {{ form.doc_migration }}
-                        Migration/Eligibility Certificate
-                    </label>
-                </div>
-                <div class="form-group checkbox-inline">
-                    <label class="form-label">
-                        {{ form.doc_study }}
-                        Study Certificate
-                    </label>
-                </div>
-                <div class="form-group checkbox-inline">
-                    <label class="form-label">
-                        {{ form.doc_participation_documents }}
-                        Participation Documents
-                    </label>
-                </div>
+            <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; margin-bottom: 10px;">For Office Use Only</h4>
 
 
-                <!-- OFFICE USE ONLY -->
-                <div class="form-group" style="grid-column: 1/-1;">
-                    <h4 class="mt-4 mb-3" style=" text-align: center; margin-top: 15px; margin-bottom: 8px;">Fees Details</h4> <!-- Heading Added -->
-                    <div class="form-grid">
-                        {# Replace the Receipt No section with this block in your template #}
+            <div class="form-group" style="grid-column: 1/-1;">
+                <label class="form-label">Program Choosen</label>
+                {{ form.admitted_to }}
+            </div>
+
+            <!-- REQUIRED DOCUMENTS SECTION -->
+            <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: 15px; margin-bottom: 8px;">Documents Required</h4>
+            <div class="form-group checkbox-inline">
+                <label class="form-label">
+                    {{ form.doc_aadhar }}
+                    Aadhar Card
+                </label>
+            </div>
+            <div class="form-group checkbox-inline">
+                <label class="form-label">
+                    {{ form.doc_marks_card }}
+                    Marks Card (Grade 10 CBSE, ICSE, IGCSE)
+                </label>
+            </div>
+            <div class="form-group checkbox-inline">
+                <label class="form-label">
+                    {{ form.doc_caste_certificate }}
+                    Caste Certificate
+                </label>
+            </div>
+            <div class="form-group checkbox-inline">
+                <label class="form-label">
+                    {{ form.doc_income_certificate }}
+                    Income Certificate
+                </label>
+            </div>
+            <div class="form-group checkbox-inline">
+                <label class="form-label">
+                    {{ form.doc_transfer }}
+                    Transfer Certificate
+                </label>
+            </div>
+            <div class="form-group checkbox-inline">
+                <label class="form-label">
+                    {{ form.doc_migration }}
+                    Migration/Eligibility Certificate
+                </label>
+            </div>
+            <div class="form-group checkbox-inline">
+                <label class="form-label">
+                    {{ form.doc_study }}
+                    Study Certificate
+                </label>
+            </div>
+            <div class="form-group checkbox-inline">
+                <label class="form-label">
+                    {{ form.doc_participation_documents }}
+                    Participation Documents
+                </label>
+            </div>
+
+
+            <!-- OFFICE USE ONLY -->
+            <div class="form-group" style="grid-column: 1/-1;">
+                <!--<h4 class="mt-4 mb-3" style=" text-align: center; margin-top: 15px; margin-bottom: 8px;">Fees Details</h4>--> <!-- Heading Added -->
+                <!--<div class="form-grid">
+                    {# Replace the Receipt No section with this block in your template #}
+                    <div class="form-group">-->
+                        <!--<div class="mb-3">
+                    <label for="{{ form.academic_year.id_for_label }}" class="form-label">Academic Year</label>
+                    {{ form.academic_year }}
+                    {% if form.academic_year.errors %}
+                    <div class="text-danger">{{ form.academic_year.errors }}</div>
+                    {% endif %}
+                </div>-->
+                        <!--<label class="form-label">Receipt No</label>
+
+                        {% if form.instance.pk %}  {# Editing: allow editing receipt number #}
+                        {{ form.receipt_no }}
+                        {% else %}  {# Creating: show readonly input with next_receipt_no #}
+                        <input type="text" class="form-control bg-light" name="receipt_no" id="id_receipt_no"
+                               value="{{ next_receipt_no }}" readonly>
+                        {{ form.receipt_no.as_hidden }}
+                        {% endif %}
+
+                        {% if last_receipt_no %}
+                        <small class="text-muted">Previous receipt no: {{ last_receipt_no }}</small>
+                        {% endif %}
+
                         <div class="form-group">
-                            <!--<div class="mb-3">
-                                <label for="{{ form.academic_year.id_for_label }}" class="form-label">Academic Year</label>
-                                {{ form.academic_year }}
-                                {% if form.academic_year.errors %}
-                                <div class="text-danger">{{ form.academic_year.errors }}</div>
-                                {% endif %}
-                            </div>-->
-                            <label class="form-label">Receipt No</label>
+                            <label class="form-label">Receipt Date</label>
+                            {{ form.receipt_date }}
+                        </div>-->
 
-                            {% if form.instance.pk %}  {# Editing: allow editing receipt number #}
-                            {{ form.receipt_no }}
-                            {% else %}  {# Creating: show readonly input with next_receipt_no #}
-                            <input type="text" class="form-control bg-light" name="receipt_no" id="id_receipt_no"
-                                   value="{{ next_receipt_no }}" readonly>
-                            {{ form.receipt_no.as_hidden }}
+
+
+                        <!--<div class="form-group">
+                    <label class="form-label">Caution Deposit Fee*</label>
+                    {{ form.tuition_advance_amount }}
+                </div>-->
+                        <!--<div class="form-group">
+                            <label class="form-label">Transcation ID/Reference No</label>
+                            {{ form.utr_no }}
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="form-label" for="id_application_fee">Application Fee:</label>
+                            <input type="text" name="application_fee" id="id_application_fee" class="form-control" readonly>
+                        </div>-->
+                        <!--<div class="form-group">
+                    <label class="form-label" for="id_tuition_fee">Tuition Fee:</label>
+                    <input type="text" name="tuition_fee" id="id_tuition_fee" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_books_fee">Books Fee:</label>
+                    <input type="text" name="books_fee" id="id_books_fee" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_uniform_fee">Uniform Fee:</label>
+                    <input type="text" name="uniform_fee" id="id_uniform_fee" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_transport_fees">Transport Fee:</label>
+                    <input type="text" name="transport_fees" id="id_transport_fees" class="form-control" readonly>
+                </div>-->
+
+                        <!--<div class="form-group">
+                            <label class="form-label required">Payment Mode <span class="text-danger"></span></label>
+                            {{ form.payment_mode }}
+                            {% if form.payment_mode.errors %}
+                            <div class="text-danger small">{{ form.payment_mode.errors.0 }}</div>
                             {% endif %}
+                        </div>-->
 
-                            {% if last_receipt_no %}
-                            <small class="text-muted">Previous receipt no: {{ last_receipt_no }}</small>
-                            {% endif %}
-
-                            <div class="form-group">
-                                <label class="form-label">Receipt Date</label>
-                                {{ form.receipt_date }}
-                            </div>
-
-
-
-                            <!--<div class="form-group">
-                                <label class="form-label">Caution Deposit Fee*</label>
-                                {{ form.tuition_advance_amount }}
-                            </div>-->
-                            <div class="form-group">
-                                <label class="form-label">Transcation ID/Reference No</label>
-                                {{ form.utr_no }}
-                            </div>
-
-
-                            <div class="form-group">
-                                <label class="form-label" for="id_application_fee">Application Fee:</label>
-                                <input type="text" name="application_fee" id="id_application_fee" class="form-control" readonly>
-                            </div>
-                            <!--<div class="form-group">
-                                <label class="form-label" for="id_tuition_fee">Tuition Fee:</label>
-                                <input type="text" name="tuition_fee" id="id_tuition_fee" class="form-control" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="id_books_fee">Books Fee:</label>
-                                <input type="text" name="books_fee" id="id_books_fee" class="form-control" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="id_uniform_fee">Uniform Fee:</label>
-                                <input type="text" name="uniform_fee" id="id_uniform_fee" class="form-control" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="id_transport_fees">Transport Fee:</label>
-                                <input type="text" name="transport_fees" id="id_transport_fees" class="form-control" readonly>
-                            </div>-->
-
-                            <div class="form-group">
-                                <label class="form-label required">Payment Mode <span class="text-danger"></span></label>
-                                {{ form.payment_mode }}
-                                {% if form.payment_mode.errors %}
-                                <div class="text-danger small">{{ form.payment_mode.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- QR Code Display Section -->
-                            <div id="qr-code-section" class="mt-3" style="display: none;">
-                                <label>Scan to Pay (QR Code)</label><br>
-                                <div id="qrcode" class="border p-2"></div>
-                            </div>
+                        <!-- QR Code Display Section -->
+                        <!--<div id="qr-code-section" class="mt-3" style="display: none;">
+                            <label>Scan to Pay (QR Code)</label><br>
+                            <div id="qrcode" class="border p-2"></div>
+                        </div>-->
 
                         <!-- TRANSPORT & HOSTEL -->
                         <!--{% if view_mode %}
-    <div class="form-group">
-        <label class="form-label">Hostel Required:</label>
-        {{ form.hostel_required }}
-    </div>
-    <div class="form-group">
-        <label class="form-label">Enter Hostel Amount</label>
-        {{ form.hostel_amount }}
-    </div>
-    <div class="form-group">
-        <label class="form-label">Transport:</label>
-        {{ form.wants_transport }}
-    </div>
-    <div class="form-group">
-        <label class="form-label">Enter Transport Amount</label>
-        {{ form.transport_amount }}
-    </div>
-    <div class="form-group">
-        <label class="form-label">Transport Route/Details</label>
-        {{ form.transport }}
-    </div>
-    <div class="form-group">
-        <label class="form-label">Scholarship:</label>
-        {{ form.has_scholarship }}
-    </div>
-    <div class="form-group">
-        <label class="form-label">Enter Scholarship Amount</label>
-        {{ form.scholarship_amount }}
-    </div>
-    {% else %}-->
+                <div class="form-group">
+                    <label class="form-label">Hostel Required:</label>
+                    {{ form.hostel_required }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Enter Hostel Amount</label>
+                    {{ form.hostel_amount }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Transport:</label>
+                    {{ form.wants_transport }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Enter Transport Amount</label>
+                    {{ form.transport_amount }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Transport Route/Details</label>
+                    {{ form.transport }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Scholarship:</label>
+                    {{ form.has_scholarship }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Enter Scholarship Amount</label>
+                    {{ form.scholarship_amount }}
+                </div>
+                {% else %}-->
                         <!-- Hostel Required Yes/No -->
                         <!--<div class="form-group checkbox-inline" style="grid-column: 1 / 2;">
-        <label class="form-label me-2">Hostel Required:</label>
-        <input type="radio" id="hostel_yes" name="hostel_required" value="yes" class="form-check-input me-1" style="margin-left:10px;">
-        <label for="hostel_yes" class="me-3" style="margin-right:10px;">Yes</label>
-        <input type="radio" id="hostel_no" name="hostel_required" value="no" class="form-check-input me-1" style="margin-left:10px;">
-        <label for="hostel_no">No</label>
-    </div>
-    <div class="form-group" id="hostel_amount_group" style="display: none;">
-        <label class="form-label">Enter Hostel Amount</label>
-        <input type="text" name="hostel_amount" class="form-control" placeholder="Enter amount" />
-    </div>
+                    <label class="form-label me-2">Hostel Required:</label>
+                    <input type="radio" id="hostel_yes" name="hostel_required" value="yes" class="form-check-input me-1" style="margin-left:10px;">
+                    <label for="hostel_yes" class="me-3" style="margin-right:10px;">Yes</label>
+                    <input type="radio" id="hostel_no" name="hostel_required" value="no" class="form-check-input me-1" style="margin-left:10px;">
+                    <label for="hostel_no">No</label>
+                </div>
+                <div class="form-group" id="hostel_amount_group" style="display: none;">
+                    <label class="form-label">Enter Hostel Amount</label>
+                    <input type="text" name="hostel_amount" class="form-control" placeholder="Enter amount" />
+                </div>
 
-    <div class="form-group checkbox-inline" style="grid-column: 1 / 2;">
-        <label class="form-label me-2">Transport:</label>
-        <input type="radio" id="transport_yes" name="wants_transport" value="yes" class="form-check-input me-1" style="margin-left:10px;">
-        <label for="transport_yes" class="me-3" style="margin-right:10px;">Yes</label>
-        <input type="radio" id="transport_no" name="wants_transport" value="no" class="form-check-input me-1" style="margin-left:10px;">
-        <label for="transport_no">No</label>
-    </div>
-    <div class="form-group" id="transport_amount_group" style="display: none;">
-        <label class="form-label">Enter Transport Amount</label>
-        <input type="text" name="transport_amount" class="form-control" placeholder="Enter amount" />
-    </div>
-    <div class="form-group" id="transport_dropdown_div" style="display: none;">
-        <label class="form-label">Transport Route/Details</label>
-        {{ form.transport }}
-    </div>-->
+                <div class="form-group checkbox-inline" style="grid-column: 1 / 2;">
+                    <label class="form-label me-2">Transport:</label>
+                    <input type="radio" id="transport_yes" name="wants_transport" value="yes" class="form-check-input me-1" style="margin-left:10px;">
+                    <label for="transport_yes" class="me-3" style="margin-right:10px;">Yes</label>
+                    <input type="radio" id="transport_no" name="wants_transport" value="no" class="form-check-input me-1" style="margin-left:10px;">
+                    <label for="transport_no">No</label>
+                </div>
+                <div class="form-group" id="transport_amount_group" style="display: none;">
+                    <label class="form-label">Enter Transport Amount</label>
+                    <input type="text" name="transport_amount" class="form-control" placeholder="Enter amount" />
+                </div>
+                <div class="form-group" id="transport_dropdown_div" style="display: none;">
+                    <label class="form-label">Transport Route/Details</label>
+                    {{ form.transport }}
+                </div>-->
                         <!-- SCHOLARSHIP SECTION -->
                         <!--<div class="form-group checkbox-inline" style="grid-column: 1 / 2;">
-        <label class="form-label me-2">Scholarship:</label>
-        <input type="radio" id="scholarship_yes" name="has_scholarship" value="yes" class="form-check-input me-1" style="margin-left:10px;">
-        <label for="scholarship_yes" class="me-3" style="margin-right:10px;">Yes</label>
-        <input type="radio" id="scholarship_no" name="has_scholarship" value="no" class="form-check-input me-1" style="margin-left:10px;">
-        <label for="scholarship_no">No</label>
-    </div>
-    <div class="form-group" id="scholarship_amount_group" style="display: none;">
-        <label class="form-label">Enter Scholarship Amount</label>
-        <input type="text" name="scholarship_amount" class="form-control" placeholder="Enter amount" />
-    </div>
-    {% endif %}-->
+                    <label class="form-label me-2">Scholarship:</label>
+                    <input type="radio" id="scholarship_yes" name="has_scholarship" value="yes" class="form-check-input me-1" style="margin-left:10px;">
+                    <label for="scholarship_yes" class="me-3" style="margin-right:10px;">Yes</label>
+                    <input type="radio" id="scholarship_no" name="has_scholarship" value="no" class="form-check-input me-1" style="margin-left:10px;">
+                    <label for="scholarship_no">No</label>
+                </div>
+                <div class="form-group" id="scholarship_amount_group" style="display: none;">
+                    <label class="form-label">Enter Scholarship Amount</label>
+                    <input type="text" name="scholarship_amount" class="form-control" placeholder="Enter amount" />
+                </div>
+                {% endif %}-->
                         <!-- Accountant's Signature -->
-                            <div class="form-group" style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
-                                <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
-                                    <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
-                                    <small>Accountant's Signature</small>
-                                </div>
+                        <!--<div class="form-group" style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
+                            <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
+                                <small>Accountant's Signature</small>
                             </div>
+                        </div>
 
-                            <div class="form-group" style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
-                                <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
-                                    <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
-                                    <small>Chairman Signature with Seal</small>
-                                </div>
+                        <div class="form-group" style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
+                            <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
+                                <small>Chairman Signature with Seal</small>
                             </div>
+                        </div>-->
 
 
-                            <!-- Dean & Director's Signature with Seal -->
-                            <div class="form-group" style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
-                                <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
-                                    <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
-                                    <small>Dean & Director's Signature with seal</small>
-                                </div>
+                        <!-- Dean & Director's Signature with Seal -->
+                        <div class="form-group" style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
+                            <div style="width: 200px; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 100%; border-bottom: 1px solid #000; height: 30px;"></div>
+                                <small>Dean & Director's Signature with seal</small>
                             </div>
-                            <!--<div class="form-group mt-4" style="display: flex; justify-content: space-between; gap: 40px;">
-                            <div style="flex: 1;text-align: center;
-                                                   margin-top: 15px;
-                                                   margin-left: 348px; ">
-                                <div style=" border-bottom: 1px solid #000; width: 54%; height: 0px; margin-top: -51px; margin-left: 198px;">Chairman Signature with Seal</div>
-                            </div>-->
-                            <!-- Declaration by the student -->
-                            <!--</div>-->
+                        </div>
+                        <!--<div class="form-group mt-4" style="display: flex; justify-content: space-between; gap: 40px;">
+                <div style="flex: 1;text-align: center;
+                                       margin-top: 15px;
+                                       margin-left: 348px; ">
+                    <div style=" border-bottom: 1px solid #000; width: 54%; height: 0px; margin-top: -51px; margin-left: 198px;">Chairman Signature with Seal</div>
+                </div>-->
+                        <!-- Declaration by the student -->
+                        <!--</div>-->
 
 
-                            <div class="mt-4" style="margin-top: -42px; display: flex; justify-content: space-between; width: 100%;">
-                                <button type="{% if view_mode %}button{% else %}submit{% endif %}"
-                                        class="btn btn-primary btn-lg no-print"
-                                        {% if view_mode %}onclick="window.history.back();" {% endif %}>
-                                    {% if view_mode %}
-                                    Back
-                                    {% elif edit_mode %}
-                                    Update
-                                    {% else %}
-                                    Submit
-                                    {% endif %}
-                                </button>
-                                <button type="button" class="btn btn-secondary btn-sm no-print" style="background-color: #800000; color: white;" onclick="window.print();">
-                                    <i class="fa fa-print"></i> Print
-                                </button>
-                            </div>
+                        <div class="mt-4" style=" display: flex; justify-content: space-between; width: 100%;">
+                            <button type="{% if view_mode %}button{% else %}submit{% endif %}"
+                                    class="btn btn-primary btn-lg no-print"
+                                    {% if view_mode %}onclick="window.history.back();" {% endif %}>
+                                {% if view_mode %}
+                                Back
+                                {% elif edit_mode %}
+                                Update
+                                {% else %}
+                                Submit
+                                {% endif %}
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm no-print" style="background-color: #800000; color: white;" onclick="window.print();">
+                                <i class="fa fa-print"></i> Print
+                            </button>
+                        </div>
 
 
-                            {% if form_submission_success %}
-                            <div class="alert alert-success text-center mt-3" role="alert">
-                                Admission form has been successfully submitted!
-                            </div>
-                            {% endif %}
-                            {% if form.errors %}
-                            <div class="alert alert-danger text-center mt-3" role="alert">
-                                Please correct the errors in the form.
-                                {{ form.errors }}
-                            </div>
-                            {% endif %}
+                        {% if form_submission_success %}
+                        <div class="alert alert-success text-center mt-3" role="alert">
+                            Admission form has been successfully submitted!
+                        </div>
+                        {% endif %}
+                        {% if form.errors %}
+                        <div class="alert alert-danger text-center mt-3" role="alert">
+                            Please correct the errors in the form.
+                            {{ form.errors }}
+                        </div>
+                        {% endif %}
 
-                        </div> <!-- End form-grid -->
-                    </div>
-                 </div>
-            </form>
+                    </div> <!-- End form-grid -->
+                </div>
+            </div>
+        </form>
         </div>
     </div>
 
 
 </div> <!-- End form-card -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const dropdown = document.getElementById("id_primary_guardian");  // Django auto-prefixes "id_"
+        const guardianFields = document.getElementById("guardian_fields");
 
+        function toggleGuardianFields() {
+            if (dropdown.value === "guardian") {
+                guardianFields.style.display = "block";
+            } else {
+                guardianFields.style.display = "none";
+            }
+        }
+
+        dropdown.addEventListener("change", toggleGuardianFields);
+        toggleGuardianFields();  // run on page load
+    });
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

@@ -97,6 +97,7 @@ TEMPLATES = [
                 'master.context_processors.user_form_permissions',
                  'lms.context_processors.student_context',
                  'lms.context_processors.employee_context',
+                 'lms.context_processors.parent_context',
             ],
         },
     },
@@ -106,20 +107,18 @@ WSGI_APPLICATION = 'student_alerts_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DATABASES = {
-     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'institute_db1',  # Replace with your actual database name
-        'USER': 'root',     # Replace with your MySQL username
-        'PASSWORD': 'root',  # Replace with your MySQL password
-        'HOST': 'localhost',           # Keep as 'localhost' if running MySQL locally
-        'PORT': '3306',                # Default MySQL port
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),      # Azure environment variable for database name
+        'USER': os.getenv('DB_USER'),      # Azure environment variable for username
+        'PASSWORD': os.getenv('DB_PASSWORD'),  # Azure environment variable for password
+        'HOST': os.getenv('DB_HOST'),      # Azure environment variable for host, e.g. yourserver.postgres.database.azure.com
+        'PORT': os.getenv('DB_PORT', '5432'),  # Azure environment variable for port, default to 5432
         'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET NAMES 'utf8mb4'"
+            'sslmode': 'require',          # Required for secure connection to Azure PostgreSQL
         },
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -178,3 +177,10 @@ MSGKART_BASE_URL = "https://alb-backend.msgkart.com"
 
 
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'saishashank0143@gmail.com'
+EMAIL_HOST_PASSWORD = 'umht bsic hycy pgli'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

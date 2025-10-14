@@ -1,0 +1,124 @@
+{% extends 'lms/parent_layout.html' %}
+
+{% block title %}Download Student Marksheet{% endblock %}
+
+{% block content %}
+
+<style>
+    .download-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 80vh;
+        text-align: center;
+        padding: 50px 20px;
+        background-color: #f9fafc;
+    }
+
+    .page-title {
+        font-size: 26px;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+        font-size: 15px;
+        color: #555;
+        margin-bottom: 30px;
+    }
+
+    .student-card {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 25px 35px;
+        margin-bottom: 30px;
+        width: 100%;
+        max-width: 700px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+        .student-card h3 {
+            margin: 0 0 20px;
+            color: #333;
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 2px solid #800000;
+            padding-bottom: 10px;
+        }
+
+    .student-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 30px;
+        font-size: 15px;
+    }
+
+        .student-info p {
+            margin: 0;
+            color: #444;
+        }
+
+        .student-info strong {
+            color: #222;
+            font-weight: 600;
+        }
+
+    .btn-maroon {
+        background-color: maroon;
+        color: #fff;
+        padding: 12px 28px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s;
+        display: inline-block;
+        box-shadow: 0 4px 10px rgba(128, 0, 0, 0.25);
+    }
+
+        .btn-maroon:hover {
+            background-color: #a00000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(128, 0, 0, 0.35);
+        }
+
+        .btn-maroon i {
+            margin-right: 8px;
+        }
+</style>
+
+<div class="download-container">
+    <h2 class="page-title">Download Student Marksheet</h2>
+    <p class="page-subtitle">Please review the student details before downloading:</p>
+
+    <div class="student-card">
+        <h3>{{ student.student_name }}</h3>
+        <div class="student-info">
+            <p><strong>Roll No:</strong> {{ student.student_userid }}</p>
+            <p><strong>Program:</strong> {{ student.course.name }}</p>
+            <p><strong>Academic Year:</strong> {{ student.academic_year.year }}</p>
+            <p><strong>Semester / Year:</strong>{{ student.course.name }} {{ student.semester }}</p>
+        </div>
+    </div>
+
+    {% if has_marks %}
+    <a href="{% url 'student_marksheet_pdf' student.id %}" class="btn-maroon">
+        <i class="fas fa-download"></i> Download Marksheet
+    </a>
+    {% else %}
+    <button class="btn-maroon" style="opacity:0.6; cursor:not-allowed;" disabled>
+        <i class="fas fa-ban"></i> Download Unavailable
+    </button>
+    {% endif %}
+
+
+
+
+</div>
+
+{% endblock %}

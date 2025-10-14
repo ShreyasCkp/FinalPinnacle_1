@@ -480,215 +480,405 @@ from decimal import Decimal, InvalidOperation
 
 @custom_login_required
 def fee_collection_collect(request):
+
     if request.method == 'POST':
+
         admission_no = request.POST.get('admission_no')
+
         selected_fee_ids = request.POST.getlist('selected_fees')
+
         payment_mode = request.POST.get('payment_mode')
+
         payment_id = request.POST.get('payment_id')
-
+ 
         for fee_id in selected_fee_ids:
+
             fee_collection = get_object_or_404(StudentFeeCollection, id=fee_id)
+ 
+            # 🔹 Fetch academic year from StudentDatabase for this admission_no
 
+            student_db = StudentDatabase.objects.filter(
+
+                pu_admission__admission_no=fee_collection.admission_no
+
+            ).first() or StudentDatabase.objects.filter(
+
+                degree_admission__admission_no=fee_collection.admission_no
+
+            ).first()
+ 
+            # ✅ Always keep academic_year as string (never None)
+
+            academic_year = str(getattr(student_db, 'academic_year', '') or '')
+ 
             raw_paid = request.POST.get(f'paid_amount_{fee_id}', '0').replace(',', '').strip()
+
             try:
+
                 paid_amount = Decimal(raw_paid) if raw_paid else Decimal('0')
+
             except InvalidOperation:
+
                 messages.error(request, f"Invalid paid amount entered for fee ID {fee_id}. Please enter a valid number.")
+
                 return redirect('fee_collection_collect')
-
+ 
             if paid_amount <= 0:
+
                 continue
-
+ 
             total_paid = sum(fc.paid_amount for fc in StudentFeeCollection.objects.filter(
+
                 admission_no=fee_collection.admission_no,
+
                 fee_type=fee_collection.fee_type
+
             ))
+
             total_discount = sum(fc.applied_discount for fc in StudentFeeCollection.objects.filter(
+
                 admission_no=fee_collection.admission_no,
+
                 fee_type=fee_collection.fee_type
+
             ))
+
             cumulative_total = total_paid + total_discount + paid_amount
+
             new_balance = max(fee_collection.amount - cumulative_total, Decimal('0'))
+ 
+            # 🔹 Get semester and current year as integers
 
+            semester_val = getattr(student_db, 'semester', None) or getattr(student_db, 'current_year', None)
+
+            try:
+
+                semester = int(semester_val) if semester_val is not None else None
+
+            except (ValueError, TypeError):
+
+                semester = None
+ 
             StudentFeeCollection.objects.create(
+
                 admission_no=fee_collection.admission_no,
+
                 student_userid=fee_collection.student_userid,
-                semester=fee_collection.semester,
-                academic_year=fee_collection.academic_year,
+
+                semester=semester,  # ✅ integer if present
+
+                academic_year=academic_year,  # ✅ always string
+
                 fee_type=fee_collection.fee_type,
+
                 amount=fee_collection.amount,
+
                 paid_amount=paid_amount,
+
                 applied_discount=Decimal('0'),
+
                 balance_amount=new_balance,
+
                 due_date=fee_collection.due_date,
+
                 payment_mode=payment_mode,
+
                 payment_id=payment_id,
+
                 payment_date=timezone.now().date(),
+
                 status='Paid' if new_balance == 0 else 'Partial'
+
             )
-
+ 
         messages.success(request, "Payment recorded successfully.")
+
         return redirect('generate_receipt', admission_no=quote(admission_no))
+ 
+    # ================= GET request handling =================
 
-    # GET request handling
+ 
+    # ================= GET request handling =================
+
     admission_no = request.GET.get('admission_no')
+
     admission = PUAdmission.objects.filter(admission_no=admission_no).first() or DegreeAdmission.objects.filter(admission_no=admission_no).first()
+
     if not admission:
+
         messages.error(request, "Admission not found.")
+
         return redirect('student_fee_list')
-
+ 
     student_db = StudentDatabase.objects.filter(
+
         pu_admission=admission if isinstance(admission, PUAdmission) else None,
+
         degree_admission=admission if isinstance(admission, DegreeAdmission) else None
+
     ).first()
+ 
+    # ✅ Always keep academic_year as string
 
+    academic_year = str(getattr(student_db, 'academic_year', '') or '')
+ 
     scholarship_fee_type = FeeType.objects.filter(name__iexact='discount').first()
+
     scholarship_amount = Decimal('0')
+
     if scholarship_fee_type:
+
         scholarship_optional_fee = OptionalFee.objects.filter(
+
             admission_no=admission.admission_no,
+
             fee_type=scholarship_fee_type
+
         ).first()
+
         if scholarship_optional_fee:
+
             scholarship_amount = scholarship_optional_fee.amount
-
+ 
     declarations = FeeDeclaration.objects.filter(
+
         course_type=admission.course_type,
+
         course=admission.course,
+
     )
+
     if hasattr(admission, 'semester') and admission.semester:
+
         declarations = declarations.filter(semester=admission.semester)
+
     elif hasattr(student_db, 'current_year') and student_db.current_year:
+
         declarations = declarations.filter(current_year=student_db.current_year)
-
+ 
     declaration_details = FeeDeclarationDetail.objects.filter(
+
         declaration__in=declarations
+
     ).select_related('fee_type').order_by('due_date')
-
+ 
     fee_collections = []
+
     discount_applied = False  # Apply scholarship only once
-
+ 
     for detail in declaration_details:
+
         fee_type_instance = detail.fee_type
+
         fee_amount = detail.amount
-
+ 
         paid_total = sum(fc.paid_amount for fc in StudentFeeCollection.objects.filter(
-            admission_no=admission.admission_no, fee_type=fee_type_instance))
-        discount_total = sum(fc.applied_discount for fc in StudentFeeCollection.objects.filter(
+
             admission_no=admission.admission_no, fee_type=fee_type_instance))
 
+        discount_total = sum(fc.applied_discount for fc in StudentFeeCollection.objects.filter(
+
+            admission_no=admission.admission_no, fee_type=fee_type_instance))
+ 
         applied_discount = Decimal('0')
+
         if not discount_applied and fee_type_instance.is_deductible and scholarship_amount > 0:
+
             applied_discount = scholarship_amount
+
             discount_applied = True
-
+ 
         balance = fee_amount - paid_total - discount_total - applied_discount
-
+ 
         existing = StudentFeeCollection.objects.filter(
+
             admission_no=admission.admission_no,
+
             fee_type=fee_type_instance
-        ).order_by('payment_date').last()
 
+        ).order_by('payment_date').last()
+ 
         if existing:
+
             existing.amount = fee_amount
+
             existing.due_date = detail.due_date
+
             existing.save()
+
             fee_collections.append(existing)
+
         else:
+
             fee_collections.append(StudentFeeCollection.objects.create(
+
                 admission_no=admission.admission_no,
+
                 student_userid=getattr(student_db, 'student_userid', '') if student_db else '',
-                semester=getattr(admission, 'semester', None),
-                academic_year=student_db.academic_year if student_db else '',
+
+                semester=getattr(student_db, 'semester', None) or getattr(student_db, 'current_year', None),
+
+                academic_year=academic_year,  # ✅ always string
+
                 fee_type=fee_type_instance,
+
                 amount=fee_amount,
+
                 paid_amount=Decimal('0'),
+
                 applied_discount=applied_discount,
+
                 balance_amount=balance,
+
                 due_date=detail.due_date,
+
                 payment_date=timezone.now().date(),  # ✅ Always set payment_date
+
                 status='Pending' if balance > 0 else 'Paid'
-            ))
 
+            ))
+ 
     optional_fees = OptionalFee.objects.filter(admission_no=admission.admission_no).exclude(fee_type=scholarship_fee_type)
+
     for opt_fee in optional_fees:
+
         fee_type_instance = opt_fee.fee_type
+
         paid_total = sum(fc.paid_amount for fc in StudentFeeCollection.objects.filter(
+
             admission_no=admission.admission_no, fee_type=fee_type_instance))
+
         discount_total = sum(fc.applied_discount for fc in StudentFeeCollection.objects.filter(
+
             admission_no=admission.admission_no, fee_type=fee_type_instance))
+
         balance = opt_fee.amount - paid_total - discount_total
-
+ 
         existing = StudentFeeCollection.objects.filter(
+
             admission_no=admission.admission_no, fee_type=fee_type_instance
+
         ).order_by('payment_date').last()
-
+ 
         if existing:
+
             existing.amount = opt_fee.amount
+
             existing.due_date = opt_fee.due_date
+
             existing.save()
+
             fee_collections.append(existing)
+
         else:
+
             fee_collections.append(StudentFeeCollection.objects.create(
+
                 admission_no=admission.admission_no,
+
                 student_userid=getattr(student_db, 'student_userid', '') if student_db else '',
-                semester=getattr(admission, 'semester', None),
-                academic_year=student_db.academic_year if student_db else '',
+
+                semester=getattr(student_db, 'semester', None) or getattr(student_db, 'current_year', None),
+
+                academic_year=academic_year,  # ✅ always string
+
                 fee_type=fee_type_instance,
+
                 amount=opt_fee.amount,
+
                 paid_amount=Decimal('0'),
+
                 applied_discount=Decimal('0'),
+
                 balance_amount=balance,
+
                 due_date=opt_fee.due_date,
+
                 payment_date=timezone.now().date(),
+
                 status='Pending'
+
             ))
-
+ 
     # Remove scholarship from display
+
     fee_collections = [f for f in fee_collections if f.fee_type.name.lower() != 'scholarship']
+
     fee_collections = sorted(fee_collections, key=lambda x: x.due_date or timezone.datetime.max.date())
-
+ 
     fee_display_list = []
+
     for fee in fee_collections:
+
         total_paid = sum(fc.paid_amount for fc in StudentFeeCollection.objects.filter(
+
             admission_no=fee.admission_no, fee_type=fee.fee_type))
+
         total_discount = sum(fc.applied_discount for fc in StudentFeeCollection.objects.filter(
+
             admission_no=fee.admission_no, fee_type=fee.fee_type))
+
         balance = fee.amount - total_paid - total_discount
-
+ 
         fee_display_list.append({
+
             'id': fee.id,
+
             'fee_type': fee.fee_type,
+
             'due_date': fee.due_date,
+
             'amount': fee.amount,
+
             'paid_amount': total_paid,
+
             'balance_amount': balance,
+
             'status': 'Paid' if balance == 0 else 'Partial' if total_paid > 0 else 'Pending',
+
             'applied_discount': total_discount,
+
             'total_paid': total_paid + total_discount,
+
         })
-
+ 
     context = {
-        'student': {
-            'admission_no': admission.admission_no,
-            'student_name': admission.student_name,
-            'admission_course_type': admission.course_type.name,
-            'admission_course': admission.course.name,
-            'admission_dob': admission.dob,
-            'admission_father_name': admission.father_name,
-            'admission_father_mobile_no': admission.father_mobile_no,
-            'category': admission.category,
-            'roll_number': getattr(student_db, 'student_userid', '') if student_db else '',
-            'semester': getattr(student_db, 'semester', None),
-            'current_year': getattr(student_db, 'current_year', None),
-        },
-        'fee_collections': fee_display_list,
-        'now': timezone.now()
-    }
 
+        'student': {
+
+            'admission_no': admission.admission_no,
+
+            'student_name': admission.student_name,
+
+            'admission_course_type': admission.course_type.name,
+
+            'admission_course': admission.course.name,
+
+            'admission_dob': admission.dob,
+
+            'admission_father_name': admission.father_name,
+
+            'admission_father_mobile_no': admission.father_mobile_no,
+
+            'category': admission.category,
+
+            'roll_number': getattr(student_db, 'student_userid', '') if student_db else '',
+
+            'semester': getattr(student_db, 'semester', None),
+
+            'current_year': getattr(student_db, 'current_year', None),
+
+        },
+
+        'fee_collections': fee_display_list,
+
+        'now': timezone.now()
+
+    }
+ 
     return render(request, 'fees/fee_collection_collect.html', context)
 
-
+ 
 
 
 
@@ -1043,17 +1233,175 @@ from django.db.models import Q
 from urllib.parse import unquote
 import re
 
+# from django.shortcuts import get_object_or_404
+# from django.utils.timezone import localdate, now as timezone_now
+# from collections import defaultdict
+# from decimal import Decimal
+# from django.db import transaction
+# from django.db.models import Q
+# from django.http import HttpResponse
+# from django.template.loader import get_template
+# from weasyprint import HTML
+# import re
+# from urllib.parse import unquote
+
+
+# @custom_login_required
+# def generate_receipt(request, admission_no):
+#     admission_no = unquote(admission_no).split(" - ")[0].strip()
+
+#     # Fetch admission object
+#     admission = PUAdmission.objects.filter(admission_no__iexact=admission_no).first()
+#     if not admission:
+#         admission = get_object_or_404(DegreeAdmission, admission_no__iexact=admission_no)
+
+#     # Get student DB
+#     student_db = (
+#         StudentDatabase.objects.filter(pu_admission=admission).first()
+#         if isinstance(admission, PUAdmission)
+#         else StudentDatabase.objects.filter(degree_admission=admission).first()
+#     )
+
+#     today = localdate()
+
+#     # All fee collections
+#     all_fee_collections = StudentFeeCollection.objects.filter(
+#         admission_no=admission.admission_no
+#     ).order_by('fee_type__name', 'id')
+
+#     # Filter today's payments
+#     fee_collections_today = all_fee_collections.filter(
+#         payment_date=today
+#     ).filter(Q(paid_amount__gt=0) | Q(applied_discount__gt=0))
+
+#     # 🚨 LOG: Today's Fee Collections
+#     print("\n===== DEBUG: Today's Fee Collections =====")
+#     for fee in fee_collections_today:
+#         print(f"FeeType: {fee.fee_type.name}, Paid: {fee.paid_amount}, Discount: {fee.applied_discount}, Payment Date: {fee.payment_date}, Receipt: {fee.receipt_no}, Mode: {fee.payment_mode}")
+
+#     # Assign receipt numbers
+#     with transaction.atomic():
+#         for fee in fee_collections_today:
+#             current_year = timezone_now().year
+#             next_year = current_year + 1
+#             promotion_cycle = f"{current_year}-{str(next_year)[-2:]}"
+#             course_name = admission.course.name.replace(" ", "").upper()[:4]
+#             prefix = f"PSCM-001-{promotion_cycle}-{course_name}-"
+
+#             last_receipt = StudentFeeCollection.objects.filter(
+#                 receipt_no__startswith=prefix
+#             ).order_by('-receipt_no').values_list('receipt_no', flat=True).first()
+
+#             last_number = int(re.search(r'(\d{4})$', last_receipt).group(1)) if last_receipt else 0
+#             new_receipt = f"{prefix}{str(last_number + 1).zfill(4)}"
+
+#             fee.receipt_no = new_receipt
+#             fee.receipt_date = today
+#             fee.save()
+
+#             print(f"Assigned Receipt No: {new_receipt} to FeeType: {fee.fee_type.name}")
+
+#     # Grouping and calculating
+#     fee_group_map = defaultdict(list)
+#     for fee in all_fee_collections:
+#         fee_group_map[fee.fee_type].append(fee)
+
+#     grouped_fees = []
+#     total_paid = Decimal('0.00')
+#     total_discount = Decimal('0.00')
+#     total_amount = Decimal('0.00')
+
+#     print("\n===== DEBUG: Grouped Fee Summary =====")
+#     for fee_type, entries in fee_group_map.items():
+#         today_paid = sum(e.paid_amount or Decimal('0.00') for e in entries if e.payment_date == today)
+#         today_discount = sum(e.applied_discount or Decimal('0.00') for e in entries if e.payment_date == today)
+#         has_today_activity = any(
+#                 e.payment_date == today and ((e.paid_amount or 0) > 0 or (e.applied_discount or 0) > 0)
+#                 for e in entries
+#             )
+#         if not has_today_activity:
+#              continue
+
+
+
+#         fee_name = fee_type.name
+#         if fee_name[-1].isdigit():
+#             prefix, number = fee_name[:-1], fee_name[-1]
+#             display_name = f"{prefix} (Installment {number})"
+#         else:
+#             display_name = fee_name
+
+#         amount = entries[0].amount
+#         total_paid_for_type = sum(e.paid_amount or Decimal('0.00') for e in entries)
+#         total_discount_for_type = sum(e.applied_discount or Decimal('0.00') for e in entries)
+#         balance_amount = amount - total_paid_for_type - total_discount_for_type
+
+#         print(f"Type: {display_name}, Amt: {amount}, Paid Today: {today_paid}, Discount Today: {today_discount}, Balance: {balance_amount}")
+
+#         grouped_fees.append({
+#             'display_fee_type': display_name,
+#             'amount': amount,
+#             'paid_amount': today_paid,
+#             'applied_discount': today_discount,
+#             'balance_amount': balance_amount,
+#             'due_date': entries[0].due_date
+#         })
+
+#         total_paid += today_paid
+#         total_discount += today_discount
+#         total_amount += amount
+
+#     student = {
+#         'admission_no': admission.admission_no,
+#         'student_name': admission.student_name,
+#         'admission_course_type': getattr(admission, 'course_type', ''),
+#         'admission_course': getattr(admission, 'course', ''),
+#         'roll_number': getattr(student_db, 'student_userid', ''),
+#         'semester': getattr(student_db, 'semester', None),
+#         'current_year': getattr(student_db, 'current_year', None),
+#     }
+
+#     context = {
+#         'admission': admission,
+#         'student': student,
+#         'fee_collections': grouped_fees,
+#         'total_paid': total_paid,
+#         'applied_discount': total_discount,
+#         'total_amount': total_amount,
+#         'total_due': sum(f['balance_amount'] for f in grouped_fees),
+#         'now': timezone_now(),
+#         'receipt_no': fee_collections_today[0].receipt_no if fee_collections_today else None,
+#         'receipt_date': fee_collections_today[0].receipt_date if fee_collections_today else None,
+#         'payment_mode': fee_collections_today[0].payment_mode if fee_collections_today else '',
+#     }
+
+#     html_string = get_template('fees/student_receipt_pdf.html').render(context)
+#     html = HTML(string=html_string)
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = f'inline; filename="Receipt_{admission.admission_no}.pdf"'
+#     html.write_pdf(target=response)
+
+#     return response
+
+
+
+
+
+import os
+import re
+from decimal import Decimal
+from collections import defaultdict
+from urllib.parse import unquote
+
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import localdate, now as timezone_now
-from collections import defaultdict
-from decimal import Decimal
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse
 from django.template.loader import get_template
-from weasyprint import HTML
-import re
-from urllib.parse import unquote
+
+import pdfkit
+from django.conf import settings
 
 
 @custom_login_required
@@ -1084,10 +1432,11 @@ def generate_receipt(request, admission_no):
         payment_date=today
     ).filter(Q(paid_amount__gt=0) | Q(applied_discount__gt=0))
 
-    # 🚨 LOG: Today's Fee Collections
+    # Debug log
     print("\n===== DEBUG: Today's Fee Collections =====")
     for fee in fee_collections_today:
-        print(f"FeeType: {fee.fee_type.name}, Paid: {fee.paid_amount}, Discount: {fee.applied_discount}, Payment Date: {fee.payment_date}, Receipt: {fee.receipt_no}, Mode: {fee.payment_mode}")
+        print(f"FeeType: {fee.fee_type.name}, Paid: {fee.paid_amount}, Discount: {fee.applied_discount}, "
+              f"Payment Date: {fee.payment_date}, Receipt: {fee.receipt_no}, Mode: {fee.payment_mode}")
 
     # Assign receipt numbers
     with transaction.atomic():
@@ -1126,13 +1475,11 @@ def generate_receipt(request, admission_no):
         today_paid = sum(e.paid_amount or Decimal('0.00') for e in entries if e.payment_date == today)
         today_discount = sum(e.applied_discount or Decimal('0.00') for e in entries if e.payment_date == today)
         has_today_activity = any(
-                e.payment_date == today and ((e.paid_amount or 0) > 0 or (e.applied_discount or 0) > 0)
-                for e in entries
-            )
+            e.payment_date == today and ((e.paid_amount or 0) > 0 or (e.applied_discount or 0) > 0)
+            for e in entries
+        )
         if not has_today_activity:
-             continue
-
-
+            continue
 
         fee_name = fee_type.name
         if fee_name[-1].isdigit():
@@ -1146,7 +1493,8 @@ def generate_receipt(request, admission_no):
         total_discount_for_type = sum(e.applied_discount or Decimal('0.00') for e in entries)
         balance_amount = amount - total_paid_for_type - total_discount_for_type
 
-        print(f"Type: {display_name}, Amt: {amount}, Paid Today: {today_paid}, Discount Today: {today_discount}, Balance: {balance_amount}")
+        print(f"Type: {display_name}, Amt: {amount}, Paid Today: {today_paid}, "
+              f"Discount Today: {today_discount}, Balance: {balance_amount}")
 
         grouped_fees.append({
             'display_fee_type': display_name,
@@ -1161,6 +1509,7 @@ def generate_receipt(request, admission_no):
         total_discount += today_discount
         total_amount += amount
 
+    # Student details
     student = {
         'admission_no': admission.admission_no,
         'student_name': admission.student_name,
@@ -1171,6 +1520,7 @@ def generate_receipt(request, admission_no):
         'current_year': getattr(student_db, 'current_year', None),
     }
 
+    # Template context
     context = {
         'admission': admission,
         'student': student,
@@ -1185,16 +1535,33 @@ def generate_receipt(request, admission_no):
         'payment_mode': fee_collections_today[0].payment_mode if fee_collections_today else '',
     }
 
+    # Render HTML
     html_string = get_template('fees/student_receipt_pdf.html').render(context)
-    html = HTML(string=html_string)
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename="Receipt_{admission.admission_no}.pdf"'
-    html.write_pdf(target=response)
 
+    # ✅ Configure wkhtmltopdf path
+    wkhtmltopdf_path = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe\bin\wkhtmltopdf.exe"
+    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+    # ✅ PDF options (A5 layout + margins)
+    options = {
+        "page-size": "A5",
+        "encoding": "UTF-8",
+        "enable-local-file-access": True,
+        "zoom": "1.25",
+        "no-outline": None,
+        "margin-top": "0.2in",
+        "margin-bottom": "0.2in",
+        "margin-left": "0.2in",
+        "margin-right": "0.2in",
+        "print-media-type": True,
+        "load-error-handling": "ignore",
+    }
+
+    # ✅ Generate PDF
+    pdf = pdfkit.from_string(html_string, False, configuration=config, options=options)
+
+    # ✅ Return PDF as inline display (like WeasyPrint version)
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="Receipt_{admission.admission_no}.pdf"'
     return response
-
-
-
-
-
 

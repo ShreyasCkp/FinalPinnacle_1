@@ -1,28 +1,135 @@
-<!-- templates/exam_type_form.html -->
+﻿<!-- templates/exam_type_form.html -->
 {% extends 'layout.html' %}
 {% block title %}
     {% if form_type == 'create' %}Create Exam Type{% elif form_type == 'edit' %}Edit Exam Type{% elif form_type == 'view' %}View Exam Type{% else %}Delete Exam Type{% endif %}
 {% endblock %}
 
 {% block content %}
-<h2>
-    {% if form_type == 'create' %}Create Exam Type{% elif form_type == 'edit' %}Edit Exam Type{% elif form_type == 'view' %}View Exam Type{% else %}Delete Exam Type{% endif %}
-</h2>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+        color: #333;
+    }
 
-<form method="post">
-    {% csrf_token %}
-    {% if form_type != 'view' and form_type != 'delete' %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Save</button>
-    {% elif form_type == 'view' %}
-    <p><strong>Title:</strong> {{ exam_type.title }}</p>
-    <p><strong>Active:</strong> {{ exam_type.is_active }}</p>
-    <p><strong>Created At:</strong> {{ exam_type.created_at }}</p>
-    <a href="{% url 'exam_type_list' %}" class="btn btn-secondary">Back</a>
-    {% elif form_type == 'delete' %}
-    <p>Are you sure you want to delete "<strong>{{ exam_type.title }}</strong>"?</p>
-    <button type="submit" class="btn btn-danger">Confirm Delete</button>
-    <a href="{% url 'exam_type_list' %}" class="btn btn-secondary">Cancel</a>
-    {% endif %}
-</form>
+    .form-container {
+        max-width: 800px;
+        margin: 25px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        margin-top: 0px;
+        font-weight: 600;
+        color: #8b0000;
+        margin-bottom: 20px;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 6px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 16px;
+        width: 100%;
+    }
+
+    /* 🚀 remove the ugly box around fieldset */
+    fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        min-width: 0;
+    }
+
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .btn-back {
+        background-color: #800000;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background-color: #6e0000;
+            color: white;
+        }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .content {
+        padding: 25px 26px 40px;
+        margin-left: 200px;
+    }
+</style>
+
+
+<div class="container form-container">
+    <h3>
+        {% if form_type == 'create' %}Create Exam Type{% elif form_type == 'edit' %}Edit Exam Type{% elif form_type == 'view' %}View Exam Type{% else %}Delete Exam Type{% endif %}
+    </h3>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form_type == 'create' or form_type == 'edit' %}
+        {{ form.as_p }}
+        <div class="btn-container">
+            <a href="{% url 'exam_type_list' %}" class="btn-back">Back</a>
+            <button type="submit" class="btn-save">
+                {% if form.instance.pk %}Update{% else %}Save{% endif %}
+            </button>
+        </div>
+
+        {% elif form_type == 'view' %}
+        <fieldset disabled>
+            {{ form.as_p }}
+        </fieldset>
+        <div class="btn-container">
+            <a href="{% url 'exam_type_list' %}" class="btn-back">Back</a>
+        </div>
+
+        {% elif form_type == 'delete' %}
+        <fieldset disabled>
+            {{ form.as_p }}
+        </fieldset>
+        <div class="btn-container">
+            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            <a href="{% url 'exam_type_list' %}" class="btn-back">Cancel</a>
+        </div>
+        {% endif %}
+    </form>
+</div>
 {% endblock %}

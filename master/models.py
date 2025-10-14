@@ -531,18 +531,18 @@ class CollegeStartEndPlan(models.Model):
 
 
 
-from django.db import models
-from master.models import Course, CourseType, AcademicYear, Employee, Semester  # Assuming Employee is your Faculty model
+# from django.db import models
+# from master.models import Course, CourseType, AcademicYear, Employee, Semester  # Assuming Employee is your Faculty model
 
-class ClassTeacher(models.Model):
-    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
-    program_type = models.ForeignKey(CourseType, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
-    faculty = models.ForeignKey(Employee, on_delete=models.CASCADE)
+# class ClassTeacher(models.Model):
+#     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
+#     program_type = models.ForeignKey(CourseType, on_delete=models.CASCADE)
+#     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+#     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
+#     faculty = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
-    class Meta:
-        unique_together = ('academic_year', 'program_type', 'course', 'semester')  # One class teacher per class
+#     class Meta:
+#         unique_together = ('academic_year', 'program_type', 'course', 'semester')  # One class teacher per class
 
-    def __str__(self):
-        return f"{self.faculty} - {self.course.name} Sem {self.semester}"
+#     def __str__(self):
+#         return f"{self.faculty} - {self.course.name} Sem {self.semester}"

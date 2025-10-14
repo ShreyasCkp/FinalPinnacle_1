@@ -304,11 +304,27 @@
             {% if emp.subject_assignments.exists %}
             {% for assign in emp.subject_assignments.all %}
             <tr class="employee-row" data-emp-id="{{ emp.id }}">
-
                 <td>{{ emp.emp_code }}</td>
                 <td>{{ emp.name }}</td>
-                <td>{{ emp.employee_userid }}</td>
-                <td>{{ emp.employee_password }}</td>
+
+                <!-- User Id -->
+                <td>
+                    {% if emp.category == 'Teaching Staff' %}
+                    {{ emp.employee_userid|default:"-" }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+
+                <!-- Password -->
+                <td>
+                    {% if emp.category == 'Teaching Staff' %}
+                    {{ emp.employee_password|default:"-" }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+
                 <td>{{ emp.category }}</td>
                 <td>{{ emp.designation }}</td>
                 <td>{{ emp.role }}</td>
@@ -332,16 +348,32 @@
                             <i class="fas fa-trash-alt"></i>
                         </a>
                     </form>
-
                 </td>
             </tr>
             {% endfor %}
             {% else %}
-            <tr class="employee-row">
+            <tr class="employee-row" data-emp-id="{{ emp.id }}">
                 <td>{{ emp.emp_code }}</td>
                 <td>{{ emp.name }}</td>
-                <td>-</td>
-                <td>-</td>
+
+                <!-- User Id -->
+                <td>
+                    {% if emp.category == 'Teaching Staff' %}
+                    {{ emp.employee_userid|default:"-" }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+
+                <!-- Password -->
+                <td>
+                    {% if emp.category == 'Teaching Staff' %}
+                    {{ emp.employee_password|default:"-" }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+
                 <td>{{ emp.category }}</td>
                 <td>{{ emp.designation }}</td>
                 <td>{{ emp.role }}</td>
@@ -367,16 +399,16 @@
                             <i class="fas fa-trash-alt"></i>
                         </a>
                     </form>
-
                 </td>
             </tr>
             {% endif %}
             {% empty %}
             <tr>
-                <td colspan="12" class="text-center text-muted">No employees found.</td>
+                <td colspan="14" class="text-center text-muted">No employees found.</td>
             </tr>
             {% endfor %}
         </tbody>
+
     </table>
 </div>
 

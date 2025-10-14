@@ -115,7 +115,40 @@
         width: 100%;
     }
 
+    .btn-save {
+        background-color: #a23030;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
 
+        .btn-save:hover {
+            background-color: #8a1f1f;
+        }
+
+    .btn-back {
+        background-color: #800000;
+        font-weight: 500;
+        padding: 6px 16px;
+        font-size: 14px;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background-color: #6e0000;
+            color: white;
+        }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
 
     .firsts {
         display: flex;
@@ -287,15 +320,16 @@
                 {% endfor %}
             </tbody>
         </table>
-
-        <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-success px-4">
-                <i class="bi bi-save"></i> Save Marks
+        <!-- Buttons -->
+        <div class="btn-container">
+            <a href="{% url 'exam_marks_list' %}" class="btn-back">Back</a>
+            {% if not view_mode %}
+            <button type="submit" class="btn-save">
+                {% if form.instance.pk %}Update{% else %}Save{% endif %}
             </button>
-            <a href="{% url 'exam_marks_list' %}" class="btn btn-secondary ms-2">
-                <i class="bi bi-arrow-left"></i> Back to List
-            </a>
+            {% endif %}
         </div>
+
     </form>
     {% else %}
     <p class="text-muted">Please select filters to load students and enter marks.</p>

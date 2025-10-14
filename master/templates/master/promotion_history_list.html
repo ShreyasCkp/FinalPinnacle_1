@@ -207,7 +207,7 @@
                 <th>From Sem</th>
                 <th>To Sem</th>
                 <th>Promotion Date</th>
-                <th>Actions</th>
+                <!--<th>Actions</th>-->
             </tr>
         </thead>
         <tbody>
@@ -222,7 +222,7 @@
                 <td>{{ history.from_semester|default:"-" }}</td>
                 <td>{{ history.to_semester|default:"-" }}</td>
                 <td>{{ history.promotion_date }}</td>
-                <td>
+                <!--<td>
                     <a href="{% url 'promotion_history_edit' history.id %}" class="icon-btn" title="Edit">
                         <i class="fas fa-edit"></i>
                     </a>
@@ -233,7 +233,7 @@
                        onclick="confirmPromotionDelete('{{ history.id }}', '{{ history.student_name }}')">
                         <i class="fas fa-trash-alt"></i>
                     </a>
-                </td>
+                </td>-->
             </tr>
             {% empty %}
             <tr>

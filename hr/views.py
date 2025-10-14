@@ -816,8 +816,85 @@ from django.shortcuts import render, get_object_or_404
 from datetime import date, datetime
 from .models import Employee, EmployeeSalarySlip, EmployeeSalaryDeclaration
 
+from django.shortcuts import render
+from decimal import Decimal
+from datetime import date
+from django.templatetags.static import static
+from .models import Employee, EmployeeSalarySlip, EmployeeSalaryDeclaration
+
+# helper function to convert number to words
+def number_to_words(num):
+    a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+         'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+         'Seventeen', 'Eighteen', 'Nineteen']
+    b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+
+    def in_words(n):
+        if n < 20:
+            return a[n]
+        if n < 100:
+            return b[n // 10] + ('' if n % 10 == 0 else ' ' + a[n % 10])
+        if n < 1000:
+            return a[n // 100] + ' Hundred' + ('' if n % 100 == 0 else ' ' + in_words(n % 100))
+        if n < 100000:
+            return in_words(n // 1000) + ' Thousand' + ('' if n % 1000 == 0 else ' ' + in_words(n % 1000))
+        if n < 10000000:
+            return in_words(n // 100000) + ' Lakh' + ('' if n % 100000 == 0 else ' ' + in_words(n % 100000))
+        return in_words(n // 10000000) + ' Crore' + ('' if n % 10000000 == 0 else ' ' + in_words(n % 10000000))
+
+    if num == 0:
+        return "Zero"
+
+    rupees = int(num)
+    paise = round((num - rupees) * 100)
+
+    result = in_words(rupees) + " Rupees"
+    if paise > 0:
+        result += " and " + in_words(paise) + " Paise"
+    return result + " Only"
+
+
+
+from django.shortcuts import render
+from decimal import Decimal
+from datetime import date
+from django.templatetags.static import static
+from .models import Employee, EmployeeSalarySlip, EmployeeSalaryDeclaration
+
+# helper function to convert number to words
+def number_to_words(num):
+    a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+         'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+         'Seventeen', 'Eighteen', 'Nineteen']
+    b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+
+    def in_words(n):
+        if n < 20:
+            return a[n]
+        if n < 100:
+            return b[n // 10] + ('' if n % 10 == 0 else ' ' + a[n % 10])
+        if n < 1000:
+            return a[n // 100] + ' Hundred' + ('' if n % 100 == 0 else ' ' + in_words(n % 100))
+        if n < 100000:
+            return in_words(n // 1000) + ' Thousand' + ('' if n % 1000 == 0 else ' ' + in_words(n % 1000))
+        if n < 10000000:
+            return in_words(n // 100000) + ' Lakh' + ('' if n % 100000 == 0 else ' ' + in_words(n % 100000))
+        return in_words(n // 10000000) + ' Crore' + ('' if n % 10000000 == 0 else ' ' + in_words(n % 10000000))
+
+    if num == 0:
+        return "Zero"
+
+    rupees = int(num)
+    paise = round((num - rupees) * 100)
+
+    result = in_words(rupees) + " Rupees"
+    if paise > 0:
+        result += " and " + in_words(paise) + " Paise"
+    return result + " Only"
+
+
+from decimal import Decimal
 def employee_salary_slip_view(request):
-    # Get employee_id from cookie
     employee_id = request.COOKIES.get("employee_id")
 
     if not employee_id:
@@ -825,7 +902,6 @@ def employee_salary_slip_view(request):
             "error": "Employee not identified. Please login again."
         })
 
-    # Validate employee exists
     try:
         employee = Employee.objects.get(id=employee_id)
     except Employee.DoesNotExist:
@@ -833,26 +909,55 @@ def employee_salary_slip_view(request):
             "error": "Employee not found in system. Please contact HR."
         })
 
-    # Get year & month from query params (default current)
     today = date.today()
     year = int(request.GET.get("year", today.year))
     month = int(request.GET.get("month", today.month))
 
-    # Get slip for that employee/month/year
     salary_slip = EmployeeSalarySlip.objects.filter(
         employee=employee, year=year, month=month
     ).first()
 
     declaration = EmployeeSalaryDeclaration.objects.filter(employee=employee).first()
 
+    # --- Handle missing data gracefully ---
+    if not salary_slip or not declaration:
+        return render(request, "hr/salary_slip.html", {
+            "error": "Salary slip or declaration not available for this month.",
+            "salary_slip": None,
+            "declaration": None,
+        })
+
+    logo_url = request.build_absolute_uri(static("images/logo.png")) 
+
+    # ✅ Attendance calculation
+    total_days, _ = get_working_days(year, month)
+    attendance_qs = attendance.objects.filter(employee=employee, date__year=year, date__month=month)
+    present_days = attendance_qs.filter(status="Present").count()
+    lop_days = sum(1 for att in attendance_qs if getattr(att, 'lop', False) and att.date.day < 25)
+
+    final_salary = salary_slip.final_salary or 0
+    total_deductions = (declaration.total_deductions or 0) + Decimal(salary_slip.salary_deduction or 0)
+
+    net_pay_in_words = num2words(final_salary, to="currency", lang="en_IN").replace("euro", "rupees").title()
+
     context = {
         "employee": employee,
-        "salary_slip": salary_slip,
         "declaration": declaration,
+        "total_deductions": total_deductions,
         "month": month,
         "year": year,
         "months": range(1, 13),
         "years": range(2020, today.year + 1),
+        "logo_url": logo_url,
+        "is_pdf": False,
+        "net_pay_in_words": net_pay_in_words,
+        'salary_slip': {
+            'present_days': present_days,
+            'total_days': total_days,
+            'lop_days': lop_days,
+            'net_pay': final_salary,
+            'salary_deduction': salary_slip.salary_deduction or 0,
+        },
     }
     return render(request, "hr/salary_slip.html", context)
 
@@ -919,14 +1024,16 @@ def employee_annual_dashboard(request):
         "year": current_year,
         "declaration": declaration  # send once for Average Pay Distribution chart
     })
+
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 import weasyprint
 from datetime import date
+from decimal import Decimal
+from num2words import num2words
 
 def download_payslip(request, month, year=None):
-    # Get employee_id from GET params first, fallback to cookie
     employee_id = request.GET.get('employee_id') or request.COOKIES.get("employee_id")
     if not employee_id:
         return HttpResponse("Employee not identified", status=400)
@@ -938,42 +1045,48 @@ def download_payslip(request, month, year=None):
     year = int(year)
     month = int(month)
 
-    # Fetch salary slip
-    salary_slip = EmployeeSalarySlip.objects.filter(employee=employee, month=month, year=year).first()
+    salary_slip = EmployeeSalarySlip.objects.filter(
+        employee=employee, month=month, year=year
+    ).first()
 
-    # Fetch salary declaration
     declaration = EmployeeSalaryDeclaration.objects.filter(employee=employee).first()
 
-    # Attendance & LOP calculation
     total_days, _ = get_working_days(year, month)
     attendance_qs = attendance.objects.filter(employee=employee, date__year=year, date__month=month)
     present_days = attendance_qs.filter(status="Present").count()
     lop_days = sum(1 for att in attendance_qs if getattr(att, 'lop', False) and att.date.day < 25)
 
-    # Net pay calculation if not stored in salary_slip
     net_pay = declaration.net_pay if declaration else 0
     total_deductions = lop_days * (net_pay / total_days if total_days > 0 else 0)
-    final_salary = net_pay - total_deductions
+    final_salary = salary_slip.final_salary
+    # ✅ Convert Net Pay to Words
+    net_pay_in_words = num2words(final_salary, to="currency", lang="en_IN").replace("euro", "rupees").title()
 
-    # Pass all the variables your template expects
+    logo_url = request.build_absolute_uri(static("images/logo.png"))
+    total_deductions = declaration.total_deductions + Decimal(salary_slip.salary_deduction or 0)
+
     context = {
         'employee': employee,
         'salary_slip': {
             'present_days': present_days,
             'total_days': total_days,
             'lop_days': lop_days,
-            'net_pay_in_words': salary_slip.net_pay_in_words if salary_slip else "",
+            'net_pay': final_salary,
+            'net_pay_in_words': net_pay_in_words,
+            'salary_deduction': salary_slip.salary_deduction if salary_slip else 0,
         },
         'declaration': declaration,
         'month': month,
         'year': year,
         'final_salary': final_salary,
-        'is_pdf': True,  # you can keep this for template adjustments
+        'logo_url': logo_url,
+        "total_deductions": total_deductions,
+        'is_pdf': True,
     }
 
     html_string = render_to_string('hr/salary_slip.html', context)
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="Payslip_{employee.emp_code}_{month}_{year}.pdf"'
-    weasyprint.HTML(string=html_string).write_pdf(response)
+    weasyprint.HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(response)
     return response

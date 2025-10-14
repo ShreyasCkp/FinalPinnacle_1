@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Admission Confirmation - Parent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        h2 {
+            color: #800000;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Dear {{ parent_name }},</h2>
+        <p>Your ward {{ student_name }}'s admission has been successfully confirmed.</p>
+
+        <h4>Parent Portal Credentials:</h4>
+        <ul>
+            <li><strong>User ID:</strong> {{ parent_userid }}</li>
+            <li><strong>Password:</strong> {{ parent_password }}</li>
+        </ul>
+
+        {% if course %}
+        <p><strong>Course:</strong> {{ course }}</p>
+        {% endif %}
+
+        {% if year %}
+        <p><strong>Academic Year:</strong> {{ year }}</p>
+        {% endif %}
+
+        <p>Please keep your credentials safe and use them to monitor your ward's progress on the portal.</p>
+
+        <p class="footer">Best Regards,<br>Admissions Office</p>
+    </div>
+</body>
+</html>

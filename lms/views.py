@@ -242,21 +242,21 @@ def student_dashboard(request):
             'url': '/student/grades/',
         })
 
-    # 🔔 Leave Notifications (from faculty)
-   # 🔔 Leave Notifications (from faculty)
-    leave_notifications = StudentNotification.objects.filter(
-    student=student,
-    is_read=False
-    ).order_by('-created_at')[:5]
+   #  # 🔔 Leave Notifications (from faculty)
+   # # 🔔 Leave Notifications (from faculty)
+   #  leave_notifications = StudentNotification.objects.filter(
+   #  student=student,
+   #  is_read=False
+   #  ).order_by('-created_at')[:5]
 
 
-    for note in leave_notifications:
-        notifications.append({
-            'type': 'leave',
-            'title': note.title,
-            'message': note.message,
-            'url': f'/student/notification/read/{note.id}/',  # ✅ This won't change
-        })
+    # for note in leave_notifications:
+    #     notifications.append({
+    #         'type': 'leave',
+    #         'title': note.title,
+    #         'message': note.message,
+    #         'url': f'/student/notification/read/{note.id}/',  # ✅ This won't change
+    #     })
 
 
 
@@ -656,6 +656,30 @@ def my_fees_view(request):
 
     fee_display_list.sort(key=lambda x: x['due_date'])
 
+    # --- Build daily_receipts like parent view ---
+    receipt_dict = defaultdict(list)
+    for payment in all_fees:
+        if payment.receipt_no:  # Only include valid receipts
+            receipt_dict[payment.receipt_no].append(payment)
+
+    daily_receipts = []
+    for receipt_no, transactions in receipt_dict.items():
+        if not transactions:
+            continue  # skip if no transactions
+
+        first_txn = transactions[0]  # 👈 use the first transaction
+
+        fee_types = ", ".join([t.fee_type.name for t in transactions if t.fee_type])
+
+        daily_receipts.append({
+            'admission_no': first_txn.admission_no,   # ✅ fixed
+            'receipt_no': receipt_no,
+            'receipt_date': first_txn.receipt_date,
+            'fee_types': fee_types,
+            'transactions': transactions,
+        })
+
+
     context = {
         'fee_collections': fee_display_list,
         'total_fees': total_fees,
@@ -663,9 +687,180 @@ def my_fees_view(request):
         'pending': total_pending,
         'overdue': total_overdue,
         'overdue_fee_types': sorted(overdue_fee_types),  # pass sorted list to template
+        'daily_receipts': daily_receipts,  # 👈 now available in template
     }
 
     return render(request, 'lms/my_fee.html', context)
+
+
+# from django.http import HttpResponse
+# from django.template.loader import get_template
+# from django.db.models import Q
+# from weasyprint import HTML
+# from master.models import StudentDatabase
+# from fees.models import StudentFeeCollection
+
+
+# def student_fee_receipt(request, admission_no, receipt_no):
+#     # Fetch all transactions for this receipt
+#     transactions = StudentFeeCollection.objects.filter(
+#         admission_no=admission_no,
+#         receipt_no=receipt_no
+#     )
+
+#     if not transactions.exists():
+#         return HttpResponse("Receipt not found", status=404)
+
+#     # Fetch student
+#     student = StudentDatabase.objects.filter(
+#         Q(pu_admission__admission_no=admission_no) |
+#         Q(degree_admission__admission_no=admission_no)
+#     ).first()
+
+#     if not student:
+#         return HttpResponse("Student not found", status=404)
+
+#     # Prepare fee rows + totals
+#     fees = []
+#     total_amount = total_paid = total_discount = total_balance = 0
+#     for txn in transactions:
+#         fees.append({
+#             "name": txn.fee_type.name if txn.fee_type else "",
+#             "due_date": txn.due_date,
+#             "amount": txn.amount,
+#             "paid": txn.paid_amount,
+#             "discount": getattr(txn, "applied_discount", 0),
+#             "balance": txn.balance_amount,
+#         })
+#         total_amount += txn.amount
+#         total_paid += txn.paid_amount
+#         total_discount += getattr(txn, "applied_discount", 0)
+#         total_balance += txn.balance_amount
+
+#     # Context for template
+#     context = {
+#         "student": student,
+#         "admission_no": student.get_admission_no(),
+#         "year_display": student.current_year or student.semester,
+#         "receipt": {
+#             "receipt_no": receipt_no,
+#             "date": transactions[0].receipt_date,
+#             "mode_of_payment": transactions[0].payment_mode,
+#             "status": "Paid" if total_paid > 0 else transactions[0].status,
+#             "fees": fees,
+#             "total_amount": total_amount,
+#             "total_paid": total_paid,
+#             "total_due": total_balance,
+#         },
+#     }
+
+#     # Render template to HTML
+#     template = get_template("lms/student_fee_download.html")
+#     html_string = template.render(context)
+
+#     # Generate PDF with WeasyPrint (important: base_url for images/fonts)
+#     pdf = HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf()
+
+#     # Return as downloadable PDF
+#     response = HttpResponse(pdf, content_type="application/pdf")
+#     response["Content-Disposition"] = f'attachment; filename="receipt_{receipt_no}.pdf"'
+#     return response
+
+
+
+import os
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.db.models import Q
+from master.models import StudentDatabase
+from fees.models import StudentFeeCollection
+import pdfkit
+from django.conf import settings
+
+
+def student_fee_receipt(request, admission_no, receipt_no):
+    # Fetch all transactions for this receipt
+    transactions = StudentFeeCollection.objects.filter(
+        admission_no=admission_no,
+        receipt_no=receipt_no
+    )
+
+    if not transactions.exists():
+        return HttpResponse("Receipt not found", status=404)
+
+    # Fetch student
+    student = StudentDatabase.objects.filter(
+        Q(pu_admission__admission_no=admission_no) |
+        Q(degree_admission__admission_no=admission_no)
+    ).first()
+
+    if not student:
+        return HttpResponse("Student not found", status=404)
+
+    # Prepare fee rows + totals
+    fees = []
+    total_amount = total_paid = total_discount = total_balance = 0
+    for txn in transactions:
+        fees.append({
+            "name": txn.fee_type.name if txn.fee_type else "",
+            "due_date": txn.due_date,
+            "amount": txn.amount,
+            "paid": txn.paid_amount,
+            "discount": getattr(txn, "applied_discount", 0),
+            "balance": txn.balance_amount,
+        })
+        total_amount += txn.amount
+        total_paid += txn.paid_amount
+        total_discount += getattr(txn, "applied_discount", 0)
+        total_balance += txn.balance_amount
+
+    # Context for template
+    context = {
+        "student": student,
+        "admission_no": student.get_admission_no(),
+        "year_display": student.current_year or student.semester,
+        "receipt": {
+            "receipt_no": receipt_no,
+            "date": transactions[0].receipt_date,
+            "mode_of_payment": transactions[0].payment_mode,
+            "status": "Paid" if total_paid > 0 else transactions[0].status,
+            "fees": fees,
+            "total_amount": total_amount,
+            "total_paid": total_paid,
+            "total_due": total_balance,
+        },
+    }
+
+    # Render HTML template
+    template = get_template("lms/student_fee_download.html")
+    html_string = template.render(context)
+
+    # ✅ Set correct wkhtmltopdf path
+    wkhtmltopdf_path = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe\bin\wkhtmltopdf.exe"
+    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+    # ✅ PDF options
+    options = {
+        "page-size": "A5",
+        "encoding": "UTF-8",
+        "enable-local-file-access": True,
+        "zoom": "1.25",
+        "no-outline": None,
+        "margin-top": "0.2in",
+        "margin-bottom": "0.2in",
+        "margin-left": "0.2in",
+        "margin-right": "0.2in",
+        "print-media-type": True,
+        "load-error-handling": "ignore",
+    }
+
+    # ✅ Generate PDF
+    pdf = pdfkit.from_string(html_string, False, configuration=config, options=options)
+
+    # ✅ Return as downloadable PDF
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="receipt_{receipt_no}.pdf"'
+    return response
 
 
 
@@ -760,15 +955,23 @@ def my_assignments_view(request):
     submitted_assignment_ids = submissions_dict.keys()
 
     # Stats
-    pending = sum(1 for a in assignments if a.id not in submitted_assignment_ids)
+    # Stats
+    pending = sum(
+        1 for a in assignments
+        if not submissions_dict.get(a.id)
+        or submissions_dict[a.id].student_status in ['pending', 'in_progress', 'rejected', 'review']
+    )
+
     submitted = sum(
         1 for a in assignments
         if submissions_dict.get(a.id) and submissions_dict[a.id].student_status == 'submitted'
     )
+
     graded = sum(
         1 for a in assignments
         if submissions_dict.get(a.id) and submissions_dict[a.id].student_status == 'graded'
     )
+
 
     # Calculate total max marks
     total_max_marks = assignments.aggregate(total=Sum('marks'))['total'] or 0
@@ -4245,7 +4448,6 @@ def student_marksheet_view(request, student_id):
 
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
@@ -4350,3 +4552,1095 @@ def employee_change_passcode(request):
 
 def settings_view(request):
     return render(request, 'lms/settings.html')
+
+
+#parent Login
+
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from admission.models import ConfirmedAdmission
+
+# ---------------- Parent Login -----------------
+def parent_login_view(request):
+    context = {}
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+
+        context['selected_user'] = username
+
+        try:
+            parent = ConfirmedAdmission.objects.get(parent_userid=username)
+
+            if parent.parent_is_locked:
+                context['error'] = "Account is locked due to multiple failed attempts. Contact admin."
+                return render(request, 'lms/parent_login.html', context)
+
+            if parent.parent_password != password:
+                parent.parent_wrong_attempts += 1
+                if parent.parent_wrong_attempts >= 3:
+                    parent.parent_is_locked = True
+                parent.save()
+                context['error'] = "Invalid password."
+                return render(request, 'lms/parent_login.html', context)
+
+            # Reset wrong attempts on success
+            parent.parent_wrong_attempts = 0
+            parent.save()
+
+            # Determine redirect URL first
+            if not parent.parent_password_changed:
+                redirect_url = reverse('parent_set_password')
+            elif not parent.parent_passcode_set:
+                redirect_url = reverse('parent_set_passcode')
+            else:
+                redirect_url = reverse('parent_dashboard')
+
+            # Create response and set cookies
+            response = HttpResponseRedirect(redirect_url)
+            response.set_cookie('parent_id', parent.id)
+            response.set_cookie('parent_userid', parent.parent_userid)
+            response.set_cookie('parent_name', parent.pu_admission.student_name if parent.pu_admission else parent.degree_admission.student_name)
+            return response
+
+        except ConfirmedAdmission.DoesNotExist:
+            context['error'] = "Invalid credentials."
+
+    return render(request, 'lms/parent_login.html', context)
+
+
+def parent_logout(request):
+    request.session.flush()
+    response = redirect('parent_login_view')
+    response.delete_cookie('parent_id')
+    response.delete_cookie('parent_userid')
+    response.delete_cookie('parent_name')
+    return response
+
+
+def parent_set_password(request):
+    parent_userid = request.COOKIES.get('parent_userid')
+    if not parent_userid:
+        return redirect('parent_login_view')
+
+    parent = ConfirmedAdmission.objects.get(parent_userid=parent_userid)
+    error = None
+
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if new_password != confirm_password:
+            error = "Passwords do not match."
+        elif len(new_password) < 8:
+            error = "Password must be at least 8 characters."
+        else:
+            parent.parent_password = new_password
+            parent.parent_password_changed = True
+            parent.save()
+            return redirect('parent_set_passcode')
+
+    return render(request, 'lms/parent_set_password.html', {
+        'error': error,
+        'selected_user': parent.parent_userid
+    })
+
+
+def parent_set_passcode(request):
+    parent_userid = request.COOKIES.get('parent_userid')
+    if not parent_userid:
+        return redirect('parent_login_view')
+
+    parent = ConfirmedAdmission.objects.get(parent_userid=parent_userid)
+    error = None
+
+    if request.method == 'POST':
+        passcode = request.POST.get('passcode')
+
+        if not passcode.isdigit() or len(passcode) < 4:
+            error = "Passcode must be at least 4 digits."
+        else:
+            parent.parent_passcode = passcode
+            parent.parent_passcode_set = True
+            parent.save()
+            return redirect('parent_dashboard')
+
+    return render(request, 'lms/parent_set_passcode.html', {'error': error})
+
+
+def parent_change_password(request):
+    parent_userid = request.COOKIES.get('parent_userid')
+    if not parent_userid:
+        return redirect('parent_login_view')
+
+    parent = ConfirmedAdmission.objects.get(parent_userid=parent_userid)
+    error = None
+    success = None
+
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if old_password != parent.parent_password:
+            error = "Old password is incorrect."
+        elif new_password != confirm_password:
+            error = "New passwords do not match."
+        elif len(new_password) < 8:
+            error = "New password must be at least 8 characters."
+        else:
+            parent.parent_password = new_password
+            parent.save()
+            success = "Password updated successfully."
+
+    return render(request, 'lms/parent_change_password.html', {
+        'error': error,
+        'success': success
+    })
+
+
+def parent_change_passcode(request):
+    parent_userid = request.COOKIES.get('parent_userid')
+    if not parent_userid:
+        return redirect('parent_login_view')
+
+    parent = ConfirmedAdmission.objects.get(parent_userid=parent_userid)
+    error = None
+    success = None
+
+    if request.method == 'POST':
+        old_passcode = request.POST.get('old_passcode')
+        new_passcode = request.POST.get('new_passcode')
+        confirm_passcode = request.POST.get('confirm_passcode')
+
+        if old_passcode != parent.parent_passcode:
+            error = "Old passcode is incorrect."
+        elif new_passcode != confirm_passcode:
+            error = "New passcodes do not match."
+        elif not new_passcode.isdigit() or len(new_passcode) < 4:
+            error = "New passcode must be at least 4 digits."
+        else:
+            parent.parent_passcode = new_passcode
+            parent.save()
+            success = "Passcode updated successfully."
+
+    return render(request, 'lms/parent_change_passcode.html', {
+        'error': error,
+        'success': success
+    })
+
+
+def parent_password_reset_view(request):
+    context = {}
+    username = request.GET.get('username') or request.POST.get('username')
+    context['selected_user'] = username
+    context['reset'] = True  # tell the template we are in reset mode
+
+    from .models import ParentDatabase  # or wherever parent info is stored
+
+    if request.method == 'POST':
+        try:
+            parent = ParentDatabase.objects.get(parent_userid=username)
+        except ParentDatabase.DoesNotExist:
+            context['error'] = "User does not exist."
+            return render(request, 'lms/parent_login.html', context)
+
+        # Step 1: Verify passcode
+        if 'verify_passcode' in request.POST:
+            input_passcode = request.POST.get('passcode', '').strip()
+            if not parent.passcode_set or parent.passcode != input_passcode:
+                context['error'] = "Incorrect passcode."
+            else:
+                context['passcode_verified'] = True  # show new password fields
+
+        # Step 2: Reset password after passcode verified
+        elif 'password_reset_submit' in request.POST:
+            new_password = request.POST.get('new_password', '').strip()
+            confirm_password = request.POST.get('confirm_password', '').strip()
+
+            import re
+            pattern = r'^[A-Z][a-z]*[!@#$%^&*(),.?":{}|<>][a-zA-Z0-9]*[0-9]+$'
+
+            if new_password != confirm_password:
+                context['error'] = "Passwords do not match."
+                context['passcode_verified'] = True
+            elif not re.match(pattern, new_password) or not (8 <= len(new_password) <= 16):
+                context['error'] = "Invalid password format."
+                context['passcode_verified'] = True
+            else:
+                parent.parent_password = new_password
+                parent.password_changed = True
+                parent.save()
+                context['success_message'] = "Password reset successfully."
+                return redirect('parent_login_view')
+
+    return render(request, 'lms/parent_login.html', context)
+
+
+from django.shortcuts import render, redirect
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Avg, Count
+
+from lms.models import Assignment, AssignmentSubmission, Exam
+from master.models import StudentDatabase, CollegeStartEndPlan
+from attendence.models import StudentAttendance
+from admission.models import ConfirmedAdmission
+
+
+def parent_dashboard(request):
+
+    parent_userid = request.COOKIES.get('parent_userid')
+
+    if not parent_userid:
+
+        return redirect('parent_login_view')
+ 
+    try:
+
+        confirmed_student = ConfirmedAdmission.objects.get(parent_userid=parent_userid)
+
+    except ConfirmedAdmission.DoesNotExist:
+
+        return redirect('parent_login_view')
+ 
+    # get the student record linked by student_userid
+
+    try:
+
+        student = StudentDatabase.objects.get(student_userid=confirmed_student.student_userid)
+
+    except StudentDatabase.DoesNotExist:
+
+        return redirect('parent_login_view')
+ 
+    # --- Parent Name logic based on primary_guardian ---
+
+    parent_name = None
+
+    if confirmed_student.pu_admission:
+
+        pu = confirmed_student.pu_admission
+
+        if pu.primary_guardian == "father":
+
+            parent_name = pu.father_name
+
+        elif pu.primary_guardian == "mother":
+
+            parent_name = pu.mother_name
+
+        elif pu.primary_guardian == "guardian":
+
+            parent_name = pu.guardian_name
+
+    elif confirmed_student.degree_admission:
+
+        deg = confirmed_student.degree_admission
+
+        if deg.primary_guardian == "father":
+
+            parent_name = deg.father_name
+
+        elif deg.primary_guardian == "mother":
+
+            parent_name = deg.mother_name
+
+        elif deg.primary_guardian == "guardian":
+
+            parent_name = deg.guardian_name
+ 
+    # === Academic Info ===
+
+    today = timezone.now().date()
+
+    semester = student.semester or student.current_year
+
+    assignments = Assignment.objects.filter(
+
+        academic_year=student.academic_year,
+
+        program_type=student.course_type,
+
+        course=student.course,
+
+        semester_number=semester
+
+    )
+ 
+    submissions = AssignmentSubmission.objects.filter(
+
+        student_userid=student.student_userid,
+
+        assignment__in=assignments
+
+    )
+
+    submissions_dict = {sub.assignment_id: sub for sub in submissions}
+
+    submitted_ids = set(submissions_dict.keys())
+ 
+    pending_assignments = sum(1 for a in assignments if a.id not in submitted_ids)
+ 
+    # Assignments due this week
+
+    end_week = today + timedelta(days=7)
+
+    due_this_week = assignments.filter(due_date__range=(today, end_week)).count()
+ 
+    # === GPA / Score ===
+
+    average_score = submissions.filter(student_status='graded').aggregate(
+
+        avg_score=Avg('score')
+
+    )['avg_score'] or 0.0
+ 
+    # === Attendance Calculation ===
+
+    attendance_rate = 0.0
+
+    total_sessions = 0
+
+    attended_sessions = 0
+ 
+    try:
+
+        plan = CollegeStartEndPlan.objects.get(
+
+            program_type=student.course_type,
+
+            academic_year=student.academic_year,
+
+            course=student.course,
+
+            semester_number=semester
+
+        )
+ 
+        start_date = plan.start_date
+
+        end_date = min(plan.end_date, today)
+ 
+        attendance_qs = StudentAttendance.objects.filter(
+
+            student=student,
+
+            course=student.course,
+
+            semester_number=semester,
+
+            academic_year=student.academic_year,
+
+            attendance_date__range=(start_date, end_date)
+
+        )
+ 
+        total_sessions = attendance_qs.count()
+
+        attended_sessions = attendance_qs.filter(status__in=['present', 'late']).count()
+ 
+        attendance_rate = round((attended_sessions / total_sessions) * 100, 2) if total_sessions > 0 else 0.0
+ 
+    except CollegeStartEndPlan.DoesNotExist:
+
+        pass
+ 
+    # === Notifications (same as student dashboard, keep as-is) ===
+
+    assignments_due = assignments.filter(due_date__gte=today).annotate(
+
+        submitted_count=Count('submissions')
+
+    )
+
+    assignment_notifications = assignments_due.filter(submitted_count=0)
+ 
+    exam_notifications = Exam.objects.filter(
+
+        course=student.course,
+
+        exam_date__range=(today, today + timedelta(days=30))
+
+    )
+ 
+    notifications = []
+ 
+    for assignment in assignment_notifications:
+
+        notifications.append({
+
+            'type': 'assignment',
+
+            'title': f"Assignment due on {assignment.due_date.strftime('%d %b')}",
+
+            'url': '/parent/assignments/',
+
+        })
+ 
+    for exam in exam_notifications:
+
+        days_until_exam = (exam.exam_date - today).days
+
+        if days_until_exam in [7, 30]:
+
+            label = f"{exam.subject.name} exam on {exam.exam_date.strftime('%d %b')} (in {days_until_exam} days)"
+
+        else:
+
+            label = f"{exam.subject.name} exam on {exam.exam_date.strftime('%d %b')}"
+
+        notifications.append({
+
+            'type': 'exam',
+
+            'title': label,
+
+            'url': '/parent/grades/',
+
+        })
+ 
+    # === Fee Summary (reused from parent_fee_view) ===
+    is_pu = student.pu_admission is not None
+    admission = student.pu_admission if is_pu else student.degree_admission if student.degree_admission else None
+
+    admission_no = admission.admission_no if admission else None
+    academic_year_obj = AcademicYear.objects.filter(year=student.academic_year).first()
+
+    # Always check last available period for dashboard summary
+    if is_pu:
+        selected_period = student.current_year or 1
+    else:
+        selected_period = student.semester or 1
+
+    fee_decl_query = {
+        "academic_year": academic_year_obj,
+        "course_type": student.course_type,
+        "course": student.course,
+        "semester": selected_period,
+    }
+    fee_decl = FeeDeclaration.objects.filter(**fee_decl_query).first()
+
+    # Determine selected period
+    if is_pu:
+        selected_period = student.current_year or 1
+    else:
+        selected_period = student.semester or 1
+
+    # Try fetching FeeDeclaration based on semester/year
+    fee_decl = FeeDeclaration.objects.filter(
+        academic_year=academic_year_obj,
+        course_type=student.course_type,
+        course=student.course,
+    ).filter(
+        # For PU: match current_year; For Degree: match semester
+        semester=selected_period if not is_pu else None
+    ).filter(
+        current_year=selected_period if is_pu else None
+    ).first()
+
+    # Calculate Fee KPI totals
+    total_fee = 0
+    paid_fee = 0
+    due_fee = 0
+    fee_status = "N/A"
+
+    if fee_decl:
+        for fee in fee_decl.fee_details.all():
+            declared = fee.amount or 0
+            total_fee += declared
+
+            # Fetch all payments for this fee type & admission_no
+            all_payments = StudentFeeCollection.objects.filter(
+                admission_no=admission_no,
+                fee_type=fee.fee_type
+            )
+            paid_sum = all_payments.aggregate(total=Sum('paid_amount'))['total'] or 0
+            paid_fee += paid_sum
+
+        due_fee = total_fee - paid_fee
+        fee_status = "Paid" if due_fee <= 0 else "Due"
+
+    # === Context ===
+    context = {
+        'student': student,
+        'confirmed_student': confirmed_student,
+        'parent_name': parent_name,
+        'logged_in_parent': confirmed_student,
+        'parent_userid': parent_userid,
+
+        # Cards
+        'pending_assignments': pending_assignments,
+        'due_this_week': due_this_week,
+        'current_gpa': round(average_score, 2),
+        'attendance_rate': attendance_rate,
+
+        # Fee Card
+        'fee_status': fee_status,
+        'due_fee': due_fee,
+        'paid_fee': paid_fee,
+        'total_fee': total_fee,
+
+        # Notifications
+        'notifications': notifications,
+        'notification_count': len(notifications),
+    }
+
+    return render(request, 'lms/parent_dashboard.html', context)
+
+#parent dashboard
+
+from django.shortcuts import render
+
+def show_page(request):
+    return render(request, "lms/parent_dashboard.html")
+
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from admission.models import ConfirmedAdmission
+from master.models import StudentDatabase
+from attendence.models import StudentAttendance
+from timetable.models import TimetableEntry
+from fees.models import StudentFeeCollection
+from collections import defaultdict
+from datetime import date
+from decimal import Decimal
+import calendar
+
+WEEKDAY_MAP = {
+    0: 'Monday', 1: 'Tuesday', 2: 'Wednesday',
+    3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'
+}
+
+def parent_attendance_view(request):
+    parent_id = request.COOKIES.get('parent_id')
+    if not parent_id:
+        return redirect("parent_login")
+
+    parent = get_object_or_404(ConfirmedAdmission, id=parent_id)
+    student = get_object_or_404(StudentDatabase, student_userid=parent.student_userid)
+
+    months = [
+        (5, 'May'), (6, 'Jun'), (7, 'Jul'), (8, 'Aug'), (9, 'Sep'), (10, 'Oct'),
+        (11, 'Nov'), (12, 'Dec'), (1, 'Jan'), (2, 'Feb'), (3, 'Mar'), (4, 'Apr')
+    ]
+
+    attendance_grid = []
+    total_present = total_late = total_absent = total_holiday = total_weekend = 0
+    total_classes = total_attended_classes = 0
+
+    today = date.today()
+    current_year = today.year
+    start_year = current_year - 1 if today.month < 5 else current_year
+    start_date = date(start_year, 5, 1)
+    end_date = date(start_year + 1, 4, 30)
+
+    records = StudentAttendance.objects.filter(
+        student=student,
+        attendance_date__range=(start_date, end_date)
+    )
+
+    attendance_by_date = defaultdict(list)
+    for record in records:
+        attendance_by_date[record.attendance_date].append(record)
+
+    timetable_entries = TimetableEntry.objects.filter(
+        course=student.course,
+        semester_number=getattr(student, 'semester_number', 1)
+    )
+
+    timetable_by_day = defaultdict(list)
+    for entry in timetable_entries:
+        timetable_by_day[entry.day].append(entry)
+
+    valid_days_per_month = {}
+    for m, _ in months:
+        y = start_year if m >= 5 else start_year + 1
+        valid_days_per_month[m] = calendar.monthrange(y, m)[1]
+
+    for day in range(1, 32):
+        if not any(day <= valid_days_per_month[m] for m, _ in months):
+            continue
+
+        row = []
+        for m, _ in months:
+            y = start_year if m >= 5 else start_year + 1
+            try:
+                current_date = date(y, m, day)
+            except ValueError:
+                row.append('')
+                continue
+
+            if current_date > today:
+                row.append('')
+                continue
+
+            weekday = current_date.weekday()
+            weekday_name = WEEKDAY_MAP[weekday]
+
+            if weekday in [5, 6]:  # Weekend
+                row.append('W')
+                total_weekend += 1
+                continue
+
+            scheduled_classes = timetable_by_day.get(weekday_name, [])
+            class_count = len(scheduled_classes)
+
+            if class_count == 0:
+                row.append('H')
+                total_holiday += 1
+                continue
+
+            attended_count = 0
+            records_today = attendance_by_date.get(current_date, [])
+            for sched_class in scheduled_classes:
+                if any(r.subject == sched_class.subject and r.status in ['present', 'late'] for r in records_today):
+                    attended_count += 1
+
+            total_classes += class_count
+            total_attended_classes += attended_count
+
+            if attended_count > 0:
+                percentage = round((attended_count / class_count) * 100)
+                row.append(f'P ({percentage}%)')
+                total_present += 1
+            else:
+                row.append('A (0%)')
+                total_absent += 1
+
+        attendance_grid.append({'day': day, 'statuses': row})
+
+    total_late = records.filter(status='L').count()
+    attendance_percentage = round((total_attended_classes / total_classes) * 100, 2) if total_classes else 0
+
+    context = {
+        "student": student,
+        "months": months,
+        "attendance_grid": attendance_grid,
+        "total_present": total_present,
+        "total_late": total_late,
+        "total_absent": total_absent,
+        "total_holiday": total_holiday,
+        "total_weekend": total_weekend,
+        "attendance_percentage": attendance_percentage,
+        "logged_in_parent": parent
+    }
+    return render(request, "lms/parent_attendance.html", context)
+
+
+
+from django.shortcuts import render, get_object_or_404
+from master.models import StudentDatabase
+from lms.models import FinalExamMarks
+from admission.models import ConfirmedAdmission
+
+def parent_marksheet_download(request):
+    # Get logged-in parent
+    parent_userid = request.COOKIES.get('parent_userid')
+    if not parent_userid:
+        return redirect('parent_login_view')
+
+    # Get confirmed student linked to parent
+    try:
+        confirmed_student = ConfirmedAdmission.objects.get(parent_userid=parent_userid)
+    except ConfirmedAdmission.DoesNotExist:
+        return redirect('parent_login_view')
+
+    # Get student record
+    try:
+        student = StudentDatabase.objects.get(student_userid=confirmed_student.student_userid)
+    except StudentDatabase.DoesNotExist:
+        return redirect('parent_login_view')
+
+    # Check if student has marks
+    has_marks = FinalExamMarks.objects.filter(student=student).exists()
+
+    context = {
+        "student": student,
+        "has_marks": has_marks,
+    }
+
+    return render(request, "lms/parent_marksheet_download.html", context)
+
+
+
+
+
+from django.shortcuts import render, redirect
+from fees.models import StudentFeeCollection, FeeDeclaration, FeeDeclarationDetail
+from admission.models import ConfirmedAdmission
+from master.models import StudentDatabase
+from django.contrib import messages
+from django.db.models import Q
+
+def parent_fee_view(request):
+    parent_userid = request.COOKIES.get("parent_userid")
+    if not parent_userid:
+        return redirect("parent_login_view")
+
+    # Get student
+    try:
+        confirmed_student = ConfirmedAdmission.objects.get(parent_userid=parent_userid)
+        student = StudentDatabase.objects.get(student_userid=confirmed_student.student_userid)
+    except (ConfirmedAdmission.DoesNotExist, StudentDatabase.DoesNotExist):
+        return redirect("parent_login_view")
+
+    # Determine admission type (PU or Degree)
+    is_pu = student.pu_admission is not None
+    admission = student.pu_admission if is_pu else student.degree_admission if student.degree_admission else None
+    parent_name = admission.parent_name() if admission else ""
+    parent_email = admission.parent_email() if admission else ""
+    parent_phone = admission.parent_phone() if admission else ""
+    parent_adhar = admission.parent_adhar() if admission else ""
+    parent_occupation = admission.parent_occupation() if admission else ""
+
+    # Determine max_period and year_display based on admission type
+    if is_pu:
+        if student.current_year:
+            max_period = student.current_year
+            year_display = f"{admission.course.name} {student.current_year}"
+        else:
+            messages.error(request, "Student year is not set. Please contact admin.")
+            max_period = 1
+            year_display = f"{admission.course.name} N/A"
+    else:
+        if student.semester:
+            max_period = 1  # always 1, because Degree semesters are not numeric for dropdown
+            year_display = f"{admission.course.name} {student.semester}"
+        else:
+            messages.error(request, "Student semester is not set. Please contact admin.")
+            max_period = 1
+            year_display = f"{admission.course.name} N/A"
+
+    # Available periods for dropdown (only for PU)
+    available_periods = list(range(1, max_period + 1)) if is_pu else [1]
+    period_label = "Year" if is_pu else "Semester"
+
+    # Get selected period from GET params or default to latest
+    selected_period = int(request.GET.get('period', available_periods[-1]))
+    if selected_period not in available_periods:
+        selected_period = available_periods[-1]
+
+    # Get admission_no
+    admission_no = admission.admission_no if admission else None
+    # Convert StudentDatabase.academic_year (string) → AcademicYear object
+    academic_year_obj = AcademicYear.objects.filter(year=student.academic_year).first()
+
+    # Build FeeDeclaration query
+    fee_decl_query = {
+        "academic_year": academic_year_obj,
+        "course_type": student.course_type,
+        "course": student.course,
+        "semester": selected_period,
+    }
+    fee_decl = FeeDeclaration.objects.filter(**fee_decl_query).first()
+
+    # If no FeeDeclaration found for PU, try matching by academic_year only
+    if not fee_decl and is_pu:
+        fee_decl_query_alt = {
+            "academic_year": academic_year_obj,
+            "course_type": student.course_type,
+            "course": student.course
+        }
+        fee_decl = FeeDeclaration.objects.filter(**fee_decl_query_alt).first()
+
+    # --- Build fee status list per fee type and period ---
+    fee_status_list = []
+    if fee_decl:
+        for fee in fee_decl.fee_details.all():
+            # Fetch ALL payments for this fee type and admission
+            all_payments = StudentFeeCollection.objects.filter(
+                admission_no=admission_no,
+                fee_type=fee.fee_type
+            ).order_by('-paid_amount', '-receipt_date')
+
+            # Prefer payment for selected period, else latest payment
+            payment = None
+            for p in all_payments:
+                if getattr(p, 'semester', None) == selected_period:
+                    payment = p
+                    break
+            if not payment and all_payments.exists():
+                payment = all_payments.first()  # fallback to latest/highest payment
+
+            fee_status_list.append({
+                "fee_type": fee.fee_type.name,
+                "declared_amount": fee.amount,
+                "due_date": fee.due_date,
+                "paid_amount": payment.paid_amount if payment else 0,
+                "discount": payment.applied_discount if payment else 0,
+                "balance": payment.balance_amount if payment else fee.amount,
+                "status": payment.status if payment else "Pending",
+                # "receipt_no": payment.receipt_no if payment else "",      # commented
+                # "receipt_date": payment.receipt_date if payment else "",  # commented
+            })
+
+    # --- Group payments by receipt_no ---
+    receipt_dict = defaultdict(list)
+
+    # Filter StudentFeeCollection by selected period (year for PU, semester for Degree)
+    if is_pu:
+        all_payments = StudentFeeCollection.objects.filter(
+            admission_no=admission_no,
+            semester=selected_period  # here semester field stores year for PU
+        ).order_by('-receipt_date', '-id')
+    else:
+        all_payments = StudentFeeCollection.objects.filter(
+            admission_no=admission_no,
+            semester=selected_period
+        ).order_by('-receipt_date', '-id')
+
+    for payment in all_payments:
+        if payment.receipt_no:  # Only consider transactions with a receipt_no
+            receipt_dict[payment.receipt_no].append(payment)
+
+    # Build daily_receipts list
+    daily_receipts = []
+    for receipt_no, transactions in receipt_dict.items():
+        fee_types = ", ".join([t.fee_type.name for t in transactions if t.fee_type])
+        daily_receipts.append({
+            'receipt_no': receipt_no,
+            'receipt_date': transactions[0].receipt_date,
+            'admission_no': admission_no,
+            'fee_types': fee_types,
+            'transactions': transactions,
+        })
+
+    # Build student details dictionary
+    student_details = {
+        'student_name': student.student_name,
+        'roll_no': getattr(student, 'student_userid', ''),  # student_userid as roll_no
+        'course': student.course.name if student.course else "",
+        'year': f"{admission.course.name} {student.current_year}" if is_pu else f"{admission.course.name} {student.semester}" if admission else "",
+        'course_type': student.course_type.name if student.course_type else "",
+        'admission_no': admission.admission_no if admission else "",
+        'mobile': student.student_phone_no or getattr(admission, 'student_phone_no', '') or getattr(admission, 'parent_phone', ''),
+        'category': getattr(admission, 'category', "") if admission else "",
+        'semester': getattr(student, 'semester', None),
+        'current_year': getattr(student, 'current_year', None),
+        'dob': getattr(admission, 'dob', None) if admission else None,
+        'father_name': getattr(admission, 'father_name', "") if admission else "",
+        'mother_name': getattr(admission, 'mother_name', "") if admission else "",
+    }
+
+    context = {
+        "parent_name": parent_name,
+        "parent_email": parent_email,
+        "parent_phone": parent_phone,
+        "parent_adhar": parent_adhar,
+        "parent_occupation": parent_occupation,
+        "student_name": student.student_name,
+        "roll_no": getattr(student, 'student_userid', ''),
+        "course": student.course.name if student.course else "",
+        "year": student.current_year if student.current_year else student.semester,
+        "course_type": student.course_type.name if student.course_type else "",
+        "admission_no": admission.admission_no if admission else "",
+        "mobile": student.student_phone_no,
+        "category": admission.category if admission else "",
+        "periods": available_periods,
+        "selected_period": selected_period,
+        "period_label": period_label,
+        "fee_status_list": fee_status_list,
+        "student_details": student_details,
+        # Updated receipts for download table
+        "daily_receipts": daily_receipts,
+    }
+
+    return render(request, "lms/parent_fee_view.html", context)
+
+
+
+
+
+# from django.http import HttpResponse
+# from django.template.loader import get_template
+# from weasyprint import HTML
+# from master.models import StudentDatabase
+# from fees.models import StudentFeeCollection
+# from django.db.models import Q
+
+# def generate_daily_receipt(request, admission_no, receipt_no):
+#     # Fetch all transactions for this receipt
+#     transactions = StudentFeeCollection.objects.filter(
+#         admission_no=admission_no,
+#         receipt_no=receipt_no
+#     )
+
+#     if not transactions.exists():
+#         return HttpResponse("No transactions found for this receipt.", status=404)
+
+#     # Fetch student via related PU or Degree admission
+#     try:
+#         student = StudentDatabase.objects.get(
+#             Q(pu_admission__admission_no=admission_no) |
+#             Q(degree_admission__admission_no=admission_no)
+#         )
+#         admission = (
+#             student.pu_admission
+#             if student.pu_admission and student.pu_admission.admission_no == admission_no
+#             else student.degree_admission
+#         )
+#     except StudentDatabase.DoesNotExist:
+#         student = None
+#         admission = None
+
+#     # Prepare totals
+#     total_amount = sum(t.amount for t in transactions)
+#     total_paid = sum(t.paid_amount for t in transactions)
+#     total_discount = sum(t.applied_discount for t in transactions)
+#     total_balance = sum(t.balance_amount for t in transactions)
+#     total_due = total_balance
+#     payment_mode = transactions.first().payment_mode or "-"
+
+#     # Build receipt details list
+#     receipt_details = [
+#         {
+#             "fee_type": txn.fee_type.name,
+#             "receipt_no": txn.receipt_no,
+#             "receipt_date": txn.receipt_date,
+#             "amount": txn.amount,
+#             "paid_amount": txn.paid_amount,
+#             "discount": txn.applied_discount,
+#             "balance": txn.balance_amount,
+#             "status": txn.status,
+#             "payment_mode": txn.payment_mode or "-",
+#         }
+#         for txn in transactions
+#     ]
+
+#     context = {
+#         "student": student,
+#         "admission_no": admission_no,
+#         "receipt_no": receipt_no,
+#         "receipt_date": transactions.first().receipt_date,
+#         "receipt_details": receipt_details,
+#         "total_amount": total_amount,
+#         "total_paid": total_paid,
+#         "total_discount": total_discount,
+#         "total_balance": total_balance,
+#         "total_due": total_due,
+#         "course": admission.course.name if admission and admission.course else "-",
+#         "parent_name": getattr(admission, "parent_name", "-") if admission else "-",
+#         "payment_mode": payment_mode,
+#     }
+
+#     # Render HTML
+#     template = get_template("lms/parent_fee_download.html")
+#     html_string = template.render(context)
+
+#     # Generate PDF (IMPORTANT: base_url to resolve assets properly)
+#     pdf = HTML(string=html_string, base_url=request.build_absolute_uri("/")).write_pdf()
+
+#     # Return as downloadable PDF
+#     response = HttpResponse(pdf, content_type="application/pdf")
+#     response["Content-Disposition"] = f'attachment; filename="fee_receipt_{student}.pdf"'
+#     return response
+
+
+
+
+import os
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from master.models import StudentDatabase
+from fees.models import StudentFeeCollection
+from django.db.models import Q
+import pdfkit
+from django.conf import settings
+
+def generate_daily_receipt(request, admission_no, receipt_no):
+    # Fetch transactions
+    transactions = StudentFeeCollection.objects.filter(
+        admission_no=admission_no,
+        receipt_no=receipt_no
+    )
+    if not transactions.exists():
+        return HttpResponse("No transactions found for this receipt.", status=404)
+
+    # Fetch student
+    try:
+        student = StudentDatabase.objects.get(
+            Q(pu_admission__admission_no=admission_no) |
+            Q(degree_admission__admission_no=admission_no)
+        )
+        admission = (
+            student.pu_admission
+            if student.pu_admission and student.pu_admission.admission_no == admission_no
+            else student.degree_admission
+        )
+    except StudentDatabase.DoesNotExist:
+        student = None
+        admission = None
+
+    # Totals
+    total_amount = sum(t.amount for t in transactions)
+    total_paid = sum(t.paid_amount for t in transactions)
+    total_discount = sum(t.applied_discount for t in transactions)
+    total_balance = sum(t.balance_amount for t in transactions)
+    total_due = total_balance
+    payment_mode = transactions.first().payment_mode or "-"
+
+    # Receipt details
+    receipt_details = [
+        {
+            "fee_type": txn.fee_type.name,
+            "receipt_no": txn.receipt_no,
+            "receipt_date": txn.receipt_date,
+            "amount": txn.amount,
+            "paid_amount": txn.paid_amount,
+            "discount": txn.applied_discount,
+            "balance": txn.balance_amount,
+            "status": txn.status,
+            "payment_mode": txn.payment_mode or "-",
+        }
+        for txn in transactions
+    ]
+
+    context = {
+        "student": student,
+        "admission_no": admission_no,
+        "receipt_no": receipt_no,
+        "receipt_date": transactions.first().receipt_date,
+        "receipt_details": receipt_details,
+        "total_amount": total_amount,
+        "total_paid": total_paid,
+        "total_discount": total_discount,
+        "total_balance": total_balance,
+        "total_due": total_due,
+        "course": admission.course.name if admission and admission.course else "-",
+        "parent_name": getattr(admission, "parent_name", "-") if admission else "-",
+        "payment_mode": payment_mode,
+    }
+
+    # Render HTML template
+    html_string = render_to_string("lms/parent_fee_download.html", context)
+
+    # wkhtmltopdf path (set correct path for your system or Azure)
+    wkhtmltopdf_path = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe\bin\wkhtmltopdf.exe"
+    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+    # Options to preserve exact layout
+    options = {
+        "page-size": "A5",
+        "encoding": "UTF-8",
+        "enable-local-file-access": True,  # allow local CSS/images
+        "zoom": "1.25",  # scale to match your HTML
+        "no-outline": None,
+        "margin-top": "0.2in",
+        "margin-bottom": "0.2in",
+        "margin-left": "0.2in",
+        "margin-right": "0.2in",
+        "load-error-handling": "ignore",  # ignores missing fonts/images
+        "print-media-type": True,  # apply @media print CSS
+    }
+
+    # Generate PDF
+    pdf = pdfkit.from_string(html_string, False, configuration=config, options=options)
+
+    # Return PDF response
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="fee_receipt_{admission_no}.pdf"'
+    return response

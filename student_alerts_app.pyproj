@@ -177,6 +177,12 @@
     <Compile Include="master\__init__.py" />
     <Compile Include="master\migrations\__init__.py" />
     <Compile Include="manage.py" />
+    <Compile Include="student_alerts_app\deployment.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="student_alerts_app\storage.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="student_alerts_app\__init__.py" />
     <Compile Include="student_alerts_app\settings.py" />
     <Compile Include="student_alerts_app\urls.py" />
@@ -278,6 +284,9 @@
   <ItemGroup>
     <Content Include="admission\templates\admission\admin_student_payment_history_receipt.html" />
     <Content Include="admission\templates\admission\admission_dashboard.html" />
+    <Content Include="admission\templates\admission\admission_email.html" />
+    <Content Include="admission\templates\admission\admission_email_parent.html" />
+    <Content Include="admission\templates\admission\admission_email_student.html" />
     <Content Include="admission\templates\admission\admission_form_fee_receipt.html" />
     <Content Include="admission\templates\admission\admission_list.html" />
     <Content Include="admission\templates\admission\confirmed_admissions.html" />
@@ -380,6 +389,17 @@
     <Content Include="lms\templates\lms\my_certificates.html" />
     <Content Include="lms\templates\lms\my_grades.html" />
     <Content Include="lms\templates\lms\my_study_materials.html" />
+    <Content Include="lms\templates\lms\parent_attendance.html" />
+    <Content Include="lms\templates\lms\parent_change_passcode.html" />
+    <Content Include="lms\templates\lms\parent_change_password.html" />
+    <Content Include="lms\templates\lms\parent_dashboard.html" />
+    <Content Include="lms\templates\lms\parent_fee_download.html" />
+    <Content Include="lms\templates\lms\parent_fee_view.html" />
+    <Content Include="lms\templates\lms\parent_layout.html" />
+    <Content Include="lms\templates\lms\parent_login.html" />
+    <Content Include="lms\templates\lms\parent_marksheet_download.html" />
+    <Content Include="lms\templates\lms\parent_set_passcode.html" />
+    <Content Include="lms\templates\lms\parent_set_password.html" />
     <Content Include="lms\templates\lms\settings.html" />
     <Content Include="lms\templates\lms\student_book_detail.html" />
     <Content Include="lms\templates\lms\student_book_list.html" />
@@ -387,6 +407,7 @@
     <Content Include="lms\templates\lms\student_certificate.html" />
     <Content Include="lms\templates\lms\student_change_passcode.html" />
     <Content Include="lms\templates\lms\student_change_password.html" />
+    <Content Include="lms\templates\lms\student_fee_download.html" />
     <Content Include="lms\templates\lms\student_leave_form.html" />
     <Content Include="lms\templates\lms\student_leave_list.html" />
     <Content Include="lms\templates\lms\student_marksheet.html" />

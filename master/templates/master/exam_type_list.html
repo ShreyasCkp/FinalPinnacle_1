@@ -1,9 +1,8 @@
 <!-- templates/exam_type_list.html -->
 {% extends 'layout.html' %}
-{% block title %}Exam Types{% endblock %}
+{% block title %}Exam Types List{% endblock %}
 
 {% block content %}
-
 <style>
     body {
         background-color: #f0f2f5;
@@ -19,7 +18,7 @@
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 2px;
+        margin-top: 20px;
         box-sizing: border-box;
     }
 
@@ -59,6 +58,16 @@
             background-color: #a10000;
         }
 
+    .search-input {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 220px;
+    }
+
     table {
         width: 100%;
         font-size: 12px;
@@ -67,10 +76,14 @@
     }
 
     th, td {
-        padding: 1px;
+        padding: 0px;
         text-align: center;
         border: 1px solid #dee2e6;
-        vertical-align: middle;
+        vertical-align: middle !important;
+    }
+
+    td {
+        font-size: 9px;
     }
 
     thead {
@@ -81,10 +94,6 @@
     tr:nth-child(even) {
         background-color: #f8f9fa;
     }
-
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
 
     .icon-btn {
         border: 1px solid #dee2e6;
@@ -107,20 +116,13 @@
             color: #b30000;
         }
 
-    .alert {
-        color: #800000;
-        font-size: 11px;
-        font-weight: 500;
-        padding: 10px 0;
-        text-align: center;
-    }
-
     .content {
         margin-left: 0px;
-        padding: 29px 24px 40px;
+        padding: 34px 24px 40px;
         min-height: 100vh;
     }
 
+    /* Confirmation Popup */
     #overlay {
         position: fixed;
         top: 0;
@@ -164,6 +166,7 @@
             color: white;
         }
 
+    /* Snackbar */
     #snackbar {
         visibility: hidden;
         min-width: 250px;
@@ -210,25 +213,24 @@
     }
 </style>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og=="
-      crossorigin="anonymous" />
-
 <div class="container mt-4">
     <div class="header-flex">
-        <h2>Exam Type List</h2>
+        <input type="text" id="examSearch" class="search-input" placeholder="Search Exam Types...">
+        <h2>Exam Types List</h2>
         <a href="{% url 'create_exam_type' %}" class="btn-add">
-            <i class="fas fa-plus me-2"></i> Add Exam Type
+            <i class="bi bi-plus-lg me-2"></i> Add Exam Type
         </a>
     </div>
+
+    {% if exam_types %}
     <table>
         <thead>
             <tr>
                 <th>SL NO</th>
                 <th>Title</th>
-                <th>Active</th>
+                <th>Status</th>
                 <th>Created At</th>
-                <th>Actions</th>
+                <th style="width: 150px;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -236,92 +238,94 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ exam_type.title }}</td>
-                <td>{{ exam_type.is_active }}</td>
+                <td>
+                    {% if exam_type.is_active %}
+                    <span>Active</span>
+                    {% else %}
+                    <span>Inactive</span>
+                    {% endif %}
+                </td>
                 <td>{{ exam_type.created_at }}</td>
                 <td>
-                    <!-- View Button -->
                     <a href="{% url 'view_exam_type' exam_type.pk %}" class="icon-btn" title="View">
                         <i class="fas fa-eye"></i>
                     </a>
-
-                    <!-- Edit Button -->
                     <a href="{% url 'edit_exam_type' exam_type.pk %}" class="icon-btn" title="Edit">
                         <i class="fas fa-edit"></i>
                     </a>
-
-                    <!-- Hidden Delete Form -->
-                    <form id="exam-type-delete-form-{{ exam_type.pk }}" method="post" action="{% url 'delete_exam_type' exam_type.pk %}" style="display: none;">
+                    <form id="delete-form-{{ exam_type.pk }}" method="POST" action="{% url 'delete_exam_type' exam_type.pk %}" style="display:none;">
                         {% csrf_token %}
                     </form>
-
-                    <!-- Delete Button with JS Confirm -->
-                    <button class="icon-btn text-danger" title="Delete"
-                            onclick="confirmExamTypeDelete('{{ exam_type.pk }}', '{{ exam_type.title }}')">
+                    <a href="#" class="icon-btn text-danger" title="Delete"
+                       onclick="confirmDelete('{{ exam_type.pk }}', '{{ exam_type.title }}')">
                         <i class="fas fa-trash-alt"></i>
-                    </button>
+                    </a>
                 </td>
-
-
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <!-- Custom Confirmation Popup -->
-    <div id="overlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-     background: rgba(0,0,0,0.5); z-index: 1000;"></div>
+    {% else %}
+    <p class="text-muted text-center mt-4">No exam types found.</p>
+    {% endif %}
+</div>
 
-    <div id="confirm-popup" style="display:none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
-     background: white; padding: 20px; border-radius: 8px; z-index: 1001; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-        <p id="confirm-popup-message" style="margin-bottom: 12px; font-weight: bold;"></p>
-        <div>
-            <button id="confirm-yes" class="btn btn-danger">Yes</button>
-            <button id="confirm-no" class="btn btn-secondary">No</button>
-        </div>
-    </div>
+<!-- Delete Confirmation -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom: 8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
 
-    <!-- Snackbar -->
-    <div id="snackbar" style="visibility: hidden; min-width: 250px; margin-left: -125px;
-     background-color: #333; color: #fff; text-align: center; border-radius: 2px;
-     padding: 12px; position: fixed; z-index: 1002; left: 50%; bottom: 30px; font-size: 16px;">
-    </div>
-    <script>
-    let deleteExamTypeId = null;
+<div id="snackbar"></div>
 
-    function confirmExamTypeDelete(id, title) {
-        deleteExamTypeId = id;
+<script>
+    let deleteId = null;
+
+    function confirmDelete(id, title) {
+        deleteId = id;
         document.getElementById('confirm-popup').style.display = 'block';
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${title}</b>?`;
     }
 
     document.getElementById('confirm-yes').addEventListener('click', () => {
-        if (deleteExamTypeId) {
-            document.getElementById(`exam-type-delete-form-${deleteExamTypeId}`).submit();
+        if (deleteId) {
+            document.getElementById(`delete-form-${deleteId}`).submit();
         }
     });
 
     document.getElementById('confirm-no').addEventListener('click', () => {
         document.getElementById('confirm-popup').style.display = 'none';
         document.getElementById('overlay').style.display = 'none';
-        deleteExamTypeId = null;
+        deleteId = null;
+    });
+
+    // Search filter
+    document.getElementById('examSearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+        rows.forEach(row => {
+            const rowText = row.innerText.toLowerCase();
+            row.style.display = rowText.includes(filter) ? '' : 'none';
+        });
     });
 
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
-        snackbar.style.visibility = "visible";
-        snackbar.classList.add("show");
+        snackbar.className = "show";
         setTimeout(() => {
-            snackbar.style.visibility = "hidden";
-            snackbar.classList.remove("show");
+            snackbar.className = snackbar.className.replace("show", "");
         }, 3000);
     }
 
-    // Show Django messages
+    // Django messages
     {% if messages %}
         {% for message in messages %}
             showSnackbar("{{ message|escapejs }}");
         {% endfor %}
     {% endif %}
-    </script>
-    {% endblock %}
+</script>
+{% endblock %}

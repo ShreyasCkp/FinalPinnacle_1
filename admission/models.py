@@ -228,6 +228,8 @@ class PUAdmission(models.Model):
     guardian_name = models.CharField(max_length=30, blank=True, null=True)
 
     guardian_address = models.CharField(max_length=100, blank=True, null=True)
+    guardian_email = models.EmailField(max_length=100, blank=True, null=True)
+    guardian_phone_no = models.CharField(max_length=15, blank=True, null=True)
 
     mother_name = models.CharField(max_length=30, blank=True, null=True)
 
@@ -562,6 +564,17 @@ class PUAdmission(models.Model):
     null=True,
     blank=True
 )
+    PRIMARY_GUARDIAN_CHOICES = [
+    ('father', 'Father'),
+    ('mother', 'Mother'),
+    ('guardian', 'Guardian'),
+      ]
+
+    primary_guardian = models.CharField(
+    max_length=10,
+    choices=PRIMARY_GUARDIAN_CHOICES,
+    default='father'
+        )
     @property
     def document_submitted(self):
         return (
@@ -571,7 +584,46 @@ class PUAdmission(models.Model):
             self.doc_income_certificate and
             self.doc_transfer
         )
+    def parent_name(self):
+        """Return the correct parent/guardian name based on primary_guardian."""
+        if self.primary_guardian == "father":
+            return self.father_name
+        elif self.primary_guardian == "mother":
+            return self.mother_name
+        elif self.primary_guardian == "guardian":
+            return self.guardian_name
+        return None
+    def parent_phone(self):
+        if self.primary_guardian == "father":
+            return self.father_mobile_no
+        elif self.primary_guardian == "mother":
+            return self.mother_phone_no
+        elif self.primary_guardian == "guardian":
+            return self.guardian_phone_no
+        return None
 
+    def parent_email(self):
+        if self.primary_guardian == "father":
+            return self.father_email
+        elif self.primary_guardian == "mother":
+            return self.mother_email
+        elif self.primary_guardian == "guardian":
+            return self.guardian_email
+        return None
+
+    def parent_adhar(self):
+        if self.primary_guardian == "father":
+            return self.aadhar_no
+        elif self.primary_guardian == "mother":
+            return self.mother_aadhar_no
+        return None
+
+    def parent_occupation(self):
+        if self.primary_guardian == "father":
+            return self.father_occupation
+        elif self.primary_guardian == "mother":
+            return self.mother_occupation
+        return None
 
     def __str__(self):
         return f"{self.admission_no} - {self.student_name}"
@@ -653,6 +705,8 @@ class DegreeAdmission(models.Model):
     mother_annual_income = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     mother_name = models.CharField(max_length=30, blank=True, null=True)
     guardian_name = models.CharField(max_length=30, blank=True, null=True)
+    guardian_email = models.EmailField(max_length=100, blank=True, null=True)
+    guardian_phone_no = models.CharField(max_length=15, blank=True, null=True)
     guardian_address = models.CharField(max_length=100, blank=True, null=True)
     mother_occupation = models.CharField(max_length=15)
     mother_phone_no = models.CharField(max_length=15)
@@ -800,6 +854,17 @@ class DegreeAdmission(models.Model):
     null=True,
     blank=True
 )
+    PRIMARY_GUARDIAN_CHOICES = [
+    ('father', 'Father'),
+    ('mother', 'Mother'),
+    ('guardian', 'Guardian'),
+      ]
+
+    primary_guardian = models.CharField(
+    max_length=10,
+    choices=PRIMARY_GUARDIAN_CHOICES,
+    default='father'
+        )
     @property
     def document_submitted(self):
         return (
@@ -809,6 +874,46 @@ class DegreeAdmission(models.Model):
             self.doc_income_certificate and
             self.doc_transfer
         )
+    def parent_name(self):
+        """Return the correct parent/guardian name based on primary_guardian."""
+        if self.primary_guardian == "father":
+            return self.father_name
+        elif self.primary_guardian == "mother":
+            return self.mother_name
+        elif self.primary_guardian == "guardian":
+            return self.guardian_name
+        return None
+    def parent_phone(self):
+        if self.primary_guardian == "father":
+            return self.father_mobile_no
+        elif self.primary_guardian == "mother":
+            return self.mother_phone_no
+        elif self.primary_guardian == "guardian":
+            return self.guardian_phone_no
+        return None
+
+    def parent_email(self):
+        if self.primary_guardian == "father":
+            return self.father_email
+        elif self.primary_guardian == "mother":
+            return self.mother_email
+        elif self.primary_guardian == "guardian":
+            return self.guardian_email
+        return None
+
+    def parent_adhar(self):
+        if self.primary_guardian == "father":
+            return self.aadhar_no
+        elif self.primary_guardian == "mother":
+            return self.mother_aadhar_no
+        return None
+
+    def parent_occupation(self):
+        if self.primary_guardian == "father":
+            return self.father_occupation
+        elif self.primary_guardian == "mother":
+            return self.mother_occupation
+        return None
 
 
     def __str__(self):
@@ -1169,7 +1274,15 @@ class ConfirmedAdmission(models.Model):
     wrong_attempts = models.IntegerField(default=0)
     is_locked = models.BooleanField(default=False)
 
-
+    
+        # ------------------ Parent Login ------------------
+    parent_userid = models.CharField(max_length=50, blank=True, null=True)
+    parent_password = models.CharField(max_length=128, blank=True, null=True)
+    parent_password_changed = models.BooleanField(default=False)
+    parent_passcode = models.CharField(max_length=10, blank=True, null=True)
+    parent_passcode_set = models.BooleanField(default=False)
+    parent_wrong_attempts = models.IntegerField(default=0)
+    parent_is_locked = models.BooleanField(default=False)
 
     def __str__(self):
         if self.pu_admission:
@@ -1179,7 +1292,7 @@ class ConfirmedAdmission(models.Model):
         return "Unlinked Admission"
 
 
-    from django.db import models
+from django.db import models
 
 class FeeCollection(models.Model):
     admission_no = models.CharField(max_length=50)

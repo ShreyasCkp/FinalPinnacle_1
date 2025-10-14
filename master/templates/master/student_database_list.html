@@ -200,6 +200,13 @@
             {% endfor %}
         </select>
 
+
+        <select name="sort" onchange="this.form.submit()">
+            <option value="">-- Sort by Name --</option>
+            <option value="asc" {% if sort_order == "asc" %}selected{% endif %}>A → Z</option>
+            <option value="desc" {% if sort_order == "desc" %}selected{% endif %}>Z → A</option>
+        </select>
+
         <button type="submit">Filter</button>
     </form>
 
@@ -258,10 +265,10 @@
                 <!--<td>{{ student.quota_type }}</td>-->
                 <td>{{ student.status }}</td>
 
-                de
+                
 
                 <!--<td>{{ student.student_phone_no|default:"-" }}</td>-->
-                lt
+                
                 <td>{{ student.father_name|default:"-" }}</td>
                 <td data-promodate="{{ entry.promotion_end_date }}">
                     <a href="{% url 'student_profile' student.id %}" class="icon-btn" title="View">

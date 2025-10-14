@@ -788,9 +788,17 @@ def student_attendance_form_add(request):
         time_slots = list({entry.time_slot for entry in timetable_entries})
 
         if selected_timeslot_id:
+
             selected_timeslot = get_object_or_404(TimeSlot, id=selected_timeslot_id)
+
             faculty_entry = timetable_entries.filter(time_slot_id=selected_timeslot_id).first()
-            faculty = faculty_entry.faculty if faculty_entry else None
+ 
+            faculty = None
+
+            if faculty_entry and faculty_entry.faculty_id:
+
+                faculty = Employee.objects.filter(id=faculty_entry.faculty_id).first()
+ 
 
         # Get students
         students = StudentDatabase.objects.filter(

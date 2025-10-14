@@ -1,0 +1,310 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Parent Portal - Pinnacle School of Commerce and Management{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* === Copy all your sidebar/topbar/footer/darkmode styles from student_layout === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif !important;
+            font-size: 14px !important;
+            color: #333;
+        }
+
+        .sidebar {
+            width: 200px;
+            height: 100vh;
+            background: linear-gradient(135deg,#800000,#800000);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 999;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+            .sidebar::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .sidebar::-webkit-scrollbar-thumb {
+                background-color: rgba(255,255,255,0.4);
+                border-radius: 4px;
+            }
+
+        .sidebar-title {
+            padding: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .sidebar-title img {
+                width: 100%;
+                height: auto;
+                object-fit: contain;
+            }
+
+        .sidebar a, .sidebar .dropdown-btn, .sidebar .dropdown-container a {
+            font-size: 13.5px !important;
+            color: #fff !important;
+            text-decoration: none;
+            padding: 10px 12px !important;
+            display: flex !important;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500 !important;
+            background-color: #800000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+            .sidebar a i, .sidebar .dropdown-btn i, .sidebar .dropdown-container a i {
+                font-size: 15px !important;
+                width: 18px;
+            }
+
+            .sidebar a:hover, .sidebar .dropdown-btn:hover, .sidebar .dropdown-container a:hover {
+                background-color: #a50000;
+                border-left: 3px solid #fff;
+            }
+
+            .sidebar a.active, .sidebar .dropdown-btn.active, .sidebar .dropdown-container a.active {
+                background-color: #a50000 !important;
+                border-left: 3px solid #fff !important;
+                font-weight: 600 !important;
+            }
+
+        .dropdown-container {
+            display: none;
+            padding-left: 0;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 200px;
+            right: 0;
+            height: 52px;
+            background: linear-gradient(135deg,#8B0000,#800000);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 12px;
+            z-index: 998;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .main-area, .content {
+            margin-left: 200px;
+            padding: 80px 26px 40px;
+            min-height: 100vh;
+        }
+
+        .footer {
+            margin-left: 200px;
+            color: #8b0000;
+            text-align: center;
+            padding: 10px 0;
+            font-weight: 500;
+            margin-top: 50px;
+        }
+
+        body.dark-mode {
+            background: #121212;
+            color: #eee;
+        }
+
+            body.dark-mode .sidebar {
+                background: #2c2c2c;
+            }
+
+            body.dark-mode .topbar {
+                background: #1e1e1e;
+            }
+
+            body.dark-mode .sidebar a, body.dark-mode .sidebar .dropdown-btn, body.dark-mode .sidebar .dropdown-container a {
+                color: #ddd !important;
+            }
+
+                body.dark-mode .sidebar a:hover {
+                    background-color: #444;
+                }
+
+                body.dark-mode .sidebar a.active, body.dark-mode .sidebar .dropdown-btn.active, body.dark-mode .sidebar .dropdown-container a.active {
+                    background-color: #555 !important;
+                    border-left: 3px solid #fff !important;
+                }
+
+            body.dark-mode #user-popup {
+                background: #2c2c2c;
+                color: #fff;
+                border-color: #555;
+            }
+
+            body.dark-mode input, body.dark-mode textarea, body.dark-mode select {
+                background: #333;
+                color: #fff;
+                border: 1px solid #555;
+            }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-title">
+            <img src="{% static 'image/logo.png' %}" alt="Logo">
+        </div>
+
+        <a href="{% url 'parent_dashboard' %}" class="{% if request.resolver_match.url_name == 'parent_dashboard' %}active{% endif %}">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+        </a>
+        <a href="{% url 'parent_attendance' %}"
+           class="{% if request.resolver_match.url_name == 'parent_attendance' %}active{% endif %}">
+            <i class="fa-solid fa-user-check"></i> Attendance
+        </a>
+
+        <a href="{% url 'parent_marksheet_download' %}"
+           class="{% if request.resolver_match.url_name == 'parent_marksheet_download' %}active{% endif %}">
+            <i class="fa-solid fa-file-pdf"></i> Marksheet
+        </a>
+
+        <a href="{% url 'parent_fee_view' %}"
+           class="{% if request.resolver_match.url_name == 'parent_dashboard' %}active{% endif %}">
+            <i class="fas fa-wallet"></i> Fees
+        </a>
+
+    </div>
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div style="font-size: large; font-weight: 700;">Parent Portal - Pinnacle School of Commerce and Management</div>
+        <div style="display:flex; align-items:center; gap:20px;">
+            <!-- ?? Notification Bell -->
+            <!-- ?? Notification Bell -->
+            <div style="position: relative;">
+                <i class="fa-solid fa-bell" id="notification-icon" style="font-size: 20px; cursor: pointer;"></i>
+                {% if notification_count > 0 %}
+                <span style="position: absolute; top: -6px; right: -6px; background: red; color: white; border-radius: 50%; font-size: 11px; padding: 2px 5px;">
+                    {{ notification_count }}
+                </span>
+                {% endif %}
+
+                <!-- 🔔 Notification Dropdown -->
+                <div id="notification-popup" style="display: none; position: absolute; top: 30px; right: 0; background: white; border: 1px solid #ccc; border-radius: 8px; width: 280px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000;">
+                    <div style="padding: 10px; font-weight: bold; background: #800000; color: white; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                        Notifications
+                    </div>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        {% if notifications %}
+                        {% for note in notifications %}
+                        <div style="display: block; padding: 10px; border-bottom: 1px solid #eee; color: #800000;">
+                            <i class="fa-solid {% if note.type == 'assignment' %}fa-file-alt{% else %}fa-calendar-alt{% endif %}" style="margin-right: 8px;"></i>
+                            {{ note.title }}
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div style="padding: 10px; text-align: center; color: #800000;">No new notifications</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- User Icon -->
+            <div style="position:relative;">
+                <i class="fas fa-user-circle" id="user-icon" style="font-size:24px; cursor:pointer;"></i>
+                <div id="user-popup" style="display:none; position:absolute; top:43px; right:0; background:white; color:#333; border:1px solid #ccc; border-radius:8px; width:220px; box-shadow:0 4px 8px rgba(0,0,0,0.1); padding:15px; z-index:1000; text-align:center;">
+                    <i class="fas fa-user-circle" style="font-size:60px; color:#800000; display:block; margin:0 auto 10px;"></i>
+                    {% if logged_in_parent %}
+                    <p><strong>{{ logged_in_parent.parent_userid }}</strong></p>
+                    {% if parent_name %}<p>Parent Name: {{ parent_name }}</p>{% endif %}
+                    {% if student %}<p>Parent of: {{ student.student_name }}</p>{% endif %}
+                    <a href="{% url 'parent_logout' %}" style="background: #800000; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 7px;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                    {% else %}
+                    <p><strong>Unknown Parent</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Designed and Developed by CKP Software Technologies &copy; 2025. All rights reserved.
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        document.getElementById('user-icon')?.addEventListener('click', function () {
+            const popup = document.getElementById('user-popup');
+            popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
+        });
+        window.addEventListener('click', function (e) {
+            const popup = document.getElementById('user-popup');
+            const icon = document.getElementById('user-icon');
+            if (!popup.contains(e.target) && e.target !== icon) { popup.style.display = 'none'; }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const bell = document.getElementById('notification-icon');
+            const popup = document.getElementById('notification-popup');
+            bell.addEventListener('click', function () {
+                popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const bell = document.getElementById('notification-icon');
+            const popup = document.getElementById('notification-popup');
+
+            bell.addEventListener('click', function () {
+                if (popup.style.display === 'none' || popup.style.display === '') {
+                    popup.style.display = 'block';
+                } else {
+                    popup.style.display = 'none';
+                }
+            });
+
+            // close popup when clicking outside
+            window.addEventListener('click', function (e) {
+                if (!popup.contains(e.target) && e.target !== bell) {
+                    popup.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

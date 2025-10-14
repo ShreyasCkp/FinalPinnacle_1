@@ -49,7 +49,23 @@ def generate_student_credentials(existing_userids=None):
     password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
     return userid, password
 
+import random
+import string
 
+def generate_parent_credentials(existing_userids):
+    """
+    Generate a unique parent userid and password.
+    """
+    # Generate UserID: "PARENT" + random 4 digits
+    while True:
+        userid = "PARENT" + ''.join(random.choices(string.digits, k=4))
+        if userid not in existing_userids:
+            break
+
+    # Generate Password: 8 character random string
+    password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+
+    return userid, password
 
 import requests
 from django.conf import settings

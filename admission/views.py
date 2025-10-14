@@ -257,7 +257,7 @@ from master.models import FeeMaster
 from admission.forms import PUAdmissionForm
 
 
-@custom_login_required
+
 def match_fee_name(name):
     name = name.strip().lower().replace(" ", "")
     if any(prefix in name for prefix in ["tution", "tuition"]):
@@ -672,7 +672,7 @@ from .utils import generate_next_receipt_no_shared
 from master.models import FeeMaster
 from core.utils import get_logged_in_user, log_activity
 
-@custom_login_required
+
 def match_fee_name(name):
     name = name.strip().lower().replace(" ", "")
     if any(prefix in name for prefix in ["tution", "tuition"]):
@@ -2781,61 +2781,6 @@ def generate_qr_dynamic(request):
     return HttpResponse(buffer.getvalue(), content_type="image/png")
 
 
-#receipt
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from weasyprint import HTML
-from .models import Student
-from decimal import Decimal
-
-@custom_login_required 
-def safe_decimal(value):
-    try:
-        return Decimal(str(value).strip()) if value not in [None, ''] else Decimal(0)
-    except:
-        return Decimal(0)
- 
-@custom_login_required
-def generate_fee_receipt_pdf(request, student_id):
-    student = Student.objects.get(id=student_id)
- 
-    student.total_fee = sum([
-        safe_decimal(student.tuition_fee),
-        safe_decimal(student.transport_fee),
-        safe_decimal(student.hostel_fee),
-        safe_decimal(student.books_fee),
-        safe_decimal(student.uniform_fee),
-        safe_decimal(student.other_fee)
-    ])
- 
-    student.total_paid = sum([
-        safe_decimal(student.tuition_amount),
-        safe_decimal(student.transport_amount),
-        safe_decimal(student.hostel_amount),
-        safe_decimal(student.books_amount),
-        safe_decimal(student.uniform_amount),
-        safe_decimal(student.other_amount)
-    ])
- 
-    student.total_pending = sum([
-        safe_decimal(student.tuition_pending_fee),
-        safe_decimal(student.transport_pending_fee),
-        safe_decimal(student.hostel_pending_fee),
-        safe_decimal(student.books_pending_fee),
-        safe_decimal(student.uniform_pending_fee)
-    ])
- 
-    html_string = render_to_string('admission/student_receipt_pdf.html', {
-        'student': student
-    })
- 
-    pdf_file = HTML(string=html_string).write_pdf()
- 
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename=receipt_{student.admission_no}.pdf'
-    return response
-
-
 
 
 
@@ -2970,113 +2915,6 @@ def save_payment(request):
 
 
 
-from decimal import Decimal
-from django.shortcuts import render, get_object_or_404
-from .models import StudentPaymentHistory
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from weasyprint import HTML
-from .models import Student
-from decimal import Decimal
-
-@custom_login_required
-def safe_decimal(value):
-    try:
-        return Decimal(str(value).strip()) if value not in [None, ''] else Decimal(0)
-    except:
-        return Decimal(0)
-
-@custom_login_required
-def download_student_receipt(request, pk):
-    payment = get_object_or_404(StudentPaymentHistory, pk=pk)
-
-    total_fee = sum([
-        safe_decimal(payment.tuition_fee),
-        safe_decimal(payment.transport_fee),
-        safe_decimal(payment.hostel_fee),
-        safe_decimal(payment.books_fee),
-        safe_decimal(payment.uniform_fee),
-        safe_decimal(payment.other_fee),
-    ])
-
-    total_paid = sum([
-        safe_decimal(payment.tuition_amount),
-        safe_decimal(payment.transport_amount),
-        safe_decimal(payment.hostel_amount),
-        safe_decimal(payment.books_amount),
-        safe_decimal(payment.uniform_amount),
-        safe_decimal(payment.other_amount),
-    ])
-
-    total_pending = sum([
-        safe_decimal(payment.tuition_pending_fee),
-        safe_decimal(payment.transport_pending_fee),
-        safe_decimal(payment.hostel_pending_fee),
-        safe_decimal(payment.books_pending_fee),
-        safe_decimal(payment.uniform_pending_fee),
-    ])
-
-    context = {
-        'payment': payment,
-        'total_fee': total_fee,
-        'total_paid': total_paid,
-        'total_pending': total_pending,
-    }
-
-    html_string = render_to_string('admission/student_payment_history_receipt.html', context)
-    pdf_file = HTML(string=html_string).write_pdf()
-
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename=receipt_{payment.admission_no}.pdf'
-    return response
-
-
-
-
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from weasyprint import HTML
-from .models import StudentPaymentHistory
-
-from decimal import Decimal
-
-@custom_login_required
-def download_admin_receipt(request, pk):
-    payment = StudentPaymentHistory.objects.get(pk=pk)
-
-    # Safely convert all fields to Decimal (default to 0 if None)
-    def to_decimal(value):
-        try:
-            return Decimal(value)
-        except:
-            return Decimal('0.00')
-
-    total_fee = (
-        to_decimal(payment.tuition_fee) +
-        to_decimal(payment.transport_fee) +
-        to_decimal(payment.hostel_fee) +
-        to_decimal(payment.books_fee) +
-        to_decimal(payment.uniform_fee)
-    )
-
-    pending_fee = (
-        to_decimal(payment.tuition_pending_fee) +
-        to_decimal(payment.transport_pending_fee) +
-        to_decimal(payment.hostel_pending_fee) +
-        to_decimal(payment.books_pending_fee) +
-        to_decimal(payment.uniform_pending_fee)
-    )
-
-    html_string = render_to_string(
-        'admission/admin_student_payment_history_receipt.html',
-        {'payment': payment, 'total_fee': total_fee, 'pending_fee': pending_fee}
-    )
-
-    pdf = HTML(string=html_string).write_pdf()
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'filename=admin_receipt_{payment.admission_no}.pdf'
-    return response
 import openpyxl
 
 from django.http import HttpResponse
@@ -3972,20 +3810,25 @@ from django.contrib import messages
 from master.models import StudentDatabase
 from .models import ConfirmedAdmission, PUAdmission, DegreeAdmission
 from .utils import generate_student_credentials  # Ensure this exists
+from .utils import generate_parent_credentials  # Ensure this exists
 
 @custom_login_required
 def generate_student_userid(request, admission_no):
-    user = get_logged_in_user(request)  # Your custom auth logic
+    user = get_logged_in_user(request)  # ✅ Your custom auth logic
 
-    # Try to find ConfirmedAdmission via PU or Degree
-    confirmed = ConfirmedAdmission.objects.select_related('pu_admission', 'degree_admission') \
-        .filter(status='confirmed') \
-        .filter(pu_admission__admission_no=admission_no).first()
+    # ------------------ Find ConfirmedAdmission ------------------
+    confirmed = (
+        ConfirmedAdmission.objects.select_related('pu_admission', 'degree_admission')
+        .filter(status='confirmed', pu_admission__admission_no=admission_no)
+        .first()
+    )
 
     if not confirmed:
-        confirmed = ConfirmedAdmission.objects.select_related('pu_admission', 'degree_admission') \
-            .filter(status='confirmed') \
-            .filter(degree_admission__admission_no=admission_no).first()
+        confirmed = (
+            ConfirmedAdmission.objects.select_related('pu_admission', 'degree_admission')
+            .filter(status='confirmed', degree_admission__admission_no=admission_no)
+            .first()
+        )
 
     if not confirmed:
         messages.error(request, f"No confirmed admission found for Admission No: {admission_no}")
@@ -3996,47 +3839,89 @@ def generate_student_userid(request, admission_no):
 
     try:
         with transaction.atomic():
-            # Only generate new ID if not already present
-            if not confirmed.student_userid:
-                existing_userids = set(
-                    ConfirmedAdmission.objects.exclude(student_userid__isnull=True).values_list('student_userid', flat=True)
-                )
-                userid, password = generate_student_credentials(existing_userids)
-                confirmed.student_userid = userid
-                confirmed.student_password = password
 
-            # Try to update/create StudentDatabase
+            # ------------------ Student ID Generation ------------------
+            if not confirmed.student_userid:
+                existing_student_ids = set(
+                    ConfirmedAdmission.objects.exclude(student_userid__isnull=True)
+                    .values_list('student_userid', flat=True)
+                )
+                student_userid, student_password = generate_student_credentials(existing_student_ids)
+                confirmed.student_userid = student_userid
+                confirmed.student_password = student_password
+
+            # ------------------ Parent ID Generation ------------------
+            if not confirmed.parent_userid:
+                existing_parent_ids = set(
+                    ConfirmedAdmission.objects.exclude(parent_userid__isnull=True)
+                    .values_list('parent_userid', flat=True)
+                )
+                parent_userid, parent_password = generate_parent_credentials(existing_parent_ids)
+                confirmed.parent_userid = parent_userid
+                confirmed.parent_password = parent_password
+
+            # ------------------ Pick Parent Contact ------------------
+            parent_name, parent_email, parent_phone = None, None, None
+
+            if admission.primary_guardian == "father":
+                parent_name = getattr(admission, "father_name", None)
+                parent_email = getattr(admission, "father_email", None)
+                parent_phone = getattr(admission, "father_mobile_no", None)
+            elif admission.primary_guardian == "mother":
+                parent_name = getattr(admission, "mother_name", None)
+                parent_email = getattr(admission, "mother_email", None)
+                parent_phone = getattr(admission, "mother_phone_no", None)
+            elif admission.primary_guardian == "guardian":
+                parent_name = getattr(admission, "guardian_name", None)
+                parent_email = getattr(admission, "guardian_email", None)
+                parent_phone = getattr(admission, "guardian_phone_no", None)
+
+            # ------------------ Student Database Sync ------------------
             StudentDatabase.objects.update_or_create(
                 pu_admission=admission if not is_degree else None,
                 degree_admission=admission if is_degree else None,
                 defaults={
                     'student_name': admission.student_name,
-                   'course': admission.course if admission.course else None,  
+                    'course': admission.course if admission.course else None,
                     'course_type': getattr(admission, 'course_type', None),
                     'quota_type': getattr(admission, 'quota_type', None) if is_degree else None,
                     'student_userid': confirmed.student_userid,
                     'student_phone_no': getattr(admission, 'student_phone_no', None),
                     'father_name': getattr(admission, 'father_name', None),
-                    'academic_year': confirmed.academic_year,  # ✅ Pass the academic year
+                    'academic_year': confirmed.academic_year.year if confirmed.academic_year else None,
                     'current_year': confirmed.current_year,
-                    'semester': confirmed.semester
+                    'semester': confirmed.semester,
+                   
                 }
             )
 
-            # Save only after student record created
+            # ------------------ Save Everything ------------------
             confirmed.save()
             log_activity(user, 'generated', confirmed)
-            messages.success(request, f"Student ID generated and saved for Admission No: {admission_no}")
+
+            messages.success(
+                request,
+                f"✅ Student & Parent IDs generated and saved for Admission No: {admission_no}"
+            )
 
     except Exception as e:
-        # ID was generated, but student database failed — log this
+        # Rollback IDs if database update fails
         print(f"[ERROR] StudentDatabase save failed for {admission_no}: {e}")
         confirmed.student_userid = None
         confirmed.student_password = None
-        messages.error(request, f"ID was generated but not saved for Admission No: {admission_no}. Please try again.")
-        # Don't save confirmed record here — allow retry
+        confirmed.parent_userid = None
+        confirmed.parent_password = None
+        confirmed.save(update_fields=[
+            "student_userid", "student_password",
+            "parent_userid", "parent_password"
+        ])
+        messages.error(
+            request,
+            f"⚠️ IDs were generated but not saved for Admission No: {admission_no}. Please try again."
+        )
 
     return redirect('confirmed_admissions')
+
  
  
  
@@ -4075,6 +3960,102 @@ def confirmed_admissions(request):
     return render(request, "admission/confirmed_admissions.html", {
         "admissions_list": admissions_list
     })
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.conf import settings
+from .models import ConfirmedAdmission
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.conf import settings
+from .models import ConfirmedAdmission
+
+def send_admission_email(request, admission_id):
+    if request.method == "POST":
+        admission = get_object_or_404(ConfirmedAdmission, id=admission_id)
+        pu_adm = getattr(admission, "pu_admission", None)
+        degree_adm = getattr(admission, "degree_admission", None)
+
+        if pu_adm:
+            student_name = pu_adm.student_name
+            course = pu_adm.course.name if pu_adm.course else ""
+            year = pu_adm.admission_date.year
+            student_userid = admission.student_userid
+            student_password = admission.student_password
+            parent_userid = admission.parent_userid
+            parent_password = admission.parent_password
+            parent_name = pu_adm.parent_name()
+            student_email = pu_adm.student_email() if callable(pu_adm.student_email) else pu_adm.student_email
+            parent_email = pu_adm.parent_email() if callable(pu_adm.parent_email) else pu_adm.parent_email
+
+        elif degree_adm:
+            student_name = degree_adm.student_name
+            course = degree_adm.course.name if degree_adm.course else ""
+            year = degree_adm.admission_date.year
+            student_userid = admission.student_userid
+            student_password = admission.student_password
+            parent_userid = admission.parent_userid
+            parent_password = admission.parent_password
+            parent_name = degree_adm.parent_name()
+            student_email = degree_adm.student_email() if callable(degree_adm.student_email) else degree_adm.student_email
+            parent_email = degree_adm.parent_email() if callable(degree_adm.parent_email) else degree_adm.parent_email
+
+        try:
+            if student_email:
+                student_message = render_to_string(
+                    'admission/admission_email_student.html',
+                    {
+                        'student_name': student_name,
+                        'student_userid': student_userid,
+                        'student_password': student_password,
+                        'course': course,
+                        'year': year,
+                    }
+                )
+                email = EmailMessage(
+                    subject="Admission Confirmation - Student",
+                    body=student_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[student_email],
+                )
+                email.content_subtype = "html"
+                email.send()
+
+            if parent_email:
+                parent_message = render_to_string(
+                    'admission/admission_email_parent.html',
+                    {
+                        'parent_name': parent_name,
+                        'student_name': student_name,
+                        'parent_userid': parent_userid,
+                        'parent_password': parent_password,
+                        'course': course,
+                        'year': year,
+                    }
+                )
+                email = EmailMessage(
+                    subject="Admission Confirmation - Parent",
+                    body=parent_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[parent_email],
+                )
+                email.content_subtype = "html"
+                email.send()
+
+            messages.success(request, "Emails sent successfully.")
+
+        except Exception as e:
+            messages.error(request, f"Error sending email: {e}")
+
+        # ✅ Redirect back and mark which admission was just sent
+        referer = request.META.get("HTTP_REFERER", "/")
+        return redirect(f"{referer}?sent={admission_id}")
+
+    return redirect('/')
 
  
  
@@ -4302,77 +4283,63 @@ def dashboard_view(request):
     }
 
     return render(request, 'admission/student_fee_dashboard.html', context)
-
-
-
-
-#Application form fee pdf
-
-
-#Application form fee pdf
-
-from django.template.loader import render_to_string
-
 from django.http import HttpResponse
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from io import BytesIO
+from .models import DegreeAdmission, PUAdmission
+from django.utils import timezone
 
-from weasyprint import HTML
+def render_to_pdf(template_src, context_dict={}):
+    """
+    Render a Django template to PDF using xhtml2pdf
+    """
+    template = render_to_string(template_src, context_dict)
+    result = BytesIO()
+    pdf = pisa.CreatePDF(src=template, dest=result)
+    if not pdf.err:
+        return result.getvalue()
+    return None
 
-from .models import DegreeAdmission
 
-@custom_login_required 
+@custom_login_required
 def download_degree_admission_fee_receipt(request, admission_no):
-
     admission = DegreeAdmission.objects.filter(admission_no=admission_no).first()
-
     if not admission:
-
         return HttpResponse("Admission not found.", status=404)
- 
-    html_string = render_to_string('admission/degree_admission_form_fee_receipt.html', {
 
-        'admission': admission
+    context = {
+        'admission': admission,
+        'date_now': timezone.now(),
+    }
+    pdf_file = render_to_pdf('admission/degree_admission_form_fee_receipt.html', context)
 
-    })
- 
-    pdf_file = HTML(string=html_string).write_pdf()
- 
+    if not pdf_file:
+        return HttpResponse("Error generating PDF", status=500)
+
     response = HttpResponse(pdf_file, content_type='application/pdf')
-
     response['Content-Disposition'] = f'inline; filename=degree_fee_receipt_{admission_no}.pdf'
-
     return response
- 
- 
-# Application form fee PDF for PU
 
-from .models import PUAdmission
 
 @custom_login_required
 def download_pu_admission_fee_receipt(request, admission_no):
- 
     admission = PUAdmission.objects.filter(admission_no=admission_no).first()
- 
     if not admission:
- 
         return HttpResponse("Admission not found.", status=404)
 
-    html_string = render_to_string('admission/admission_form_fee_receipt.html', {
- 
-        'admission': admission
- 
-    })
+    context = {
+        'admission': admission,
+        'date_now': timezone.now(),
+    }
+    pdf_file = render_to_pdf('admission/admission_form_fee_receipt.html', context)
 
-    pdf_file = HTML(string=html_string).write_pdf()
+    if not pdf_file:
+        return HttpResponse("Error generating PDF", status=500)
 
     response = HttpResponse(pdf_file, content_type='application/pdf')
- 
     response['Content-Disposition'] = f'inline; filename=pu_fee_receipt_{admission_no}.pdf'
- 
     return response
- 
-
- 
-
 
 
 

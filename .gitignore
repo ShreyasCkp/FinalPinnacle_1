@@ -16,3 +16,4 @@ settings_secret.py
 .DS_Store
 Thumbs.db
 obj/ 
+.vs".vs/" 

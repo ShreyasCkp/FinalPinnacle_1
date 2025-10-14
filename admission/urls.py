@@ -58,12 +58,12 @@ path('enquiry/convert/<str:enquiry_no>', views.convert_enquiry, name='convert_en
    
     path('get_student_details', views.get_student_details, name='get_student_details'),
     path('generate_qr_dynamic', generate_qr_dynamic, name='generate_qr_dynamic'),
-    path('receipt/<int:student_id>/pdf', views.generate_fee_receipt_pdf, name='generate_fee_receipt_pdf'), # PDF Receipt
+    # path('receipt/<int:student_id>/pdf', views.generate_fee_receipt_pdf, name='generate_fee_receipt_pdf'), # PDF Receipt
 
     path('save-payment', views.save_payment, name='save_payment'),
 
-    path('receipt/student/<int:pk>', views.download_student_receipt, name='download_student_receipt'),
-    path('receipt/admin/<int:pk>', views.download_admin_receipt, name='download_admin_receipt'),
+    # path('receipt/student/<int:pk>', views.download_student_receipt, name='download_student_receipt'),
+    # path('receipt/admin/<int:pk>', views.download_admin_receipt, name='download_admin_receipt'),
 
    path('enquiry-print-form', views.enquiry_print_form, name='enquiry_print_form'),
 
@@ -180,6 +180,7 @@ path('collect-fee-payment', views.collect_fee_payment_page, name='collect_fee_pa
 
 path('collect-fee-payment-ajax', views.collect_fee_payment_ajax, name='collect_fee_payment_ajax'),
 
+    path("send-admission-email/<int:admission_id>/", views.send_admission_email, name="send_admission_email"),
 
 
 ]

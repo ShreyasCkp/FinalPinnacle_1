@@ -35,15 +35,25 @@
         .logo-header {
             width: 100%;
             display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
+            justify-content: center; /* Center both logos as a group */
             align-items: center;
-            height: 1.2cm;
-            min-height: 1.2cm;
-            max-height: 1.2cm;
+            gap: 20px; /* Space between logos */
             margin-bottom: 10px;
-            position: relative;
         }
+
+        .logo-img {
+            height: 1.2cm;
+            width: auto;
+            object-fit: contain;
+            display: inline-block;
+        }
+
+        /* Slight right shift for the first image only */
+        .logo-header img:first-child {
+            margin-left: 55px; /* Adjust this value (10–25px) as needed */
+        }
+
+
 
         .logo-college {
             height: 1.2cm;
@@ -53,7 +63,6 @@
             display: block;
             background: #fff;
             border-radius: 2px;
-            /* Move this logo a bit right, e.g. 1cm from left */
             margin-left: 2.2cm;
             margin-right: 1.2cm;
         }
@@ -82,247 +91,141 @@
                 width: auto !important;
             }
 
-            .btn-container,
-            .footer {
-                display: none !important;
-            }
-
-            .receipt-container {
-                box-shadow: none;
-                border: none;
-                border-radius: 0;
-                max-width: 100%;
-                padding: 0;
-            }
-
-            body {
-                margin: 0;
-            }
-        }
-
-        .receipt-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin: 6px 0 8px;
-            padding-bottom: 4px;
-            border-bottom: 1px solid #d1d5db;
-            text-align: center;
-        }
-
-        .details-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .details-box {
-            flex: 1 1 200px;
-            min-width: 160px;
-            background: #f8fafc;
-            border-radius: 5px;
-            padding: 8px;
-            font-size: 0.75rem;
-        }
-
-            .details-box h3 {
-                font-size: 0.78rem;
+            .receipt-title {
+                font-size: 0.9rem;
                 font-weight: 600;
-                margin-bottom: 6px;
-                border-bottom: 1px solid #1e40af;
-                padding-bottom: 3px;
-                color: #1e40af;
+                margin: 6px 0 8px;
+                padding-bottom: 4px;
+                border-bottom: 1px solid #d1d5db;
+                text-align: center;
             }
 
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 2px 0;
-        }
+            .details-section {
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-bottom: 10px;
+            }
 
-        .detail-label {
-            font-weight: 600;
-            color: #374151;
-        }
+            .details-box {
+                flex: 1 1 45%;
+                min-width: 200px;
+                background: #f8fafc;
+                border-radius: 5px;
+                padding: 8px;
+                font-size: 0.75rem;
+                border: 1px solid #d1d5db;
+            }
 
-        .detail-value {
-            text-align: right;
-            color: #4b5563;
-        }
+                .details-box h3 {
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                    margin-bottom: 6px;
+                    border-bottom: 1px solid #1e40af;
+                    padding-bottom: 3px;
+                    color: #1e40af;
+                    text-align: center;
+                }
 
-        .fee-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-            margin-top: 6px;
-            margin-bottom: 12px;
-        }
+            .detail-item {
+                display: flex;
+                justify-content: space-between;
+                margin: 2px 0;
+            }
 
-            .fee-table th,
-            .fee-table td {
-                padding: 4px 6px;
-                border-bottom: 1px solid #e5e7eb;
+            .detail-label {
+                font-weight: 600;
+                color: #374151;
+            }
+
+            .detail-value {
                 text-align: right;
+                color: #4b5563;
             }
 
-                .fee-table th:first-child,
-                .fee-table td:first-child {
+
+            .fee-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.75rem;
+                margin-top: 6px;
+                margin-bottom: 12px;
+                margin-right: 20px;
+            }
+
+                .fee-table th,
+                .fee-table td {
+                    padding: 4px 6px;
+                    border-bottom: 1px solid #e5e7eb;
                     text-align: left;
                 }
 
-            .fee-table th {
-                background: #e0e7ff;
-                color: #1e40af;
+                    .fee-table th:first-child,
+                    .fee-table td:first-child {
+                        text-align: left;
+                    }
+
+                .fee-table th {
+                    background: #e0e7ff;
+                    color: #1e40af;
+                    font-weight: 700;
+                }
+
+            .total-rowes {
                 font-weight: 700;
+                background: #e0e7ff;
             }
 
-        .total-row {
-            font-weight: 700;
-            background: #f3f4f6;
-        }
-
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 16px;
-            font-size: 0.75rem;
-        }
-
-        .sig-block {
-            text-align: center;
-        }
-
-        .sig-line {
-            border-bottom: 1px solid #374151;
-            height: 22px;
-            width: 100px;
-            margin: 0 auto 2px;
-        }
-
-        .sig-title {
-            font-weight: 600;
-            font-size: 0.72rem;
-        }
-
-        .footer {
-            font-size: 0.7rem;
-            color: #6b7280;
-            border-top: 1px solid #d1d5db;
-            padding-top: 4px;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .btn-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-            gap: 6px;
-        }
-
-        button {
-            cursor: pointer;
-            font-size: 0.75rem;
-            padding: 5px 10px;
-            font-weight: 600;
-            border: none;
-            border-radius: 5px;
-        }
-
-        .btn-print {
-            background: #2563eb;
-            color: #fff;
-        }
-
-            .btn-print:hover {
-                background: #1e40af;
+            .paid {
+                color: green;
             }
 
-        .btn-close {
-            background: #ef4444;
-            color: #fff;
-        }
-
-            .btn-close:hover {
-                background: #b91c1c;
+            .pending {
+                color: red;
             }
 
-        @media (max-width: 700px) {
-            .details-section {
-                flex-direction: column;
-                gap: 8px;
+            .total {
+                color: #800000;
             }
 
             .signatures {
-                flex-direction: column;
-                gap: 14px;
+                display: flex;
+                justify-content: space-between;
+                margin-top: 16px;
+                font-size: 0.75rem;
             }
 
-            .logo-header {
-                height: 1.2cm;
-                min-height: 1.2cm;
-                max-height: 1.2cm;
+            .sig-block {
+                text-align: center;
             }
 
-            .logo-college, .logo-pinnacle {
-                height: 1.2cm;
-                max-height: 1.2cm;
+            .sig-line {
+                border-bottom: 1px solid #374151;
+                height: 22px;
+                width: 100px;
+                margin: 0 auto 2px;
             }
-        }
 
-        .detail-item.small {
-            font-size: 12px;
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-
-        .force-bold {
-            font-weight: 700 !important;
-            color: #374151 !important;
-        }
-    </style>
-    <style>
-        .highlight {
-            background-color: #fff9c4; /* Light yellow */
-            font-weight: 600;
-        }
-
-        .paid {
-            color: green;
-        }
-
-        .pending {
-            color: red;
-        }
-
-        .total {
-            color: #800000;
-        }
-
-        .total-rowes {
-            font-weight: 700;
-            background: #e0e7ff;
+            .sig-title {
+                font-weight: 600;
+                font-size: 0.72rem;
+            }
         }
     </style>
 </head>
-
 <body>
-    <article class="receipt-container" role="document" aria-label="Fee Receipt for {{ student.name|default:'Student' }}">
-        <!-- LOGO HEADER: Left logo is college-logo-with-name, right logo is Pinnacle (both 1.2cm), left logo has left margin for movement -->
+    <article class="receipt-container">
         <div class="logo-header">
-            <img src="https://i.postimg.cc/HxYthbCy/college-logo-with-name-white-png-1.jpg"
-                 alt="College Logo with Name"
-                 class="logo-college" />
-            <img src="https://i.postimg.cc/Xq9Sp7Mk/Screenshot-2025-06-27-144955.png"
-                 alt="Pinnacle Logo Icon"
-                 class="logo-pinnacle" />
+            <img src="https://i.postimg.cc/Xq9Sp7Mk/Screenshot-2025-06-27-144955.png" alt="Pinnacle Logo" class="logo-img" />
+            <img src="https://i.postimg.cc/HxYthbCy/college-logo-with-name-white-png-1.jpg" alt="College Logo" class="logo-img" />
         </div>
 
+
         <h2 class="receipt-title">FEE RECEIPT</h2>
-        <section class="details-section">
-            <section class="details-box" aria-labelledby="student-details-title">
+
+        <section style="margin-right:20px;" class="details-section">
+            <section class="details-box">
                 <h3 id="student-details-title">Student Details</h3>
                 <div class="detail-item"><span class="detail-label">Admission No:</span><span class="detail-value" style="font-size:8px !important">{{ student.admission_no }}</span></div>
                 <div class="detail-item"><span class="detail-label">Name:</span><span class="detail-value">{{ student.student_name }}</span></div>
@@ -335,11 +238,11 @@
                 {% endif %}
 
                 <!--<div class="detail-item" style="font-size: 10px; white-space: nowrap;">
-                    <span class="detail-label force-bold">Branch Code:</span>
-                    <span class="detail-value force-bold">{{ student.branch_code }}</span>
-                </div>-->
+                <span class="detail-label force-bold">Branch Code:</span>
+                <span class="detail-value force-bold">{{ student.branch_code }}</span>
+            </div>-->
             </section>
-            <section class="details-box" aria-labelledby="payment-details-title">
+            <section style="margin-top:20px;" class="details-box">
                 <h3 id="payment-details-title">Payment Details</h3>
                 <div class="detail-item"><span class="detail-label">Receipt No:</span><span class="detail-value" style="font-size:8px !important">{{ receipt_no }}</span></div>
                 <div class="detail-item"><span class="detail-label">Date</span><span class="detail-value">{{ receipt_date }}</span></div>
@@ -347,6 +250,7 @@
                 <div class="detail-item">
                     <span class="detail-label">Status:</span> <span>Paid</span>
                 </div>
+
                 <!--<div class="detail-item"><span class="detail-label">Receipt Date:</span><span class="detail-value">{{ student.receipt_date|default:"-" }}</span></div>-->
             </section>
         </section>
@@ -367,8 +271,6 @@
                 {% for fee in fee_collections %}
                 <tr>
                     <td>{{ fee.display_fee_type }}</td>
-
-
                     <td>{{ fee.due_date|date:"d-m-Y" }}</td>
                     <td>{{ fee.amount }}</td>
                     <td>{{ fee.applied_discount }}</td>
@@ -410,14 +312,15 @@
                 </tr>
             </tbody>
         </table>
-        <div class="signatures">
-            <div class="sig-block">
-                <span class="sig-line"></span>
-                <div class="sig-title">Dean Signature with Seal</div>
+        <div class="signatures" style="width:100%; margin-top:16px; font-size:0.75rem; overflow:hidden;">
+            <div class="sig-block" style="float:left; width:45%; text-align:left;">
+                <span class="sig-line" style="border-bottom:1px solid #374151; display:block; height:22px; width:150px; margin-bottom:2px;"></span>
+                <div class="sig-title" style="font-weight:600; font-size:0.72rem;">Dean Signature with Seal</div>
             </div>
-            <div class="sig-block">
-                <span class="sig-line"></span>
-                <div class="sig-title">Authorized Signature</div>
+
+            <div class="sig-block" style="float:right; width:45%; text-align:right; margin-right:1cm;">
+                <span class="sig-line" style="border-bottom:1px solid #374151; display:block; height:22px; width:150px; margin-bottom:2px; margin-left:auto; margin-right:0;"></span>
+                <div class="sig-title" style="font-weight:600; font-size:0.72rem;">Authorized Signature</div>
             </div>
         </div>
 

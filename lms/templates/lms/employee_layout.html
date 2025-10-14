@@ -195,7 +195,7 @@
         </a>
 
         <a href="{% url 'employee_attendance_view' %}" class="{% if request.resolver_match.url_name == 'employee_attendance_view' %}active{% endif %}">
-            <i class="fa-solid fa-calendar-check"></i> View My Attendance
+            <i class="fa-solid fa-calendar-check"></i> View Attendance
         </a>
 
         <a href="{% url 'employee_leave_create' %}" class="{% if request.resolver_match.url_name == 'employee_leave_create' %}active{% endif %}">
@@ -226,9 +226,9 @@
             <i class="fa-solid fa-pen-nib"></i> Exam Marks
         </a>
 
-        <a href="{% url 'leave_approval_list' %}" class="{% if request.resolver_match.url_name == 'leave_approval_list' %}active{% endif %}">
+        <!--<a href="{% url 'leave_approval_list' %}" class="{% if request.resolver_match.url_name == 'leave_approval_list' %}active{% endif %}">
             <i class="fa-solid fa-thumbs-up"></i> Leave Requests
-        </a>
+        </a>-->
 
         <a href="{% url 'employee_annual_dashboard' %}" class="{% if request.resolver_match.url_name == 'employee_annual_dashboard' %}active{% endif %}">
             <i class="fa-solid fa-money-check-dollar"></i> Payroll
@@ -257,6 +257,32 @@
     <div class="topbar">
         <div style="font-size: large; font-weight: 700;">Pinnacle School - Employee Portal</div>
         <div style="display: flex; align-items: center; gap: 20px;">
+
+            <div style="position: relative;">
+                <i class="fa-solid fa-bell" id="notification-icon" style="font-size: 20px; cursor: pointer;"></i>
+                {% if notification_count > 0 %}
+                <span style="position: absolute; top: -6px; right: -6px; background: red; color: white; border-radius: 50%; font-size: 11px; padding: 2px 5px;">
+                    {{ notification_count }}
+                </span>
+                {% endif %}
+                <div id="notification-popup" style="display: none; position: absolute; top: 30px; right: 0; background: white; border: 1px solid #ccc; border-radius: 8px; width: 280px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000;">
+                    <div style="padding: 10px; font-weight: bold; background: #800000; color: white; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                        Notifications
+                    </div>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        {% if notifications %}
+                        {% for note in notifications %}
+                        <a href="{{ note.url }}" style="display: block; padding: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #800000;">
+                            <i class="fa-solid {% if note.type == 'task' %}fa-tasks{% else %}fa-calendar-alt{% endif %}" style="margin-right: 8px;"></i>
+                            {{ note.title }}
+                        </a>
+                        {% endfor %}
+                        {% else %}
+                        <div style="padding: 10px; text-align: center; color: #800000;">No new notifications</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
             <div style="position: relative;">
                 <i class="fas fa-user-circle" id="user-icon" style="font-size: 24px; cursor: pointer;"></i>

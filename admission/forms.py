@@ -124,9 +124,15 @@ class PUAdmissionForm(forms.ModelForm):
 
         }
 
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Make all fields not required first
+        for field in self.fields.values():
+            field.required = False
+
+        # Now, explicitly make 'emergency_contact' required
+        self.fields['emergency_contact'].required = True
 
         # Show all Course Types
         self.fields['course_type'].queryset = CourseType.objects.all()
@@ -166,22 +172,12 @@ class PUAdmissionForm(forms.ModelForm):
         # Set filtered course queryset
         self.fields['course'].queryset = filtered_courses
 
-        # Set admitted_to queryset based on course_type (same filtering as 'course')
+        # Set admitted_to queryset based on course_type
         if 'admitted_to' in self.fields:
             self.fields['admitted_to'].queryset = filtered_courses
 
         # Set transport queryset
         self.fields['transport'].queryset = MasterTransport.objects.all()
-
-
-        required_fields = [
-            'mother_name', 'father_name', 'student_phone_no', 
-            'current_address', 'category', 'caste', 'payment_mode','student_declaration_date','student_declaration_place'
-        ]
-        for field_name in required_fields:
-            if field_name in self.fields:
-                self.fields[field_name].required = True
-
 
         # Add form-control and capitalize-on-input class to specific fields
         fields_to_capitalize = [
@@ -191,6 +187,8 @@ class PUAdmissionForm(forms.ModelForm):
         for field in fields_to_capitalize:
             if field in self.fields:
                 self.fields[field].widget.attrs.update({'class': 'form-control capitalize-on-input'})
+
+
 
 
     def clean_student_name(self):
@@ -256,37 +254,36 @@ class DegreeAdmissionForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        super(DegreeAdmissionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-        # Set required for selected fields
-        required_fields = [
-            'father_name', 'mother_name', 'student_phone_no',
-            'permanent_address', 'category', 'caste', 'payment_mode','student_declaration_date','student_declaration_place'
-        ]
-        for field in required_fields:
-            if field in self.fields:
-                self.fields[field].required = True
+        # 1. Make all fields non-required initially
+        for fname, field in self.fields.items():
+            field.required = False
 
-        # Add Bootstrap classes
+        # 2. Then mark only emergency_contact as required
+        if 'emergency_contact' in self.fields:
+            self.fields['emergency_contact'].required = True
+
+        # 3. Add Bootstrap classes to widgets
         for field_name, field in self.fields.items():
             if not isinstance(field.widget, (forms.FileInput, forms.CheckboxInput, forms.CheckboxSelectMultiple)):
                 css_class = field.widget.attrs.get('class', '')
                 field.widget.attrs['class'] = f'{css_class} form-control'.strip()
 
-        # Populate transport
+        # 4. Populate transport queryset
         self.fields['transport'].queryset = MasterTransport.objects.all()
 
-        # Capitalize input fields
+        # 5. Capitalize certain input fields
         capitalize_fields = [
             'student_name', 'father_name', 'mother_name', 'religion',
             'nationality', 'permanent_address', 'current_address',
         ]
         for field in capitalize_fields:
             if field in self.fields:
-                old_class = self.fields[field].widget.attrs.get('class', '')
-                self.fields[field].widget.attrs['class'] = f'{old_class} capitalize-on-input'.strip()
+                old_cls = self.fields[field].widget.attrs.get('class', '')
+                self.fields[field].widget.attrs['class'] = f'{old_cls} capitalize-on-input'.strip()
 
-        # Set default course_type
+        # 6. Default for course_type
         default_course_type = CourseType.objects.filter(
             Q(name__icontains="Commerce") |
             Q(name__icontains="School of Commerce") |
@@ -301,7 +298,7 @@ class DegreeAdmissionForm(forms.ModelForm):
         ):
             self.fields['course_type'].initial = default_course_type
 
-        # Determine course_type_id
+        # 7. Determine course_type_id and filter course/admitted_to
         course_type_id = None
         if 'course_type' in self.data:
             try:
@@ -315,7 +312,6 @@ class DegreeAdmissionForm(forms.ModelForm):
         elif default_course_type:
             course_type_id = default_course_type.id
 
-        # Filter course and admitted_to
         if course_type_id:
             filtered_courses = Course.objects.filter(course_type_id=course_type_id).order_by('name')
             self.fields['course'].queryset = filtered_courses
@@ -324,7 +320,7 @@ class DegreeAdmissionForm(forms.ModelForm):
             self.fields['course'].queryset = Course.objects.none()
             self.fields['admitted_to'].queryset = Course.objects.none()
 
-        # Phone validations
+        # 8. Phone field widget restrictions (pattern, maxlength etc.)
         phone_fields = ['father_mobile_no', 'student_phone_no', 'emergency_contact']
         for field_name in phone_fields:
             if field_name in self.fields:
@@ -344,26 +340,14 @@ class DegreeAdmissionForm(forms.ModelForm):
             return phone_str
         return phone
 
-    def clean_father_mobile_no(self):
-        return self._validate_phone_number('father_mobile_no')
-
-    def clean_student_phone_no(self):
-        return self._validate_phone_number('student_phone_no')
-
     def clean_emergency_contact(self):
+        # Since this is required, if missing, it will error out automatically, but we can further validate
         return self._validate_phone_number('emergency_contact')
 
-    def clean_father_name(self):
-        father_name = self.cleaned_data.get('father_name')
-        if not father_name:
-            raise ValidationError("Father name is required.")
-        return father_name
+    # Optionally: remove the clean methods for father_name, mother_name etc.
+    # (or make them conditional only if those are filled)
 
-    def clean_mother_name(self):
-        mother_name = self.cleaned_data.get('mother_name')
-        if not mother_name:
-            raise ValidationError("Mother name is required.")
-        return mother_name
+
 
 
 

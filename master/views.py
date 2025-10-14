@@ -2106,11 +2106,66 @@ def resend_message_view(request, message_id):
 from .models import StudentDatabase, CourseType, Course, CollegeStartEndPlan  # ✅ import plan model
 from django.utils import timezone
 from datetime import datetime
+from .forms import StudentDatabaseForm
+# @custom_login_required
+# def student_database(request):
+#     selected_program_type = request.GET.get('program_type', '')
+#     selected_combination = request.GET.get('combination', '')
+
+#     students_with_promodate = []
+
+#     if selected_program_type and selected_combination:
+#         students = StudentDatabase.objects.select_related('course', 'course_type')
+
+#         if selected_program_type != 'all':
+#             students = students.filter(course_type__name__iexact=selected_program_type)
+
+#         if selected_combination != 'all':
+#             students = students.filter(course__name__iexact=selected_combination)
+
+#         students = students.order_by('student_userid')
+
+#         for student in students:
+#             # Get matching college plan for that student's course, sem/year, academic year
+#             try:
+#                 plan = CollegeStartEndPlan.objects.get(
+#                     program_type=student.course_type,
+#                     course=student.course,
+#                     academic_year=student.academic_year,
+#                     semester_number=student.semester if student.semester else student.current_year
+#                 )
+#                 promotion_end_date = plan.end_date
+#             except CollegeStartEndPlan.DoesNotExist:
+#                 promotion_end_date = None  # fallback if no plan found
+
+#             students_with_promodate.append({
+#                 'student': student,
+#                 'promotion_end_date': promotion_end_date.isoformat() if promotion_end_date else None
+#             })
+
+#     program_type_list = CourseType.objects.values_list('name', flat=True).distinct()
+#     if selected_program_type and selected_program_type != 'all':
+#         combination_list = Course.objects.filter(course_type__name__iexact=selected_program_type).values_list('name', flat=True).distinct()
+#     else:
+#         combination_list = Course.objects.values_list('name', flat=True).distinct()
+
+#     context = {
+#         'students_with_promodate': students_with_promodate,
+#         'program_type_list': program_type_list,
+#         'combination_list': combination_list,
+#         'selected_program_type': selected_program_type,
+#         'selected_combination': selected_combination,
+#     }
+
+#     return render(request, 'master/student_database_list.html', context)
+
+
 
 @custom_login_required
 def student_database(request):
     selected_program_type = request.GET.get('program_type', '')
     selected_combination = request.GET.get('combination', '')
+    sort_order = request.GET.get('sort', '')  # NEW: sorting parameter
 
     students_with_promodate = []
 
@@ -2123,10 +2178,15 @@ def student_database(request):
         if selected_combination != 'all':
             students = students.filter(course__name__iexact=selected_combination)
 
-        students = students.order_by('student_userid')
+        # ✅ Apply sorting by name
+        if sort_order == "asc":
+            students = students.order_by("student_name")
+        elif sort_order == "desc":
+            students = students.order_by("-student_name")
+        else:
+            students = students.order_by("student_userid")
 
         for student in students:
-            # Get matching college plan for that student's course, sem/year, academic year
             try:
                 plan = CollegeStartEndPlan.objects.get(
                     program_type=student.course_type,
@@ -2136,7 +2196,7 @@ def student_database(request):
                 )
                 promotion_end_date = plan.end_date
             except CollegeStartEndPlan.DoesNotExist:
-                promotion_end_date = None  # fallback if no plan found
+                promotion_end_date = None
 
             students_with_promodate.append({
                 'student': student,
@@ -2155,9 +2215,12 @@ def student_database(request):
         'combination_list': combination_list,
         'selected_program_type': selected_program_type,
         'selected_combination': selected_combination,
+        'sort_order': sort_order,  # pass to template
     }
 
     return render(request, 'master/student_database_list.html', context)
+
+
 
 
 
@@ -4346,9 +4409,19 @@ def edit_exam_type(request, pk):
         form = ExamTypeForm(instance=exam_type)
     return render(request, 'master/exam_type_form.html', {'form': form, 'form_type': 'edit', 'exam_type': exam_type})
 
+from django.shortcuts import render, get_object_or_404
+from master.models import ExamType
+from master.forms import ExamTypeForm  # make sure you import your form
+
 def view_exam_type(request, pk):
     exam_type = get_object_or_404(ExamType, pk=pk)
-    return render(request, 'master/exam_type_form.html', {'form_type': 'view', 'exam_type': exam_type})
+    form = ExamTypeForm(instance=exam_type)  # prefilled form
+    return render(request, 'master/exam_type_form.html', {
+        'form_type': 'view',
+        'exam_type': exam_type,
+        'form': form
+    })
+
 
 # views.py
 from django.db import IntegrityError
@@ -4681,8 +4754,8 @@ def college_start_end_plan_delete(request, pk):
     return redirect('college_start_end_plan_list')
 
 
-from .models import ClassTeacher
-from .forms import ClassTeacherForm
+# from .models import ClassTeacher
+# from .forms import ClassTeacherForm
 from django.contrib import messages
 
 @custom_login_required
@@ -4691,8 +4764,8 @@ def class_teacher_list(request):
     return render(request, 'master/class_teacher_list.html', {'teachers': teachers})
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import ClassTeacher
-from .forms import ClassTeacherForm
+# from .models import ClassTeacher
+# from .forms import ClassTeacherForm
 from master.models import CourseType, Course, AcademicYear, Semester, Employee, EmployeeSubjectAssignment
 import logging
 

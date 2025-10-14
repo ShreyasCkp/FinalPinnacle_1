@@ -1,6 +1,7 @@
 
 from django.urls import path
 from . import views
+from django.urls import path, re_path
  
 urlpatterns = [
    
@@ -15,18 +16,23 @@ urlpatterns = [
     path('student/change-passcode/', views.student_change_passcode, name='student_change_passcode'),
 
 
-    path('student/attendance/', views.my_attendance_view, name='my_attendance_view'),
-    path('student/fees/',views.my_fees_view, name='my_fees_view'),
-    path('student/profile/', views.student_profile_view, name='student_profile_view'),
+    path('my/attendance/', views.my_attendance_view, name='my_attendance_view'),
+    path('my/fees/and/payments/',views.my_fees_view, name='my_fees_view'),
+    path(
+    "student/fee-receipt/<path:admission_no>/<str:receipt_no>/",
+    views.student_fee_receipt,
+    name="student_fee_receipt"
+),
+    path('my/profile/', views.student_profile_view, name='student_profile_view'),
 
-    path('student/assignments/', views.my_assignments_view, name='my_assignments_view'),
+    path('my/assignments/', views.my_assignments_view, name='my_assignments_view'),
     path('submit-assignment/<int:assignment_id>/', views.submit_assignment_view, name='submit_assignment'),
 
 
     #grade
-    path('student/grades/', views.my_grades_view, name='my_grades_view'),
+    path('my/grades/', views.my_grades_view, name='my_grades_view'),
     path('student/study-materials/', views.my_study_materials_view, name='my_study_materials_view'),
-    path('student/certificates/', views.my_certificates_view, name='my_certificates_view'),
+    path('my/certificates/', views.my_certificates_view, name='my_certificates_view'),
     #
     path('assignments/add/', views.create_assignment, name='create_assignment'),
     path('Assignments_List/', views.assignment_list, name='assignment_list'),
@@ -35,16 +41,16 @@ urlpatterns = [
     path('assignments/<int:pk>/view/', views.view_assignment, name='view_assignment'),
 
     #lib
-        path('library', views.book_list, name='book_list'),
+    path('library', views.book_list, name='book_list'),
     path('library/add', views.add_book, name='add_book'),
     path('library/view/<int:pk>', views.book_view, name='book_view'),
     path('library/edit/<int:pk>', views.book_update, name='book_update'),
     path('library/delete/<int:pk>', views.book_delete, name='book_delete'),
 
-        path('books/<int:book_id>/borrow-details/', views.book_borrow_details, name='book_borrow_details'),
+    path('books/<int:book_id>/borrow-details/', views.book_borrow_details, name='book_borrow_details'),
 
-     path('borrow/new/', views.borrow_book_view, name='borrow_book'),
-path('borrow/<int:record_id>/details/', views.borrow_record_details, name='borrow_record_details'),
+    path('borrow/new/', views.borrow_book_view, name='borrow_book'),
+    path('borrow/<int:record_id>/details/', views.borrow_record_details, name='borrow_record_details'),
 
     #this is pdf 
     # path('study-materials/', views.employee_study_material_list, name='employee_study_material_list'),
@@ -87,7 +93,7 @@ path('borrow/<int:record_id>/details/', views.borrow_record_details, name='borro
 
     # Delete exam marks
     path('exam-marks/delete/<int:pk>/', views.delete_exam_marks, name='delete_exam_marks'),
-    path('calendar/form', views.student_calendar_form, name='student_calendar_form'),
+    path('student/calendar/', views.student_calendar_form, name='student_calendar_form'),
 
     path('student/leave/create/', views.student_leave_create, name='student_leave_create'),
     path('student/leave/list/', views.student_leave_list, name='student_leave_list'),
@@ -99,18 +105,18 @@ path('borrow/<int:record_id>/details/', views.borrow_record_details, name='borro
     path('student/notification/read/<int:notification_id>/', views.mark_notification_as_read, name='mark_notification_as_read'),
 
 # urls.py
-path('student/leave/<int:pk>/cancel/', views.student_leave_cancel, name='student_leave_cancel'),
-path('employee-login/', views.employee_login_view, name='employee_login_view'),
+    path('student/leave/<int:pk>/cancel/', views.student_leave_cancel, name='student_leave_cancel'),
+    path('employee-login/', views.employee_login_view, name='employee_login_view'),
     path('employee/logout/', views.employee_logout, name='employee_logout'),
     path('employee/set-password/', views.employee_set_password, name='employee_set_password'),
     path('employee/set-passcode/', views.employee_set_passcode, name='employee_set_passcode'),
     path('employee-dashboard/', views.employee_dashboard_view, name='employee_dashboard_view'),
     path('employee/password-reset/', views.employee_password_reset_view, name='employee_password_reset_view'),
-     path('profile/', views.employee_profile, name='employee_profile'),
+    path('profile/', views.employee_profile, name='employee_profile'),
   # employee/urls.py
 
 
-  path('employee/attendance/', views.employee_attendance_view, name='employee_attendance_view'),
+    path('view/attendance/', views.employee_attendance_view, name='employee_attendance_view'),
     path('assignments/<int:assignment_id>/download/', views.download_assignment, name='download_assignment'),
     path("assignment/<int:assignment_id>/mark-in-progress/", views.mark_in_progress, name="mark_in_progress"),
 
@@ -125,10 +131,10 @@ path('employee-login/', views.employee_login_view, name='employee_login_view'),
     path('assignments/<int:assignment_id>/download/', views.download_assignment, name='download_assignment'),
     path("assignment/<int:assignment_id>/mark-in-progress/", views.mark_in_progress, name="mark_in_progress"),
 
-      path("assignment/<int:assignment_id>/mark-in-progress/", views.mark_in_progress, name="mark_in_progress"),
-            path("certificate/", views.student_certificate_view, name="student_certificate_view"),
+    path("assignment/<int:assignment_id>/mark-in-progress/", views.mark_in_progress, name="mark_in_progress"),
+    path("certificate/", views.student_certificate_view, name="student_certificate_view"),
     path("employee/all-student-marks/", views.employee_all_student_view, name="employee_all_student_view"),
-            path("mypage/", views.show_page, name="show_page"),   # ?? name is important
+    path("mypage/", views.show_page, name="show_page"),   # ?? name is important
 
 
          #certificate marks enter
@@ -144,14 +150,47 @@ path('employee-login/', views.employee_login_view, name='employee_login_view'),
 
 
      # Student-facing library
-path('student/library/', views.student_book_list, name='student_book_list'),
-path('student/library/<int:pk>/', views.student_book_detail, name='student_book_detail'),
+    path('library/', views.student_book_list, name='student_book_list'),
+    path('student/library/<int:pk>/', views.student_book_detail, name='student_book_detail'),
 
 
-  path('employee/change-password/', views.employee_change_password, name='employee_change_password'),
+    path('employee/change-password/', views.employee_change_password, name='employee_change_password'),
     path('employee/change-passcode/', views.employee_change_passcode, name='employee_change_passcode'),
 
     path('settings/', views.settings_view, name='settings'),
+
+
+        # Parent login URLs
+    path('parent-login/', views.parent_login_view, name='parent_login_view'),
+    path('parent-logout/', views.parent_logout, name='parent_logout'),
+    path('parent-set-password/', views.parent_set_password, name='parent_set_password'),
+    path('parent-set-passcode/', views.parent_set_passcode, name='parent_set_passcode'),
+    path('parent-password-reset/', views.parent_password_reset_view, name='parent_password_reset_view'),
+
+            # Parent Change Password / Passcode (after login)
+    path('parent-change-password/', views.parent_change_password, name='parent_change_password'),
+    path('parent-change-passcode/', views.parent_change_passcode, name='parent_change_passcode'),
+
+
+    #parent dashboard
+    path("mypage/", views.show_page, name="show_page"),   # ?? name is important
+
+    path("parent/dashboard/", views.parent_dashboard, name="parent_dashboard"),
+    # in urls.py
+    path("parent/attendance/", views.parent_attendance_view, name="parent_attendance"),
+
+
+# urls.py
+
+    path("parent/fees/", views.parent_fee_view, name="parent_fee_view"),
+
+    # urls.py
+    path("download/student/marksheet/", views.parent_marksheet_download, name="parent_marksheet_download"),
+
+re_path(r'^generate-daily-receipt/(?P<admission_no>.+)/(?P<receipt_no>[^/]+)/$', views.generate_daily_receipt, name='generate_daily_receipt'),
+
+
+
 
 
 

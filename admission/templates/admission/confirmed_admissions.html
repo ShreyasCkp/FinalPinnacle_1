@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 {% block title %}Confirmed Admissions{% endblock %}
 
 {% block content %}
@@ -105,7 +105,7 @@
         <h2 style="margin: 0; font-size: 22px; font-weight: bold; color: #800000; text-align: center; width: 100%;">Confirmed Admissions</h2>
     </div>
 
-    <table>
+    <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th>Sl No</th>
@@ -114,105 +114,128 @@
                 <th>Course</th>
                 <th>Application Date</th>
                 <th>Tuition Advance</th>
-                <th>UserID</th>
-                <th>Password</th>
+                <th>Student UserID</th>
+                <th>Student Password</th>
+                <th>Parent UserID</th>
+                <th>Parent Password</th>
                 <th>Action</th>
                 <th>Send Email</th>
             </tr>
         </thead>
         <tbody>
-
             {% for admission in admissions_list %}
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>
-
                     {% if admission.pu_admission %}
-
                     {{ admission.pu_admission.admission_no }}
-
                     {% elif admission.degree_admission %}
-
                     {{ admission.degree_admission.admission_no }}
-
                     {% endif %}
                 </td>
 
                 <td>
-
                     {% if admission.pu_admission %}
-
                     {{ admission.pu_admission.student_name }}
-
                     {% elif admission.degree_admission %}
-
                     {{ admission.degree_admission.student_name }}
-
                     {% endif %}
                 </td>
 
                 <td>{{ admission.course }}</td>
 
                 <td>
-
                     {% if admission.pu_admission %}
-
                     {{ admission.pu_admission.admission_date }}
-
                     {% elif admission.degree_admission %}
-
                     {{ admission.degree_admission.admission_date }}
-
                     {% endif %}
                 </td>
 
                 <td>
-
                     {% if admission.tuition_advance_amount %}
-
                     {{ admission.tuition_advance_amount|floatformat:2 }}
-
                     {% else %}
-
                     0.00
-
                     {% endif %}
                 </td>
 
+                <!-- Student login -->
                 <td>{{ admission.student_userid|default:"-" }}</td>
                 <td>{{ admission.student_password|default:"-" }}</td>
 
+                <!-- Parent login -->
+                <td>{{ admission.parent_userid|default:"-" }}</td>
+                <td>{{ admission.parent_password|default:"-" }}</td>
+
+                <!-- Generate ID action -->
                 <td>
-
-                    {% if not admission.student_userid %}
+                    {% if not admission.student_userid or not admission.parent_userid %}
                     <form method="post" action="{% if admission.pu_admission %}
-
                         {% url 'generate_student_userid' admission.pu_admission.admission_no|urlencode %}
-
                     {% elif admission.degree_admission %}
-
                         {% url 'generate_student_userid' admission.degree_admission.admission_no|urlencode %}
-
                     {% endif %}" style="display:inline;">
-
-
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary btn-sm">Generate ID</button>
                     </form>
-
                     {% else %}
-                    <span class="text-success">ID Generated</span>
-
+                    <span class="text-success">IDs Generated</span>
                     {% endif %}
                 </td>
-                <td>
-                    <button class="btn btn-warning btn-sm" {% if not admission.student_userid %}disabled{% endif %}>Send Email</button>
-                </td>
-            </tr>
 
+                <!-- Send Email -->
+                <td>
+                    <form method="post" action="{% url 'send_admission_email' admission.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="btn btn-warning btn-sm email-btn"
+                                {% if not admission.student_userid or not admission.parent_userid %}disabled{% endif %}>
+                            Send Email
+                        </button>
+                    </form>
+
+                </td>
+
+            </tr>
             {% endfor %}
+        </tbody>
     </table>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sentId = urlParams.get("sent");
+
+        // Load all previously sent admission IDs from localStorage
+        let sentAdmissions = JSON.parse(localStorage.getItem("sentAdmissions") || "[]");
+
+        // ✅ If email just sent, mark it as sent in localStorage
+        if (sentId && !sentAdmissions.includes(sentId)) {
+            sentAdmissions.push(sentId);
+            localStorage.setItem("sentAdmissions", JSON.stringify(sentAdmissions));
+        }
+
+        // ✅ Apply "Resend Email" state to all sent admissions
+        sentAdmissions.forEach(id => {
+            const form = document.querySelector(`form[action$='/${id}/']`);
+            if (form) {
+                const btn = form.querySelector(".email-btn");
+                btn.textContent = "Resend Email";
+                btn.classList.remove("btn-warning");
+                btn.classList.add("btn-success");
+            }
+        });
+
+        // ✅ Clean the ?sent=... from URL
+        if (sentId) {
+            const newUrl = window.location.href.split('?')[0];
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    });
+</script>
+
+
 <script>
     document.getElementById('confirmedAdmissionSearch').addEventListener('keyup', function () {
         const filter = this.value.toLowerCase();

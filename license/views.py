@@ -85,7 +85,7 @@ def create_license_view(request):
         license = License.objects.create(
             license_key='CKP-2025 v1.0.0',
             start_date=date(2025, 6, 5),
-            end_date=date(2025, 6, 17),
+            end_date=date(2025, 10, 17),
             activated=True,  # Make sure this is set to True for testing
             client_name="Naveen"
         )
@@ -188,7 +188,7 @@ from datetime import date
  
 HARDCODED_KEY = "CKP-2025 v1.0.0"
 START_DATE = date(2025, 6, 5)
-END_DATE = date(2025, 9, 30)
+END_DATE = date(2025, 10, 17)
  
 @custom_login_required
 def license_check_view(request):

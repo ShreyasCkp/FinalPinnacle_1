@@ -73,19 +73,19 @@
         background: #800000;
         color: white;
         border-radius: 8px;
-        padding: 16px;
+        padding: 10px;
         text-align: center;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
         .kpi-card h3 {
             margin: 0;
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .kpi-card p {
             margin: 4px 0 0 0;
-            font-size: 13px;
+            font-size: 12px;
         }
 
     .table {
@@ -215,6 +215,7 @@
 <div id="snackbar"></div>
 
 <script>
+
 function showSnackbar(message) {
     const snackbar = document.getElementById("snackbar");
     snackbar.textContent = message;
@@ -225,6 +226,7 @@ function showSnackbar(message) {
     {% for message in messages %}
         showSnackbar("{{ message|escapejs }}");
     {% endfor %}
-{% endif %}
+    {% endif %}
+
 </script>
 {% endblock %}
