@@ -1,5 +1,10 @@
+# ==========================================================
 # Azure Web App Deployment Workflow for Django (Python 3.9)
+# ==========================================================
 # Docs: https://github.com/Azure/webapps-deploy
+# Project: Pinnacle College Final
+# Python version: 3.9
+# ==========================================================
 
 name: Build and deploy Python app to Azure Web App - Pinnacle-College-Final
 
@@ -16,43 +21,62 @@ jobs:
       contents: read
 
     steps:
+      # ✅ Checkout repository
       - uses: actions/checkout@v4
 
+      # ✅ Setup Python 3.9
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      # ✅ Create virtual environment & install all dependencies (including pandas etc.)
+      # ✅ Create virtual environment & install dependencies
       - name: Create virtual environment and install dependencies
         run: |
+          echo "🔧 Creating virtual environment..."
           python -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip
 
-          # Install your requirements if already exists
+          # If requirements.txt already exists, install from it
           if [ -f requirements.txt ]; then
             echo "📦 Installing from existing requirements.txt..."
             pip install -r requirements.txt
           fi
 
-          # Ensure required deployment dependencies are installed and compatible
-          pip install gunicorn whitenoise psycopg2==2.9.9
+          # Ensure critical deployment dependencies (compatible with Python 3.9)
+          echo "📦 Installing essential production dependencies..."
+          pip install \
+            Django>=3.2,<5.0 \
+            gunicorn>=20.1.0 \
+            whitenoise>=6.0.0 \
+            psycopg2-binary>=2.9.0,<3.0 \
+            holidays>=0.33 \
+            requests \
+            pillow \
+            pandas \
+            numpy \
+            sqlparse \
+            asgiref \
+            typing-extensions
 
-          # Re-freeze dependencies to lock versions for deployment
+          # Re-freeze dependencies for deployment reproducibility
           pip freeze > requirements.txt
+
           echo "✅ Final requirements.txt generated:"
           cat requirements.txt
 
-      # ✅ Run migrations & collect static files
+      # ✅ Run Django migrations & collect static files
       - name: Run migrations and collect static files
         run: |
           source antenv/bin/activate
-          python manage.py makemigrations
-          python manage.py migrate
+          echo "🗃️ Running migrations..."
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+          echo "🎨 Collecting static files..."
           python manage.py collectstatic --noinput
 
-      # ✅ Optional: List project files
+      # ✅ Optional: Display project structure
       - name: List all project files
         run: |
           echo "📂 Project structure after build:"
@@ -75,11 +99,13 @@ jobs:
       contents: read
 
     steps:
+      # ✅ Download the built artifact
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: python-app
-      
+
+      # ✅ Azure login using federated credentials
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -87,6 +113,7 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_31C325A2DA5B4C89B4D4476AEC70AA2A }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F081FF28A10E4E16918ED3344A4B0B16 }}
 
+      # ✅ Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
