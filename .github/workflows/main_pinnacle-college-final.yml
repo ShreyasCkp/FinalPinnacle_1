@@ -1,5 +1,5 @@
 # ==========================================================
-# Azure Web App Deployment Workflow for Django (Python 3.9)
+# Azure Web App Deployment Workflow for Django (Python 3.11)
 # ==========================================================
 # Docs: https://github.com/Azure/webapps-deploy
 # Project: Pinnacle College Final
@@ -24,17 +24,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ✅ Setup Python 3.9
-      - name: Set up Python 3.9
+      # ✅ Setup Python 3.11
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
-      # ✅ Install system dependencies needed for psycopg2
+      # ✅ Install system dependencies needed for psycopg2 & weasyprint
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpq-dev build-essential
+          sudo apt-get install -y libpq-dev build-essential libffi-dev libssl-dev \
+                                 libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
+                                 libblas-dev liblapack-dev libharfbuzz-dev libfribidi-dev \
+                                 libxml2-dev libxslt1-dev python3-cairo python3-pango \
+                                 python3-gdk-pixbuf
 
       # ✅ Create virtual environment & install dependencies
       - name: Create virtual environment and install dependencies
@@ -48,13 +52,16 @@ jobs:
           if [ -f requirements.txt ]; then
             echo "✅ Found existing requirements.txt — installing..."
             pip install -r requirements.txt
+            # Ensure hijridate is installed explicitly
+            pip install hijridate
           else
             echo "⚠️ No requirements.txt found — installing essential Django stack..."
-            pip install Django>=3.2,<5.0
-            pip install gunicorn>=20.1.0
+            pip install Django>=4.2
+            pip install gunicorn>=20.1
             pip install whitenoise>=6.0.0
-            pip install psycopg2-binary>=2.9.0,<3.0
+            pip install psycopg2-binary>=2.9
             pip install holidays>=0.33
+            pip install hijridate
             pip install requests pillow pandas numpy sqlparse asgiref typing-extensions
             pip freeze > requirements.txt
           fi
