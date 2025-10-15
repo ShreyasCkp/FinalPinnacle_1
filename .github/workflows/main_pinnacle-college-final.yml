@@ -3,7 +3,6 @@
 # ==========================================================
 # Docs: https://github.com/Azure/webapps-deploy
 # Project: Pinnacle College Final
-# Python version: 3.9
 # ==========================================================
 
 name: Build and deploy Python app to Azure Web App - Pinnacle-College-Final
@@ -44,23 +43,22 @@ jobs:
             pip install -r requirements.txt
           fi
 
-          # Ensure critical deployment dependencies (compatible with Python 3.9)
+          # ✅ Install essential production dependencies
           echo "📦 Installing essential production dependencies..."
-          pip install \
-            Django>=3.2,<5.0 \
-            gunicorn>=20.1.0 \
-            whitenoise>=6.0.0 \
-            psycopg2-binary>=2.9.0,<3.0 \
-            holidays>=0.33 \
-            requests \
-            pillow \
-            pandas \
-            numpy \
-            sqlparse \
-            asgiref \
-            typing-extensions
+          pip install Django>=3.2,<5.0
+          pip install gunicorn>=20.1.0
+          pip install whitenoise>=6.0.0
+          pip install psycopg2-binary>=2.9.0,<3.0
+          pip install holidays>=0.33
+          pip install requests
+          pip install pillow
+          pip install pandas
+          pip install numpy
+          pip install sqlparse
+          pip install asgiref
+          pip install typing-extensions
 
-          # Re-freeze dependencies for deployment reproducibility
+          # ✅ Freeze final dependency list
           pip freeze > requirements.txt
 
           echo "✅ Final requirements.txt generated:"
@@ -99,18 +97,18 @@ jobs:
       contents: read
 
     steps:
-      # ✅ Download the built artifact
+      # ✅ Download built artifact
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      # ✅ Azure login using federated credentials
+      # ✅ Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C581BC829F484ADA97D5594AB275605F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_31C325A2DA5B4C89B4D4476AEC70AA2A }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_31C325A2DA5B4D4476AEC70AA2A }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F081FF28A10E4E16918ED3344A4B0B16 }}
 
       # ✅ Deploy to Azure Web App
