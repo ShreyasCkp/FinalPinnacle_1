@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      # ✅ Install system dependencies for psycopg2, weasyprint, etc.
+      # ✅ Install system dependencies (for psycopg2, weasyprint, etc.)
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -53,20 +53,22 @@ jobs:
 
           echo "📦 Installing Python dependencies..."
           if [ -f requirements.txt ]; then
-            echo "✅ Found existing requirements.txt — installing..."
-            pip install -r requirements.txt
+            echo "✅ Found requirements.txt — installing..."
+            pip install -r requirements.txt || true
           else
-            echo "⚠️ No requirements.txt found — creating and installing essentials..."
-            pip install Django gunicorn whitenoise psycopg2-binary \
-                        holidays hijridate requests pillow pandas numpy \
-                        sqlparse asgiref typing-extensions \
-                        geopy num2words
-            pip freeze > requirements.txt
+            echo "⚠️ No requirements.txt found — creating one..."
+            touch requirements.txt
           fi
 
-          # ✅ Ensure critical packages exist even if missing from requirements
+          # ✅ Ensure critical packages are always installed
+          echo "🔒 Ensuring required packages are installed..."
           pip install --upgrade \
-            geopy num2words hijridate holidays weasyprint
+            Django gunicorn whitenoise psycopg2-binary \
+            pandas numpy requests pillow \
+            holidays hijridate geopy num2words weasyprint
+
+          echo "🧾 Updating requirements.txt..."
+          pip freeze > requirements.txt
 
           echo "✅ Final installed packages:"
           pip freeze
@@ -81,7 +83,7 @@ jobs:
           echo "🎨 Collecting static files..."
           python manage.py collectstatic --noinput
 
-      # ✅ Optional: Display project structure
+      # ✅ Optional: List project structure
       - name: List project files
         run: |
           echo "📂 Project structure after build:"
