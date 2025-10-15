@@ -1,6 +1,5 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
+# Azure Web App Deployment Workflow for Django (Python 3.9)
+# Docs: https://github.com/Azure/webapps-deploy
 
 name: Build and deploy Python app to Azure Web App - Pinnacle-College-Final
 
@@ -24,20 +23,28 @@ jobs:
         with:
           python-version: '3.9'
 
-      # ✅ Create virtual environment and install base dependencies
+      # ✅ Create virtual environment & install all dependencies (including pandas etc.)
       - name: Create virtual environment and install dependencies
         run: |
           python -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip
-          # Install key Django + deployment dependencies
-          pip install django gunicorn whitenoise dj-database-url psycopg2==2.9.9
-          # Freeze all installed packages to requirements.txt
+
+          # Install your requirements if already exists
+          if [ -f requirements.txt ]; then
+            echo "📦 Installing from existing requirements.txt..."
+            pip install -r requirements.txt
+          fi
+
+          # Ensure required deployment dependencies are installed and compatible
+          pip install gunicorn whitenoise psycopg2==2.9.9
+
+          # Re-freeze dependencies to lock versions for deployment
           pip freeze > requirements.txt
-          echo "✅ Generated requirements.txt:"
+          echo "✅ Final requirements.txt generated:"
           cat requirements.txt
 
-      # ✅ Run migrations and collect static files
+      # ✅ Run migrations & collect static files
       - name: Run migrations and collect static files
         run: |
           source antenv/bin/activate
@@ -45,10 +52,10 @@ jobs:
           python manage.py migrate
           python manage.py collectstatic --noinput
 
-      # ✅ Optional: list all files (to verify artifact content)
-      - name: List project files
+      # ✅ Optional: List project files
+      - name: List all project files
         run: |
-          echo "📂 Listing all project files..."
+          echo "📂 Project structure after build:"
           ls -R
 
       # ✅ Upload artifact for deployment
