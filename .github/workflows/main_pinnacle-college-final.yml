@@ -30,6 +30,12 @@ jobs:
         with:
           python-version: '3.9'
 
+      # ✅ Install system dependencies needed for psycopg2
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpq-dev build-essential
+
       # ✅ Create virtual environment & install dependencies
       - name: Create virtual environment and install dependencies
         run: |
@@ -38,7 +44,7 @@ jobs:
           source antenv/bin/activate
           pip install --upgrade pip
 
-          echo "📦 Installing dependencies..."
+          echo "📦 Installing Python dependencies..."
           if [ -f requirements.txt ]; then
             echo "✅ Found existing requirements.txt — installing..."
             pip install -r requirements.txt
@@ -78,7 +84,7 @@ jobs:
         with:
           name: python-app
           path: |
-            .
+            . 
             !antenv/
 
   deploy:
