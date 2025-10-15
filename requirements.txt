@@ -55,3 +55,4 @@ yarl==1.20.0
 zopfli==0.2.3.post1
 hijridate>=2.5.0
 pdfplumber>=0.9.0
+sendgrid>=6.11.0
