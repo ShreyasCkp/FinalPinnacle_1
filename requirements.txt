@@ -59,5 +59,7 @@ sendgrid>=6.11.0
 xhtml2pdf>=0.2.8
 pdfkit>=1.0.0
 geopy>=2.0
+num2words>=0.5.12
+
 
 
