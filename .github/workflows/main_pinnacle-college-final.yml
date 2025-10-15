@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      # ✅ Install system dependencies for psycopg2 & weasyprint
+      # ✅ Install system dependencies for psycopg2, weasyprint, etc.
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -49,28 +49,27 @@ jobs:
           echo "🔧 Creating virtual environment..."
           python -m venv antenv
           source antenv/bin/activate
-          pip install --upgrade pip
+          pip install --upgrade pip setuptools wheel
 
           echo "📦 Installing Python dependencies..."
           if [ -f requirements.txt ]; then
             echo "✅ Found existing requirements.txt — installing..."
             pip install -r requirements.txt
-            # Ensure hijridate is installed explicitly
-            pip install hijridate
           else
-            echo "⚠️ No requirements.txt found — installing essential Django stack..."
-            pip install Django>=4.2
-            pip install gunicorn>=20.1
-            pip install whitenoise>=6.0.0
-            pip install psycopg2-binary>=2.9
-            pip install holidays>=0.33
-            pip install hijridate
-            pip install requests pillow pandas numpy sqlparse asgiref typing-extensions
+            echo "⚠️ No requirements.txt found — creating and installing essentials..."
+            pip install Django gunicorn whitenoise psycopg2-binary \
+                        holidays hijridate requests pillow pandas numpy \
+                        sqlparse asgiref typing-extensions \
+                        geopy num2words
             pip freeze > requirements.txt
           fi
 
-          echo "✅ Final requirements.txt:"
-          cat requirements.txt
+          # ✅ Ensure critical packages exist even if missing from requirements
+          pip install --upgrade \
+            geopy num2words hijridate holidays weasyprint
+
+          echo "✅ Final installed packages:"
+          pip freeze
 
       # ✅ Run Django migrations & collect static files
       - name: Run migrations and collect static files
@@ -94,7 +93,7 @@ jobs:
         with:
           name: python-app
           path: |
-            . 
+            .
             !antenv/
 
   deploy:
