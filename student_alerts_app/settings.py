@@ -30,7 +30,12 @@ DEBUG = True
 
 
 
-ALLOWED_HOSTS = ['192.168.10.221', 'localhost', '127.0.0.1', '122.166.213.68']
+ALLOWED_HOSTS = [
+    '192.168.10.221', 'localhost', '127.0.0.1',
+    '122.166.213.68',
+    'your-app-name.azurewebsites.net'
+]
+
 
 # Application references
 # https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-INSTALLED_APPS
@@ -106,19 +111,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'student_alerts_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+import os
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),      # Azure environment variable for database name
-        'USER': os.getenv('DB_USER'),      # Azure environment variable for username
-        'PASSWORD': os.getenv('DB_PASSWORD'),  # Azure environment variable for password
-        'HOST': os.getenv('DB_HOST'),      # Azure environment variable for host, e.g. yourserver.postgres.database.azure.com
-        'PORT': os.getenv('DB_PORT', '5432'),  # Azure environment variable for port, default to 5432
+        'NAME': os.getenv('DB_NAME', 'institute_db_pg'),
+        'USER': os.getenv('DB_USER', 'dbadmin'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'Admin@2025'),
+        'HOST': os.getenv('DB_HOST', 'collegepgdb2025.postgres.database.azure.com'),
+        'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
-            'sslmode': 'require',          # Required for secure connection to Azure PostgreSQL
+            'sslmode': 'require',  # 🔐 Required for Azure PostgreSQL
         },
     }
 }
+
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -154,13 +162,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 import os
 
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-STATIC_URL = '/static/'
-STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
 TIME_ZONE = 'Asia/Kolkata'
 USE_TZ = True
 
@@ -184,3 +191,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'saishashank0143@gmail.com'
 EMAIL_HOST_PASSWORD = 'umht bsic hycy pgli'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
