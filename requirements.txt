@@ -53,6 +53,7 @@ weasyprint==65.1
 webencodings==0.5.1
 yarl==1.20.0
 zopfli==0.2.3.post1
-hijridate==0.6.1
+hijridate>=2.5.0
+
 
 
