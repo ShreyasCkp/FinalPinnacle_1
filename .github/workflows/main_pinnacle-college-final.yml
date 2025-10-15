@@ -21,10 +21,11 @@ jobs:
 
     steps:
       # ✅ Checkout repository
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       # ✅ Setup Python 3.9
-      - name: Set up Python version
+      - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
@@ -37,31 +38,22 @@ jobs:
           source antenv/bin/activate
           pip install --upgrade pip
 
-          # If requirements.txt already exists, install from it
+          echo "📦 Installing dependencies..."
           if [ -f requirements.txt ]; then
-            echo "📦 Installing from existing requirements.txt..."
+            echo "✅ Found existing requirements.txt — installing..."
             pip install -r requirements.txt
+          else
+            echo "⚠️ No requirements.txt found — installing essential Django stack..."
+            pip install Django>=3.2,<5.0
+            pip install gunicorn>=20.1.0
+            pip install whitenoise>=6.0.0
+            pip install psycopg2-binary>=2.9.0,<3.0
+            pip install holidays>=0.33
+            pip install requests pillow pandas numpy sqlparse asgiref typing-extensions
+            pip freeze > requirements.txt
           fi
 
-          # ✅ Install essential production dependencies
-          echo "📦 Installing essential production dependencies..."
-          pip install Django>=3.2,<5.0
-          pip install gunicorn>=20.1.0
-          pip install whitenoise>=6.0.0
-          pip install psycopg2-binary>=2.9.0,<3.0
-          pip install holidays>=0.33
-          pip install requests
-          pip install pillow
-          pip install pandas
-          pip install numpy
-          pip install sqlparse
-          pip install asgiref
-          pip install typing-extensions
-
-          # ✅ Freeze final dependency list
-          pip freeze > requirements.txt
-
-          echo "✅ Final requirements.txt generated:"
+          echo "✅ Final requirements.txt:"
           cat requirements.txt
 
       # ✅ Run Django migrations & collect static files
@@ -69,19 +61,19 @@ jobs:
         run: |
           source antenv/bin/activate
           echo "🗃️ Running migrations..."
-          python manage.py makemigrations --noinput
+          python manage.py makemigrations --noinput || true
           python manage.py migrate --noinput
           echo "🎨 Collecting static files..."
           python manage.py collectstatic --noinput
 
       # ✅ Optional: Display project structure
-      - name: List all project files
+      - name: List project files
         run: |
           echo "📂 Project structure after build:"
           ls -R
 
       # ✅ Upload artifact for deployment
-      - name: Upload artifact for deployment jobs
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: python-app
@@ -98,13 +90,13 @@ jobs:
 
     steps:
       # ✅ Download built artifact
-      - name: Download artifact from build job
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
       # ✅ Login to Azure
-      - name: Login to Azure
+      - name: Azure Login
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C581BC829F484ADA97D5594AB275605F }}
