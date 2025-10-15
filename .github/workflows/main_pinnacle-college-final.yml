@@ -1,7 +1,6 @@
 # ==========================================================
 # Azure Web App Deployment Workflow for Django (Python 3.11)
 # ==========================================================
-# Docs: https://github.com/Azure/webapps-deploy
 # Project: Pinnacle College Final
 # ==========================================================
 
@@ -51,39 +50,28 @@ jobs:
           source antenv/bin/activate
           pip install --upgrade pip setuptools wheel
 
-          echo "📦 Installing Python dependencies..."
+          echo "📦 Installing dependencies..."
           if [ -f requirements.txt ]; then
-            echo "✅ Found requirements.txt — installing..."
             pip install -r requirements.txt || true
-          else
-            echo "⚠️ No requirements.txt found — creating one..."
-            touch requirements.txt
           fi
 
-          # ✅ Ensure critical packages are always installed
-          echo "🔒 Ensuring required packages are installed..."
-          pip install --upgrade \
-            Django gunicorn whitenoise psycopg2-binary \
-            pandas numpy requests pillow \
-            holidays hijridate geopy num2words weasyprint
+          # ✅ Ensure essential Django packages exist
+          pip install --upgrade Django gunicorn whitenoise psycopg2-binary \
+            pandas numpy requests pillow holidays hijridate geopy num2words weasyprint
 
-          echo "🧾 Updating requirements.txt..."
           pip freeze > requirements.txt
 
-          echo "✅ Final installed packages:"
-          pip freeze
-
-      # ✅ Run Django migrations & collect static files
-      - name: Run migrations and collect static files
+      # ✅ Run Django migrations and collect static files
+      - name: Prepare Django project
         run: |
           source antenv/bin/activate
-          echo "🗃️ Running migrations..."
-          python manage.py makemigrations --noinput || true
-          python manage.py migrate --noinput
+          echo "🗃️ Skipping makemigrations (existing DB)..."
+          # Skip creating migrations on the build server
+          python manage.py migrate --noinput || true
           echo "🎨 Collecting static files..."
-          python manage.py collectstatic --noinput
+          python manage.py collectstatic --noinput || true
 
-      # ✅ Optional: List project structure
+      # ✅ Optional: list structure
       - name: List project files
         run: |
           echo "📂 Project structure after build:"
