@@ -192,3 +192,4 @@ EMAIL_HOST_USER = 'saishashank0143@gmail.com'
 EMAIL_HOST_PASSWORD = 'umht bsic hycy pgli'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+
