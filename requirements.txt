@@ -60,11 +60,3 @@ pdfkit>=1.0.0
 geopy>=2.0
 num2words>=0.5.12
 psycopg2-binary>=2.9
-
-
-
-
-
-
-
-
