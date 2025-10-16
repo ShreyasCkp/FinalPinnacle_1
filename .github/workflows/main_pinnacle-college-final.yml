@@ -1,11 +1,4 @@
-# ==========================================================
-# Azure Web App Deployment Workflow for Django (Python 3.9)
-# Final Optimized Version (Fast + All Dependencies Included)
-# ==========================================================
-# Project: Pinnacle College Final
-# ==========================================================
-
-name: Build and deploy Django app to Azure Web App - Pinnacle-College-Final
+name: Build and Deploy Django App to Azure
 
 on:
   push:
@@ -20,28 +13,18 @@ jobs:
       contents: read
 
     steps:
-      # ✅ 1. Checkout repository
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ✅ 2. Set up Python 3.9
+      # 2. Set up Python 3.9
       - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      # ✅ 3. Cache pip packages (massively speeds up builds)
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      # ✅ 4. Install system-level libraries
-      - name: Install system dependencies
-        run: |
+      # 3. Install system dependencies
+      - run: |
           sudo apt-get update
           sudo apt-get install -y \
             libpq-dev build-essential libffi-dev libssl-dev \
@@ -52,41 +35,30 @@ jobs:
             python3-cairocffi python3-gi-cairo gir1.2-pango-1.0 \
             gir1.2-gdkpixbuf-2.0
 
-      # ✅ 5. Install Python dependencies (including sendgrid + twilio + pdfplumber)
-      - name: Install Python dependencies
-        run: |
+      # 4. Install Python dependencies
+      - run: |
           python -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip setuptools wheel
-          pip install \
-            Django==4.2.* \
-            gunicorn==23.* \
-            whitenoise==6.* \
-            psycopg2-binary==2.9.* \
-            twilio==9.* \
-            sendgrid==6.* \
-            pdfplumber==0.11.* \
-            openpyxl==3.* \
-            pandas numpy requests pillow holidays hijridate geopy num2words weasyprint
-          pip freeze > requirements.txt
+          pip install -r requirements.txt
+          pip install qrcode sendgrid twilio pdfplumber
 
-      # ✅ 6. Run migrations & collect static files
-      - name: Prepare Django project
-        run: |
+      # 5. Run migrations & collectstatic
+      - run: |
           source antenv/bin/activate
-          echo "🗃 Applying migrations..."
-          python manage.py migrate --noinput || true
-          echo "🎨 Collecting static files..."
-          python manage.py collectstatic --noinput || true
+          python manage.py migrate --noinput
+          python manage.py collectstatic --noinput
 
-      # ✅ 7. Upload build artifact for deployment
-      - name: Upload artifact for deployment
+      # 6. Upload all project files for deployment (auto fetch everything except virtual env)
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
-            .
-            !antenv/
+            **/*
+          exclude: |
+            env/**
+            antenv/**
 
   deploy:
     runs-on: ubuntu-latest
@@ -96,21 +68,22 @@ jobs:
       contents: read
 
     steps:
-      # ✅ 8. Download artifact
+      # 1. Download build artifact
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      # ✅ 9. Log in to Azure
+      # 2. Azure Login
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ✅ 10. Deploy to Azure Web App
+      # 3. Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Pinnacle-College-Final'
           slot-name: 'Production'
+          package: '**/*'
