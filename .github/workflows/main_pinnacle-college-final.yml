@@ -1,10 +1,10 @@
 # ==========================================================
-# Azure Web App Deployment Workflow for Django (Python 3.11)
+# Azure Web App Deployment Workflow for Django (Python 3.9)
 # ==========================================================
 # Project: Pinnacle College Final
 # ==========================================================
 
-name: Build and deploy Python app to Azure Web App - Pinnacle-College-Final
+name: Build and deploy Django app to Azure Web App - Pinnacle-College-Final
 
 on:
   push:
@@ -19,14 +19,17 @@ jobs:
       contents: read
 
     steps:
+      # ✅ 1. Checkout your repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      # ✅ 2. Set up Python 3.9 (to match Azure runtime)
+      - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.9'
 
+      # ✅ 3. Install system dependencies required by Pillow, psycopg2, WeasyPrint, etc.
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -39,24 +42,28 @@ jobs:
             python3-cairocffi python3-gi-cairo gir1.2-pango-1.0 \
             gir1.2-gdkpixbuf-2.0
 
-      - name: Create virtual environment and install dependencies
+      # ✅ 4. Install Python dependencies and generate requirements.txt
+      - name: Install Python dependencies
         run: |
           python -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip setuptools wheel
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt || true
-          fi
-          pip install --upgrade Django gunicorn whitenoise psycopg2-binary \
+          pip install \
+            Django==4.2.* \
+            gunicorn==23.* \
+            whitenoise==6.* \
+            psycopg2-binary==2.9.* \
             pandas numpy requests pillow holidays hijridate geopy num2words weasyprint
           pip freeze > requirements.txt
 
+      # ✅ 5. Run migrations & collect static files
       - name: Prepare Django project
         run: |
           source antenv/bin/activate
-          python manage.py migrate --noinput || true
-          python manage.py collectstatic --noinput || true
+          python manage.py migrate --noinput
+          python manage.py collectstatic --noinput
 
+      # ✅ 6. Upload build artifact for deployment
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
@@ -73,21 +80,21 @@ jobs:
       contents: read
 
     steps:
+      # ✅ 7. Download the artifact built in previous job
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      # ✅ Azure Login using JSON credentials
+      # ✅ 8. Log in to Azure using Service Principal JSON credentials
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ✅ Deploy to Azure Web App
+      # ✅ 9. Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: 'Pinnacle-College-Final'
           slot-name: 'Production'
