@@ -33,7 +33,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '192.168.10.221', 'localhost', '127.0.0.1',
     '122.166.213.68',
-    'your-app-name.azurewebsites.net'
+    'pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net'
 ]
 
 
@@ -191,5 +191,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'saishashank0143@gmail.com'
 EMAIL_HOST_PASSWORD = 'umht bsic hycy pgli'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 
