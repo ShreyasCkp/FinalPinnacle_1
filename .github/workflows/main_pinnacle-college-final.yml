@@ -90,4 +90,5 @@ jobs:
         with:
           app-name: 'Pinnacle-College-Final'
           slot-name: 'Production'
-          package: 'python-app/**'
+          package: 'python-app'
+
