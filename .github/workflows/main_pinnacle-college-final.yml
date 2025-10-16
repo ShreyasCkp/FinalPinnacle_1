@@ -72,11 +72,12 @@ jobs:
       contents: read
 
     steps:
-      # 1. Download build artifact
+      # 1. Download build artifact into a folder
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
+          path: python-app-folder   # <-- MUST specify a folder
 
       # 2. Azure Login
       - name: Azure Login
@@ -90,5 +91,4 @@ jobs:
         with:
           app-name: 'Pinnacle-College-Final'
           slot-name: 'Production'
-          package: 'python-app'
-
+          package: 'python-app-folder'  # <-- point to downloaded folder
