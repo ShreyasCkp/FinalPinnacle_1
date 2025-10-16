@@ -40,16 +40,15 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m venv antenv
-          pip install --upgrade pip setuptools wheel
-          pip install -r requirements.txt
-          pip install qrcode sendgrid twilio pdfplumber
+          ./antenv/bin/pip install --upgrade pip setuptools wheel
+          ./antenv/bin/pip install -r requirements.txt
+          ./antenv/bin/pip install qrcode sendgrid twilio pdfplumber
 
-      # 5. Run migrations and collectstatic
+      # 5. Run migrations and collectstatic using venv Python
       - name: Run Django migrations & collectstatic
         run: |
-          source antenv/bin/activate
-          python manage.py migrate --noinput
-          python manage.py collectstatic --noinput
+          ./antenv/bin/python manage.py migrate --noinput
+          ./antenv/bin/python manage.py collectstatic --noinput
 
       # 6. Upload project files (excluding virtual environment)
       - name: Upload build artifact
