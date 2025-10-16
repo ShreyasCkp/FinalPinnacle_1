@@ -19,17 +19,14 @@ jobs:
       contents: read
 
     steps:
-      # ✅ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ✅ Setup Python 3.11
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # ✅ Install system dependencies (for psycopg2, weasyprint, etc.)
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -42,42 +39,25 @@ jobs:
             python3-cairocffi python3-gi-cairo gir1.2-pango-1.0 \
             gir1.2-gdkpixbuf-2.0
 
-      # ✅ Create virtual environment & install dependencies
       - name: Create virtual environment and install dependencies
         run: |
-          echo "🔧 Creating virtual environment..."
           python -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip setuptools wheel
-
-          echo "📦 Installing dependencies..."
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt || true
           fi
-
-          # ✅ Ensure essential Django packages exist
           pip install --upgrade Django gunicorn whitenoise psycopg2-binary \
             pandas numpy requests pillow holidays hijridate geopy num2words weasyprint
-
           pip freeze > requirements.txt
 
-      # ✅ Run Django migrations and collect static files
       - name: Prepare Django project
         run: |
           source antenv/bin/activate
-          echo "🗃️ Applying migrations..."
           python manage.py migrate --noinput || true
-          echo "🎨 Collecting static files..."
           python manage.py collectstatic --noinput || true
 
-      # ✅ Optional: list structure
-      - name: List project files
-        run: |
-          echo "📂 Project structure after build:"
-          ls -R
-
-      # ✅ Upload artifact for deployment
-      - name: Upload artifact for deployment job
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: python-app
@@ -93,13 +73,12 @@ jobs:
       contents: read
 
     steps:
-      # ✅ Download built artifact
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      # ✅ Login to Azure using unified credentials
+      # ✅ Azure Login using JSON credentials
       - name: Azure Login
         uses: azure/login@v2
         with:
