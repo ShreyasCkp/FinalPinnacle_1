@@ -44,18 +44,15 @@ jobs:
           ./antenv/bin/pip install -r requirements.txt
           ./antenv/bin/pip install qrcode sendgrid twilio pdfplumber
 
-      # 5. Run Django migrations & collectstatic
-      - name: Run Django migrations & collectstatic
-        run: |
-          # Fake conflicting master migration to avoid InconsistentMigrationHistory
-          ./antenv/bin/python manage.py migrate --fake master 0007_course_coursetype_employee_student_user_and_more
-          ./antenv/bin/python manage.py migrate --fake-initial
-          # Apply any new migrations normally
-          ./antenv/bin/python manage.py migrate --noinput
-          # Collect static files
-          ./antenv/bin/python manage.py collectstatic --noinput
+      # 5. Skip migrations (to avoid InconsistentMigrationHistory)
+      - name: Skip migrations
+        run: echo "Skipping migrations in CI/CD to avoid InconsistentMigrationHistory"
 
-      # 6. Upload project files (excluding virtual environment)
+      # 6. Collect static files
+      - name: Collect static files
+        run: ./antenv/bin/python manage.py collectstatic --noinput
+
+      # 7. Upload project files (excluding virtual environment)
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
