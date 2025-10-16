@@ -6,7 +6,7 @@ from .settings import *
 from .settings import BASE_DIR
 
 # Override ALLOWED_HOSTS from environment variable
-allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'Pinnacle-College-Final.azurewebsites.net,localhost,127.0.0.1')
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net,localhost,127.0.0.1')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
 
 # CSRF_TRUSTED_ORIGINS for Azure
@@ -33,3 +33,4 @@ DATABASES = {
         },
     }
 }
+
