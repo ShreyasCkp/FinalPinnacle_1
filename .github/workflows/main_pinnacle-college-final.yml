@@ -99,7 +99,7 @@ jobs:
         with:
           name: python-app
 
-      # ✅ Login to Azure using Service Principal (JSON creds)
+      # ✅ Login to Azure using unified credentials
       - name: Azure Login
         uses: azure/login@v2
         with:
