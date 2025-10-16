@@ -17,7 +17,7 @@ DEBUG = False  # Changed to False for production
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'Pinnacle-College-Final.azurewebsites.net',  # Correct Azure hostname
+    'pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net',  # Correct Azure hostname
 ]
 
 # Application definition
@@ -146,3 +146,4 @@ MSGKART_EMAIL = os.getenv('MSGKART_EMAIL', 'pscm@ckpsoftware.com')
 MSGKART_PHONE_ID = os.getenv('MSGKART_PHONE_ID', '677200268805951')
 MSGKART_ACCOUNT_ID = os.getenv('MSGKART_ACCOUNT_ID', '1079493607572130')
 MSGKART_BASE_URL = os.getenv('MSGKART_BASE_URL', 'https://alb-backend.msgkart.com')
+
