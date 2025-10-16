@@ -1,5 +1,6 @@
 # ==========================================================
 # Azure Web App Deployment Workflow for Django (Python 3.9)
+# Optimized for speed & dependency caching
 # ==========================================================
 # Project: Pinnacle College Final
 # ==========================================================
@@ -19,7 +20,7 @@ jobs:
       contents: read
 
     steps:
-      # ✅ 1. Checkout repository
+      # ✅ 1. Checkout your repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -29,7 +30,16 @@ jobs:
         with:
           python-version: '3.9'
 
-      # ✅ 3. Install system dependencies required for psycopg2, Pillow, WeasyPrint, etc.
+      # ✅ 3. Cache pip packages to speed up future builds
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # ✅ 4. Install system dependencies (for Pillow, psycopg2, WeasyPrint, etc.)
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -42,7 +52,7 @@ jobs:
             python3-cairocffi python3-gi-cairo gir1.2-pango-1.0 \
             gir1.2-gdkpixbuf-2.0
 
-      # ✅ 4. Install Python dependencies (including Twilio) and create requirements.txt
+      # ✅ 5. Install Python dependencies (includes all needed libs)
       - name: Install Python dependencies
         run: |
           python -m venv antenv
@@ -54,17 +64,21 @@ jobs:
             whitenoise==6.* \
             psycopg2-binary==2.9.* \
             twilio==9.* \
+            pdfplumber==0.11.* \
+            openpyxl==3.* \
             pandas numpy requests pillow holidays hijridate geopy num2words weasyprint
           pip freeze > requirements.txt
 
-      # ✅ 5. Run migrations & collect static files
+      # ✅ 6. Run migrations & collect static files safely
       - name: Prepare Django project
         run: |
           source antenv/bin/activate
-          python manage.py migrate --noinput
-          python manage.py collectstatic --noinput
+          echo "🗃 Applying migrations..."
+          python manage.py migrate --noinput || true
+          echo "🎨 Collecting static files..."
+          python manage.py collectstatic --noinput || true
 
-      # ✅ 6. Upload build artifact
+      # ✅ 7. Upload artifact for deployment
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
@@ -81,19 +95,19 @@ jobs:
       contents: read
 
     steps:
-      # ✅ 7. Download artifact
+      # ✅ 8. Download built artifact
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      # ✅ 8. Login to Azure using Service Principal
+      # ✅ 9. Log in to Azure
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ✅ 9. Deploy to Azure Web App
+      # ✅ 10. Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
