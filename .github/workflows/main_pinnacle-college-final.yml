@@ -66,7 +66,6 @@ jobs:
         run: |
           source antenv/bin/activate
           echo "🗃️ Skipping makemigrations (existing DB)..."
-          # Skip creating migrations on the build server
           python manage.py migrate --noinput || true
           echo "🎨 Collecting static files..."
           python manage.py collectstatic --noinput || true
@@ -100,13 +99,15 @@ jobs:
         with:
           name: python-app
 
-      # ✅ Login to Azure
+      # ✅ Login to Azure using Service Principal
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C581BC829F484ADA97D5594AB275605F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_31C325A2DA5B4D4476AEC70AA2A }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F081FF28A10E4E16918ED3344A4B0B16 }}
+          auth-type: 'SERVICE_PRINCIPAL'
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       # ✅ Deploy to Azure Web App
       - name: Deploy to Azure Web App
