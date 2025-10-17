@@ -36,29 +36,34 @@ jobs:
             python3-cairocffi python3-gi-cairo gir1.2-pango-1.0 \
             gir1.2-gdkpixbuf-2.0
 
-      # 4. (Optional) Verify Django setup locally in CI
-      - name: Install Python dependencies (CI check only)
+      # 4. (Optional) Verify Django setup in CI
+      - name: Install Python dependencies (for validation)
         run: |
           pip install --upgrade pip setuptools wheel
-          pip install "cryptography<41" pdfplumber qrcode sendgrid twilio -r requirements.txt
+          pip install "cryptography<41" pdfplumber qrcode sendgrid twilio
+          pip install -r requirements.txt
+          python manage.py check || true
 
-      # 5. Collect static files
+      # 5. Collect static files (optional pre-check)
       - name: Collect static files
         run: |
           python manage.py collectstatic --noinput || true
 
-      # 6. Upload app files to artifact (include requirements.txt!)
-      - name: Upload project files (excluding virtual environment)
+      # 6. Upload project files for deployment
+      - name: Upload project artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
-            **/*
+            ./
           exclude: |
             venv/**
+            antenv/**
+            env/**
             .git/**
             .github/**
             __pycache__/**
+            *.log
 
   deploy:
     runs-on: ubuntu-latest
@@ -68,14 +73,14 @@ jobs:
       contents: read
 
     steps:
-      # 1. Download the artifact from build job
+      # 1. Download artifact
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
           path: .
 
-      # 2. Azure login
+      # 2. Azure Login
       - name: Azure Login
         uses: azure/login@v2
         with:
