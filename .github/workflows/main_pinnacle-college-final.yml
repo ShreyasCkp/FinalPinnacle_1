@@ -46,7 +46,7 @@ jobs:
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
 
-      - name: Upload artifact for deployment
+      - name: Upload all project files
         uses: actions/upload-artifact@v4
         with:
           name: python-app
@@ -79,4 +79,11 @@ jobs:
           slot-name: 'Production'
           package: .
           enable-oryx-build: true
-          startup-command: "./startup.sh"
+          startup-command: >
+            bash -c "
+            pip install --upgrade pip &&
+            pip install -r requirements.txt &&
+            python manage.py migrate --noinput &&
+            python manage.py collectstatic --noinput &&
+            gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
+            "
