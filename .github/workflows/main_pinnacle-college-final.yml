@@ -36,19 +36,40 @@ jobs:
       - name: Collect static files
         run: python manage.py collectstatic --noinput
 
-      # 6️⃣ Apply migrations safely (fixes inconsistent migration history)
+      # 6️⃣ Apply migrations safely (dynamic)
       - name: Apply migrations safely
         run: |
           echo "Checking for migration inconsistencies..."
 
-          # Fake the master app migration 0007 if not applied
-          python manage.py migrate master 0007 --fake || true
+          python - <<'EOF'
+          import subprocess
+          import sys
+          import os
+          import django
 
-          # Fake the admission initial migration
-          python manage.py migrate admission 0001 --fake || true
+          os.environ.setdefault("DJANGO_SETTINGS_MODULE", "student_alerts_app.settings")
+          django.setup()
 
-          # Apply remaining migrations in correct order
-          python manage.py migrate --noinput
+          from django.db.migrations.executor import MigrationExecutor
+          from django.db import connections
+
+          connection = connections['default']
+          executor = MigrationExecutor(connection)
+          plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
+
+          # Get all unapplied migrations
+          unapplied = [migration for migration, backwards in plan if not backwards]
+          if unapplied:
+              print("Faking unapplied migrations in correct order:")
+              for app, name in unapplied:
+                  print(f" - {app}.{name}")
+                  subprocess.run([sys.executable, "manage.py", "migrate", app, name, "--fake"], check=True)
+          else:
+              print("No unapplied migrations to fake.")
+
+          # Apply all remaining migrations normally
+          subprocess.run([sys.executable, "manage.py", "migrate", "--noinput"], check=True)
+          EOF
 
       # 7️⃣ Deploy to Azure Web App
       - name: Deploy to Azure Web App
