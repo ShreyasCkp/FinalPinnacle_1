@@ -17,7 +17,7 @@ path('-collect-fee', views.fee_collection_collect, name='fee_collection_collect'
     path('-collect-fee-payment', views.collect_fee_payment_page, name='collect_fee_payment_page'),
     path('-generate-qr', views.generate_qr_dynamic, name='generate_qr_dynamic'),
      
-       re_path(r'^/receipt/(?P<admission_no>.+)/$', generate_receipt, name='generate_receipt'),
+    re_path(r'^receipt/(?P<admission_no>.+)/$', views.generate_receipt, name='generate_receipt')
 
 
 

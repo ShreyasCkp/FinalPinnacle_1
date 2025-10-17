@@ -1,36 +1,25 @@
-"""
-Deployment-specific settings for Azure App Service.
-"""
 import os
+from decouple import config
 from .settings import *
-from .settings import BASE_DIR
 
-# Override ALLOWED_HOSTS from environment variable
-allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net,localhost,127.0.0.1')
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
+DEBUG = False
 
-# CSRF_TRUSTED_ORIGINS for Azure
-CSRF_TRUSTED_ORIGINS = ['https://' + host for host in ALLOWED_HOSTS if host not in ['localhost', '127.0.0.1']]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='college-portal-efdhgwg8eqg0ejaj.centralindia-01.azurewebsites.net').split(',')
 
-# Whitenoise: Skip compression for binary files
-WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [
-    '.jpg', '.jpeg', '.png', '.gif', '.webp',
-    '.woff', '.woff2', '.ttf', '.eot', '.otf',
-    '.svg', '.ico', '.mp4', '.webm'
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{host}" for host in ALLOWED_HOSTS if host not in ['localhost', '127.0.0.1']
 ]
 
-# Database configuration for Azure PostgreSQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'institute_db_pg'),
-        'USER': os.getenv('DB_USER', 'dbadmin'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'Admin@2025'),
-        'HOST': os.getenv('DB_HOST', 'collegepgdb2025.postgres.database.azure.com'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
+        'OPTIONS': {'sslmode': 'require'},
     }
 }
 
+# Whitenoise already set in base settings

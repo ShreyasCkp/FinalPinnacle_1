@@ -11,6 +11,7 @@ settings_secret.py
 # VS Code / IDE stuff
 .vscode/
 .idea/
+venv/
  
 # OS files
 .DS_Store
