@@ -9,15 +9,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       # 1️⃣ Checkout repository
       - uses: actions/checkout@v3
 
-      # 2️⃣ Set up Python
+      # 2️⃣ Set up Python 3.9
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: "3.9"
 
       # 3️⃣ Install system dependencies
       - name: Install system dependencies
@@ -25,27 +26,28 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev shared-mime-info
 
-      # 4️⃣ Upgrade pip and install dependencies
+      # 4️⃣ Upgrade pip and install Python dependencies
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       # 5️⃣ Collect static files
       - name: Collect static files
         run: python manage.py collectstatic --noinput
 
-      # 6️⃣ Apply migrations safely
+      # 6️⃣ Apply migrations safely (fixes inconsistent migration history)
       - name: Apply migrations safely
         run: |
           echo "Checking for migration inconsistencies..."
-          # Apply master app migrations first
-          python manage.py migrate master --noinput || true
-          
-          # Fake admission app initial migration if needed
-          python manage.py migrate admission --fake || true
-          
-          # Apply remaining migrations
+
+          # Fake the master app migration 0007 if not applied
+          python manage.py migrate master 0007 --fake || true
+
+          # Fake the admission initial migration
+          python manage.py migrate admission 0001 --fake || true
+
+          # Apply remaining migrations in correct order
           python manage.py migrate --noinput
 
       # 7️⃣ Deploy to Azure Web App
