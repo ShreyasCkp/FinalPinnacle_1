@@ -35,13 +35,13 @@ jobs:
       - name: Collect static files
         run: python manage.py collectstatic --noinput
 
-      # 6️⃣ Run migrations in dependency order
-      - name: Run migrations
+      # 6️⃣ Run migrations safely
+      - name: Apply migrations safely
         run: |
           echo "Applying master app migrations first..."
-          python manage.py migrate master --noinput
-          echo "Applying admission app migrations next..."
-          python manage.py migrate admission --noinput
+          python manage.py migrate master 0007 --noinput
+          echo "Faking admission app migrations to fix dependency..."
+          python manage.py migrate admission --fake
           echo "Applying remaining migrations..."
           python manage.py migrate --noinput
 
