@@ -18,7 +18,7 @@ jobs:
       contents: read
 
     steps:
-      # 🧾 Checkout repo
+      # 🧾 Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.9'
 
-      # 🧱 Install system dependencies (for pycairo, weasyprint, reportlab, psycopg2, etc.)
+      # 🧱 Install system dependencies
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -38,17 +38,18 @@ jobs:
             libgdk-pixbuf2.0-dev \
             libffi-dev \
             shared-mime-info \
-            libpq-dev
+            libpq-dev \
+            build-essential
 
-      # 📦 Create virtual environment & install Python dependencies
+      # 📦 Install Python dependencies in virtual environment
       - name: Create virtual environment & install dependencies
         run: |
-          python -m venv antenv
-          source antenv/bin/activate
+          python -m venv venv
+          source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ⚙️ Set environment variables for CI build
+      # ⚙️ Set environment variables for deployment
       - name: Set environment variables
         run: |
           echo "DJANGO_ENV=deployment" >> $GITHUB_ENV
@@ -67,25 +68,22 @@ jobs:
           echo "MSGKART_BASE_URL=${{ secrets.MSGKART_BASE_URL }}" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
 
-      # ⚙️ Run Django migrations & collect static files
-      - name: Run Django migrations and collect static files
+      # ⚙️ Run Django migrations and collect static files
+      - name: Run migrations and collect static
         run: |
-          source antenv/bin/activate
+          source venv/bin/activate
           python manage.py migrate --noinput
           python manage.py collectstatic --noinput
 
-      # 📤 Upload artifact for deployment
+      # 📤 Upload all project files (excluding venv)
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
             .
-            !antenv/
+            !venv/
 
-  # ============================================
-  # 🚀 Deploy Job
-  # ============================================
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -95,12 +93,12 @@ jobs:
 
     steps:
       # 📥 Download artifact from build job
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      # 🔐 Azure login using your credentials
+      # 🔐 Azure login
       - name: Login to Azure
         uses: azure/login@v2
         with:
