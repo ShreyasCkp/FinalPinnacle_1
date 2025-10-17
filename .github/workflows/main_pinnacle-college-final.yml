@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.9'
 
-      # 🧱 Install system dependencies (for pycairo, weasyprint, reportlab, etc.)
+      # 🧱 Install system dependencies (for pycairo, weasyprint, reportlab, psycopg2, etc.)
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -37,25 +37,45 @@ jobs:
             libpango1.0-dev \
             libgdk-pixbuf2.0-dev \
             libffi-dev \
-            shared-mime-info
+            shared-mime-info \
+            libpq-dev
 
       # 📦 Create virtual environment & install Python dependencies
-      - name: Create and start virtual environment
+      - name: Create virtual environment & install dependencies
         run: |
           python -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ⚙️ Run migrations & collect static files
-      - name: Run migrations and collect static files
+      # ⚙️ Set environment variables for CI build
+      - name: Set environment variables
+        run: |
+          echo "DJANGO_ENV=deployment" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> $GITHUB_ENV
+          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> $GITHUB_ENV
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+          echo "MSGKART_API_KEY=${{ secrets.MSGKART_API_KEY }}" >> $GITHUB_ENV
+          echo "MSGKART_EMAIL=${{ secrets.MSGKART_EMAIL }}" >> $GITHUB_ENV
+          echo "MSGKART_PHONE_ID=${{ secrets.MSGKART_PHONE_ID }}" >> $GITHUB_ENV
+          echo "MSGKART_ACCOUNT_ID=${{ secrets.MSGKART_ACCOUNT_ID }}" >> $GITHUB_ENV
+          echo "MSGKART_BASE_URL=${{ secrets.MSGKART_BASE_URL }}" >> $GITHUB_ENV
+          echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
+
+      # ⚙️ Run Django migrations & collect static files
+      - name: Run Django migrations and collect static files
         run: |
           source antenv/bin/activate
           python manage.py migrate --noinput
           python manage.py collectstatic --noinput
 
       # 📤 Upload artifact for deployment
-      - name: Upload artifact for deployment jobs
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: python-app
@@ -74,13 +94,13 @@ jobs:
       contents: read
 
     steps:
-      # 📥 Download build artifact
+      # 📥 Download artifact from build job
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      # 🔐 Azure login
+      # 🔐 Azure login using your credentials
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -89,9 +109,9 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
 
       # 🌐 Deploy to Azure Web App
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
+          package: .
