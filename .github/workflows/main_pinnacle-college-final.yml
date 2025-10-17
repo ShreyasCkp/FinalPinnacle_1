@@ -41,14 +41,6 @@ jobs:
             libpq-dev \
             build-essential
 
-      # 📦 Install Python dependencies in virtual environment
-      - name: Create virtual environment & install dependencies
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
       # ⚙️ Set environment variables for deployment
       - name: Set environment variables
         run: |
@@ -68,21 +60,12 @@ jobs:
           echo "MSGKART_BASE_URL=${{ secrets.MSGKART_BASE_URL }}" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
 
-      # ⚙️ Run Django migrations and collect static files
-      - name: Run migrations and collect static
-        run: |
-          source venv/bin/activate
-          python manage.py migrate --noinput
-          python manage.py collectstatic --noinput
-
-      # 📤 Upload all project files (excluding venv)
+      # 📤 Upload all project files (requirements.txt must be in root)
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            .
-            !venv/
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -106,10 +89,16 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EDE88DCF06254615AB8F130C24D59BC5 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
 
-      # 🌐 Deploy to Azure Web App
+      # 🌐 Deploy to Azure Web App (enable Oryx build to install dependencies)
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
           package: .
+          enable-oryx-build: true
+
+      # ⚙️ Run Django migrations and collect static
+      - name: Run Django migrations and collect static
+        run: |
+          az webapp ssh --name pinnacle-college-final --command "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
