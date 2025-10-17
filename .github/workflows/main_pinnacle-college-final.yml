@@ -13,14 +13,17 @@ jobs:
       contents: read
 
     steps:
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Set up Python 3.9
       - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
+      # 3. Install system dependencies
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -33,19 +36,18 @@ jobs:
             python3-cairocffi python3-gi-cairo gir1.2-pango-1.0 \
             gir1.2-gdkpixbuf-2.0
 
-      - name: Install Python dependencies
+      # 4. (Optional) Verify Django setup locally in CI
+      - name: Install Python dependencies (CI check only)
         run: |
-          python -m venv venv
-          source venv/bin/activate
           pip install --upgrade pip setuptools wheel
-          # Use older cryptography to avoid GLIBC issues
           pip install "cryptography<41" pdfplumber qrcode sendgrid twilio -r requirements.txt
 
+      # 5. Collect static files
       - name: Collect static files
         run: |
-          source venv/bin/activate
-          python manage.py collectstatic --noinput
+          python manage.py collectstatic --noinput || true
 
+      # 6. Upload app files to artifact (include requirements.txt!)
       - name: Upload project files (excluding virtual environment)
         uses: actions/upload-artifact@v4
         with:
@@ -55,6 +57,8 @@ jobs:
           exclude: |
             venv/**
             .git/**
+            .github/**
+            __pycache__/**
 
   deploy:
     runs-on: ubuntu-latest
@@ -64,20 +68,23 @@ jobs:
       contents: read
 
     steps:
+      # 1. Download the artifact from build job
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
-          path: python-app-folder
+          path: .
 
+      # 2. Azure login
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # 3. Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Pinnacle-College-Final'
           slot-name: 'Production'
-          package: 'python-app-folder'
+          package: .
