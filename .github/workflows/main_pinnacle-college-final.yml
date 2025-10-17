@@ -46,30 +46,33 @@ jobs:
           import sys
           import os
           import django
-
+          
           os.environ.setdefault("DJANGO_SETTINGS_MODULE", "student_alerts_app.settings")
           django.setup()
-
-          from django.db.migrations.executor import MigrationExecutor
+          
           from django.db import connections
+          from django.db.migrations.executor import MigrationExecutor
 
           connection = connections['default']
           executor = MigrationExecutor(connection)
           plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
 
-          # Get all unapplied migrations
+          # Extract app_label and name from Migration object
           unapplied = [migration for migration, backwards in plan if not backwards]
           if unapplied:
               print("Faking unapplied migrations in correct order:")
-              for app, name in unapplied:
-                  print(f" - {app}.{name}")
-                  subprocess.run([sys.executable, "manage.py", "migrate", app, name, "--fake"], check=True)
+              for migration in unapplied:
+                  app_label = migration.app_label
+                  name = migration.name
+                  print(f" - {app_label}.{name}")
+                  subprocess.run([sys.executable, "manage.py", "migrate", app_label, name, "--fake"], check=True)
           else:
               print("No unapplied migrations to fake.")
 
-          # Apply all remaining migrations normally
+          # Apply remaining migrations normally
           subprocess.run([sys.executable, "manage.py", "migrate", "--noinput"], check=True)
           EOF
+
 
       # 7️⃣ Deploy to Azure Web App
       - name: Deploy to Azure Web App
@@ -79,3 +82,4 @@ jobs:
           slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: .
+
