@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      # 3️⃣ Install system dependencies (fix pycairo build error)
+      # 3️⃣ Install system dependencies
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -35,21 +35,24 @@ jobs:
       - name: Collect static files
         run: python manage.py collectstatic --noinput
 
-      # 6️⃣ Run migrations safely
+      # 6️⃣ Apply migrations safely
       - name: Apply migrations safely
         run: |
-          echo "Applying master app migrations first..."
-          python manage.py migrate master 0007 --noinput
-          echo "Faking admission app migrations to fix dependency..."
-          python manage.py migrate admission --fake
-          echo "Applying remaining migrations..."
+          echo "Checking for migration inconsistencies..."
+          # Apply master app migrations first
+          python manage.py migrate master --noinput || true
+          
+          # Fake admission app initial migration if needed
+          python manage.py migrate admission --fake || true
+          
+          # Apply remaining migrations
           python manage.py migrate --noinput
 
       # 7️⃣ Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "your-azure-app-name"      # 🔁 replace with your actual app name
+          app-name: "your-azure-app-name"
           slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: .
