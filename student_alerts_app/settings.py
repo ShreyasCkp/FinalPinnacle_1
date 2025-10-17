@@ -17,7 +17,6 @@ DEBUG = False  # Changed to False for production
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net',  # Correct Azure hostname
 ]
 
 # Application definition
