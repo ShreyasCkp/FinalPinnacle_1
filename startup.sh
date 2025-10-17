@@ -9,5 +9,5 @@ python manage.py migrate --noinput
 # Collect static files
 python manage.py collectstatic --noinput
 
-# Start Gunicorn
+# #Start Gunicorn
 gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
