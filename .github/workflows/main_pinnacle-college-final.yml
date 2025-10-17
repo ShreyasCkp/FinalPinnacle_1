@@ -35,21 +35,17 @@ jobs:
       - name: Collect static files
         run: python manage.py collectstatic --noinput
 
-      # 6️⃣ Handle inconsistent migrations (fix migration dependency issue)
-      - name: Fix inconsistent migration history
-        run: |
-          echo "Checking for migration inconsistencies..."
-          python manage.py migrate master zero --fake
-          python manage.py migrate admission zero --fake
-          python manage.py migrate --fake-initial
-
-      # 7️⃣ Run migrations cleanly
+      # 6️⃣ Run migrations in dependency order
       - name: Run migrations
         run: |
-          python manage.py makemigrations --noinput
+          echo "Applying master app migrations first..."
+          python manage.py migrate master --noinput
+          echo "Applying admission app migrations next..."
+          python manage.py migrate admission --noinput
+          echo "Applying remaining migrations..."
           python manage.py migrate --noinput
 
-      # 8️⃣ Deploy to Azure Web App
+      # 7️⃣ Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
