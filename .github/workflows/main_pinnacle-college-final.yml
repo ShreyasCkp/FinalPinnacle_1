@@ -23,28 +23,30 @@ jobs:
           
       - name: Install system dependencies
         run: |
-         sudo apt-get update
-         sudo apt-get install -y \
-          build-essential \
-          python3-dev \
-          python3-pip \
-          libcairo2-dev \
-          libcairo2 \
-          libpango1.0-dev \
-          libgdk-pixbuf2.0-dev \
-          libffi-dev \
-          shared-mime-info \
-          libpq-dev \
-          pkg-config \
-          git \
-          wget \
-          python3-venv \
-          fontconfig \
-          libjpeg-dev \
-          zlib1g-dev \
-          meson \
-          ninja-build \
-          cmake
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            python3-dev \
+            python3-pip \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libgdk-pixbuf2.0-dev \
+            libffi-dev \
+            shared-mime-info \
+            libpq-dev \
+            pkg-config \
+            git \
+            wget \
+            python3-venv \
+            fontconfig \
+            libjpeg-dev \
+            zlib1g-dev \
+            meson \
+            ninja-build \
+            cmake \
+            libcairo2 \
+            python3-cffi
+
 
 
 
@@ -106,5 +108,6 @@ jobs:
             python manage.py collectstatic --noinput &&
             exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
             "
+
 
 
