@@ -1,4 +1,4 @@
-# Use full Debian-based Python image
+# Use a full Debian-based Python image
 FROM python:3.9-bullseye
 
 # Set environment variables
@@ -8,13 +8,15 @@ ENV PYTHONUNBUFFERED 1
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for pycairo and PDF libs
 RUN apt-get update && apt-get install -y \
     build-essential \
     libcairo2-dev \
     pkg-config \
     python3-dev \
     libffi-dev \
+    libjpeg-dev \
+    zlib1g-dev \
     git \
     && rm -rf /var/lib/apt/lists/*
 
