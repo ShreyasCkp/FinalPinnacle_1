@@ -78,7 +78,6 @@ jobs:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
           package: .
-          enable-oryx-build: true
           startup-command: >
             bash -c "
             pip install --upgrade pip &&
@@ -87,3 +86,4 @@ jobs:
             python manage.py collectstatic --noinput &&
             gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
             "
+
