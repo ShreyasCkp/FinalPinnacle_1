@@ -1,5 +1,5 @@
-# Use an official Python image
-FROM python:3.9-slim
+# Use full Debian-based Python image
+FROM python:3.9-bullseye
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -18,20 +18,20 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pip latest version
+# Upgrade pip
 RUN pip install --upgrade pip
 
-# Copy requirements first for caching
+# Copy requirements first (for caching)
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the Django project code
+# Copy the Django project
 COPY . .
 
-# Expose port for Azure (should match WEBSITES_PORT)
+# Expose port
 EXPOSE 8000
 
-# Run Django with gunicorn
+# Run gunicorn
 CMD ["gunicorn", "student_alerts_app.wsgi:application", "--bind", "0.0.0.0:8000"]
