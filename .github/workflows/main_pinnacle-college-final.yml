@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # fetch all history
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,7 +30,6 @@ jobs:
             build-essential \
             python3-dev \
             python3-pip \
-            libcairo2 \
             libcairo2-dev \
             libpango1.0-dev \
             libgdk-pixbuf2.0-dev \
@@ -43,10 +44,6 @@ jobs:
             libfreetype6-dev \
             libpng-dev \
             libfontconfig1-dev
-
-      - name: Verify pkg-config and cairo
-        run: |
-          pkg-config --modversion cairo || { echo "ERROR: pkg-config or cairo not found"; exit 1; }
 
       - name: Set environment variables
         run: |
@@ -64,12 +61,11 @@ jobs:
       - name: Upgrade pip and install pycairo
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip cache purge
-          pip install --no-cache-dir pycairo==1.24.0 || { echo "ERROR: pycairo installation failed"; exit 1; }
+          pip install --no-cache-dir pycairo==1.24.0
 
       - name: Install Python dependencies
         run: |
-          pip install --no-cache-dir -r requirements.txt || { echo "ERROR: requirements.txt installation failed"; exit 1; }
+          pip install --no-cache-dir -r requirements.txt
 
       - name: List all project files
         run: |
@@ -77,11 +73,16 @@ jobs:
           ls -laR .
           echo "========================="
 
-      - name: Upload project files as artifact
+      - name: Prepare deployment folder
+        run: |
+          mkdir -p deploy
+          cp -r . deploy/
+
+      - name: Upload project as artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: .
+          path: deploy/
 
   deploy:
     runs-on: ubuntu-latest
@@ -108,7 +109,7 @@ jobs:
         with:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
-          package: .
+          package: deploy/
           startup-command: >
             bash -c "
             apt-get update && apt-get install -y pkg-config libcairo2-dev libfreetype6-dev libpng-dev libfontconfig1-dev &&
