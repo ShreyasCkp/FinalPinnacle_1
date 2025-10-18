@@ -39,7 +39,14 @@ jobs:
             git \
             wget \
             python3-venv \
-            fontconfig
+            fontconfig \
+            libfreetype6-dev \
+            libpng-dev \
+            libfontconfig1-dev
+
+      - name: Verify pkg-config and cairo
+        run: |
+          pkg-config --modversion cairo || { echo "ERROR: pkg-config or cairo not found"; exit 1; }
 
       - name: Set environment variables
         run: |
@@ -57,10 +64,12 @@ jobs:
       - name: Upgrade pip and install pycairo
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install --no-cache-dir pycairo==1.24.0
+          pip cache purge
+          pip install --no-cache-dir pycairo==1.20.0 --only-binary=:all: || { echo "ERROR: pycairo installation failed"; exit 1; }
 
       - name: Install Python dependencies
-        run: pip install --no-cache-dir -r requirements.txt
+        run: |
+          pip install --no-cache-dir -r requirements.txt || { echo "ERROR: requirements.txt installation failed"; exit 1; }
 
       - name: List all project files
         run: |
@@ -102,8 +111,9 @@ jobs:
           package: .
           startup-command: >
             bash -c "
+            apt-get update && apt-get install -y pkg-config libcairo2-dev libfreetype6-dev libpng-dev libfontconfig1-dev &&
             python -m pip install --upgrade pip setuptools wheel &&
-            pip install --no-cache-dir pycairo==1.24.0 &&
+            pip install --no-cache-dir pycairo==1.20.0 --only-binary=:all: || pip install --no-cache-dir pycairo==1.20.0 &&
             pip install --no-cache-dir -r requirements.txt &&
             python manage.py migrate --noinput &&
             python manage.py collectstatic --noinput &&
