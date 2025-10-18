@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-
+          
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -42,6 +42,7 @@ jobs:
             fontconfig \
             libjpeg-dev \
             zlib1g-dev
+
 
       - name: Set environment variables
         run: |
@@ -101,3 +102,4 @@ jobs:
             python manage.py collectstatic --noinput &&
             exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
             "
+
