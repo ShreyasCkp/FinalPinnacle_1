@@ -44,7 +44,6 @@ jobs:
             libfreetype6-dev \
             libpng-dev \
             libfontconfig1-dev
-
       - name: Set environment variables
         run: |
           echo "DJANGO_ENV=deployment" >> $GITHUB_ENV
@@ -57,27 +56,22 @@ jobs:
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> $GITHUB_ENV
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
-
       - name: Upgrade pip and install pycairo
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install --no-cache-dir pycairo==1.24.0
-
       - name: Install Python dependencies
         run: |
           pip install --no-cache-dir -r requirements.txt
-
       - name: List all project files
         run: |
           echo "===== Project Files ====="
           ls -laR .
           echo "========================="
-
       - name: Prepare deployment folder
         run: |
           mkdir -p deploy
           cp -r . deploy/
-
       - name: Upload project as artifact
         uses: actions/upload-artifact@v4
         with:
