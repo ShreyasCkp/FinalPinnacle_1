@@ -15,12 +15,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # fetch all history
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-          
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -31,24 +33,17 @@ jobs:
             libcairo2-dev \
             libpango1.0-dev \
             libgdk-pixbuf2.0-dev \
-            libffi-dev \
-            shared-mime-info \
-            libpq-dev \
             pkg-config \
+            libffi-dev \
+            libjpeg-dev \
+            zlib1g-dev \
             git \
             wget \
             python3-venv \
             fontconfig \
-            libjpeg-dev \
-            zlib1g-dev \
-            meson \
-            ninja-build \
-            cmake \
-            libcairo2 \
-            python3-cffi
-
-
-
+            libfreetype6-dev \
+            libpng-dev \
+            libfontconfig1-dev
 
       - name: Set environment variables
         run: |
@@ -63,51 +58,65 @@ jobs:
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
 
-      - name: Upgrade pip and install Python dependencies
+      - name: Upgrade pip and install pycairo
         run: |
           python -m pip install --upgrade pip setuptools wheel
+          pip install --no-cache-dir pycairo==1.24.0
+
+      - name: Install Python dependencies
+        run: |
           pip install --no-cache-dir -r requirements.txt
 
-      - name: Upload project files
+      - name: List all project files
+        run: |
+          echo "===== Project Files ====="
+          ls -laR .
+          echo "========================="
+
+      - name: Prepare deployment folder
+        run: |
+          mkdir -p deploy
+          rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github
+
+      - name: Upload project as artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: .
+          path: deploy/
 
   deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write
-      contents: read
+      runs-on: ubuntu-latest
+      needs: build
+      permissions:
+        id-token: write
+        contents: read
 
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
+      steps:
+        - name: Download artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: python-app
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_947BB4DEA5B14B9CBF177985A0D9D75B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EDE88DCF06254615AB8F130C24D59BC5 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
+        - name: Login to Azure
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_947BB4DEA5B14B9CBF177985A0D9D75B }}
+            tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EDE88DCF06254615AB8F130C24D59BC5 }}
+            subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'pinnacle-college-final'
-          slot-name: 'Production'
-          package: .
-          startup-command: >
-            bash -c "
-            python -m pip install --upgrade pip setuptools wheel &&
-            pip install --no-cache-dir -r requirements.txt &&
-            python manage.py migrate --noinput &&
-            python manage.py collectstatic --noinput &&
-            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
-            "
-
-
-
+        - name: Deploy to Azure Web App
+          uses: azure/webapps-deploy@v3
+          with:
+            app-name: 'pinnacle-college-final'
+            slot-name: 'Production'
+            package: .
+            startup-command: >
+              bash -c "
+              apt-get update && apt-get install -y pkg-config libcairo2-dev libfreetype6-dev libpng-dev libfontconfig1-dev &&
+              python -m pip install --upgrade pip setuptools wheel &&
+              pip install --no-cache-dir pycairo==1.24.0 &&
+              pip install --no-cache-dir -r requirements.txt &&
+              python manage.py migrate --noinput &&
+              python manage.py collectstatic --noinput &&
+              exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
+              "
