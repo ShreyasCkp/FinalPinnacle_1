@@ -1,14 +1,14 @@
-# ✅ Use a maintained Python image
+# ✅ Use maintained Python image
 FROM python:3.9-bullseye
 
-# Prevent .pyc files and enable unbuffered logs
+# Prevent .pyc and enable unbuffered output
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set working directory
+# Working directory
 WORKDIR /app
 
-# ✅ Install system dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
@@ -27,27 +27,27 @@ RUN apt-get update && apt-get install -y \
     fontconfig \
  && rm -rf /var/lib/apt/lists/*
 
-# ✅ Upgrade pip and wheel
+# Upgrade pip
 RUN python -m pip install --upgrade pip setuptools wheel
 
-# ✅ Install pycairo first (required by some libraries)
+# Install pycairo
 RUN pip install --no-cache-dir pycairo==1.24.0
 
-# ✅ Copy requirements and install dependencies
+# Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ✅ Copy project files
+# Copy project
 COPY . .
 
-# ✅ Create static and media directories if not existing
+# Create static/media
 RUN mkdir -p /app/static /app/media
 
-# ✅ Collect static files during build (optional but recommended)
+# Collect static during build
 RUN python manage.py collectstatic --noinput
 
-# ✅ Expose the port Gunicorn will run on
+# Expose Gunicorn port
 EXPOSE 8000
 
-# ✅ Run Gunicorn server
+# Start server
 CMD ["gunicorn", "student_alerts_app.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "600"]
