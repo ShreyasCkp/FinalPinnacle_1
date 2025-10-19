@@ -67,7 +67,7 @@ jobs:
         run: |
           mkdir -p deploy
           rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github
-          cp -r antenv deploy/   # include virtual environment
+          # Do not include virtual environment in artifact
 
       - name: Upload project as artifact
         uses: actions/upload-artifact@v4
@@ -101,14 +101,11 @@ jobs:
         with:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
-          package: python-app/
+          package: deploy/    # <-- contains manage.py
           startup-command: >
             bash -c "
-            source antenv/bin/activate &&
+            source ./antenv/bin/activate &&
             python manage.py migrate --noinput &&
             python manage.py collectstatic --noinput &&
             exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
             "
-
-
-
