@@ -85,38 +85,38 @@ jobs:
           path: deploy/
 
   deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write
-      contents: read
+      runs-on: ubuntu-latest
+      needs: build
+      permissions:
+        id-token: write
+        contents: read
 
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
+      steps:
+        - name: Download artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: python-app
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_947BB4DEA5B14B9CBF177985A0D9D75B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EDE88DCF06254615AB8F130C24D59BC5 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
+        - name: Login to Azure
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_947BB4DEA5B14B9CBF177985A0D9D75B }}
+            tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EDE88DCF06254615AB8F130C24D59BC5 }}
+            subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'pinnacle-college-final'
-          slot-name: 'Production'
-          package: deploy/
-          startup-command: >
-            bash -c "
-            apt-get update && apt-get install -y pkg-config libcairo2-dev libfreetype6-dev libpng-dev libfontconfig1-dev &&
-            python -m pip install --upgrade pip setuptools wheel &&
-            pip install --no-cache-dir pycairo==1.24.0 &&
-            pip install --no-cache-dir -r requirements.txt &&
-            python manage.py migrate --noinput &&
-            python manage.py collectstatic --noinput &&
-            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
-            "
+        - name: Deploy to Azure Web App
+          uses: azure/webapps-deploy@v3
+          with:
+            app-name: 'pinnacle-college-final'
+            slot-name: 'Production'
+            package: .
+            startup-command: >
+              bash -c "
+              apt-get update && apt-get install -y pkg-config libcairo2-dev libfreetype6-dev libpng-dev libfontconfig1-dev &&
+              python -m pip install --upgrade pip setuptools wheel &&
+              pip install --no-cache-dir pycairo==1.24.0 &&
+              pip install --no-cache-dir -r requirements.txt &&
+              python manage.py migrate --noinput &&
+              python manage.py collectstatic --noinput &&
+              exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
+              "
