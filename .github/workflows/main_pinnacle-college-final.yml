@@ -112,7 +112,6 @@ jobs:
             package: .
             startup-command: >
               bash -c "
-              apt-get update && apt-get install -y pkg-config libcairo2-dev libfreetype6-dev libpng-dev libfontconfig1-dev &&
               python -m pip install --upgrade pip setuptools wheel &&
               pip install --no-cache-dir pycairo==1.24.0 &&
               pip install --no-cache-dir -r requirements.txt &&
@@ -120,3 +119,4 @@ jobs:
               python manage.py collectstatic --noinput &&
               exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
               "
+
