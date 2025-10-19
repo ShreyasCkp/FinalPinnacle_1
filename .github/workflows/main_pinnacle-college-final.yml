@@ -97,10 +97,12 @@ jobs:
         with:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
-          package: .
+          package: deploy/
           startup-command: >
             bash -c "
+            source antenv/bin/activate &&
             python manage.py migrate --noinput &&
             python manage.py collectstatic --noinput &&
             exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
             "
+
