@@ -1,46 +1,53 @@
-# Use a Debian-based Python image
+# ✅ Use a maintained Python image
 FROM python:3.9-bullseye
 
-# Set environment variables
+# Prevent .pyc files and enable unbuffered logs
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies required for pycairo, PDF libs, and Django
+# ✅ Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libcairo2 \
-    libcairo2-dev \
-    pkg-config \
     python3-dev \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libgdk-pixbuf2.0-dev \
+    pkg-config \
     libffi-dev \
     libjpeg-dev \
     zlib1g-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libfontconfig1-dev \
     git \
     wget \
-    python3-venv \
     fontconfig \
-    libpango1.0-dev \
-    libgdk-pixbuf2.0-dev \
-    && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and install pycairo first
-RUN pip install --upgrade pip setuptools wheel
+# ✅ Upgrade pip and wheel
+RUN python -m pip install --upgrade pip setuptools wheel
+
+# ✅ Install pycairo first (required by some libraries)
 RUN pip install --no-cache-dir pycairo==1.24.0
 
-# Copy requirements first for caching
+# ✅ Copy requirements and install dependencies
 COPY requirements.txt .
-
-# Install remaining Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy Django project
+# ✅ Copy project files
 COPY . .
 
-# Expose port
+# ✅ Create static and media directories if not existing
+RUN mkdir -p /app/static /app/media
+
+# ✅ Collect static files during build (optional but recommended)
+RUN python manage.py collectstatic --noinput
+
+# ✅ Expose the port Gunicorn will run on
 EXPOSE 8000
 
-# Run Django via Gunicorn
+# ✅ Run Gunicorn server
 CMD ["gunicorn", "student_alerts_app.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "600"]
