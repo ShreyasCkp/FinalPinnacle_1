@@ -40,7 +40,7 @@ jobs:
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
-          rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github
+          rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github --exclude antenv
           cd deploy
           zip -r ../release.zip .
           cd ..
@@ -79,10 +79,4 @@ jobs:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
           package: release.zip
-          startup-command: >
-            bash -c "
-            source antenv/bin/activate &&
-            python manage.py migrate --noinput &&
-            python manage.py collectstatic --noinput &&
-            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
-    "
+          startup-command: bash -c "source antenv/bin/activate && python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600"
