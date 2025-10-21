@@ -18,25 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-          cache: 'pip'
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-venv build-essential python3-dev pkg-config \
-              libcairo2 libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libffi-dev shared-mime-info
-
-      - name: Install Python dependencies
-        run: |
-          python -m venv antenv
-          source antenv/bin/activate
-          pip install --upgrade pip wheel setuptools
-          pip install -r requirements.txt
-
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
@@ -79,4 +60,5 @@ jobs:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
           package: release.zip
-          startup-command: bash -c "source antenv/bin/activate && python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600"
+          startup-command: >
+            bash -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600"
