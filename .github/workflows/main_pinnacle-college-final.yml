@@ -85,4 +85,4 @@ jobs:
             python manage.py migrate --noinput &&
             python manage.py collectstatic --noinput &&
             exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
-            "
+    "
