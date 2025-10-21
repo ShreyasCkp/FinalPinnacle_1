@@ -47,14 +47,19 @@ jobs:
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
-          rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github
-        # No need to copy virtual environment to artifact
+          rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github --exclude antenv
+
+      - name: Create ZIP for deployment
+        run: |
+          cd deploy
+          zip -r ../release.zip .
+          cd ..
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: deploy/
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -65,7 +70,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
-          path: python-app
+          path: .
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -79,12 +84,10 @@ jobs:
         with:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
-          package: python-app
+          package: release.zip
           startup-command: >
             bash -c "
-            python -m venv antenv &&
             source antenv/bin/activate &&
-            pip install -r requirements.txt &&
             python manage.py migrate --noinput &&
             python manage.py collectstatic --noinput &&
             exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
