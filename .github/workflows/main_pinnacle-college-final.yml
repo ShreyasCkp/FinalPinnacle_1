@@ -84,4 +84,5 @@ jobs:
         uses: azure/CLI@v2
         with:
           inlineScript: |
-            az webapp ssh --name pinnacle-college-final --resource-group YOUR_RESOURCE_GROUP --command "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
+            az webapp ssh --name pinnacle-college-final --resource-group pinnacle-college-final --command "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
+
