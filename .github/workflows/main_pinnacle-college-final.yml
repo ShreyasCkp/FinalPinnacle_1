@@ -84,6 +84,8 @@ jobs:
         uses: azure/CLI@v2
         with:
           inlineScript: |
+            echo "Installing Azure CLI webapp extension..."
+            az extension add --name webapp --upgrade
             echo "Running Django migrations and collectstatic on Azure Web App..."
             az webapp run-command invoke \
               --name pinnacle-college-final \
