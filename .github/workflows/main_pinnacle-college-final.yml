@@ -1,3 +1,4 @@
+
 name: Build and deploy Python app to Azure Web App - pinnacle-college-final
 
 on:
@@ -23,14 +24,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-venv build-essential python3-dev
-
       - name: Install Python dependencies
         run: |
           python -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
-
       - name: Set environment variables
         run: |
           echo "DJANGO_ENV=deployment" >> $GITHUB_ENV
@@ -43,18 +42,15 @@ jobs:
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> $GITHUB_ENV
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
-
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
           rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github --exclude antenv
-
       - name: Create ZIP for deployment
         run: |
           cd deploy
           zip -r ../release.zip .
           cd ..
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
