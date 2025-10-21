@@ -21,6 +21,7 @@ jobs:
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
+          # Copy all files including requirements.txt, but exclude virtualenv & GitHub folder
           rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github --exclude antenv
           cd deploy
           zip -r ../release.zip .
@@ -61,4 +62,8 @@ jobs:
           slot-name: 'Production'
           package: release.zip
           startup-command: >
-            bash -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600"
+            bash -c "python -m pip install --upgrade pip &&
+                     pip install -r requirements.txt &&
+                     python manage.py migrate --noinput &&
+                     python manage.py collectstatic --noinput &&
+                     exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600"
