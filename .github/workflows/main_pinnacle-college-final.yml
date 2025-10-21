@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,7 +29,7 @@ jobs:
           python -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip
-          pip install --no-cache-dir -r requirements.txt
+          pip install -r requirements.txt
 
       - name: Set environment variables
         run: |
@@ -43,11 +44,17 @@ jobs:
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
 
-      - name: Upload project as artifact
+      - name: Prepare deployment package
+        run: |
+          mkdir -p deploy
+          rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github
+        # No need to copy virtual environment to artifact
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: .   # upload everything in root (no deploy folder)
+          path: deploy/
 
   deploy:
     runs-on: ubuntu-latest
@@ -58,7 +65,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
-          path: python-app   # <- downloads artifact into this folder
+          path: python-app
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -72,10 +79,12 @@ jobs:
         with:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
-          package: python-app  # <- point to folder where artifact is downloaded
+          package: python-app
           startup-command: >
             bash -c "
-            source ./antenv/bin/activate &&
+            python -m venv antenv &&
+            source antenv/bin/activate &&
+            pip install -r requirements.txt &&
             python manage.py migrate --noinput &&
             python manage.py collectstatic --noinput &&
             exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
