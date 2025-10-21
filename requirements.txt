@@ -68,7 +68,7 @@ requests==2.32.3
 sendgrid==6.9.0
 six==1.17.0
 sqlparse==0.5.3
-svglib==1.6.0
+svglib==1.4.1
 tinycss2==1.4.0
 tinyhtml5==2.0.0
 tomli==2.2.1
