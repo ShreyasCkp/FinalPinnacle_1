@@ -87,11 +87,10 @@ jobs:
           package: ${{ env.DEPLOY_PACKAGE }}
           # startup command: install from local wheels, then migrate/collectstatic and start gunicorn
           startup-command: >
-            bash -c "
-            python -m pip install --upgrade pip &&
-            # install using wheels included in the deployed app to avoid building on Azure
+            bash -c "python -m pip install --upgrade pip &&
             pip install --no-index --find-links /home/site/wwwroot/wheels -r /home/site/wwwroot/requirements.txt &&
             python /home/site/wwwroot/manage.py migrate --noinput &&
             python /home/site/wwwroot/manage.py collectstatic --noinput &&
-            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
-            "
+            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600"
+          
+
