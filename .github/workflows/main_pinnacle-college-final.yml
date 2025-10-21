@@ -37,26 +37,10 @@ jobs:
           pip install --upgrade pip wheel setuptools
           pip install -r requirements.txt
 
-      - name: Set environment variables
-        run: |
-          echo "DJANGO_ENV=deployment" >> $GITHUB_ENV
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
-          echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> $GITHUB_ENV
-          echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> $GITHUB_ENV
-          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
-          echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
-
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
-          rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github --exclude antenv
-
-      - name: Create ZIP for deployment
-        run: |
+          rsync -av --progress . deploy/ --exclude deploy --exclude .git --exclude .github
           cd deploy
           zip -r ../release.zip .
           cd ..
@@ -82,7 +66,7 @@ jobs:
           name: python-app
           path: .
 
-      - name: Login to Azure
+      - name: Azure Login (Federated Identity)
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_947BB4DEA5B14B9CBF177985A0D9D75B }}
@@ -95,10 +79,9 @@ jobs:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
           package: release.zip
-          startup-command: >
-            bash -c "
-            source antenv/bin/activate &&
-            python manage.py migrate --noinput &&
-            python manage.py collectstatic --noinput &&
-            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
-            "
+
+      - name: Run Django migrations & collectstatic on Azure
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az webapp ssh --name pinnacle-college-final --resource-group YOUR_RESOURCE_GROUP --command "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
