@@ -79,15 +79,10 @@ jobs:
           app-name: 'pinnacle-college-final'
           slot-name: 'Production'
           package: release.zip
-
-      - name: Run Django migrations & collectstatic on Azure
-        uses: azure/CLI@v2
-        with:
-          inlineScript: |
-            echo "Installing Azure CLI webapp extension..."
-            az extension add --name webapp --upgrade
-            echo "Running Django migrations and collectstatic on Azure Web App..."
-            az webapp run-command invoke \
-              --name pinnacle-college-final \
-              --resource-group pinnacle-college-final \
-              --command-line "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
+          startup-command: >
+            bash -c "
+            source antenv/bin/activate &&
+            python manage.py migrate --noinput &&
+            python manage.py collectstatic --noinput &&
+            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
+            "
