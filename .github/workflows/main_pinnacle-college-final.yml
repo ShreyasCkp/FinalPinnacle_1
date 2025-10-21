@@ -86,6 +86,6 @@ jobs:
           inlineScript: |
             echo "Running Django migrations and collectstatic on Azure Web App..."
             az webapp run-command invoke \
-              --resource-group pinnacle-college-final \
               --name pinnacle-college-final \
+              --resource-group pinnacle-college-final \
               --command-line "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
