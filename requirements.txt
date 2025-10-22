@@ -45,7 +45,7 @@ pdfplumber
 pillow
 pluggy
 propcache
-psycopg2-binary
+psycopg2-binary>=2.9.9
 pycairo
 pycparser
 pydyf
