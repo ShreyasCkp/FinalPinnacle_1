@@ -38,7 +38,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           mkdir -p wheels
-          # Make sure mysqlclient is ignored if present
+          # Exclude mysqlclient if present
           grep -v "mysqlclient" requirements.txt > requirements_postgres.txt
           pip wheel --wheel-dir wheels -r requirements_postgres.txt
 
@@ -64,6 +64,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -87,7 +88,8 @@ jobs:
           startup-command: >
             bash -c "
             python -m pip install --upgrade pip &&
-            pip install --no-index --find-links /home/site/wwwroot/wheels -r /home/site/wwwroot/requirements.txt &&
+            # Install wheels first but allow PyPI fallback
+            pip install --find-links /home/site/wwwroot/wheels -r /home/site/wwwroot/requirements.txt &&
             python /home/site/wwwroot/manage.py migrate --noinput &&
             python /home/site/wwwroot/manage.py collectstatic --noinput &&
             exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
