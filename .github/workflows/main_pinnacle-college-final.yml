@@ -96,20 +96,24 @@ jobs:
 
       # 9️⃣ Run Django migrations via Azure run-command
       - name: Run Django migrations
-        uses: azure/cli@v1
+        uses: azure/cli@v2
         with:
+          azcliversion: latest
           inlineScript: |
             az webapp run-command invoke \
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --command "python3 manage.py migrate --noinput"
-
+      
       # 🔟 Run collectstatic via Azure run-command
       - name: Run collectstatic
-        uses: azure/cli@v1
+        uses: azure/cli@v2
         with:
+          azcliversion: latest
           inlineScript: |
             az webapp run-command invoke \
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --command "python3 manage.py collectstatic --noinput"
+
+
