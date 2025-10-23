@@ -78,6 +78,7 @@ tzdata
 tzlocal
 uritools
 urllib3
+weasyprint==62.3
 webencodings
 werkzeug
 whitenoise
