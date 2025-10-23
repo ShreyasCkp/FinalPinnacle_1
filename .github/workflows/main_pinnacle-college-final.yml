@@ -94,16 +94,22 @@ jobs:
           slot-name: 'Production'
           package: ./deploy
 
-      # 9️⃣ Run Django migrations via Azure App Service run command
+      # 9️⃣ Run Django migrations via Azure run-command
       - name: Run Django migrations
         uses: azure/cli@v1
         with:
           inlineScript: |
-            az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "python3 manage.py migrate --noinput"
+            az webapp run-command invoke \
+              --name ${{ env.APP_NAME }} \
+              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --command "python3 manage.py migrate --noinput"
 
-      # 🔟 Run collectstatic via Azure App Service run command
+      # 🔟 Run collectstatic via Azure run-command
       - name: Run collectstatic
         uses: azure/cli@v1
         with:
           inlineScript: |
-            az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "python3 manage.py collectstatic --noinput"
+            az webapp run-command invoke \
+              --name ${{ env.APP_NAME }} \
+              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --command "python3 manage.py collectstatic --noinput"
