@@ -19,10 +19,12 @@ jobs:
       DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install system dependencies for WeasyPrint, Cairo & PostgreSQL
+      # 2️⃣ Install system dependencies for WeasyPrint, Cairo & PostgreSQL
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -32,11 +34,13 @@ jobs:
             shared-mime-info python3-dev \
             libgirepository1.0-dev libjpeg-dev zlib1g-dev
 
+      # 3️⃣ Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # 4️⃣ Set environment variables in Azure
       - name: Set Azure Web App environment variables
         uses: azure/cli@v1
         with:
@@ -59,6 +63,7 @@ jobs:
               MSGKART_ACCOUNT_ID='${{ secrets.MSGKART_ACCOUNT_ID }}' \
               MSGKART_BASE_URL='${{ secrets.MSGKART_BASE_URL }}'
 
+      # 5️⃣ Prepare deployment package
       - name: Prepare deployment package
         run: |
           mkdir deploy
@@ -70,6 +75,7 @@ jobs:
             --exclude 'deploy' \
             ./deploy/
 
+      # 6️⃣ Enable Azure build on deployment
       - name: Enable build on deployment in Azure
         run: |
           az webapp config appsettings set \
@@ -77,9 +83,24 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
 
+      # 7️⃣ Wait a few seconds to avoid container restart conflicts
+      - name: Wait for Azure Web App to stabilize
+        run: sleep 15
+
+      # 8️⃣ Deploy to Azure
       - name: Deploy Django app to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.APP_NAME }}
           slot-name: 'Production'
           package: ./deploy
+
+      # 9️⃣ Run Django migrations remotely
+      - name: Run Django migrations on Azure
+        run: |
+          az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "source /home/site/wwwroot/venv/bin/activate && python manage.py migrate --noinput"
+
+      # 🔟 Run collectstatic remotely
+      - name: Run collectstatic on Azure
+        run: |
+          az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "source /home/site/wwwroot/venv/bin/activate && python manage.py collectstatic --noinput"
