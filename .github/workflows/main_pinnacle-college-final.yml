@@ -18,24 +18,6 @@ jobs:
       RESOURCE_GROUP: pinnacle-college-final
       DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
 
-      # Database
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-
-      # Email
-      EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-      EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-
-      # MsgKart API
-      MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
-      MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
-      MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
-      MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
-      MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,73 +26,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            libcairo2 \
-            libcairo2-dev \
-            pkg-config \
-            libpango-1.0-0 \
-            libpangocairo-1.0-0 \
-            libgdk-pixbuf2.0-0 \
-            libffi-dev \
-            libpq-dev \
-            shared-mime-info \
-            python3-dev \
-            libgirepository1.0-dev \
-            libjpeg-dev \
-            zlib1g-dev
+            libcairo2 libcairo2-dev pkg-config \
+            libpango-1.0-0 libpangocairo-1.0-0 \
+            libgdk-pixbuf2.0-0 libffi-dev libpq-dev \
+            shared-mime-info python3-dev \
+            libgirepository1.0-dev libjpeg-dev zlib1g-dev
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Clear pip cache (prevent ZIP errors)
-        run: rm -rf ~/.cache/pip
-
-      - name: Create virtual environment and install dependencies
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip setuptools wheel
-          echo "psycopg2-binary==2.9.9" >> requirements.txt
-          pip install -r requirements.txt
-
-      - name: Run collectstatic
-        env:
-          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
-          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-          MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
-          MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
-          MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
-          MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
-          MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
-        run: |
-          source venv/bin/activate
-          python manage.py collectstatic --noinput || true
-
-      - name: Run Django migrations
-        env:
-          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
-          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-          MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
-          MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
-          MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
-          MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
-          MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
-        run: |
-          source venv/bin/activate
-          python manage.py migrate --noinput
-
-      - name: Login to Azure using AZURE_CREDENTIALS
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -147,6 +69,13 @@ jobs:
             --exclude '.github' \
             --exclude 'deploy' \
             ./deploy/
+
+      - name: Enable build on deployment in Azure
+        run: |
+          az webapp config appsettings set \
+            --name ${{ env.APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
 
       - name: Deploy Django app to Azure Web App
         uses: azure/webapps-deploy@v3
