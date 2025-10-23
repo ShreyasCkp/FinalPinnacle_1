@@ -140,7 +140,13 @@ jobs:
       - name: Prepare deployment package
         run: |
           mkdir deploy
-          cp -r manage.py requirements.txt student_alerts_app static templates deploy/
+          rsync -av --progress ./ \
+            --exclude 'venv' \
+            --exclude '.git' \
+            --exclude '__pycache__' \
+            --exclude '.github' \
+            --exclude 'deploy' \
+            ./deploy/
 
       - name: Deploy Django app to Azure Web App
         uses: azure/webapps-deploy@v3
