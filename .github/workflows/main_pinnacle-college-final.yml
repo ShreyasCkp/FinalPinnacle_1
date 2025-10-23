@@ -17,13 +17,24 @@ jobs:
       APP_NAME: pinnacle-college-final
       RESOURCE_GROUP: pinnacle-college
       DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
+
+      # Database
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
+
+      # Email
       EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
       EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+
+      # MsgKart API
+      MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
+      MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
+      MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
+      MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
+      MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
 
     steps:
       - name: Checkout repository
@@ -72,20 +83,32 @@ jobs:
           echo "psycopg2-binary==2.9.9" >> requirements.txt
           pip install -r requirements.txt
 
+      # Run collectstatic
       - name: Run collectstatic
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
           EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
           EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+          MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
+          MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
+          MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
+          MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
+          MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
         run: |
           source venv/bin/activate
           python manage.py collectstatic --noinput || true
 
+      # Run Django migrations
       - name: Run Django migrations
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
           EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
           EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+          MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
+          MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
+          MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
+          MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
+          MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
         run: |
           source venv/bin/activate
           python manage.py migrate --noinput
@@ -97,6 +120,7 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EDE88DCF06254615AB8F130C24D59BC5 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
 
+      # Push environment variables to Azure
       - name: Set Azure Web App environment variables
         uses: azure/cli@v1
         with:
@@ -105,13 +129,19 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --settings \
+              DJANGO_SETTINGS_MODULE='${{ env.DJANGO_SETTINGS_MODULE }}' \
               DB_NAME='${{ secrets.DB_NAME }}' \
               DB_USER='${{ secrets.DB_USER }}' \
               DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
               DB_HOST='${{ secrets.DB_HOST }}' \
               DB_PORT='${{ secrets.DB_PORT }}' \
               EMAIL_HOST_USER='${{ secrets.EMAIL_HOST_USER }}' \
-              EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}'
+              EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}' \
+              MSGKART_API_KEY='${{ secrets.MSGKART_API_KEY }}' \
+              MSGKART_EMAIL='${{ secrets.MSGKART_EMAIL }}' \
+              MSGKART_PHONE_ID='${{ secrets.MSGKART_PHONE_ID }}' \
+              MSGKART_ACCOUNT_ID='${{ secrets.MSGKART_ACCOUNT_ID }}' \
+              MSGKART_BASE_URL='${{ secrets.MSGKART_BASE_URL }}'
 
       - name: Prepare deployment package
         run: |
