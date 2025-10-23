@@ -78,9 +78,11 @@ tzdata
 tzlocal
 uritools
 urllib3
+weasyprint
 webencodings
 werkzeug
 whitenoise
 xhtml2pdf
 yarl
 zopfli
+
