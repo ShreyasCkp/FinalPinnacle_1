@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Install system dependencies for WeasyPrint, Cairo & PostgreSQL
+      # 2️⃣ Install system dependencies for packages like WeasyPrint, Cairo & PostgreSQL
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -63,19 +63,7 @@ jobs:
               MSGKART_ACCOUNT_ID='${{ secrets.MSGKART_ACCOUNT_ID }}' \
               MSGKART_BASE_URL='${{ secrets.MSGKART_BASE_URL }}'
 
-      # 5️⃣ Prepare deployment package
-      - name: Prepare deployment package
-        run: |
-          mkdir deploy
-          rsync -av --progress ./ \
-            --exclude 'venv' \
-            --exclude '.git' \
-            --exclude '__pycache__' \
-            --exclude '.github' \
-            --exclude 'deploy' \
-            ./deploy/
-
-      # 6️⃣ Enable Azure build on deployment
+      # 5️⃣ Enable SCM build during deployment
       - name: Enable build on deployment in Azure
         run: |
           az webapp config appsettings set \
@@ -83,11 +71,22 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
 
+      # 6️⃣ Prepare deployment package (source only, no venv)
+      - name: Prepare deployment package
+        run: |
+          mkdir deploy
+          rsync -av --progress ./ \
+            --exclude '.git' \
+            --exclude '__pycache__' \
+            --exclude '.github' \
+            --exclude 'deploy' \
+            ./deploy/
+
       # 7️⃣ Wait a few seconds to avoid container restart conflicts
       - name: Wait for Azure Web App to stabilize
         run: sleep 15
 
-      # 8️⃣ Deploy to Azure
+      # 8️⃣ Deploy source code using ZIP deploy (SCM build will install dependencies)
       - name: Deploy Django app to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
@@ -95,12 +94,16 @@ jobs:
           slot-name: 'Production'
           package: ./deploy
 
-      # 9️⃣ Run Django migrations remotely
-      - name: Run Django migrations on Azure
-        run: |
-          az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "source /home/site/wwwroot/venv/bin/activate && python manage.py migrate --noinput"
+      # 9️⃣ Run Django migrations via Azure App Service run command
+      - name: Run Django migrations
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "python3 manage.py migrate --noinput"
 
-      # 🔟 Run collectstatic remotely
-      - name: Run collectstatic on Azure
-        run: |
-          az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "source /home/site/wwwroot/venv/bin/activate && python manage.py collectstatic --noinput"
+      # 🔟 Run collectstatic via Azure App Service run command
+      - name: Run collectstatic
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "python3 manage.py collectstatic --noinput"
