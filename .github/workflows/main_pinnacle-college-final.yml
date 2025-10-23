@@ -22,12 +22,14 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
+      EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+      EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 🔧 Install all required system dependencies (includes Cairo + PostgreSQL + WeasyPrint)
+      # 🧱 Install Cairo, WeasyPrint, PostgreSQL build dependencies
       - name: Install system dependencies for WeasyPrint, Cairo & PostgreSQL
         run: |
           sudo apt-get update
@@ -67,13 +69,14 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip setuptools wheel
-          # Ensure PostgreSQL driver exists (safety)
           echo "psycopg2-binary==2.9.9" >> requirements.txt
           pip install -r requirements.txt
 
       - name: Run collectstatic
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
+          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
         run: |
           source venv/bin/activate
           python manage.py collectstatic --noinput || true
@@ -81,6 +84,8 @@ jobs:
       - name: Run Django migrations
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
+          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
         run: |
           source venv/bin/activate
           python manage.py migrate --noinput
@@ -104,7 +109,9 @@ jobs:
               DB_USER='${{ secrets.DB_USER }}' \
               DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
               DB_HOST='${{ secrets.DB_HOST }}' \
-              DB_PORT='${{ secrets.DB_PORT }}'
+              DB_PORT='${{ secrets.DB_PORT }}' \
+              EMAIL_HOST_USER='${{ secrets.EMAIL_HOST_USER }}' \
+              EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}'
 
       - name: Prepare deployment package
         run: |
