@@ -1,16 +1,9 @@
 #!/bin/bash
-set -e  # Exit immediately if any command fails
-
+set -e
 echo "---- Installing system dependencies ----"
 apt-get update -y
-apt-get install -y \
-    libcairo2 libcairo2-dev libpango-1.0-0 libpangocairo-1.0-0 \
-    libgdk-pixbuf2.0-0 libffi-dev libjpeg-dev zlib1g-dev \
-    fonts-dejavu-core
-
-echo "---- Installing Python dependencies ----"
-pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
+apt-get install -y libcairo2 libcairo2-dev libpango1.0-0 libpangocairo-1.0-0 \
+                   libgdk-pixbuf2.0-0 libffi-dev libjpeg-dev zlib1g-dev
 
 echo "---- Running Django setup ----"
 python manage.py migrate --noinput
