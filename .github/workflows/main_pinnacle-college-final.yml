@@ -85,12 +85,24 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: ${{ env.AZURE_SLOT_NAME }}
           package: ${{ env.DEPLOY_PACKAGE }}
-          startup-command: >
-            bash -c "
-            python -m pip install --upgrade pip &&
-            # Install wheels first but allow PyPI fallback
-            pip install --find-links /home/site/wwwroot/wheels -r /home/site/wwwroot/requirements.txt &&
-            python /home/site/wwwroot/manage.py migrate --noinput &&
-            python /home/site/wwwroot/manage.py collectstatic --noinput &&
-            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0 --timeout 600
-            "
+          startup-command: |
+            bash -c '
+            set -e
+            echo "🔧 Upgrading pip..."
+            python -m pip install --upgrade pip
+
+            echo "📦 Installing dependencies (skipping mysqlclient)..."
+            grep -v "mysqlclient" /home/site/wwwroot/requirements.txt > /home/site/wwwroot/requirements_postgres.txt
+            pip install --find-links /home/site/wwwroot/wheels -r /home/site/wwwroot/requirements_postgres.txt
+
+            echo "⚙️ Running migrations..."
+            python /home/site/wwwroot/manage.py migrate --noinput
+
+            echo "🧹 Collecting static files..."
+            python /home/site/wwwroot/manage.py collectstatic --noinput
+
+            echo "🚀 Starting Gunicorn server..."
+            exec gunicorn student_alerts_app.wsgi:application --bind=0.0.0.0:8000 --timeout 600
+            '
+
+
