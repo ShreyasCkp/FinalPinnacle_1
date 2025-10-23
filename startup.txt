@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "---- Installing system dependencies ----"
+apt-get update
+apt-get install -y libcairo2 libcairo2-dev libpango-1.0-0 libpangocairo-1.0-0 \
+                   libgdk-pixbuf2.0-0 libffi-dev libjpeg-dev zlib1g-dev
+echo "---- Running Django setup ----"
+python manage.py migrate --noinput
+python manage.py collectstatic --noinput
+gunicorn student_alerts_app.wsgi:application 
