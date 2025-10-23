@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: pinnacle-college-final  # your Azure App Service name
+  AZURE_WEBAPP_NAME: pinnacle-college-final   # your Azure App Service name
   PYTHON_VERSION: '3.9'
   DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
 
@@ -16,27 +16,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout code
       - name: ✅ Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Set up Python
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: 📦 Install dependencies
+      # 3️⃣ Install system dependencies (needed for pycairo, weasyprint, etc.)
+      - name: ⚙️ Install system dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 libcairo2-dev pkg-config python3-dev \
+            libgdk-pixbuf2.0-dev libpango1.0-dev libffi-dev \
+            libjpeg-dev zlib1g-dev build-essential
 
-      - name: 🔍 Run Django checks
+      # 4️⃣ Install Python dependencies
+      - name: 📦 Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install --no-cache-dir -r requirements.txt
+
+      # 5️⃣ Run Django checks
+      - name: 🔍 Run Django system checks
         run: |
           python manage.py check
 
+      # 6️⃣ Run database migrations
+      - name: 🗄️ Run migrations
+        run: |
+          python manage.py migrate --noinput
+
+      # 7️⃣ Collect static files
       - name: 🧾 Collect static files
         run: |
           python manage.py collectstatic --noinput
 
+      # 8️⃣ Deploy to Azure Web App
       - name: 🚀 Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
