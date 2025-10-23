@@ -40,7 +40,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 🧱 Install Cairo, WeasyPrint, PostgreSQL build dependencies
       - name: Install system dependencies for WeasyPrint, Cairo & PostgreSQL
         run: |
           sudo apt-get update
@@ -83,7 +82,6 @@ jobs:
           echo "psycopg2-binary==2.9.9" >> requirements.txt
           pip install -r requirements.txt
 
-      # Run collectstatic
       - name: Run collectstatic
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -98,7 +96,6 @@ jobs:
           source venv/bin/activate
           python manage.py collectstatic --noinput || true
 
-      # Run Django migrations
       - name: Run Django migrations
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -113,14 +110,11 @@ jobs:
           source venv/bin/activate
           python manage.py migrate --noinput
 
-      - name: Login to Azure
+      - name: Login to Azure using AZURE_CREDENTIALS
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_947BB4DEA5B14B9CBF177985A0D9D75B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EDE88DCF06254615AB8F130C24D59BC5 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Push environment variables to Azure
       - name: Set Azure Web App environment variables
         uses: azure/cli@v1
         with:
