@@ -27,17 +27,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install system dependencies for WeasyPrint & PostgreSQL
+      # 🔧 Install all required system dependencies (includes Cairo + PostgreSQL + WeasyPrint)
+      - name: Install system dependencies for WeasyPrint, Cairo & PostgreSQL
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             libcairo2 \
+            libcairo2-dev \
+            pkg-config \
             libpango-1.0-0 \
             libpangocairo-1.0-0 \
             libgdk-pixbuf2.0-0 \
             libffi-dev \
             libpq-dev \
-            shared-mime-info
+            shared-mime-info \
+            python3-dev \
+            libgirepository1.0-dev \
+            libjpeg-dev \
+            zlib1g-dev
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -59,8 +66,8 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-          pip install --upgrade pip
-          # Ensure PostgreSQL driver is installed
+          pip install --upgrade pip setuptools wheel
+          # Ensure PostgreSQL driver exists (safety)
           echo "psycopg2-binary==2.9.9" >> requirements.txt
           pip install -r requirements.txt
 
