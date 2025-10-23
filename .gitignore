@@ -4,8 +4,8 @@ __pycache__/
 *.sqlite3
  
 # Django secret settings
-*.env
-.env
+# *.env
+# .env
 settings_secret.py
  
 # VS Code / IDE stuff

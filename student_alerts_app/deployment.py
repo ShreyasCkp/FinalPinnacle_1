@@ -1,6 +1,6 @@
 import os
 from decouple import config
-from .settings import *
+
 
 DEBUG = False
 
