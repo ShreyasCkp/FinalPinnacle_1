@@ -1157,7 +1157,7 @@ def generate_qr_dynamic(request):
 from decimal import Decimal
 from django.http import HttpResponse
 from django.template.loader import get_template
-from weasyprint import HTML
+
 from fees.models import StudentFeeCollection
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
@@ -1187,7 +1187,7 @@ logger = logging.getLogger(__name__)
 from decimal import Decimal
 from django.http import HttpResponse
 from django.template.loader import get_template
-from weasyprint import HTML
+
 from fees.models import StudentFeeCollection
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
@@ -1218,7 +1218,7 @@ from collections import defaultdict
 
 from django.template.loader import get_template
 
-from weasyprint import HTML
+
 
 
 from django.utils.timezone import localdate
@@ -1232,158 +1232,6 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from urllib.parse import unquote
 import re
-
-# from django.shortcuts import get_object_or_404
-# from django.utils.timezone import localdate, now as timezone_now
-# from collections import defaultdict
-# from decimal import Decimal
-# from django.db import transaction
-# from django.db.models import Q
-# from django.http import HttpResponse
-# from django.template.loader import get_template
-# from weasyprint import HTML
-# import re
-# from urllib.parse import unquote
-
-
-# @custom_login_required
-# def generate_receipt(request, admission_no):
-#     admission_no = unquote(admission_no).split(" - ")[0].strip()
-
-#     # Fetch admission object
-#     admission = PUAdmission.objects.filter(admission_no__iexact=admission_no).first()
-#     if not admission:
-#         admission = get_object_or_404(DegreeAdmission, admission_no__iexact=admission_no)
-
-#     # Get student DB
-#     student_db = (
-#         StudentDatabase.objects.filter(pu_admission=admission).first()
-#         if isinstance(admission, PUAdmission)
-#         else StudentDatabase.objects.filter(degree_admission=admission).first()
-#     )
-
-#     today = localdate()
-
-#     # All fee collections
-#     all_fee_collections = StudentFeeCollection.objects.filter(
-#         admission_no=admission.admission_no
-#     ).order_by('fee_type__name', 'id')
-
-#     # Filter today's payments
-#     fee_collections_today = all_fee_collections.filter(
-#         payment_date=today
-#     ).filter(Q(paid_amount__gt=0) | Q(applied_discount__gt=0))
-
-#     # 🚨 LOG: Today's Fee Collections
-#     print("\n===== DEBUG: Today's Fee Collections =====")
-#     for fee in fee_collections_today:
-#         print(f"FeeType: {fee.fee_type.name}, Paid: {fee.paid_amount}, Discount: {fee.applied_discount}, Payment Date: {fee.payment_date}, Receipt: {fee.receipt_no}, Mode: {fee.payment_mode}")
-
-#     # Assign receipt numbers
-#     with transaction.atomic():
-#         for fee in fee_collections_today:
-#             current_year = timezone_now().year
-#             next_year = current_year + 1
-#             promotion_cycle = f"{current_year}-{str(next_year)[-2:]}"
-#             course_name = admission.course.name.replace(" ", "").upper()[:4]
-#             prefix = f"PSCM-001-{promotion_cycle}-{course_name}-"
-
-#             last_receipt = StudentFeeCollection.objects.filter(
-#                 receipt_no__startswith=prefix
-#             ).order_by('-receipt_no').values_list('receipt_no', flat=True).first()
-
-#             last_number = int(re.search(r'(\d{4})$', last_receipt).group(1)) if last_receipt else 0
-#             new_receipt = f"{prefix}{str(last_number + 1).zfill(4)}"
-
-#             fee.receipt_no = new_receipt
-#             fee.receipt_date = today
-#             fee.save()
-
-#             print(f"Assigned Receipt No: {new_receipt} to FeeType: {fee.fee_type.name}")
-
-#     # Grouping and calculating
-#     fee_group_map = defaultdict(list)
-#     for fee in all_fee_collections:
-#         fee_group_map[fee.fee_type].append(fee)
-
-#     grouped_fees = []
-#     total_paid = Decimal('0.00')
-#     total_discount = Decimal('0.00')
-#     total_amount = Decimal('0.00')
-
-#     print("\n===== DEBUG: Grouped Fee Summary =====")
-#     for fee_type, entries in fee_group_map.items():
-#         today_paid = sum(e.paid_amount or Decimal('0.00') for e in entries if e.payment_date == today)
-#         today_discount = sum(e.applied_discount or Decimal('0.00') for e in entries if e.payment_date == today)
-#         has_today_activity = any(
-#                 e.payment_date == today and ((e.paid_amount or 0) > 0 or (e.applied_discount or 0) > 0)
-#                 for e in entries
-#             )
-#         if not has_today_activity:
-#              continue
-
-
-
-#         fee_name = fee_type.name
-#         if fee_name[-1].isdigit():
-#             prefix, number = fee_name[:-1], fee_name[-1]
-#             display_name = f"{prefix} (Installment {number})"
-#         else:
-#             display_name = fee_name
-
-#         amount = entries[0].amount
-#         total_paid_for_type = sum(e.paid_amount or Decimal('0.00') for e in entries)
-#         total_discount_for_type = sum(e.applied_discount or Decimal('0.00') for e in entries)
-#         balance_amount = amount - total_paid_for_type - total_discount_for_type
-
-#         print(f"Type: {display_name}, Amt: {amount}, Paid Today: {today_paid}, Discount Today: {today_discount}, Balance: {balance_amount}")
-
-#         grouped_fees.append({
-#             'display_fee_type': display_name,
-#             'amount': amount,
-#             'paid_amount': today_paid,
-#             'applied_discount': today_discount,
-#             'balance_amount': balance_amount,
-#             'due_date': entries[0].due_date
-#         })
-
-#         total_paid += today_paid
-#         total_discount += today_discount
-#         total_amount += amount
-
-#     student = {
-#         'admission_no': admission.admission_no,
-#         'student_name': admission.student_name,
-#         'admission_course_type': getattr(admission, 'course_type', ''),
-#         'admission_course': getattr(admission, 'course', ''),
-#         'roll_number': getattr(student_db, 'student_userid', ''),
-#         'semester': getattr(student_db, 'semester', None),
-#         'current_year': getattr(student_db, 'current_year', None),
-#     }
-
-#     context = {
-#         'admission': admission,
-#         'student': student,
-#         'fee_collections': grouped_fees,
-#         'total_paid': total_paid,
-#         'applied_discount': total_discount,
-#         'total_amount': total_amount,
-#         'total_due': sum(f['balance_amount'] for f in grouped_fees),
-#         'now': timezone_now(),
-#         'receipt_no': fee_collections_today[0].receipt_no if fee_collections_today else None,
-#         'receipt_date': fee_collections_today[0].receipt_date if fee_collections_today else None,
-#         'payment_mode': fee_collections_today[0].payment_mode if fee_collections_today else '',
-#     }
-
-#     html_string = get_template('fees/student_receipt_pdf.html').render(context)
-#     html = HTML(string=html_string)
-#     response = HttpResponse(content_type='application/pdf')
-#     response['Content-Disposition'] = f'inline; filename="Receipt_{admission.admission_no}.pdf"'
-#     html.write_pdf(target=response)
-
-#     return response
-
-
 
 
 
