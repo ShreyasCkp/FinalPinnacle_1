@@ -78,15 +78,13 @@ tzdata
 tzlocal
 uritools
 urllib3
-<<<<<<< HEAD
 weasyprint==62.3
-=======
 weasyprint
->>>>>>> 7b9b1bdf532a6d62137c600274d1f37e916a6ede
 webencodings
 werkzeug
 whitenoise
 xhtml2pdf
 yarl
 zopfli
+
 
