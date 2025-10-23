@@ -1,4 +1,4 @@
-name: Build and deploy Python app to Azure Web App - pinnacle-college-final
+name: Build and Deploy Django App to Azure
 
 on:
   push:
@@ -6,51 +6,60 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_NAME: pinnacle-college-final   # your Azure App Service name
+  PYTHON_VERSION: '3.9'
+  DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-
-    env:
-      APP_NAME: pinnacle-college-final
-      RESOURCE_GROUP: pinnacle-college-final
-      DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }}
 
     steps:
-      - name: Checkout repository
+      # 1️⃣ Checkout code
+      - name: ✅ Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      # 2️⃣ Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
+      # 3️⃣ Install system dependencies (needed for pycairo, weasyprint, etc.)
+      - name: ⚙️ Install system dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2 libcairo2-dev pkg-config python3-dev \
+            libgdk-pixbuf2.0-dev libpango1.0-dev libffi-dev \
+            libjpeg-dev zlib1g-dev build-essential
 
-      - name: Run Django migrations
-        run: python manage.py migrate --noinput
+      # 4️⃣ Install Python dependencies
+      - name: 📦 Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install --no-cache-dir -r requirements.txt
 
-      - name: Collect static files
-        run: python manage.py collectstatic --noinput
+      # 5️⃣ Run Django checks
+      - name: 🔍 Run Django system checks
+        run: |
+          python manage.py check
 
-      - name: Login to Azure
-        uses: azure/login@v2
+      # 6️⃣ Run database migrations
+      - name: 🗄️ Run migrations
+        run: |
+          python manage.py migrate --noinput
+
+      # 7️⃣ Collect static files
+      - name: 🧾 Collect static files
+        run: |
+          python manage.py collectstatic --noinput
+
+      # 8️⃣ Deploy to Azure Web App
+      - name: 🚀 Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Deploy Django app to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.APP_NAME }}
-          slot-name: 'Production'
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
