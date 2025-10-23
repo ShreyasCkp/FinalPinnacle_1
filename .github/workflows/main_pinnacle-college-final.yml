@@ -15,142 +15,93 @@ jobs:
 
     env:
       APP_NAME: pinnacle-college-final
-      RESOURCE_GROUP: pinnacle-college
+      RESOURCE_GROUP: pinnacle-college-final
       DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
 
-      # Database
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-
-      # Email
-      EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-      EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-
-      # MsgKart API
-      MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
-      MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
-      MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
-      MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
-      MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
-
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 🧱 Install Cairo, WeasyPrint, PostgreSQL build dependencies
-      - name: Install system dependencies for WeasyPrint, Cairo & PostgreSQL
+      # 2️⃣ Install system dependencies for packages like WeasyPrint, Cairo & PostgreSQL
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            libcairo2 \
-            libcairo2-dev \
-            pkg-config \
-            libpango-1.0-0 \
-            libpangocairo-1.0-0 \
-            libgdk-pixbuf2.0-0 \
-            libffi-dev \
-            libpq-dev \
-            shared-mime-info \
-            python3-dev \
-            libgirepository1.0-dev \
-            libjpeg-dev \
-            zlib1g-dev
+            libcairo2 libcairo2-dev pkg-config \
+            libpango-1.0-0 libpangocairo-1.0-0 \
+            libgdk-pixbuf2.0-0 libffi-dev libpq-dev \
+            shared-mime-info python3-dev \
+            libgirepository1.0-dev libjpeg-dev zlib1g-dev
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Clear pip cache (prevent ZIP errors)
-        run: rm -rf ~/.cache/pip
-
-      - name: Create virtual environment and install dependencies
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip setuptools wheel
-          echo "psycopg2-binary==2.9.9" >> requirements.txt
-          pip install -r requirements.txt
-
-      # Run collectstatic
-      - name: Run collectstatic
-        env:
-          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
-          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-          MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
-          MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
-          MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
-          MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
-          MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
-        run: |
-          source venv/bin/activate
-          python manage.py collectstatic --noinput || true
-
-      # Run Django migrations
-      - name: Run Django migrations
-        env:
-          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
-          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-          MSGKART_API_KEY: ${{ secrets.MSGKART_API_KEY }}
-          MSGKART_EMAIL: ${{ secrets.MSGKART_EMAIL }}
-          MSGKART_PHONE_ID: ${{ secrets.MSGKART_PHONE_ID }}
-          MSGKART_ACCOUNT_ID: ${{ secrets.MSGKART_ACCOUNT_ID }}
-          MSGKART_BASE_URL: ${{ secrets.MSGKART_BASE_URL }}
-        run: |
-          source venv/bin/activate
-          python manage.py migrate --noinput
-
+      # 3️⃣ Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_947BB4DEA5B14B9CBF177985A0D9D75B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EDE88DCF06254615AB8F130C24D59BC5 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8F8B89E4B4844020AD6054725D3AED37 }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Push environment variables to Azure
+      # 4️⃣ Set Azure Web App environment variables
       - name: Set Azure Web App environment variables
-        uses: azure/cli@v1
+        uses: azure/cli@v2
         with:
+          azcliversion: latest
           inlineScript: |
             az webapp config appsettings set \
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --settings \
-              DJANGO_SETTINGS_MODULE='${{ env.DJANGO_SETTINGS_MODULE }}' \
-              DB_NAME='${{ secrets.DB_NAME }}' \
-              DB_USER='${{ secrets.DB_USER }}' \
-              DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-              DB_HOST='${{ secrets.DB_HOST }}' \
-              DB_PORT='${{ secrets.DB_PORT }}' \
-              EMAIL_HOST_USER='${{ secrets.EMAIL_HOST_USER }}' \
-              EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}' \
-              MSGKART_API_KEY='${{ secrets.MSGKART_API_KEY }}' \
-              MSGKART_EMAIL='${{ secrets.MSGKART_EMAIL }}' \
-              MSGKART_PHONE_ID='${{ secrets.MSGKART_PHONE_ID }}' \
-              MSGKART_ACCOUNT_ID='${{ secrets.MSGKART_ACCOUNT_ID }}' \
-              MSGKART_BASE_URL='${{ secrets.MSGKART_BASE_URL }}'
+                DJANGO_SETTINGS_MODULE='${{ env.DJANGO_SETTINGS_MODULE }}' \
+                DB_NAME='${{ secrets.DB_NAME }}' \
+                DB_USER='${{ secrets.DB_USER }}' \
+                DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+                DB_HOST='${{ secrets.DB_HOST }}' \
+                DB_PORT='${{ secrets.DB_PORT }}' \
+                EMAIL_HOST_USER='${{ secrets.EMAIL_HOST_USER }}' \
+                EMAIL_HOST_PASSWORD='${{ secrets.EMAIL_HOST_PASSWORD }}' \
+                MSGKART_API_KEY='${{ secrets.MSGKART_API_KEY }}' \
+                MSGKART_EMAIL='${{ secrets.MSGKART_EMAIL }}' \
+                MSGKART_PHONE_ID='${{ secrets.MSGKART_PHONE_ID }}' \
+                MSGKART_ACCOUNT_ID='${{ secrets.MSGKART_ACCOUNT_ID }}' \
+                MSGKART_BASE_URL='${{ secrets.MSGKART_BASE_URL }}'
 
+      # 5️⃣ Enable SCM build during deployment
+      - name: Enable build on deployment in Azure
+        run: |
+          az webapp config appsettings set \
+            --name ${{ env.APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+
+      # 6️⃣ Prepare deployment package (source only, no venv)
       - name: Prepare deployment package
         run: |
           mkdir deploy
-          cp -r manage.py requirements.txt student_alerts_app static templates deploy/
+          rsync -av --progress ./ \
+            --exclude '.git' \
+            --exclude '__pycache__' \
+            --exclude '.github' \
+            --exclude 'deploy' \
+            ./deploy/
 
+      # 7️⃣ Wait a few seconds to avoid container restart conflicts
+      - name: Wait for Azure Web App to stabilize
+        run: sleep 15
+
+      # 8️⃣ Deploy source code using ZIP deploy (SCM build will install dependencies)
       - name: Deploy Django app to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.APP_NAME }}
           slot-name: 'Production'
           package: ./deploy
+
+      # ✅ Optional: Set post-deploy command for migrations and collectstatic
+      - name: Set post-deploy startup script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az webapp config appsettings set \
+              --name ${{ env.APP_NAME }} \
+              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --settings STARTUP_CMD="python3 manage.py migrate --noinput && python3 manage.py collectstatic --noinput && gunicorn student_alerts_app.wsgi:application"
