@@ -1,4 +1,4 @@
-name: Deploy Django App to Azure
+name: Build and Deploy Django App to Azure
 
 on:
   push:
@@ -6,27 +6,40 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_NAME: pinnacle-college-final  # your Azure App Service name
+  PYTHON_VERSION: '3.9'
+  DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
+
 jobs:
-  deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: ✅ Checkout repository
         uses: actions/checkout@v4
 
-      - name: Login to Azure
-        uses: azure/login@v2
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Enable build during deployment
+      - name: 📦 Install dependencies
         run: |
-          az webapp config appsettings set \
-            --name pinnacle-college-final \
-            --resource-group pinnacle-college-final \
-            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
+      - name: 🔍 Run Django checks
+        run: |
+          python manage.py check
+
+      - name: 🧾 Collect static files
+        run: |
+          python manage.py collectstatic --noinput
+
+      - name: 🚀 Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
         with:
-          app-name: pinnacle-college-final
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
