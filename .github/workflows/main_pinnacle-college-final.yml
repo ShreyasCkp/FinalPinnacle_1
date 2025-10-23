@@ -100,4 +100,5 @@ jobs:
             az webapp config set \
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
-              --startup-file "/home/site/wwwroot/startup.txt"
+              --startup-file "/home/site/wwwroot/startup.sh"
+
