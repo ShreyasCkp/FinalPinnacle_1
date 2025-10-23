@@ -13,4 +13,4 @@ source antenv/bin/activate
 # python manage.py migrate --noinput
 
 # Start Gunicorn
-gunicorn your_project_name.wsgi:application --bind 0.0.0.0:$PORT
+gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:$PORT
