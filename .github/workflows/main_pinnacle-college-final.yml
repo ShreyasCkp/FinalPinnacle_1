@@ -9,7 +9,7 @@ on:
 env:
   APP_NAME: pinnacle-college-final
   RESOURCE_GROUP: pinnacle-college-final
-  PYTHON_VERSION: '3.9.18'  # Use explicit minor version for Oryx
+  PYTHON_VERSION: '3.9.23'  # Use explicit minor version for Oryx
   DJANGO_ENV: deployment
 
 jobs:
@@ -137,3 +137,4 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --startup-file "gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:\$PORT --timeout 180"
+
