@@ -56,4 +56,5 @@ jobs:
         run: |
           echo "Files deployed to /home/site/wwwroot:"
           curl -s -u ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }} \
-          https://${{ env.AZURE_WEBAPP_NAME }}.scm.azurewebsites.net/api/vfs/ | jq
+          https://${{ env.AZURE_WEBAPP_NAME }}.scm.azurewebsites.net/api/vfs/site/wwwroot/
+
