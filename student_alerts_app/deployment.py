@@ -28,7 +28,7 @@ DATABASES = {
 # ✅ Gunicorn recommended startup command (for Azure)
 # Set this in Azure → Configuration → General settings → Startup Command:
 # gunicorn student_alerts_app.wsgi --timeout 120 --log-file -
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
