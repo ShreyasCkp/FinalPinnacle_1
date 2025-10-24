@@ -21,23 +21,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Install system dependencies (required for xhtml2pdf / Cairo)
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libcairo2 libcairo2-dev \
-            libpango-1.0-0 libpangocairo-1.0-0 \
-            libgdk-pixbuf2.0-0 libffi-dev shared-mime-info \
-            libjpeg-dev zlib1g-dev build-essential pkg-config
-
-      # 3️⃣ Set up Python
+      # 2️⃣ Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # 4️⃣ Cache pip dependencies
+      # 3️⃣ Cache pip dependencies
       - name: Cache pip
         uses: actions/cache@v3
         with:
@@ -46,7 +36,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # 5️⃣ Create venv and install dependencies
+      # 4️⃣ Install Python dependencies
       - name: Install Python dependencies
         run: |
           python -m venv venv
@@ -54,7 +44,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 6️⃣ Run Django migrations
+      # 5️⃣ Run Django migrations
       - name: Run Django migrations
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -62,7 +52,7 @@ jobs:
           source venv/bin/activate
           python manage.py migrate --noinput
 
-      # 7️⃣ Collect static files
+      # 6️⃣ Collect static files
       - name: Collect static files
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -70,11 +60,18 @@ jobs:
           source venv/bin/activate
           python manage.py collectstatic --noinput
 
-      # 8️⃣ Azure login
+      # 7️⃣ Azure login
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 8️⃣ Remove old files in wwwroot except media (optional)
+      - name: Clean existing files in wwwroot
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "rm -rf /home/site/wwwroot/*"
 
       # 9️⃣ Set Azure Web App environment variables
       - name: Set Azure Web App environment variables
@@ -92,7 +89,11 @@ jobs:
               DB_HOST='${{ secrets.DB_HOST }}' \
               DB_PORT='${{ secrets.DB_PORT }}' \
               SECRET_KEY='${{ secrets.SECRET_KEY }}' \
-              DEBUG=False
+              DEBUG=False \
+              ALLOWED_HOSTS='${{ secrets.ALLOWED_HOSTS }}' \
+              SECURE_SSL_REDIRECT=False \
+              SESSION_COOKIE_SECURE=False \
+              CSRF_COOKIE_SECURE=False
 
       # 🔟 Deploy Django app via ZIP deploy
       - name: Deploy Django app to Azure Web App
@@ -103,7 +104,7 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
 
-      # 1️⃣1️⃣ Set Startup Command for Gunicorn
+      # 1️⃣1️⃣ Set Startup Command (Gunicorn)
       - name: Set Startup Command
         uses: azure/cli@v1
         with:
@@ -112,5 +113,3 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --startup-file "gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:\$PORT --timeout 120"
-
-
