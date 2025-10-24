@@ -86,5 +86,3 @@ whitenoise
 xhtml2pdf
 yarl
 zopfli
-
-
