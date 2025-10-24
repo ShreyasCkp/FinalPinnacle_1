@@ -36,7 +36,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # 4️⃣ Install Python dependencies
+      # 4️⃣ Install Python dependencies (optional for tests)
       - name: Install Python dependencies
         run: |
           python -m venv venv
@@ -44,7 +44,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 5️⃣ Run Django migrations locally (optional, mostly for check)
+      # 5️⃣ Run Django migrations locally (optional, mainly for checks)
       - name: Run Django migrations locally
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -64,11 +64,11 @@ jobs:
       # 7️⃣ Clean project for ZIP deploy
       - name: Prepare clean deployment ZIP
         run: |
-          # Remove venv, caches, git, github, pycache
-          rm -rf venv __pycache__ *.pyc *.pyo .git .github
-          # Optional: remove any old tar/zip
+          echo "Cleaning old virtualenvs, caches, git files, and deployment artifacts"
+          rm -rf venv antenv __pycache__ *.pyc *.pyo .git .github .vscode *.zip
+          # Remove old deployment packages if exist
           rm -f output.zip
-          # Create ZIP of all project files
+          # Create ZIP of all project files except media/uploads
           zip -r output.zip . -x "media/*" "uploads/*"
 
       # 8️⃣ Azure login
