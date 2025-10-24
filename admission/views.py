@@ -4285,7 +4285,6 @@ def dashboard_view(request):
     return render(request, 'admission/student_fee_dashboard.html', context)
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from xhtml2pdf import pisa
 from io import BytesIO
 from .models import DegreeAdmission, PUAdmission
 from django.utils import timezone
@@ -4294,6 +4293,8 @@ def render_to_pdf(template_src, context_dict={}):
     """
     Render a Django template to PDF using xhtml2pdf
     """
+    from xhtml2pdf import pisa
+
     template = render_to_string(template_src, context_dict)
     result = BytesIO()
     pdf = pisa.CreatePDF(src=template, dest=result)
