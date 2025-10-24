@@ -16,102 +16,103 @@ jobs:
 build_and_deploy:
 runs-on: ubuntu-latest
 
-
+```
 steps:
-# 1️⃣ Checkout repository
-- name: Checkout code
-  uses: actions/checkout@v4
+  # 1️⃣ Checkout repository
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-# 2️⃣ Install system dependencies
-- name: Install system dependencies
-  run: |
-    sudo apt-get update
-    sudo apt-get install -y \
-      libcairo2 libcairo2-dev \
-      libpango-1.0-0 libpangocairo-1.0-0 \
-      libgdk-pixbuf2.0-0 libffi-dev shared-mime-info \
-      libjpeg-dev zlib1g-dev build-essential pkg-config
+  # 2️⃣ Install system dependencies
+  - name: Install system dependencies
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y \
+        libcairo2 libcairo2-dev \
+        libpango-1.0-0 libpangocairo-1.0-0 \
+        libgdk-pixbuf2.0-0 libffi-dev shared-mime-info \
+        libjpeg-dev zlib1g-dev build-essential pkg-config
 
-# 3️⃣ Set up Python
-- name: Setup Python
-  uses: actions/setup-python@v5
-  with:
-    python-version: ${{ env.PYTHON_VERSION }}
+  # 3️⃣ Set up Python
+  - name: Setup Python
+    uses: actions/setup-python@v5
+    with:
+      python-version: ${{ env.PYTHON_VERSION }}
 
-# 4️⃣ Cache pip dependencies
-- name: Cache pip
-  uses: actions/cache@v3
-  with:
-    path: ~/.cache/pip
-    key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-    restore-keys: |
-      ${{ runner.os }}-pip-
+  # 4️⃣ Cache pip dependencies
+  - name: Cache pip
+    uses: actions/cache@v3
+    with:
+      path: ~/.cache/pip
+      key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      restore-keys: |
+        ${{ runner.os }}-pip-
 
-# 5️⃣ Create venv and install dependencies
-- name: Create virtual environment and install dependencies
-  run: |
-    python -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip
-    pip install -r requirements.txt
+  # 5️⃣ Create venv and install dependencies
+  - name: Create virtual environment and install dependencies
+    run: |
+      python -m venv venv
+      source venv/bin/activate
+      pip install --upgrade pip
+      pip install -r requirements.txt
 
-# 6️⃣ Make startup.sh executable
-- name: Make startup.sh executable
-  run: chmod +x startup.sh
+  # 6️⃣ Make startup.sh executable
+  - name: Make startup.sh executable
+    run: chmod +x startup.sh
 
-# 7️⃣ Run Django migrations
-- name: Run Django migrations
-  env:
-    DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
-  run: |
-    source venv/bin/activate
-    python manage.py migrate --noinput
+  # 7️⃣ Run Django migrations
+  - name: Run Django migrations
+    env:
+      DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
+    run: |
+      source venv/bin/activate
+      python manage.py migrate --noinput
 
-# 8️⃣ Collect static files
-- name: Collect static files
-  env:
-    DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
-  run: |
-    source venv/bin/activate
-    python manage.py collectstatic --noinput
+  # 8️⃣ Collect static files
+  - name: Collect static files
+    env:
+      DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
+    run: |
+      source venv/bin/activate
+      python manage.py collectstatic --noinput
 
-# 9️⃣ Azure login
-- name: Azure login
-  uses: azure/login@v2
-  with:
-    creds: ${{ secrets.AZURE_CREDENTIALS }}
+  # 9️⃣ Azure login
+  - name: Azure login
+    uses: azure/login@v2
+    with:
+      creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-# 🔟 Set Azure Web App environment variables
-- name: Set Azure Web App environment variables
-  uses: azure/cli@v1
-  with:
-    inlineScript: |
-      az webapp config appsettings set \
-        --name ${{ env.APP_NAME }} \
-        --resource-group ${{ env.RESOURCE_GROUP }} \
-        --settings \
-        DB_NAME='${{ secrets.DB_NAME }}' \
-        DB_USER='${{ secrets.DB_USER }}' \
-        DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-        DB_HOST='${{ secrets.DB_HOST }}' \
-        DB_PORT='${{ secrets.DB_PORT }}'
+  # 🔟 Set Azure Web App environment variables
+  - name: Set Azure Web App environment variables
+    uses: azure/cli@v1
+    with:
+      inlineScript: |
+        az webapp config appsettings set \
+          --name ${{ env.APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --settings \
+          DB_NAME='${{ secrets.DB_NAME }}' \
+          DB_USER='${{ secrets.DB_USER }}' \
+          DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+          DB_HOST='${{ secrets.DB_HOST }}' \
+          DB_PORT='${{ secrets.DB_PORT }}'
 
-# 1️⃣1️⃣ Deploy Django app (raw folder deploy)
-- name: Deploy app to Azure Web App (no ZIP)
-  uses: azure/cli@v1
-  with:
-    inlineScript: |
-      echo "Deploying project files to Azure Web App..."
-      az webapp deploy \
-        --name ${{ env.APP_NAME }} \
-        --resource-group ${{ env.RESOURCE_GROUP }} \
-        --src-path . \
-        --type war --async false
+  # 1️⃣1️⃣ Deploy Django app (raw folder deploy)
+  - name: Deploy app to Azure Web App (no ZIP)
+    uses: azure/cli@v1
+    with:
+      inlineScript: |
+        echo "Deploying project files to Azure Web App..."
+        az webapp deploy \
+          --name ${{ env.APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --src-path . \
+          --type war --async false
 
-# 1️⃣2️⃣ Confirm deployed files
-- name: Verify deployment files
-  uses: azure/cli@v1
-  with:
-    inlineScript: |
-      echo "Deployment complete. Verifying files..."
-      az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }}
+  # 1️⃣2️⃣ Confirm deployed files
+  - name: Verify deployment files
+    uses: azure/cli@v1
+    with:
+      inlineScript: |
+        echo "Deployment complete. Verifying files..."
+        az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }}
+```
