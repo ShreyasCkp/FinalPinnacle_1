@@ -1,18 +1,19 @@
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status
+set -e
 
-echo "Installing system dependencies for Cairo..."
-# Install Cairo and related libraries
+echo "Installing Cairo system dependencies..."
 apt-get update && apt-get install -y \
     libcairo2 \
+    libcairo2-dev \
     libpango-1.0-0 \
+    libpango1.0-dev \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
     shared-mime-info \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Apply database migrations
+# Apply migrations
 echo "Applying database migrations..."
 python manage.py migrate --noinput
 
