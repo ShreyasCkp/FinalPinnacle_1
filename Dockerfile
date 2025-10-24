@@ -13,8 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN chmod +x start.sh
+RUN chmod +x startup.sh
 
 EXPOSE 8000
 
-CMD ["./start.sh"]
+CMD ["./startup.sh"]

@@ -6,20 +6,12 @@ from .settings import *
 DEBUG = False
 
 # ✅ Allow Azure + local + container IPs
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '169.254.133.3',  # Azure internal container IP
-    'pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net',
-    '.azurewebsites.net',  # wildcard for Azure apps
-]
+ALLOWED_HOSTS = ['*']
 
 # ✅ CSRF trusted origins (only https)
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{host.strip()}" for host in ALLOWED_HOSTS
-    if host not in ['localhost', '127.0.0.1'] and not host.startswith('.')
+    'https://pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net',
 ]
-
 # ✅ Database (with SSL)
 DATABASES = {
     'default': {
