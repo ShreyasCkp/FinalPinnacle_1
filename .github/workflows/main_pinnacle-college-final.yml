@@ -9,8 +9,8 @@ on:
 env:
   APP_NAME: pinnacle-college-final
   RESOURCE_GROUP: pinnacle-college-final
-  PYTHON_VERSION: '3.9'
-  DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
+  PYTHON_VERSION: '3.9.18'  # Use explicit minor version for Oryx
+  DJANGO_ENV: deployment
 
 jobs:
   build_and_deploy:
@@ -53,7 +53,15 @@ jobs:
       # 6️⃣ Run Django migrations locally (optional, for validation)
       - name: Run Django migrations locally
         env:
-          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
+          DJANGO_ENV: ${{ env.DJANGO_ENV }}
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DEBUG: False
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |
           source venv/bin/activate
           python manage.py makemigrations
@@ -62,7 +70,15 @@ jobs:
       # 7️⃣ Collect static files locally
       - name: Collect static files locally
         env:
-          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
+          DJANGO_ENV: ${{ env.DJANGO_ENV }}
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DEBUG: False
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |
           source venv/bin/activate
           python manage.py collectstatic --noinput
@@ -81,7 +97,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 🔟 Set Azure Web App environment variables (merge, preserve existing secrets)
+      # 🔟 Set Azure Web App environment variables
       - name: Set Azure Web App environment variables
         uses: azure/cli@v1
         with:
@@ -90,13 +106,13 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --settings \
-                DJANGO_SETTINGS_MODULE=${{ env.DJANGO_SETTINGS_MODULE }} \
+                DJANGO_ENV=${{ env.DJANGO_ENV }} \
+                SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} \
                 DB_NAME=${{ secrets.DB_NAME }} \
                 DB_USER=${{ secrets.DB_USER }} \
                 DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
                 DB_HOST=${{ secrets.DB_HOST }} \
                 DB_PORT=${{ secrets.DB_PORT }} \
-                SECRET_KEY=${{ secrets.SECRET_KEY }} \
                 DEBUG=False \
                 ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} \
                 SECURE_SSL_REDIRECT=False \
