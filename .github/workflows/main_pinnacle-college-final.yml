@@ -9,7 +9,7 @@ on:
 env:
   APP_NAME: pinnacle-college-final
   RESOURCE_GROUP: pinnacle-college-final
-  PYTHON_VERSION: '3.9.23'  # Use explicit minor version for Oryx
+  PYTHON_VERSION: '3.9.23'
   DJANGO_ENV: deployment
 
 jobs:
@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
-      - name: Checkout code
+      # 1️⃣ Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       # 2️⃣ Setup Python
@@ -27,11 +27,16 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # 3️⃣ Install system dependencies for Cairo (required by xhtml2pdf/reportlab)
+      # 3️⃣ Install system dependencies (for Cairo required by xhtml2pdf/reportlab)
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libffi-dev shared-mime-info
+          sudo apt-get install -y \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libgdk-pixbuf2.0-dev \
+            libffi-dev \
+            shared-mime-info
 
       # 4️⃣ Cache pip dependencies
       - name: Cache pip
@@ -45,12 +50,12 @@ jobs:
       # 5️⃣ Install Python dependencies
       - name: Install Python dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
+          python -m venv antenv
+          source antenv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 6️⃣ Run Django migrations locally (optional, for validation)
+      # 6️⃣ Run Django migrations locally
       - name: Run Django migrations locally
         env:
           DJANGO_ENV: ${{ env.DJANGO_ENV }}
@@ -63,8 +68,7 @@ jobs:
           DEBUG: False
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |
-          source venv/bin/activate
-          python manage.py makemigrations
+          source antenv/bin/activate
           python manage.py migrate --noinput
 
       # 7️⃣ Collect static files locally
@@ -80,15 +84,14 @@ jobs:
           DEBUG: False
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |
-          source venv/bin/activate
+          source antenv/bin/activate
           python manage.py collectstatic --noinput
 
-      # 8️⃣ Clean project for ZIP deploy
-      - name: Prepare clean deployment ZIP
+      # 8️⃣ Prepare clean deployment ZIP
+      - name: Prepare deployment ZIP
         run: |
-          echo "Cleaning old virtualenvs, caches, git files, and deployment artifacts"
-          rm -rf venv antenv __pycache__ *.pyc *.pyo .git .github .vscode *.zip
-          rm -f output.zip
+          echo "Cleaning old artifacts"
+          rm -rf __pycache__ *.pyc *.pyo .git .github .vscode *.zip
           zip -r output.zip . -x "media/*" "uploads/*"
 
       # 9️⃣ Azure login
@@ -136,5 +139,4 @@ jobs:
             az webapp config set \
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
-              --startup-file "gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:\$PORT --timeout 180"
-
+              --startup-file "./startup.sh"
