@@ -27,7 +27,13 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # 3️⃣ Cache pip dependencies
+      # 3️⃣ Install system dependencies for Cairo (required by xhtml2pdf/reportlab)
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libffi-dev shared-mime-info
+
+      # 4️⃣ Cache pip dependencies
       - name: Cache pip
         uses: actions/cache@v3
         with:
@@ -36,7 +42,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # 4️⃣ Install Python dependencies (optional for tests)
+      # 5️⃣ Install Python dependencies
       - name: Install Python dependencies
         run: |
           python -m venv venv
@@ -44,7 +50,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 5️⃣ Run Django migrations locally (optional, mainly for checks)
+      # 6️⃣ Run Django migrations locally (optional, for validation)
       - name: Run Django migrations locally
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -53,7 +59,7 @@ jobs:
           python manage.py makemigrations
           python manage.py migrate --noinput
 
-      # 6️⃣ Collect static files locally
+      # 7️⃣ Collect static files locally
       - name: Collect static files locally
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -61,23 +67,21 @@ jobs:
           source venv/bin/activate
           python manage.py collectstatic --noinput
 
-      # 7️⃣ Clean project for ZIP deploy
+      # 8️⃣ Clean project for ZIP deploy
       - name: Prepare clean deployment ZIP
         run: |
           echo "Cleaning old virtualenvs, caches, git files, and deployment artifacts"
           rm -rf venv antenv __pycache__ *.pyc *.pyo .git .github .vscode *.zip
-          # Remove old deployment packages if exist
           rm -f output.zip
-          # Create ZIP of all project files except media/uploads
           zip -r output.zip . -x "media/*" "uploads/*"
 
-      # 8️⃣ Azure login
+      # 9️⃣ Azure login
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 9️⃣ Set Azure Web App environment variables
+      # 🔟 Set Azure Web App environment variables (merge, preserve existing secrets)
       - name: Set Azure Web App environment variables
         uses: azure/cli@v1
         with:
@@ -86,20 +90,20 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --settings \
-              DJANGO_SETTINGS_MODULE=${{ env.DJANGO_SETTINGS_MODULE }} \
-              DB_NAME='${{ secrets.DB_NAME }}' \
-              DB_USER='${{ secrets.DB_USER }}' \
-              DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-              DB_HOST='${{ secrets.DB_HOST }}' \
-              DB_PORT='${{ secrets.DB_PORT }}' \
-              SECRET_KEY='${{ secrets.SECRET_KEY }}' \
-              DEBUG=False \
-              ALLOWED_HOSTS='${{ secrets.ALLOWED_HOSTS }}' \
-              SECURE_SSL_REDIRECT=False \
-              SESSION_COOKIE_SECURE=False \
-              CSRF_COOKIE_SECURE=False
+                DJANGO_SETTINGS_MODULE=${{ env.DJANGO_SETTINGS_MODULE }} \
+                DB_NAME=${{ secrets.DB_NAME }} \
+                DB_USER=${{ secrets.DB_USER }} \
+                DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                DB_HOST=${{ secrets.DB_HOST }} \
+                DB_PORT=${{ secrets.DB_PORT }} \
+                SECRET_KEY=${{ secrets.SECRET_KEY }} \
+                DEBUG=False \
+                ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} \
+                SECURE_SSL_REDIRECT=False \
+                SESSION_COOKIE_SECURE=False \
+                CSRF_COOKIE_SECURE=False
 
-      # 🔟 Deploy Django app via ZIP deploy
+      # 1️⃣1️⃣ Deploy Django app via ZIP
       - name: Deploy Django app to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
@@ -108,7 +112,7 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: output.zip
 
-      # 1️⃣1️⃣ Set Startup Command (Gunicorn)
+      # 1️⃣2️⃣ Set Startup Command (Gunicorn)
       - name: Set Startup Command
         uses: azure/cli@v1
         with:
