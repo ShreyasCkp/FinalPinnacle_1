@@ -9,8 +9,8 @@ on:
 env:
   APP_NAME: pinnacle-college-final
   RESOURCE_GROUP: pinnacle-college-final
-  PYTHON_VERSION: '3.9'
-  DJANGO_SETTINGS_MODULE: student_alerts_app.deployment
+  PYTHON_VERSION: '3.9.23'  # Use explicit minor version for Oryx
+  DJANGO_ENV: deployment
 
 jobs:
   build_and_deploy:
@@ -21,21 +21,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Install system dependencies (required for xhtml2pdf / Cairo)
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libcairo2 libcairo2-dev \
-            libpango-1.0-0 libpangocairo-1.0-0 \
-            libgdk-pixbuf2.0-0 libffi-dev shared-mime-info \
-            libjpeg-dev zlib1g-dev build-essential pkg-config
-
-      # 3️⃣ Set up Python
+      # 2️⃣ Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+
+      # 3️⃣ Install system dependencies for Cairo (required by xhtml2pdf/reportlab)
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2-dev libpango1.0-dev libgdk-pixbuf2.0-dev libffi-dev shared-mime-info
 
       # 4️⃣ Cache pip dependencies
       - name: Cache pip
@@ -46,7 +42,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # 5️⃣ Create venv and install dependencies
+      # 5️⃣ Install Python dependencies
       - name: Install Python dependencies
         run: |
           python -m venv venv
@@ -54,29 +50,54 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 6️⃣ Run Django migrations
-      - name: Run Django migrations
+      # 6️⃣ Run Django migrations locally (optional, for validation)
+      - name: Run Django migrations locally
         env:
-          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
+          DJANGO_ENV: ${{ env.DJANGO_ENV }}
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DEBUG: False
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |
           source venv/bin/activate
+          python manage.py makemigrations
           python manage.py migrate --noinput
 
-      # 7️⃣ Collect static files
-      - name: Collect static files
+      # 7️⃣ Collect static files locally
+      - name: Collect static files locally
         env:
-          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
+          DJANGO_ENV: ${{ env.DJANGO_ENV }}
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DEBUG: False
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |
           source venv/bin/activate
           python manage.py collectstatic --noinput
 
-      # 8️⃣ Azure login
+      # 8️⃣ Clean project for ZIP deploy
+      - name: Prepare clean deployment ZIP
+        run: |
+          echo "Cleaning old virtualenvs, caches, git files, and deployment artifacts"
+          rm -rf venv antenv __pycache__ *.pyc *.pyo .git .github .vscode *.zip
+          rm -f output.zip
+          zip -r output.zip . -x "media/*" "uploads/*"
+
+      # 9️⃣ Azure login
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 9️⃣ Set Azure Web App environment variables
+      # 🔟 Set Azure Web App environment variables
       - name: Set Azure Web App environment variables
         uses: azure/cli@v1
         with:
@@ -85,25 +106,29 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --settings \
-              DJANGO_SETTINGS_MODULE=${{ env.DJANGO_SETTINGS_MODULE }} \
-              DB_NAME='${{ secrets.DB_NAME }}' \
-              DB_USER='${{ secrets.DB_USER }}' \
-              DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-              DB_HOST='${{ secrets.DB_HOST }}' \
-              DB_PORT='${{ secrets.DB_PORT }}' \
-              SECRET_KEY='${{ secrets.SECRET_KEY }}' \
-              DEBUG=False
+                DJANGO_ENV=${{ env.DJANGO_ENV }} \
+                SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} \
+                DB_NAME=${{ secrets.DB_NAME }} \
+                DB_USER=${{ secrets.DB_USER }} \
+                DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                DB_HOST=${{ secrets.DB_HOST }} \
+                DB_PORT=${{ secrets.DB_PORT }} \
+                DEBUG=False \
+                ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} \
+                SECURE_SSL_REDIRECT=False \
+                SESSION_COOKIE_SECURE=False \
+                CSRF_COOKIE_SECURE=False
 
-      # 🔟 Deploy Django app via ZIP deploy
+      # 1️⃣1️⃣ Deploy Django app via ZIP
       - name: Deploy Django app to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.APP_NAME }}
           slot-name: Production
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: .
+          package: output.zip
 
-      # 1️⃣1️⃣ Set Startup Command for Gunicorn
+      # 1️⃣2️⃣ Set Startup Command (Gunicorn)
       - name: Set Startup Command
         uses: azure/cli@v1
         with:
@@ -111,6 +136,5 @@ jobs:
             az webapp config set \
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
-              --startup-file "gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:\$PORT --timeout 120"
-
+              --startup-file "gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:\$PORT --timeout 180"
 
