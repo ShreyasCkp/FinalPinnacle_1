@@ -44,34 +44,38 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 5️⃣ Run Django migrations
-      - name: Run Django migrations
+      # 5️⃣ Run Django migrations locally (optional, mostly for check)
+      - name: Run Django migrations locally
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
         run: |
           source venv/bin/activate
+          python manage.py makemigrations
           python manage.py migrate --noinput
 
-      # 6️⃣ Collect static files
-      - name: Collect static files
+      # 6️⃣ Collect static files locally
+      - name: Collect static files locally
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
         run: |
           source venv/bin/activate
           python manage.py collectstatic --noinput
 
-      # 7️⃣ Azure login
+      # 7️⃣ Clean project for ZIP deploy
+      - name: Prepare clean deployment ZIP
+        run: |
+          # Remove venv, caches, git, github, pycache
+          rm -rf venv __pycache__ *.pyc *.pyo .git .github
+          # Optional: remove any old tar/zip
+          rm -f output.zip
+          # Create ZIP of all project files
+          zip -r output.zip . -x "media/*" "uploads/*"
+
+      # 8️⃣ Azure login
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # 8️⃣ Remove old files in wwwroot except media (optional)
-      - name: Clean existing files in wwwroot
-        uses: azure/cli@v1
-        with:
-          inlineScript: |
-            az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --command "rm -rf /home/site/wwwroot/*"
 
       # 9️⃣ Set Azure Web App environment variables
       - name: Set Azure Web App environment variables
@@ -102,7 +106,7 @@ jobs:
           app-name: ${{ env.APP_NAME }}
           slot-name: Production
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: .
+          package: output.zip
 
       # 1️⃣1️⃣ Set Startup Command (Gunicorn)
       - name: Set Startup Command
@@ -112,4 +116,4 @@ jobs:
             az webapp config set \
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
-              --startup-file "gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:\$PORT --timeout 120"
+              --startup-file "gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:\$PORT --timeout 180"
