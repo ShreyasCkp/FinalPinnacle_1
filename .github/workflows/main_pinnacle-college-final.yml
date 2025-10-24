@@ -1,4 +1,4 @@
-name: Build and deploy Django App to Azure Web App (Raw Deploy)
+name: Build and Deploy Django App to Azure Web App
 
 on:
   push:
@@ -17,9 +17,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ Install system dependencies (required for xhtml2pdf / Cairo)
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -29,11 +31,13 @@ jobs:
             libgdk-pixbuf2.0-0 libffi-dev shared-mime-info \
             libjpeg-dev zlib1g-dev build-essential pkg-config
 
+      # 3️⃣ Set up Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      # 4️⃣ Cache pip dependencies
       - name: Cache pip
         uses: actions/cache@v3
         with:
@@ -42,16 +46,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Create virtual environment and install dependencies
+      # 5️⃣ Create venv and install dependencies
+      - name: Install Python dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Make startup.sh executable
-        run: chmod +x startup.sh
-
+      # 6️⃣ Run Django migrations
       - name: Run Django migrations
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -59,6 +62,7 @@ jobs:
           source venv/bin/activate
           python manage.py migrate --noinput
 
+      # 7️⃣ Collect static files
       - name: Collect static files
         env:
           DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}
@@ -66,11 +70,13 @@ jobs:
           source venv/bin/activate
           python manage.py collectstatic --noinput
 
+      # 8️⃣ Azure login
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # 9️⃣ Set Azure Web App environment variables
       - name: Set Azure Web App environment variables
         uses: azure/cli@v1
         with:
@@ -79,26 +85,31 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --settings \
+              DJANGO_SETTINGS_MODULE=${{ env.DJANGO_SETTINGS_MODULE }} \
               DB_NAME='${{ secrets.DB_NAME }}' \
               DB_USER='${{ secrets.DB_USER }}' \
               DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
               DB_HOST='${{ secrets.DB_HOST }}' \
-              DB_PORT='${{ secrets.DB_PORT }}'
+              DB_PORT='${{ secrets.DB_PORT }}' \
+              SECRET_KEY='${{ secrets.SECRET_KEY }}' \
+              DEBUG=False
 
-      - name: Deploy app to Azure Web App (no ZIP)
+      # 🔟 Deploy Django app via ZIP deploy
+      - name: Deploy Django app to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.APP_NAME }}
+          slot-name: Production
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: .
+
+      # 1️⃣1️⃣ Set Startup Command for Gunicorn
+      - name: Set Startup Command
         uses: azure/cli@v1
         with:
           inlineScript: |
-            echo "Deploying project files to Azure Web App..."
-            az webapp deploy \
+            az webapp config set \
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
-              --src-path . \
-              --type war --async false
+              --startup-file "gunicorn student_alerts_app.wsgi:application --bind 0.0.0.0:\$PORT --timeout 120"
 
-      - name: Verify deployment files
-        uses: azure/cli@v1
-        with:
-          inlineScript: |
-            echo "Deployment complete. Verifying files..."
-            az webapp ssh --name ${{ env.APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }}
