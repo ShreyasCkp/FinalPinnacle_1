@@ -13,7 +13,7 @@ certifi
 cffi
 charset-normalizer
 colorama
-cryptography
+cryptography==41.0.7
 cssselect2
 Django>=4.2,<5.0
 docopt
@@ -79,7 +79,6 @@ tzlocal
 uritools
 urllib3
 weasyprint==62.3
-weasyprint
 webencodings
 werkzeug
 whitenoise
