@@ -140,3 +140,4 @@ jobs:
               --name ${{ env.APP_NAME }} \
               --resource-group ${{ env.RESOURCE_GROUP }} \
               --startup-file "./startup.sh"
+
