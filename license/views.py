@@ -188,7 +188,7 @@ from datetime import date
  
 HARDCODED_KEY = "CKP-2025 v1.0.0"
 START_DATE = date(2025, 6, 5)
-END_DATE = date(2025, 10, 17)
+END_DATE = date(2025, 11, 27)
  
 @custom_login_required
 def license_check_view(request):
