@@ -12,7 +12,7 @@ certifi
 cffi
 charset-normalizer
 colorama
-cryptography==41.0.7
+cryptography==42.0.1
 Django>=4.2,<5.0
 docopt
 et-xmlfile
