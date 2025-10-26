@@ -1022,10 +1022,11 @@ def employee_annual_dashboard(request):
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-import weasyprint
+from xhtml2pdf import pisa
 from datetime import date
 from decimal import Decimal
 from num2words import num2words
+from django.templatetags.static import static
 
 def download_payslip(request, month, year=None):
     employee_id = request.GET.get('employee_id') or request.COOKIES.get("employee_id")
@@ -1050,14 +1051,11 @@ def download_payslip(request, month, year=None):
     present_days = attendance_qs.filter(status="Present").count()
     lop_days = sum(1 for att in attendance_qs if getattr(att, 'lop', False) and att.date.day < 25)
 
-    net_pay = declaration.net_pay if declaration else 0
-    total_deductions = lop_days * (net_pay / total_days if total_days > 0 else 0)
-    final_salary = salary_slip.final_salary
-    # ✅ Convert Net Pay to Words
+    final_salary = salary_slip.final_salary if salary_slip else 0
     net_pay_in_words = num2words(final_salary, to="currency", lang="en_IN").replace("euro", "rupees").title()
 
     logo_url = request.build_absolute_uri(static("images/logo.png"))
-    total_deductions = declaration.total_deductions + Decimal(salary_slip.salary_deduction or 0)
+    total_deductions = (declaration.total_deductions if declaration else 0) + (salary_slip.salary_deduction if salary_slip else 0)
 
     context = {
         'employee': employee,
@@ -1082,5 +1080,15 @@ def download_payslip(request, month, year=None):
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="Payslip_{employee.emp_code}_{month}_{year}.pdf"'
-    weasyprint.HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(response)
+
+    # Convert HTML to PDF using xhtml2pdf
+    pisa_status = pisa.CreatePDF(
+        src=html_string,
+        dest=response,
+        link_callback=lambda uri, rel: request.build_absolute_uri(uri)
+    )
+
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF", status=500)
+
     return response
