@@ -17,17 +17,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Python 3.9
+      # 2️⃣ Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # 3️⃣ Install system dependencies (for Cairo required by xhtml2pdf/reportlab/pdfplumber)
+      # 3️⃣ Install system dependencies (required for xhtml2pdf, reportlab)
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -36,12 +36,9 @@ jobs:
             libpango1.0-dev \
             libgdk-pixbuf2.0-dev \
             libffi-dev \
-            libssl-dev \
-            build-essential \
-            python3-dev \
             shared-mime-info
 
-      # 4️⃣ Cache pip
+      # 4️⃣ Cache pip dependencies
       - name: Cache pip
         uses: actions/cache@v3
         with:
@@ -50,17 +47,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      # 5️⃣ Install Python dependencies in venv
+      # 5️⃣ Install Python dependencies (local for testing migrations/collectstatic)
       - name: Install Python dependencies
         run: |
-          python -m venv antenv
-          source antenv/bin/activate
+          python -m venv venv
+          source venv/bin/activate
           pip install --upgrade pip
-          pip install wheel
           pip install -r requirements.txt
 
-      # 6️⃣ Run Django migrations
-      - name: Run Django migrations
+      # 6️⃣ Run Django migrations locally
+      - name: Run Django migrations locally
         env:
           DJANGO_ENV: ${{ env.DJANGO_ENV }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
@@ -72,11 +68,11 @@ jobs:
           DEBUG: False
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |
-          source antenv/bin/activate
+          source venv/bin/activate
           python manage.py migrate --noinput
 
-      # 7️⃣ Collect static files
-      - name: Collect static files
+      # 7️⃣ Collect static files locally
+      - name: Collect static files locally
         env:
           DJANGO_ENV: ${{ env.DJANGO_ENV }}
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
@@ -88,14 +84,15 @@ jobs:
           DEBUG: False
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
         run: |
-          source antenv/bin/activate
+          source venv/bin/activate
           python manage.py collectstatic --noinput
 
-      # 8️⃣ Prepare deployment ZIP
+      # 8️⃣ Prepare clean deployment ZIP (exclude venv, media, uploads)
       - name: Prepare deployment ZIP
         run: |
-          rm -f output.zip
-          zip -r output.zip . -x "media/*" "uploads/*" "*.git*" ".github/*" ".vscode/*"
+          echo "Cleaning old artifacts"
+          rm -rf __pycache__ *.pyc *.pyo .git .github .vscode *.zip venv
+          zip -r output.zip . -x "media/*" "uploads/*" "antenv/*" "*.git*" ".github/*" ".vscode/*"
 
       # 9️⃣ Azure login
       - name: Azure login
