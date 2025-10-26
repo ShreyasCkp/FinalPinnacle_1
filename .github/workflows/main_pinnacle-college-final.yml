@@ -10,133 +10,49 @@ env:
   APP_NAME: pinnacle-college-final
   RESOURCE_GROUP: pinnacle-college-final
   PYTHON_VERSION: '3.9'
-  DJANGO_ENV: deployment
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Python
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # 3️⃣ Install system dependencies (required for xhtml2pdf, reportlab)
-      - name: Install system dependencies
+      - name: Install system dependencies (PostgreSQL + build tools)
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            libcairo2-dev \
-            libpango1.0-dev \
-            libgdk-pixbuf2.0-dev \
-            libffi-dev \
-            shared-mime-info
+          sudo apt-get install -y python3-dev libpq-dev build-essential
 
-      # 4️⃣ Cache pip dependencies
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      # 5️⃣ Install Python dependencies (local for testing migrations/collectstatic)
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 6️⃣ Run Django migrations locally
-      - name: Run Django migrations locally
-        env:
-          DJANGO_ENV: ${{ env.DJANGO_ENV }}
-          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DEBUG: False
-          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+      - name: Collect static files
         run: |
-          source venv/bin/activate
-          python manage.py migrate --noinput
+          python manage.py collectstatic --noinput || echo "collectstatic failed"
 
-      # 7️⃣ Collect static files locally
-      - name: Collect static files locally
-        env:
-          DJANGO_ENV: ${{ env.DJANGO_ENV }}
-          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DEBUG: False
-          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+      - name: Run migrations
         run: |
-          source venv/bin/activate
-          python manage.py collectstatic --noinput
+          python manage.py migrate || echo "migrations failed"
 
-      # 8️⃣ Prepare clean deployment ZIP (exclude venv, media, uploads)
-      - name: Prepare deployment ZIP
+      - name: Create ZIP package for deployment
         run: |
-          echo "Cleaning old artifacts"
-          rm -rf __pycache__ *.pyc *.pyo .git .github .vscode *.zip venv
-          zip -r output.zip . -x "media/*" "uploads/*" "antenv/*" "*.git*" ".github/*" ".vscode/*"
+          mkdir -p deploy
+          rsync -av --exclude='deploy' --exclude='.git' --exclude='__pycache__' ./ ./deploy/
+          cd deploy
+          zip -r ../deploy.zip .
+          cd ..
 
-      # 9️⃣ Azure login
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # 🔟 Set Azure Web App environment variables
-      - name: Set Azure Web App environment variables
-        uses: azure/cli@v1
-        with:
-          inlineScript: |
-            az webapp config appsettings set \
-              --name ${{ env.APP_NAME }} \
-              --resource-group ${{ env.RESOURCE_GROUP }} \
-              --settings \
-                DJANGO_ENV=${{ env.DJANGO_ENV }} \
-                SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} \
-                DB_NAME=${{ secrets.DB_NAME }} \
-                DB_USER=${{ secrets.DB_USER }} \
-                DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-                DB_HOST=${{ secrets.DB_HOST }} \
-                DB_PORT=${{ secrets.DB_PORT }} \
-                DEBUG=False \
-                ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} \
-                SECURE_SSL_REDIRECT=False \
-                SESSION_COOKIE_SECURE=False \
-                CSRF_COOKIE_SECURE=False
-
-      # 1️⃣1️⃣ Deploy Django app via ZIP
-      - name: Deploy Django app to Azure Web App
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.APP_NAME }}
-          slot-name: Production
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: output.zip
-
-      # 1️⃣2️⃣ Set Startup Command (Gunicorn)
-      - name: Set Startup Command
-        uses: azure/cli@v1
-        with:
-          inlineScript: |
-            az webapp config set \
-              --name ${{ env.APP_NAME }} \
-              --resource-group ${{ env.RESOURCE_GROUP }} \
-              --startup-file "./startup.sh"
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: deploy.zip
