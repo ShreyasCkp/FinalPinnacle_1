@@ -46,7 +46,7 @@ psycopg2-binary>=2.9.9
 pycairo
 pycparser
 pyhanko==0.23.1
-pyhanko-certvalidator==0.23.0
+pyhanko-certvalidator==0.26.2
 PyJWT
 pypdf
 pypdfium2
