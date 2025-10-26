@@ -216,22 +216,17 @@ def leave_reject(request, leave_id):
     return render(request, "hr/approve_modal.html", {"leave": leave, "action": "reject"})
 
 
-
 # hr/views.py
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
 from .models import EmployeeSalaryDeclaration
 from .forms import EmployeeSalaryDeclarationForm
 from master.models import Employee
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
-from .models import EmployeeSalaryDeclaration
 from django.template.loader import render_to_string
-import weasyprint  # or xhtml2pdf
+from xhtml2pdf import pisa  # replaced weasyprint
 
 def view_payslip(request, pk):
     declaration = get_object_or_404(EmployeeSalaryDeclaration, pk=pk)
-    # Use employee related data if you want up-to-date data:
     employee = declaration.employee
     return render(request, 'hr/payslip_form.html', {
         'form': declaration,
@@ -241,28 +236,27 @@ def view_payslip(request, pk):
     })
 
 
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-import weasyprint
-from .models import EmployeeSalaryDeclaration
-
 def download_payslip(request, pk):
     declaration = get_object_or_404(EmployeeSalaryDeclaration, pk=pk)
-    employee = declaration.employee  # get related employee
+    employee = declaration.employee
 
     html_string = render_to_string('hr/payslip_form.html', {
         'declaration': declaration,
         'employee': employee,
-        'is_pdf': True,  # you can use this in your template to adjust UI for PDF
+        'is_pdf': True,  # Adjust UI in template for PDF
     })
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="Payslip_{declaration.emp_code}.pdf"'
-    
-    weasyprint.HTML(string=html_string).write_pdf(response)
+
+    # Convert HTML to PDF using xhtml2pdf
+    pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('We had some errors generating the PDF <pre>' + html_string + '</pre>')
 
     return response
+
 
 
 
