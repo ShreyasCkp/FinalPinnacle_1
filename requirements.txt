@@ -3,7 +3,7 @@ aiohttp
 aiohttp-retry
 aiosignal
 arabic-reshaper
-asgiref
+asgiref>=3.7,<4.0
 asn1crypto
 async-timeout
 attrs
