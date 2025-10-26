@@ -1029,34 +1029,38 @@ from num2words import num2words
 from django.templatetags.static import static
 
 def download_payslip(request, month, year=None):
+    # Identify employee
     employee_id = request.GET.get('employee_id') or request.COOKIES.get("employee_id")
     if not employee_id:
         return HttpResponse("Employee not identified", status=400)
     
     employee = get_object_or_404(Employee, id=employee_id)
 
+    # Determine month and year
     if not year:
         year = request.GET.get('year') or date.today().year
     year = int(year)
     month = int(month)
 
-    salary_slip = EmployeeSalarySlip.objects.filter(
-        employee=employee, month=month, year=year
-    ).first()
-
+    # Fetch salary slip and declaration
+    salary_slip = EmployeeSalarySlip.objects.filter(employee=employee, month=month, year=year).first()
     declaration = EmployeeSalaryDeclaration.objects.filter(employee=employee).first()
 
+    # Calculate attendance
     total_days, _ = get_working_days(year, month)
     attendance_qs = attendance.objects.filter(employee=employee, date__year=year, date__month=month)
     present_days = attendance_qs.filter(status="Present").count()
     lop_days = sum(1 for att in attendance_qs if getattr(att, 'lop', False) and att.date.day < 25)
 
+    # Compute final salary and in-words
     final_salary = salary_slip.final_salary if salary_slip else 0
     net_pay_in_words = num2words(final_salary, to="currency", lang="en_IN").replace("euro", "rupees").title()
 
+    # Logo and deductions
     logo_url = request.build_absolute_uri(static("images/logo.png"))
     total_deductions = (declaration.total_deductions if declaration else 0) + (salary_slip.salary_deduction if salary_slip else 0)
 
+    # Context for template
     context = {
         'employee': employee,
         'salary_slip': {
@@ -1076,12 +1080,14 @@ def download_payslip(request, month, year=None):
         'is_pdf': True,
     }
 
+    # Render HTML template
     html_string = render_to_string('hr/salary_slip.html', context)
 
+    # Generate PDF response
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="Payslip_{employee.emp_code}_{month}_{year}.pdf"'
 
-    # Convert HTML to PDF using xhtml2pdf
+    # xhtml2pdf conversion
     pisa_status = pisa.CreatePDF(
         src=html_string,
         dest=response,
@@ -1092,3 +1098,4 @@ def download_payslip(request, month, year=None):
         return HttpResponse("Error generating PDF", status=500)
 
     return response
+
