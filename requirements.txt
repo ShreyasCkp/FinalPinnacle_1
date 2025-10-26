@@ -1,79 +1,94 @@
-aiohappyeyeballs
+# Django
+Django>=4.2,<5.0
+
+# Database
+psycopg2-binary>=2.9.9
+
+# Async / HTTP
 aiohttp
 aiohttp-retry
 aiosignal
-arabic-reshaper
-asgiref>=3.7,<4.0
-asn1crypto
 async-timeout
-attrs
-Brotli
-certifi
-cffi
-charset-normalizer
-colorama
-cryptography==42.0.1
-Django>=4.2,<5.0
-docopt
-et-xmlfile
-exceptiongroup
-fonttools
-freetype-py
 frozenlist
-geographiclib
-geopy
-gunicorn
-hijridate
-holidays
-idna
-iniconfig
+yarl
+urllib3
+requests
+
+# Cryptography / Security
+cryptography>=42.0.1
+cffi
+asn1crypto
+oscrypto
+PyJWT
+
+# System / Utilities
+attrs
+packaging
+typing-extensions
+python-decouple
+python-dateutil
+tzdata
+tzlocal
+six
+colorama
+
+# Parsing / XML / HTML
 lxml
 markupsafe
-multidict
-num2words
-numpy
-openpyxl
-oscrypto
-packaging
-pandas
+et-xmlfile
+tinyhtml5
+webencodings
+
+# PDFs
 pdfkit
 pdfminer-six
 pdfplumber
-pillow
-pluggy
-propcache
-psycopg2-binary>=2.9.9
-pycairo
-pycparser
-PyJWT
 pypdf
 pypdfium2
-pytest
-python-bidi
-python-dateutil
-python-decouple
-python-http-client
-pytz
-pyyaml
-qrcode
 reportlab==3.6.13
-requests
-sendgrid
-six
-sqlparse
-svglib
-tinyhtml5
-tomli
-twilio
-typing-extensions
-tzdata
-tzlocal
-uritools
-urllib3
-webencodings
-werkzeug
-whitenoise
 xhtml2pdf==0.2.10
-yarl
-zopfli
+svglib
 
+# Excel / Data
+openpyxl
+pandas
+numpy
+num2words
+
+# Fonts / Graphics
+python-bidi
+arabic-reshaper
+freetype-py
+fonttools
+pillow
+qrcode
+
+# Testing / Dev
+pytest
+pluggy
+iniconfig
+exceptiongroup
+
+# Deployment / Server
+gunicorn
+whitenoise
+werkzeug
+
+# Dates / Calendars
+holidays
+hijridate
+geopy
+geographiclib
+
+# Networking / APIs
+python-http-client
+twilio
+sendgrid
+urllib3
+uritools
+
+# PDF caching / extra
+propcache
+zopfli
+Brotli
+docopt
