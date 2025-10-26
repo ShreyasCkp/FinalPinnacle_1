@@ -8,13 +8,11 @@ asn1crypto
 async-timeout
 attrs
 Brotli
-cairocffi
 certifi
 cffi
 charset-normalizer
 colorama
 cryptography==41.0.7
-cssselect2
 Django>=4.2,<5.0
 docopt
 et-xmlfile
@@ -27,7 +25,6 @@ geopy
 gunicorn
 hijridate
 holidays
-html5lib
 idna
 iniconfig
 lxml
@@ -48,13 +45,11 @@ propcache
 psycopg2-binary>=2.9.9
 pycairo
 pycparser
-pydyf
 pyhanko==0.23.1
 pyhanko-certvalidator==0.23.0
 PyJWT
 pypdf
 pypdfium2
-pyphen
 pytest
 python-bidi
 python-dateutil
@@ -69,7 +64,6 @@ sendgrid
 six
 sqlparse
 svglib
-tinycss2
 tinyhtml5
 tomli
 twilio
@@ -78,7 +72,6 @@ tzdata
 tzlocal
 uritools
 urllib3
-weasyprint==62.3
 webencodings
 werkzeug
 whitenoise
