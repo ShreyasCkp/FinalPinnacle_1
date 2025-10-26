@@ -49,8 +49,8 @@ psycopg2-binary>=2.9.9
 pycairo
 pycparser
 pydyf
-pyhanko
-pyhanko-certvalidator
+pyhanko==0.23.1
+pyhanko-certvalidator==0.23.0
 PyJWT
 pypdf
 pypdfium2
@@ -82,6 +82,6 @@ weasyprint==62.3
 webencodings
 werkzeug
 whitenoise
-xhtml2pdf
+xhtml2pdf==0.2.10
 yarl
 zopfli
