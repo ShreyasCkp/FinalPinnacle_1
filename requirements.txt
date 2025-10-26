@@ -58,7 +58,7 @@ python-http-client
 pytz
 pyyaml
 qrcode
-reportlab
+reportlab==3.6.13
 requests
 sendgrid
 six
