@@ -735,19 +735,6 @@ def subject_form_delete(request, pk):
     messages.success(request, f"Subject '{subject_name}' deleted successfully.")
     return redirect('subject_form_list')
 
-
-
-
-
-
-# from django.http import JsonResponse
-# from .models import Employee
-
-# def get_faculties_by_subject(request):
-#     subject_name = request.GET.get('name', '').strip()
-#     faculties = Employee.objects.filter(department__iexact=subject_name)
-#     data = [{'id': f.id, 'name': f.name} for f in faculties]
-#     return JsonResponse({'faculties': data})
  
 
 
@@ -1140,19 +1127,6 @@ def dashboard_view(request):
    # Pending leave notifications older than 7 days
     seven_days_ago = timezone.now() - timedelta(days=7)
     pending_leaves = Leave.objects.filter(is_approved=False, applied_on__lte=seven_days_ago)
-
-    # # Use a set to ensure each employee appears only once
-    # pending_employees = set()
-    # for leave in pending_leaves:
-    #     employee_name = getattr(leave.employee, 'name', 'Unknown Employee')
-    #     if employee_name not in pending_employees:
-    #         unread_notifications.append({
-    #             'user': employee_name,
-    #             'message': '',  # Keep empty to only show name in dropdown
-    #             'timestamp': leave.applied_on,
-    #             'link': '/hr/leaves/'  # Redirect to leave page on click
-    #         })
-    #         pending_employees.add(employee_name)
 
 
     # Sort notifications by timestamp descending

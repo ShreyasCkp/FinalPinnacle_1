@@ -8,10 +8,7 @@ class TimeSlotForm(forms.ModelForm):
         fields = ['start_time', 'end_time']
 
 
-# class TimetableEntryForm(forms.ModelForm):
-#     class Meta:
-#         model = TimetableEntry
-#         fields = ['day', 'time_slot', 'semester', 'subject', 'faculty', 'room']
+
 
 
 from django import forms

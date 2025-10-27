@@ -503,16 +503,6 @@ def weekly_timetable_view(request, course_id=None, semester_number=None):
 
 
 
-# def weekly_timetable_view(request, course_id, semester_number):
-#     semester = get_object_or_404(Semester, course__id=course_id, number=semester_number)
-#     week_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-#     timetable = {
-#         day: TimetableEntry.objects.filter(semester=semester, day=day).order_by('time_slot')
-#         for day in week_days
-#     }
-#     return render(request, 'timetable/weekly.html', {
-#         'timetable': timetable, 'semester': semester
-#     })
 
 
 @custom_login_required

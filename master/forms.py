@@ -696,24 +696,5 @@ class CollegeStartEndPlanForm(forms.ModelForm):
         }
 
 
-# from django import forms
-# from .models import ClassTeacher, Course, CourseType, AcademicYear
-# from master.models import Employee
-
-# class ClassTeacherForm(forms.ModelForm):
-#     class Meta:
-#         model = ClassTeacher
-#         fields = ['academic_year', 'program_type', 'course', 'semester', 'faculty']
-#         widgets = {
-#             'academic_year': forms.Select(attrs={'class': 'form-select'}),
-#             'program_type': forms.Select(attrs={'class': 'form-select'}),
-#             'course': forms.Select(attrs={'class': 'form-select'}),
-#             'semester': forms.Select(attrs={'class': 'form-select'}),  # use Select widget explicitly
-#             'faculty': forms.Select(attrs={'class': 'form-select'}),
-#         }
-
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.fields['faculty'].queryset = Employee.objects.filter(is_locked=False)
 
 

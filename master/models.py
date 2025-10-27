@@ -47,36 +47,7 @@ class StudentRecord(models.Model):
 
     def __str__(self):
         return f"{self.student_name} ({self.student_id})"
-# class SentMessage(models.Model):
-#     subject = models.CharField(max_length=255)
-#     message = models.TextField()
-#     send_sms = models.BooleanField(default=False)
-#     send_whatsapp = models.BooleanField(default=False)
-#     department = models.CharField(max_length=100)
-#     sent_at = models.DateTimeField(auto_now_add=True)
-    
-#     # Add this field for status
-#     status = models.CharField(max_length=255, default="sms:0 whatsapp:0")
 
-#     # Adding foreign keys to link the message to the student and guardian phone
-#     student_name = models.ForeignKey(StudentRecord, on_delete=models.CASCADE, related_name='sent_messages')
-#     guardian_phone_no = models.CharField(max_length=15, blank=True, null=True)  # Added phone number field
-
-#     def __str__(self):
-#         return f"{self.subject} ({self.department})"
-
-# class MessageDelivery(models.Model):
-#     message = models.ForeignKey(SentMessage, on_delete=models.CASCADE, related_name='deliveries')
-#     student = models.ForeignKey(StudentRecord, on_delete=models.CASCADE)
-#     phone_number = models.CharField(max_length=15)
-#     status = models.CharField(
-#         max_length=20,
-#         choices=[('Delivered', 'Delivered'), ('Not Delivered', 'Not Delivered'), ('Pending', 'Pending')],
-#         default='Pending'
-#     )
-
-#     def __str__(self):
-#         return f"{self.student.student_name} - {self.status}"
 
 class Student(models.Model):
     id = models.AutoField(primary_key=True)
@@ -116,26 +87,7 @@ class Subject(models.Model):
         return f"{self.name} {self.semester}"
 
        
-# class Subject(models.Model):
-#     name = models.CharField(max_length=100)
-#     semester_number = models.PositiveIntegerField()
-#     course = models.ForeignKey('Course', on_delete=models.CASCADE)
-#     subject_code = models.CharField(max_length=20, null=True, blank=True)
-#     credit = models.PositiveIntegerField(null=True, blank=True)
-#     faculty = models.ForeignKey('Employee', on_delete=models.SET_NULL, null=True, blank=True)
 
-#     def __str__(self):
-#         return f"{self.name} (Sem {self.semester_number}, {self.course.name})"
-
-# class Subject(models.Model):
-#     name = models.CharField(max_length=100)
-#     semester_number = models.PositiveIntegerField()
-#     course = models.ForeignKey('Course', on_delete=models.CASCADE)
-#     subject_code = models.CharField(max_length=20, null=True, blank=True)
-#     credit = models.PositiveIntegerField(null=True, blank=True)
-
-#     def __str__(self):
-#         return f"{self.name} (Sem {self.semester_number}, {self.course.name})"
 
 from django.db import models
 
@@ -531,18 +483,3 @@ class CollegeStartEndPlan(models.Model):
 
 
 
-# from django.db import models
-# from master.models import Course, CourseType, AcademicYear, Employee, Semester  # Assuming Employee is your Faculty model
-
-# class ClassTeacher(models.Model):
-#     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
-#     program_type = models.ForeignKey(CourseType, on_delete=models.CASCADE)
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-#     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
-#     faculty = models.ForeignKey(Employee, on_delete=models.CASCADE)
-
-#     class Meta:
-#         unique_together = ('academic_year', 'program_type', 'course', 'semester')  # One class teacher per class
-
-#     def __str__(self):
-#         return f"{self.faculty} - {self.course.name} Sem {self.semester}"

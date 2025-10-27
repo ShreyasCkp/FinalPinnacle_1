@@ -141,50 +141,14 @@
 </div>
         {% endfor %}
  
-        <!--{% if faculty_subject_class_counts %}
-<div style="width: 100%; text-align: center; margin-top: 30px;">
-<h3 style="color: #006400;">Total Classes Per Week: {{ total }}</h3>
-</div>
-            {% else %}
-<p style="text-align: center;">No data found.</p>
-            {% endif %}
-        {% endwith %}-->
+
 </div>
 </body>
 </html>
  
 <script>
     $(document).ready(function () {
-    //    const courseSelect = $('#course');
-    //    const semesterSelect = $('#semester');
- 
-    //    courseSelect.change(function () {
-    //        const courseId = $(this).val();
- 
-    //        if (courseId) {
-    //            $.post("{% url 'get_semesters_by_course' %}", {
-    //                course_id: courseId,
-    //                csrfmiddlewaretoken: '{{ csrf_token }}'
-    //            }, function (data) {
-    //                semesterSelect.empty().append($('<option>', { value: '', text: 'All Semesters' }));
- 
-    //                $.each(data.semesters, function (index, semester) {
-    //                    semesterSelect.append($('<option>', {
-    //                        value: semester.number,
-    //                        text: semester.name
-    //                    }));
-    //                });
-    //            });
-    //        } else {
-    //            semesterSelect.empty().append($('<option>', { value: '', text: 'All Semesters' }));
-    //        }
-    //    });
- 
-    //    // Trigger initial population if course is already selected
-    //    if (courseSelect.val()) {
-    //        courseSelect.trigger('change');
-    //    }
-    //});
+   
  
 </script>
  
