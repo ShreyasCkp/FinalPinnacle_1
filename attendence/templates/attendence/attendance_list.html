@@ -344,9 +344,11 @@
                     </form>
 
 
-                    <a href="#" class="icon-btn" title="Delete"
-                       onclick="confirmAttendanceDelete({{ record.id }}, '{{ record.employee.name|escapejs }}')">
-                        <i class="fas fa-trash-alt"></i>
+                    <a href="#" class="icon-btn delete-btn"
+                    data-id="{{ record.id }}"
+                    data-name="{{ record.employee.name|escapejs }}"
+                    title="Delete">
+                    <i class="fas fa-trash-alt"></i>
                     </a>
                     {% endif %}
                 </td>
@@ -400,39 +402,55 @@
 <div id="overlay"></div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
     let deleteAttendanceId = null;
 
-    function confirmAttendanceDelete(attendanceId, employeeName) {
-        deleteAttendanceId = attendanceId;
-        document.getElementById("confirm-popup").style.display = "block";
-        document.getElementById("overlay").style.display = "block";
-        document.getElementById("confirm-popup-message").innerHTML =
-            `Are you sure you want to delete attendance for <b>${employeeName}</b>?`;
-    }
+    // 🗑️ Handle Delete Button Click
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault(); // prevent anchor link jump
 
+            const attendanceId = this.getAttribute("data-id");
+            const employeeName = this.getAttribute("data-name");
+
+            deleteAttendanceId = attendanceId;
+
+            document.getElementById("confirm-popup").style.display = "block";
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("confirm-popup-message").innerHTML =
+                `Are you sure you want to delete attendance for <b>${employeeName}</b>?`;
+        });
+    });
+
+    // ✅ Confirm delete
     document.getElementById("confirm-yes").addEventListener("click", function () {
         if (deleteAttendanceId) {
-            document.getElementById(`attendance-delete-form-${deleteAttendanceId}`).submit();
+            const form = document.getElementById(`attendance-delete-form-${deleteAttendanceId}`);
+            if (form) form.submit();
         }
     });
 
+    // ❌ Cancel delete
     document.getElementById("confirm-no").addEventListener("click", function () {
         document.getElementById("confirm-popup").style.display = "none";
         document.getElementById("overlay").style.display = "none";
         deleteAttendanceId = null;
     });
-</script>
 
-<script>
-    document.getElementById('attendanceSearch').addEventListener('input', function () {
-        const filter = this.value.toLowerCase();
-        const rows = document.querySelectorAll('table tbody tr');
+    // 🔍 Search filter
+    const searchInput = document.getElementById('attendanceSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll('table tbody tr');
 
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? '' : 'none';
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
         });
-    });
+    }
+});
 </script>
 
 
