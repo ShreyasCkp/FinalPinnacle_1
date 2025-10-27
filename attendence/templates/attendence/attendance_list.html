@@ -502,25 +502,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 </style>
 
+
 <div id="snackbar"></div>
 
-
 <script>
-    function showSnackbar(message) {
-        const snackbar = document.getElementById("snackbar");
-        snackbar.textContent = message;
-        snackbar.className = "show";
-        setTimeout(() => {
-            snackbar.className = snackbar.className.replace("show", "");
-        }, 3000);
-    }
+function showSnackbar(message) {
+    const snackbar = document.getElementById("snackbar");
+    snackbar.textContent = message;
+    snackbar.className = "show";
+    setTimeout(() => {
+        snackbar.className = snackbar.className.replace("show", "");
+    }, 3000);
+}
 
-    // Django message integration
-    {% if messages %}
-        {% for message in messages %}
-            showSnackbar("{{ message|escapejs }}");
-        {% endfor %}
-    {% endif %}
+// 🧾 Django messages — wrapped inside a string so VS Code ignores it
+// The `/* */` comments silence JS parser errors
+/* {% if messages %} */
+/* {% for message in messages %} */
+showSnackbar("{{ message|escapejs }}");
+/* {% endfor %} */
+/* {% endif %} */
 </script>
+
+
+
 
 {% endblock %}
