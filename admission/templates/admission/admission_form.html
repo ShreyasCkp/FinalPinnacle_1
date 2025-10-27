@@ -1081,11 +1081,7 @@
                 <input type="text" name="uniform_fee" id="id_uniform_fee" class="form-control" readonly>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="id_transport_fees">Transport Fee:</label>
-                <input type="text" name="transport_fees" id="id_transport_fees" class="form-control" readonly>
-            </div>-->
-
+           
 
 
                         <!--<div class="form-group">
@@ -1102,7 +1098,7 @@
                             <label>Scan to Pay (QR Code)</label><br>
                             <div id="qrcode" class="border p-2"></div>
                         </div>-->
-                        <!-- TRANSPORT & HOSTEL -->
+                        
                         <!-- Hostel Required Yes/No -->
                         <!--<div class="form-group checkbox-inline" style="grid-column: 1 / 2;">
                 <label class="form-label me-2">Hostel Required:</label>
@@ -1118,22 +1114,9 @@
             </div>
 
 
-            <div class="form-group checkbox-inline" style="grid-column: 1 / 2;">
-                <label class="form-label me-2">Transport:</label>
-                <input type="radio" id="transport_yes" name="wants_transport" value="yes" class="form-check-input me-1" style="margin-left:10px;" {% if view_mode %}disabled{% endif %}>
-                <label for="transport_yes" class="me-3" style="margin-right:10px;">Yes</label>
-                <input type="radio" id="transport_no" name="wants_transport" value="no" class="form-check-input me-1" style="margin-left:10px;" {% if view_mode %}disabled{% endif %}>
-                <label for="transport_no">No</label>
-            </div>
+            
 
-            <div class="form-group" id="transport_amount_group" style="display: none;">
-                <label class="form-label">Enter Transport Amount</label>
-                <input type="text" name="transport_amount" class="form-control" placeholder="Enter amount" />
-            </div>
-            <div class="form-group" id="transport_dropdown_div" style="display: none;">
-                <label class="form-label">Transport Route/Details</label>
-                {{ form.transport }}
-            </div>-->
+            
                         <!-- SCHOLARSHIP SECTION -->
                         <!--<div class="form-group checkbox-inline" style="grid-column: 1 / 2;">
                 <label class="form-label me-2">Scholarship:</label>
@@ -1504,7 +1487,7 @@ $(document).ready(function () {
 
             "tuition_amount",
 
-            "transport_amount",
+            
 
             "hostel_amount",
 
@@ -1841,136 +1824,8 @@ $(document).ready(function () {
     });
 
 
-    //document.addEventListener('DOMContentLoaded', function () {
-    //    // Existing Transport Logic ...
-    //    const yes = document.getElementById('transport_yes');
-    //    const no = document.getElementById('transport_no');
-    //    const dropdown = document.getElementById('transport_dropdown_div');
-    //    let hostelInput = document.getElementById('id_hostel_required') || document.querySelector('[name="hostel_required"]');
-
-    //    function toggleTransportDropdown() {
-    //        if (yes && yes.checked) {
-    //            dropdown.style.display = 'block';
-    //            if (hostelInput) {
-    //                hostelInput.disabled = true;
-    //                if (hostelInput.type === "checkbox" || hostelInput.type === "radio") hostelInput.checked = false;
-    //                else if (hostelInput.tagName === "SELECT") hostelInput.value = "";
-    //            }
-    //        } else if (no && no.checked) {
-    //            dropdown.style.display = 'none';
-    //            const select = dropdown.querySelector('select');
-    //            if (select) select.selectedIndex = 0;
-    //            if (hostelInput) hostelInput.disabled = false;
-    //        }
-    //    }
-
-    //    if (yes) yes.addEventListener('change', toggleTransportDropdown);
-    //    if (no) no.addEventListener('change', toggleTransportDropdown);
-    //    toggleTransportDropdown();
-
-    //    // ✅ Scholarship logic
-    //    const schYes = document.getElementById('scholarship_yes');
-    //    const schNo = document.getElementById('scholarship_no');
-    //    const schGroup = document.getElementById('scholarship_amount_group');
-
-    //    function toggleScholarshipField() {
-    //        if (schYes && schYes.checked) {
-    //            schGroup.style.display = 'block';
-    //        } else {
-    //            schGroup.style.display = 'none';
-    //            const input = schGroup.querySelector('input');
-    //            if (input) input.value = '';
-    //        }
-    //    }
-
-    //    if (schYes) schYes.addEventListener('change', toggleScholarshipField);
-    //    if (schNo) schNo.addEventListener('change', toggleScholarshipField);
-    //    toggleScholarshipField(); // Initialize
-    //});
+    
 </script>
-
-<!--<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const transportYes = document.getElementById('transport_yes');
-        const transportNo = document.getElementById('transport_no');
-        const transportDropdown = document.getElementById('transport_dropdown_div');
-        const transportAmountGroup = document.getElementById('transport_amount_group');
-        const transportAmountInput = transportAmountGroup ? transportAmountGroup.querySelector('input[name="transport_amount"]') : null;
-
-        const hostelYes = document.getElementById('hostel_yes');
-        const hostelNo = document.getElementById('hostel_no');
-        const hostelAmountGroup = document.getElementById('hostel_amount_group');
-        const hostelAmountInput = hostelAmountGroup ? hostelAmountGroup.querySelector('input[name="hostel_amount"]') : null;
-
-        function toggleHostelState(disable) {
-            hostelYes.disabled = disable;
-            hostelNo.disabled = disable;
-            if (hostelAmountInput) {
-                hostelAmountInput.disabled = disable;
-                if (disable) hostelAmountInput.value = '';
-            }
-            if (disable && hostelAmountGroup) hostelAmountGroup.style.display = 'none';
-        }
-
-        function toggleTransportState(disable) {
-            transportYes.disabled = disable;
-            transportNo.disabled = disable;
-
-            if (transportDropdown) {
-                transportDropdown.style.display = disable ? 'none' : (transportYes.checked ? 'block' : 'none');
-                const select = transportDropdown.querySelector('select');
-                if (select) {
-                    select.disabled = disable;
-                    if (disable) select.selectedIndex = 0;
-                }
-            }
-
-            if (transportAmountGroup) {
-                transportAmountGroup.style.display = disable ? 'none' : (transportYes.checked ? 'block' : 'none');
-                if (transportAmountInput) {
-                    transportAmountInput.disabled = disable;
-                    if (disable) transportAmountInput.value = '';
-                }
-            }
-        }
-
-        function toggleHostelAmount() {
-            if (hostelYes.checked && !hostelYes.disabled) {
-                hostelAmountGroup.style.display = 'block';
-            } else {
-                hostelAmountGroup.style.display = 'none';
-                if (hostelAmountInput) hostelAmountInput.value = '';
-            }
-        }
-
-        function masterToggle() {
-            if (transportYes.checked) {
-                transportDropdown.style.display = 'block';
-                if (transportAmountGroup) transportAmountGroup.style.display = 'block';
-                toggleHostelState(true);
-            } else if (transportNo.checked) {
-                transportDropdown.style.display = 'none';
-                if (transportAmountGroup) transportAmountGroup.style.display = 'none';
-                toggleHostelState(false);
-            }
-
-            if (hostelYes.checked) {
-                toggleHostelAmount();
-                toggleTransportState(true);
-            } else if (hostelNo.checked) {
-                toggleHostelAmount();
-                toggleTransportState(false);
-            }
-        }
-
-        if (transportYes) transportYes.addEventListener('change', masterToggle);
-        if (transportNo) transportNo.addEventListener('change', masterToggle);
-        if (hostelYes) hostelYes.addEventListener('change', masterToggle);
-        if (hostelNo) hostelNo.addEventListener('change', masterToggle);
-
-        masterToggle();
-    });
-</script>-->
 
 
 <script>
@@ -2162,7 +2017,7 @@ $(document).ready(function () {
                         $('#id_tuition_fee').val(data.tuition_fee);
                         $('#id_books_fee').val(data.books_fee);
                         $('#id_uniform_fee').val(data.uniform_fee);
-                        $('#id_transport_fees').val(data.transport_fees);
+                        
                     }
                 });
             }
