@@ -1,27 +1,30 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting Django app at $(date)"
+LOG_DIR=/home/LogFiles
+mkdir -p $LOG_DIR
 
-# 1. (Optional) Activate virtual environment if exists
+echo "🚀 Starting Django app at $(date)" | tee -a $LOG_DIR/startup.log
+
+# Optional: activate venv
 if [ -f "/home/site/wwwroot/antenv/bin/activate" ]; then
   source /home/site/wwwroot/antenv/bin/activate
 fi
 
-# 2. Install Python dependencies
-pip install --no-cache-dir --upgrade pip
-pip install --no-cache-dir -r /home/site/wwwroot/requirements.txt
+# Upgrade pip and install dependencies
+python3 -m pip install --no-cache-dir --upgrade pip | tee -a $LOG_DIR/startup.log
+python3 -m pip install --no-cache-dir -r /home/site/wwwroot/requirements.txt | tee -a $LOG_DIR/startup.log
 
-# 3. Apply database migrations
-python3 /home/site/wwwroot/manage.py migrate --noinput || echo "⚠️ Migrations failed"
+# Apply database migrations
+python3 /home/site/wwwroot/manage.py migrate --noinput | tee -a $LOG_DIR/startup.log || echo "⚠️ Migrations failed" | tee -a $LOG_DIR/startup.log
 
-# 4. Collect static files
-python3 /home/site/wwwroot/manage.py collectstatic --noinput || echo "⚠️ Collectstatic failed"
+# Collect static files
+python3 /home/site/wwwroot/manage.py collectstatic --noinput | tee -a $LOG_DIR/startup.log || echo "⚠️ Collectstatic failed" | tee -a $LOG_DIR/startup.log
 
-# 5. Start Gunicorn with logs
+# Start Gunicorn
 exec gunicorn student_alerts_app.wsgi:application \
-    --bind 0.0.0.0:${PORT:-8000} \
-    --workers 3 \
-    --timeout 600 \
-    --access-logfile /home/LogFiles/gunicorn-access.log \
-    --error-logfile /home/LogFiles/gunicorn-error.log
+  --bind 0.0.0.0:${PORT:-8000} \
+  --workers 3 \
+  --timeout 600 \
+  --access-logfile $LOG_DIR/gunicorn-access.log \
+  --error-logfile $LOG_DIR/gunicorn-error.log
