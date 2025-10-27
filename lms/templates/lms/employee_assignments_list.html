@@ -325,7 +325,6 @@
         document.getElementById('overlay').style.display = 'none';
         deleteAssignmentId = null;
     });
-
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
@@ -335,12 +334,14 @@
         }, 3000);
     }
 
-    // Django messages support
-    {% if messages %}
-        {% for message in messages %}
-            showSnackbar("{{ message|escapejs }}");
-        {% endfor %}
-    {% endif %}
+    // 🧾 Django messages — wrapped inside a string so VS Code ignores it
+    // The `/* */` comments silence JS parser errors
+    /* {% if messages %} */
+    /* {% for message in messages %} */
+    showSnackbar("{{ message|escapejs }}");
+    /* {% endfor %} */
+    /* {% endif %} */
+
 </script>
 
 

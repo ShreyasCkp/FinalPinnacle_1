@@ -301,7 +301,7 @@ from django.shortcuts import render, redirect
 @custom_login_required
 def admission_form(request, enquiry_no=None):
     success = False
-    academic_prefix = "PSCM2025-26PUC"
+    academic_prefix = "PSCM2026-27PUC"
     last = PUAdmission.objects.filter(admission_no__startswith=f"{academic_prefix}/").order_by('-id').first()
     last_number = int(re.search(r"/(\d+)$", last.admission_no).group(1)) if (last and last.admission_no) else 0
 
@@ -694,7 +694,7 @@ from datetime import date
 @custom_login_required
 def degree_admission_form(request, enquiry_no=None):
     success = False
-    prefix = "PSCM2025-26DG"
+    prefix = "PSCM2026-27DG"
  
     last = DegreeAdmission.objects.filter(admission_no__startswith=f"{prefix}/").order_by('-id').first()
     last_num = int(re.search(r'/(\d+)$', last.admission_no).group(1)) if (last and last.admission_no) else 0
