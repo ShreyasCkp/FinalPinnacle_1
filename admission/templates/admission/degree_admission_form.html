@@ -594,10 +594,9 @@ Photo
 </h4>
 
 <div class="form-group">
-  <label for="id_course_type" class="form-label">
-    Program Type
-  </label>
-  <select name="course_type" id="id_course_type" class="form-select" {% if view_mode %}disabled{% endif %}>
+  <label for="id_course_type" class="form-label">Program Type</label>
+  <select name="course_type" id="id_course_type" class="form-select"
+          {% if view_mode %}disabled{% endif %}>
     <option value="">Select Course Type</option>
     {% for ct in form.fields.course_type.queryset %}
       <option value="{{ ct.id }}"
@@ -610,22 +609,25 @@ Photo
   </select>
 </div>
 
-<div class="form-group">
-  <label for="id_course" class="form-label">
-    Course
-  </label>
-  <select name="course" id="id_course" class="form-select" {% if view_mode %}disabled{% endif %}>
+<div class="form-group mt-3">
+  <label for="id_course" class="form-label">Course</label>
+  <select name="course" id="id_course" class="form-select"
+          {% if view_mode %}disabled{% endif %}>
     <option value="">Select Course</option>
-    {% for c in form.fields.course.queryset %}
-      <option value="{{ c.id }}"
-        {% if form.instance.course_id == c.id %}
-          selected
-        {% endif %}>
-        {{ c.name }}
-      </option>
-    {% endfor %}
+    {# Pre-fill course if editing #}
+    {% if form.initial.course %}
+      {% for course in form.fields.course.queryset %}
+        <option value="{{ course.id }}"
+          {% if course.id == form.initial.course %}
+            selected
+          {% endif %}>
+          {{ course.name }}
+        </option>
+      {% endfor %}
+    {% endif %}
   </select>
 </div>
+
 
 <div class="form-group">
   <label class="form-label">Medium of Instruction in BCOM Course</label>
@@ -1089,39 +1091,44 @@ Photo
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
-        function loadCourses(courseTypeId, selectedCourseId = null) {
-            var url = "{% url 'ajax_load_courses' %}";
-            $.ajax({
-                url: url,
-                data: {
-                    'course_type': courseTypeId
-                },
-                success: function (data) {
-                    $("#id_course").html('<option value="">Select Course</option>');
-                    data.forEach(function (course) {
-                        const selected = selectedCourseId && selectedCourseId == course.id ? "selected" : "";
-                        $("#id_course").append(`<option value="${course.id}" ${selected}>${course.name}</option>`);
-                    });
-                }
-            });
+$(document).ready(function () {
+
+    function loadCourses(courseTypeId, selectedCourseId = null) {
+        if (!courseTypeId) {
+            $("#id_course").html('<option value="">Select Course</option>');
+            return;
         }
 
-        $('#id_course_type').change(function () {
-            const courseTypeId = $(this).val();
-            loadCourses(courseTypeId);
+        $.ajax({
+            url: "{% url 'ajax_load_courses' %}",
+            data: { 'course_type': courseTypeId },
+            success: function (data) {
+                $("#id_course").html('<option value="">Select Course</option>');
+                data.forEach(function (course) {
+                    const selected = selectedCourseId == course.id ? "selected" : "";
+                    $("#id_course").append(`<option value="${course.id}" ${selected}>${course.name}</option>`);
+                });
+            }
         });
+    }
 
-        {% if not form.instance.pk %}
-        // This is 'Add' mode
-        const initialCourseType = $('#id_course_type').val();
-        if (initialCourseType) {
-            loadCourses(initialCourseType);
-        }
-        {% endif %}
+    // 🔁 When Program Type changes → load Courses dynamically
+    $('#id_course_type').change(function () {
+        const courseTypeId = $(this).val();
+        loadCourses(courseTypeId);
     });
-</script>
 
+    // 🟡 Preload courses when editing (or adding with preset type)
+    /* {% if not view_mode %} */
+    const initialCourseType = $('#id_course_type').val();
+    const selectedCourse = "{{ form.initial.course|default:'' }}";
+    if (initialCourseType) {
+        loadCourses(initialCourseType, selectedCourse);
+    }
+    /* {% endif %} */
+
+});
+</script>
 
 
 {% if add_mode or edit_mode %}
@@ -1944,7 +1951,6 @@ Photo
     });
 
 </script>
-
 
 <!--<script>
     $('#id_course_type, #id_course').change(function () {

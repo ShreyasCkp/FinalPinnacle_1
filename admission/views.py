@@ -4283,6 +4283,7 @@ def dashboard_view(request):
     }
 
     return render(request, 'admission/student_fee_dashboard.html', context)
+
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from io import BytesIO
@@ -4919,4 +4920,12 @@ def student_fee_history(request, admission_no):
     history = StudentPaymentHistory.objects.filter(admission_no=admission_no).order_by('-payment_date')
     return render(request, "student_fee_history.html", {"history": history})
 
+# views.py
+from django.http import JsonResponse
+from master.models import Course  # adjust import as per your app
+
+def ajax_load_courses(request):
+    course_type_id = request.GET.get('course_type')
+    courses = Course.objects.filter(course_type_id=course_type_id).values('id', 'name')
+    return JsonResponse(list(courses), safe=False)
 

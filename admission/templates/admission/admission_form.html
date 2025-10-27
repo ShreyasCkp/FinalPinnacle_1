@@ -803,34 +803,39 @@
                 <h4 class="mt-4 mb-3 text-uppercase text-primary" style=" text-align: center; margin-top: -5px; margin-bottom: 8px; ">Admission Details</h4>
 
 
-
                 <div class="form-group">
-                    <label for="id_course_type" class="form-label">
-                        Program Type
-                    </label>
-                    <select name="course_type" id="id_course_type" class="form-select" {% if view_mode %}disabled{% endif %}>
-                        <option value="">Select Course Type</option>
-                        {% for ct in form.fields.course_type.queryset %}
-                        <option value="{{ ct.id }}" {% if form.initial.course_type == ct.id %}selected{% endif %}>{{ ct.name }}</option>
-                        {% endfor %}
-                    </select>
+                <label for="id_course_type" class="form-label">Program Type</label>
+                <select name="course_type" id="id_course_type" class="form-select"
+                        {% if view_mode %}disabled{% endif %}>
+                    <option value="">Select Course Type</option>
+                    {% for ct in form.fields.course_type.queryset %}
+                    <option value="{{ ct.id }}"
+                        {% if form.initial.course_type and ct.id == form.initial.course_type %}
+                        selected
+                        {% endif %}>
+                        {{ ct.name }}
+                    </option>
+                    {% endfor %}
+                </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="id_course" class="form-label">
-                        Course
-                    </label>
-                    <select name="course" id="id_course" class="form-select" {% if view_mode %}disabled{% endif %}>
-                        <option value="">Select Course</option>
-                        {% for c in form.fields.course.queryset %}
-                        <option value="{{ c.id }}"
-                                {% if form.instance.course and form.instance.course.id == c.id %}
-                                selected
-                                {% endif %}>
-                            {{ c.name }}
+                <div class="form-group mt-3">
+                <label for="id_course" class="form-label">Course</label>
+                <select name="course" id="id_course" class="form-select"
+                        {% if view_mode %}disabled{% endif %}>
+                    <option value="">Select Course</option>
+                    {# Pre-fill course if editing #}
+                    {% if form.initial.course %}
+                    {% for course in form.fields.course.queryset %}
+                        <option value="{{ course.id }}"
+                        {% if course.id == form.initial.course %}
+                            selected
+                        {% endif %}>
+                        {{ course.name }}
                         </option>
-                        {% endfor %}
-                    </select>
+                    {% endfor %}
+                    {% endif %}
+                </select>
                 </div>
 
 
@@ -1330,47 +1335,44 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
-        function loadCourses(courseTypeId, selectedCourseId = null) {
-            if (!courseTypeId) {
+$(document).ready(function () {
+
+    function loadCourses(courseTypeId, selectedCourseId = null) {
+        if (!courseTypeId) {
+            $("#id_course").html('<option value="">Select Course</option>');
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'ajax_load_courses' %}",
+            data: { 'course_type': courseTypeId },
+            success: function (data) {
                 $("#id_course").html('<option value="">Select Course</option>');
-                return;
+                data.forEach(function (course) {
+                    const selected = selectedCourseId == course.id ? "selected" : "";
+                    $("#id_course").append(`<option value="${course.id}" ${selected}>${course.name}</option>`);
+                });
             }
-
-            var url = "{% url 'ajax_load_courses' %}";
-            $.ajax({
-                url: url,
-                data: {
-                    'course_type': courseTypeId
-                },
-                success: function (data) {
-                    $("#id_course").html('<option value="">Select Course</option>');
-                    data.forEach(function (course) {
-                        const selected = selectedCourseId && selectedCourseId == course.id ? "selected" : "";
-                        $("#id_course").append(`<option value="${course.id}" ${selected}>${course.name}</option>`);
-                    });
-                }
-            });
-        }
-
-        // 🔁 When course type changes
-        $('#id_course_type').change(function () {
-            const courseTypeId = $(this).val();
-            loadCourses(courseTypeId);
         });
+    }
 
-        // 🟡 Preload courses ONLY in Add mode (not edit/view)
-        {% if not form.instance.pk %}
-        const initialCourseType = $('#id_course_type').val();
-        if (initialCourseType) {
-            loadCourses(initialCourseType);
-        }
-        {% endif %}
+    // 🔁 When Program Type changes → load Courses dynamically
+    $('#id_course_type').change(function () {
+        const courseTypeId = $(this).val();
+        loadCourses(courseTypeId);
     });
+
+    // 🟡 Preload courses when editing (or adding with preset type)
+    /* {% if not view_mode %} */
+    const initialCourseType = $('#id_course_type').val();
+    const selectedCourse = "{{ form.initial.course|default:'' }}";
+    if (initialCourseType) {
+        loadCourses(initialCourseType, selectedCourse);
+    }
+    /* {% endif %} */
+
+});
 </script>
-
-
-
 
 
 

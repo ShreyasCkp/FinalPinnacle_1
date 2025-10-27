@@ -182,7 +182,7 @@ path('collect-fee-payment-ajax', views.collect_fee_payment_ajax, name='collect_f
 
     path("send-admission-email/<int:admission_id>/", views.send_admission_email, name="send_admission_email"),
 
-
+ path('ajax/load-courses/', views.ajax_load_courses, name='ajax_load_courses'),
 ]
 
 
