@@ -448,55 +448,53 @@
     });
 </script>
 
-<div id="snackbar"></div>
-
 <script>
-function showSnackbar(message) {
-    const snackbar = document.getElementById("snackbar");
-    snackbar.textContent = message;
-    snackbar.className = "show";
-    setTimeout(() => {
-        snackbar.className = snackbar.className.replace("show", "");
-    }, 3000);
-}
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
 
-// 🧾 Django messages
-/* {% if messages %} */
-/* {% for message in messages %} */
-showSnackbar("{{ message|escapejs }}");
-/* {% endfor %} */
-/* {% endif %} */
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
 
-document.addEventListener('DOMContentLoaded', function () {
-    // 🔍 Employee search filter
-    const searchInput = document.getElementById('employeeSearch');
-    if (searchInput) {
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('employeeSearch');
+
         searchInput.addEventListener('input', function () {
             const filter = this.value.toLowerCase();
             const rows = document.querySelectorAll('.employee-row');
+
             rows.forEach(row => {
                 const cells = row.getElementsByTagName('td');
                 let found = false;
+
                 for (let i = 0; i < cells.length; i++) {
-                    if (cells[i].textContent.toLowerCase().includes(filter)) {
+                    const text = cells[i].textContent.toLowerCase();
+                    if (text.includes(filter)) {
                         found = true;
                         break;
                     }
                 }
+
                 row.style.display = found ? '' : 'none';
             });
         });
-    }
+    });
 
-    // 🗑️ Delete confirmation popup
     let deleteId = null;
-    window.confirmDelete = function(id, name) {
+    function confirmDelete(id, name) {
         deleteId = id;
         document.getElementById('confirm-popup').style.display = 'block';
         document.getElementById('overlay').style.display = 'block';
-        document.getElementById('confirm-popup-message').innerHTML =
-            `Are you sure you want to delete <b>${name}</b>?`;
-    };
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
+    }
 
     document.getElementById('confirm-yes').addEventListener('click', () => {
         if (deleteId) {
@@ -509,9 +507,31 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('overlay').style.display = 'none';
         deleteId = null;
     });
-});
+
 </script>
 
+<div id="snackbar"></div>
+
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+
+    // Django message support
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+
+
+
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
