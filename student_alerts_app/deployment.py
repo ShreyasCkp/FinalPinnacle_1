@@ -5,6 +5,9 @@ from .settings import *
 # ✅ Production mode
 DEBUG = False
 
+
+APPEND_SLASH = True
+
 # ✅ Allow Azure + local + container IPs
 ALLOWED_HOSTS = ['*']
 

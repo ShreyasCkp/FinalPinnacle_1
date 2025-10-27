@@ -18,7 +18,6 @@
             justify-content: flex-start;
             gap: 16px;
             margin-top: 29px;
-            /*margin-left: 68px;*/
         }
 
         .card {
@@ -29,14 +28,13 @@
             width: 210px;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            transition: box-shadow 0.2s;
             align-items: center;
+            transition: box-shadow 0.2s;
         }
 
-            .card:hover {
-                box-shadow: 0 6px 18px rgba(60, 130, 255, 0.16);
-            }
+        .card:hover {
+            box-shadow: 0 6px 18px rgba(60, 130, 255, 0.16);
+        }
 
         .faculty-name {
             font-size: 16px;
@@ -63,28 +61,26 @@
 
         .filter-form {
             margin: 12px 75px;
-            /* align-items: center; */
-            /* text-align: center; */
         }
 
-            .filter-form select {
-                padding: 2px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-            }
+        .filter-form select {
+            padding: 2px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
 
-            .filter-form button {
-                padding: 3px 10px;
-                border-radius: 5px;
-                border: black;
-                background: white;
-                color: black;
-            }
+        .filter-form button {
+            padding: 3px 10px;
+            border-radius: 5px;
+            background: white;
+            color: black;
+            border: 1px solid #000;
+        }
 
-                .filter-form button:hover {
-                    background: #800;
-                    color: white;
-                }
+        .filter-form button:hover {
+            background: #800;
+            color: white;
+        }
 
         .content {
             padding: 80px 26px 40px;
@@ -93,64 +89,53 @@
     </style>
 </head>
 <body>
-<h2 style="text-align: center; font-size: 22px; margin-top: -12px; color: #800;">
+    <h2 style="text-align: center; font-size: 22px; margin-top: -12px; color: #800;">
         Faculty Schedule Overview
-</h2>
- 
-    <form method="get">
-<label for="course">Course:</label>
-<select name="course" id="course" onchange="this.form.submit()">
-<option value="">All Courses</option>
-            {% for course in courses %}
-<option value="{{ course.id }}" {% if course.id == selected_course_id %}selected{% endif %}>{{ course.name }}</option>
-            {% endfor %}
-</select>
- 
-      
-<label for="semester">Semester:</label>
-<select name="semester" id="semester" onchange="this.form.submit()">
-<option value="">All Semesters</option>
-                {% for sem in semesters %}
-<option value="{{ sem.number }}" {% if sem.number == selected_semester %}selected{% endif %}>
-                        {{ sem.name }}
-</option>
-                {% endfor %}
-</select>
- 
-   
- 
-    </form>
- 
- 
-    <div class="cards-container" style="display: flex; flex-wrap: wrap; gap: 15px;">
-        {% with total=0 %}
-        {% for entry in faculty_subject_class_counts %}
-        {% with total=total|add:entry.class_count %}
-        {% endwith %}
-<div class="card" style="border: 1px solid #ccc; border-radius: 10px; padding: 15px; width: 220px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); background-color: #fdfdfd;">
-<div class="faculty-name" style="font-weight: bold; font-size: 16px; color: #800;">
-                {{ entry.faculty__name }}
-</div>
-<div class="subject-name" style="margin-top: 5px;">
-                {{ entry.subject__name }} <br>
-<small style="color: #800000;">({{ entry.subject__course__name }})</small>
-</div>
-<div class="class-count" style="margin-top: 8px; color: #800;">
-                {{ entry.class_count }} class{{ entry.class_count|pluralize:",es" }} / week
-</div>
-</div>
-        {% endfor %}
- 
+    </h2>
 
-</div>
+    <form method="get" class="filter-form">
+        <label for="course">Course:</label>
+        <select name="course" id="course" onchange="this.form.submit()">
+            <option value="">All Courses</option>
+            {% for course in courses %}
+                <option value="{{ course.id }}" {% if course.id == selected_course_id %}selected{% endif %}>{{ course.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="semester">Semester:</label>
+        <select name="semester" id="semester" onchange="this.form.submit()">
+            <option value="">All Semesters</option>
+            {% for sem in semesters %}
+                <option value="{{ sem.number }}" {% if sem.number == selected_semester %}selected{% endif %}>
+                    {{ sem.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <div class="cards-container">
+        {% for entry in faculty_subject_class_counts %}
+            <div class="card">
+                <div class="faculty-name">{{ entry.faculty__name }}</div>
+                <div class="subject-name">
+                    {{ entry.subject__name }} <br>
+                    <small style="color: #800000;">({{ entry.subject__course__name }})</small>
+                </div>
+                <div class="class-count">
+                    {{ entry.class_count }} class{{ entry.class_count|pluralize:",es" }} / week
+                </div>
+            </div>
+        {% empty %}
+            <p style="margin: 20px; color: gray;">No data available for the selected filters.</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // future JS logic can go here
+        });
+    </script>
 </body>
 </html>
- 
-<script>
-    $(document).ready(function () {
-   
- 
-</script>
- 
- 
+
 {% endblock %}
