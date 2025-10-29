@@ -1,94 +1,32 @@
-# Django
-Django>=4.2,<5.0
-
-# Database
-psycopg2-binary>=2.9.9
-
-# Async / HTTP
-aiohttp
-aiohttp-retry
-aiosignal
-async-timeout
-frozenlist
-yarl
-urllib3
-requests
-
-# Cryptography / Security
-cryptography>=42.0.1
-cffi
-asn1crypto
-oscrypto
-PyJWT
-
-# System / Utilities
-attrs
-packaging
-typing-extensions
-python-decouple
-python-dateutil
-tzdata
-tzlocal
-six
-colorama
-
-# Parsing / XML / HTML
-lxml
-markupsafe
-et-xmlfile
-tinyhtml5
-webencodings
-
-# PDFs
-pdfkit
-pdfminer-six
-pdfplumber
-pypdf
-pypdfium2
-reportlab==3.6.13
-xhtml2pdf==0.2.10
-svglib
-
-# Excel / Data
-openpyxl
-pandas
-numpy
-num2words
-
-# Fonts / Graphics
-python-bidi
-arabic-reshaper
-freetype-py
-fonttools
-pillow
-qrcode
-
-# Testing / Dev
-pytest
-pluggy
-iniconfig
-exceptiongroup
-
-# Deployment / Server
-gunicorn
-whitenoise
-werkzeug
-
-# Dates / Calendars
-holidays
-hijridate
-geopy
-geographiclib
-
-# Networking / APIs
-python-http-client
-twilio
-sendgrid
-urllib3
-uritools
-
-# PDF caching / extra
-propcache
-zopfli
-Brotli
-docopt
+aiohappyeyeballs==2.6.1
+aiohttp==3.13.2
+aiohttp-retry==2.9.1
+aiosignal==1.4.0
+asgiref==3.10.0
+attrs==25.4.0
+certifi==2025.10.5
+charset-normalizer==3.4.4
+Django==5.2.7
+frozenlist==1.8.0
+hijridate==2.5.0
+holidays==0.83
+idna==3.11
+multidict==6.7.0
+numpy==2.3.4
+pandas==2.3.3
+propcache==0.4.1
+psycopg==3.2.12
+psycopg-binary==3.2.12
+PyJWT==2.10.1
+python-dateutil==2.9.0.post0
+python-decouple==3.8
+pytz==2025.2
+requests==2.32.5
+six==1.17.0
+sqlparse==0.5.3
+twilio==9.8.5
+typing_extensions==4.15.0
+tzdata==2025.2
+urllib3==2.5.0
+whitenoise==6.11.0
+yarl==1.22.0
