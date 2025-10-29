@@ -1,6 +1,17 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 {% block title %}Admission{% endblock %}
-{% block content %}
+
+
+<style>
+@media (max-width: 768px) {
+  .topbar { left: 0; }
+  .main-area, .content, .footer { margin-left: 0 !important; padding: 70px 16px 24px !important; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .container { max-width: 100%; margin: 0; border-radius: 0; padding: 16px; }
+}
+</style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -44,7 +55,7 @@
                     if (data.success) {
                         let html = `<b>${data.message}</b>`;
                         if (data.error_count > 0) {
-                            html += `<br><br><b>⚠️ ${data.error_count} Record(s) Skipped:</b><ul>`;
+                            html += `<br><br><b>âš ï¸ ${data.error_count} Record(s) Skipped:</b><ul>`;
                             html += data.errors.map(e => `<li>${e}</li>`).join('');
                             if (data.error_count > 10) {
                                 html += `<li>...and ${data.error_count - 10} more.</li>`;
@@ -58,12 +69,12 @@
                             width: 350
                         });
                     } else {
-                        Swal.fire('❌ Upload Failed', data.error || 'Unknown error occurred.', 'error');
+                        Swal.fire('âŒ Upload Failed', data.error || 'Unknown error occurred.', 'error');
                     }
                 })
                 .catch(error => {
                     console.error(error);
-                    Swal.fire('❌ Upload Failed', 'Something went wrong during upload.', 'error');
+                    Swal.fire('âŒ Upload Failed', 'Something went wrong during upload.', 'error');
                 });
         });
     </script>
@@ -224,7 +235,7 @@
         justify-content: flex-end;
     }
 
-    /* ✅ Responsive Design */
+    /* âœ… Responsive Design */
     @media (max-width: 768px) {
         h2 {
             font-size: 18px;
@@ -277,3 +288,4 @@
 </style>
 
 {% endblock %}
+

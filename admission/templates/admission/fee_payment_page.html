@@ -1,5 +1,16 @@
-{% extends 'layout.html' %}
-{% block content %}
+﻿{% extends 'layout.html' %}
+
+
+<style>
+@media (max-width: 768px) {
+  .topbar { left: 0; }
+  .main-area, .content, .footer { margin-left: 0 !important; padding: 70px 16px 24px !important; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .container { max-width: 100%; margin: 0; border-radius: 0; padding: 16px; }
+}
+</style>
 
 <div class="container mt-4">
     <h2 class="text-center mb-3">Confirm Payment</h2>
@@ -13,11 +24,11 @@
                     <tr>
                         <th>Fee Name</th>
                         <th>Due Date</th>
-                        <th>Total (₹)</th>
-                        <th>Paid (₹)</th>
-                        <th>Balance (₹)</th>
+                        <th>Total (â‚¹)</th>
+                        <th>Paid (â‚¹)</th>
+                        <th>Balance (â‚¹)</th>
                         <th>Mode</th>
-                        <th>Pay (₹)</th>
+                        <th>Pay (â‚¹)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         infoContent.innerHTML = `
             <div class="text-center">
-                <p><strong>Scan to pay ₹${amount} via ${mode}:</strong></p>
+                <p><strong>Scan to pay â‚¹${amount} via ${mode}:</strong></p>
                 <img src="${qrURL}" alt="${mode} QR Code" width="200" class="img-thumbnail mb-2">
                 <p>Or pay to UPI ID: <strong>${collegeUpiId}</strong></p>
                 ${transactionField}
@@ -151,3 +162,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 {% endblock %}
+

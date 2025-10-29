@@ -1,8 +1,19 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 
 {% block title %}Attendance Settings{% endblock %}
 
-{% block content %}
+
+
+<style>
+@media (max-width: 768px) {
+  .topbar { left: 0; }
+  .main-area, .content, .footer { margin-left: 0 !important; padding: 70px 16px 24px !important; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .container { max-width: 100%; margin: 0; border-radius: 0; padding: 16px; }
+}
+</style>
 <div style="width: 100vw; padding: 2rem;">
     <div class="form-card mx-auto" style="width: 55%; max-width: 100%;">
         <div class="form-title">Attendance Settings</div>
@@ -212,3 +223,4 @@
     }
 </style>
 {% endblock %}
+
