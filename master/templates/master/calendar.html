@@ -9,23 +9,28 @@
 <style>
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 0;
+        margin: 0;
+        background-color: #f8f9fa;
     }
 
     .calendar-container {
         display: flex;
-        flex-wrap: nowrap; /* make boxes stay side by side */
-        gap: 2rem;
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+        gap: 1rem;
         padding: 7px;
         margin-top: 25px;
         justify-content: center; /* center the row */
     }
 
     .calendar-box {
-        flex: 0 0 60%; /* takes 60% width */
+        flex: 1 1 100%; /* take full width on small screens */
+        max-width: 600px; /* optional max width */
         padding: 10px;
         border-radius: 15px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         text-align: center;
+        background-color: #fff;
     }
 
     .calendar-header {
@@ -33,72 +38,58 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 5px;
     }
 
-        .calendar-header h2 {
-            color: #8b0000;
-            font-weight: 700;
-            font-size: 25px;
-            margin: 0;
-            margin-left: 387px;
-            margin-top: -25px;
-        }
+    .calendar-header h2 {
+        color: #8b0000;
+        font-weight: 700;
+        font-size: 22px;
+        margin: 0;
+        flex: 1 1 auto;
+        text-align: center;
+    }
 
     .month-year {
         color: #8b0000;
         font-weight: 700;
         font-size: 16px;
         margin-bottom: 1px;
+        text-align: center;
     }
 
     .btn-add {
         background-color: #8b0000;
         color: white;
         border: none;
-        padding: 6px 3px;
+        padding: 6px 10px;
         border-radius: 6px;
-        text-decoration: none;
         font-size: 13px;
         transition: background-color 0.3s ease;
-        margin-right: 41px;
-        margin-top: 4px;
+        text-decoration: none;
     }
-
-    .bg-info {
-        --bs-bg-opacity: 1;
-        background-color: #8b0000 !important;
-        padding: 6px;
-    }
-
-    .border-warning {
-        --bs-border-opacity: 1;
-        border-color: #fff !important;
-    }
-
-    /* .btn-add:hover {
-            background-color: #5e35b1;
-        }*/
 
     .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 10px;
-        margin-right: 0px;
+        gap: 5px;
+        margin-top: 10px;
     }
 
     .calendar-day-name {
         font-weight: 500;
         background-color: #8b0000;
         color: white;
-        padding: 2px 0;
+        padding: 4px 0;
         border-radius: 6px;
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .calendar-day {
         background-color: #ffffff;
         border: 1px solid #d1c4e9;
-        padding: 4px 0;
+        padding: 8px 0;
         border-radius: 8px;
         color: #333;
         font-size: 12px;
@@ -107,150 +98,15 @@
         cursor: pointer;
     }
 
-        .calendar-day:hover {
-            background-color: #ede7f6;
-        }
-
-        .calendar-day.today {
-            background-color: #8b0000;
-            color: #fff;
-            border: 2px solid #8b0000;
-            font-weight: bold;
-        }
-
-    .bg-warning {
-        --bs-bg-opacity: 1;
-        background-color: #dc3545 !important;
+    .calendar-day:hover {
+        background-color: #ede7f6;
     }
 
-    .bg-primary {
-        --bs-bg-opacity: 1;
-        background-color: #8b0000 !important;
-        padding: 6px;
-    }
-
-    .btn:hover {
-        color: var(--bs-btn-hover-color);
+    .calendar-day.today {
         background-color: #8b0000;
-        border-color: #8b0000;
-    }
-
-    .event-box {
-        flex: 0 0 35%; /* takes 35% width */
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        max-height: 470px;
-        overflow-y: auto;
-    }
-
-        /* Optional: Style the scrollbar */
-        .event-box::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .event-box::-webkit-scrollbar-thumb {
-            background-color: #ccc;
-            border-radius: 3px;
-        }
-
-        .event-box::-webkit-scrollbar-track {
-            background-color: transparent;
-        }
-
-
-        .event-box h3 {
-            color: #8b0000;
-            font-weight: 700;
-            font-size: 20px;
-            margin-bottom: 19px;
-            margin-top: -26px;
-        }
-
-    .event-item {
-        background-color: #fff;
-        padding: 14px 6px;
+        color: #fff;
         border: 2px solid #8b0000;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        transition: transform 0.2s;
-        color: #8b0000;
-    }
-
-    h5 {
-        font-size: 18px;
-    }
-
-    .event-item:hover {
-        transform: scale(1.02);
-    }
-
-    .event-item h4 {
-        margin: 0;
-        font-size: 16px;
-        color: #8b0000;
-    }
-
-    .event-item small {
-        color: #8b0000;
-        font-size: 13px;
-    }
-
-    .badge {
-        margin-top: 6px;
-        font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 4px;
-    }
-
-    .modal-footer {
-        display: flex;
-        flex-shrink: 0;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-end;
-        /* padding: calc(var(--bs-modal-padding) - var(--bs-modal-footer-gap) * .5); */
-        background-color: var(--bs-modal-footer-bg);
-        border-top: var(--bs-modal-footer-border-width) solid var(--bs-modal-footer-border-color);
-        border-bottom-right-radius: var(--bs-modal-inner-border-radius);
-        border-bottom-left-radius: var(--bs-modal-inner-border-radius);
-    }
-
-    .modal-content {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        width: 52%;
-        color: var(--bs-modal-color);
-        pointer-events: auto;
-        background-color: var(--bs-modal-bg);
-        background-clip: padding-box;
-        border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
-        border-radius: var(--bs-modal-border-radius);
-        outline: 0;
-        margin-left: 341px;
-        /* margin-right: -45px; */
-    }
-
-    .p-3 {
-        padding: 0rem !important;
-    }
-
-    .modal-body {
-        position: relative;
-        flex: 1 1 auto;
-        padding: var(--bs-modal-padding);
-        font-size: 14px;
-    }
-
-    .px-4 {
-        /*padding-right: 6.5rem !important;*/
-        padding-left: 0.5rem !important;
-    }
-
-    .custom-modal-size {
-        max-width: 700px; /* Adjust as needed */
-        width: 100%;
+        font-weight: bold;
     }
 
     .holiday-highlight {
@@ -259,6 +115,104 @@
         color: #8b0000 !important;
         font-weight: bold;
     }
+
+    .event-box {
+        flex: 1 1 100%; /* Full width on mobile */
+        max-width: 600px;
+        padding: 15px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        margin-top: 15px;
+    }
+
+    .event-box h5 {
+        color: #8b0000;
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .event-item {
+        background-color: #fff;
+        padding: 12px;
+        border: 2px solid #8b0000;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        color: #8b0000;
+    }
+
+    .event-item h4 {
+        margin: 0;
+        font-size: 15px;
+        color: #8b0000;
+    }
+
+    .event-item small {
+        font-size: 12px;
+    }
+
+    .badge {
+        margin-top: 6px;
+        font-size: 10px;
+        padding: 4px 6px;
+        border-radius: 4px;
+    }
+
+    .modal-content {
+        width: 100% !important;
+        margin: 0 auto;
+    }
+
+    .custom-modal-size {
+        max-width: 95% !important;
+    }
+
+    /* MOBILE RESPONSIVE STYLING */
+    @media (max-width: 480px) {
+        .calendar-grid {
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .calendar-day-name {
+            font-size: 9px;
+            padding: 2px 0;
+        }
+
+        .calendar-day {
+            font-size: 11px;
+            padding: 6px 0;
+        }
+
+        .calendar-header h2 {
+            font-size: 18px;
+        }
+
+        .btn-add {
+            font-size: 12px;
+            padding: 5px 8px;
+        }
+
+        .event-item h4 {
+            font-size: 14px;
+        }
+
+        .event-item small {
+            font-size: 11px;
+        }
+
+        .month-year {
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 768px) {
+    .content {
+        margin-left: 0;
+        padding: 38px 14px 8px;
+    }
+}
 </style>
 
 <div class="calendar-header">
@@ -267,7 +221,6 @@
 </div>
 
 {{ gov_holidays_json|json_script:"gh-data" }}
-
 
 <div class="container calendar-container">
     <div class="calendar-box">
@@ -295,14 +248,13 @@
             {% endfor %}
             {% endfor %}
         </div>
-        <!-- List holidays for this month -->
+
         {% if month_holidays %}
         <div style="margin-top: 12px; text-align:center;">
             <strong>Government Holidays:</strong><br>
             {% for h in month_holidays %}
             {{ h.date|date:"d-M" }} - {{ h.name }}<br>
             {% endfor %}
-
         </div>
         {% endif %}
     </div>
@@ -315,17 +267,15 @@
             <h4>{{ event.title }}</h4>
             <small>{{ event.date }} | {{ event.time }}</small><br>
             <span class="badge bg-warning text-dark">{{ event.get_event_type_display|title }}</span><br>
-            <button class="btn btn-sm btn-outline-secondary mt-2" data-bs-toggle="modal" data-bs-target="#eventModal{{ event.id }}" style="color: #8b0000; background: bottom;">View</button>
+            <button class="btn btn-sm btn-outline-secondary mt-2" data-bs-toggle="modal" data-bs-target="#eventModal{{ event.id }}" style="color: #8b0000;">View</button>
         </div>
 
-        <!-- Individual Event Modal (optional use) -->
         <div class="modal fade" id="eventModal{{ event.id }}" tabindex="-1" aria-labelledby="eventModalLabel{{ event.id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered custom-modal-size">
-
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="eventModalLabel{{ event.id }}">{{ event.title }}</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="padding: 18px; font-size: 11px;"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <p><strong>Date:</strong> {{ event.date }}</p>
@@ -333,9 +283,6 @@
                         <p><strong>Type:</strong> {{ event.get_event_type_display }}</p>
                         <p><strong>Description:</strong> {{ event.description|default:"No additional details provided." }}</p>
                     </div>
-                    <!--<div class="modal-footer">
-                        <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" style=" padding: 2px; background: #800;">Close</button>
-                    </div>-->
                 </div>
             </div>
         </div>
@@ -348,20 +295,16 @@
 <!-- Global Modal for Day Clicks -->
 <div class="modal fade" id="dayEventModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered custom-modal-size">
-
         <div class="modal-content">
             <div class="modal-header bg-info text-white">
                 <h5 class="modal-title">Events on <span id="selectedDate"></span></h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="font-size: 14px; margin-right: 0px;"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="dayEventContent">
-                <!-- Dynamic content will be inserted here -->
-            </div>
+            <div class="modal-body" id="dayEventContent"></div>
         </div>
     </div>
 </div>
 
-<!-- Output your events JSON safely -->
 {{ events_json|json_script:"event-data" }}
 
 <script>
@@ -369,7 +312,6 @@
 
     function showEventsForDate(date) {
         const filtered = allEvents.filter(e => e.date === date);
-
         const content = filtered.length > 0
             ? filtered.map(e => `
                 <div class="mb-3 p-3 border-start border-3 border-warning bg-light rounded">
@@ -383,23 +325,19 @@
 
         document.getElementById('selectedDate').textContent = date;
         document.getElementById('dayEventContent').innerHTML = content;
-        const modal = new bootstrap.Modal(document.getElementById('dayEventModal'));
+
+        const modalEl = document.getElementById('dayEventModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
     }
 
-    // Optional: attach click handlers for your calendar days
     document.querySelectorAll('.calendar-day').forEach(dayEl => {
         dayEl.addEventListener('click', () => {
-            // Assuming your days have data-date attributes formatted 'YYYY-MM-DD'
             const date = dayEl.getAttribute('data-date');
-            if (date) {
-                showEventsForDate(date);
-            }
+            if (date) showEventsForDate(date);
         });
     });
-</script>
 
-<script>
     // Highlight holidays
     const holidays = JSON.parse(document.getElementById('gh-data').textContent);
     document.querySelectorAll('.calendar-day').forEach(el => {
@@ -410,29 +348,6 @@
             el.title = holidays.find(h => h.date === dt).name;
         }
     });
-
-    function showEventsForDate(date) {
-        const filtered = allEvents.filter(e => e.date === date);
-
-        const content = filtered.length > 0
-            ? filtered.map(e => `
-            <div class="mb-3 p-3 border-start border-3 border-warning bg-light rounded">
-                <h5 class="mb-1">${e.title}</h5>
-                <div><strong>Time:</strong> ${e.time}</div>
-                <div><strong>Type:</strong> ${e.event_type}</div>
-                <div><strong>Description:</strong> ${e.description || 'No details provided.'}</div>
-            </div>
-        `).join('')
-            : '<p>No events for this day.</p>';
-
-        document.getElementById('selectedDate').textContent = date;
-        document.getElementById('dayEventContent').innerHTML = content;
-
-        // Use Bootstrap 5 recommended modal instance call
-        const modalEl = document.getElementById('dayEventModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        modal.show();
-    }
-
 </script>
+
 {% endblock %}

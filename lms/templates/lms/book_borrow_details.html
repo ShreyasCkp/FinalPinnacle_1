@@ -4,6 +4,7 @@
 
 {% block content %}
 <style>
+    /* General Reset */
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,8 +12,9 @@
         padding: 0;
     }
 
+    /* Container */
     .container {
-        margin-left: 200px; /* space for sidebar */
+        margin-left: 200px; /* space for sidebar on desktop */
         padding: 30px;
         max-width: calc(100% - 200px);
         background: #fff;
@@ -22,26 +24,27 @@
         box-sizing: border-box;
     }
 
+    /* Header */
     .header-flex {
         display: flex;
-        justify-content: center; /* center title */
+        justify-content: center;
         align-items: center;
-        position: relative; /* for button positioning */
+        position: relative;
         margin-bottom: 20px;
+        flex-wrap: wrap; /* allow wrapping on small screens */
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
+    /* Button */
     .btn-add {
-        /* position: absolute;
-        right: 0;*/
         background-color: #800000;
         color: #fff;
         font-size: 13px;
@@ -52,17 +55,21 @@
         text-decoration: none;
         cursor: pointer;
         transition: background-color 0.3s;
+        margin-top: 10px;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
+    /* Table */
     table {
         width: 100%;
         font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        overflow-x: auto;
+        display: block; /* allows horizontal scroll on mobile */
     }
 
     th, td {
@@ -89,6 +96,7 @@
         display: flex;
         justify-content: flex-start;
         margin-top: 25px;
+        flex-wrap: wrap;
     }
 
     .content {
@@ -96,12 +104,37 @@
         padding: 26px 26px 40px;
         min-height: 100vh;
     }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .container {
+            margin-left: 0;
+            max-width: 100%;
+            padding: 15px;
+        }
+
+        .header-flex h2 {
+            font-size: 18px;
+        }
+
+        table {
+            font-size: 10px;
+        }
+
+        th, td {
+            padding: 4px 6px;
+        }
+
+        .btn-add {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+    }
 </style>
 
 <div class="container mt-4">
     <div class="header-flex">
         <h2>Borrow Details for "{{ book.title }}"</h2>
-
     </div>
 
     {% if borrow_records %}
@@ -130,30 +163,19 @@
                 <td>{{ record.return_due_date }}</td>
                 <td>
                     <a href="{% url 'borrow_record_details' record.id %}" style="color: #800000; font-weight: 600; text-decoration: none;">
-                        {% if record.returned %}
-                        Returned
-                        {% else %}
-                        Pending
-                        {% endif %}
+                        {% if record.returned %}Returned{% else %}Pending{% endif %}
                     </a>
                 </td>
             </tr>
             {% endfor %}
-
-
         </tbody>
-
     </table>
-    <div class="bottom-btn-wrapper">
-        <a href="{% url 'book_list' %}" class="btn-add">
-            Back
-        </a>
-    </div>
 
+    <div class="bottom-btn-wrapper">
+        <a href="{% url 'book_list' %}" class="btn-add">Back</a>
+    </div>
     {% else %}
     <p>No borrow records found for this book.</p>
     {% endif %}
 </div>
-
-
 {% endblock %}

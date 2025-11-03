@@ -1,55 +1,96 @@
 <style>
+.term {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 30px 20px;
+    border: 3px solid transparent;
+    border-radius: 12px;
+    background-image: linear-gradient(#fff, #fff), linear-gradient(45deg, #ff19e6, #8200c7);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+.term h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.term p {
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.term ul {
+    text-align: left;
+    margin-top: 15px;
+    padding-left: 20px;
+    line-height: 1.5;
+}
+
+.term ul li {
+    margin-bottom: 10px;
+}
+
+.term a {
+    text-decoration: none;
+}
+
+.back {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back a {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff00cc, #3333ff);
+    color: white;
+    padding: 10px 25px;
+    font-size: 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.back a:hover {
+    transform: scale(1.02);
+    opacity: 0.95;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
     .term {
-        max-width: 700px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 3px solid transparent;
-        border-radius: 10px;
-        background-image: linear-gradient(#fff, #fff), linear-gradient(45deg, #ff19e6, #8200c7);
-        background-origin: border-box;
-        background-clip: padding-box, border-box;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-        height: 70vh;
-        position: relative;
+        padding: 25px 15px;
+        margin: 30px 15px;
     }
 
-        .term h2, .term p {
-            text-align: center;
-        }
+    .back a {
+        font-size: 15px;
+        padding: 10px 20px;
+    }
+}
 
-        .term ul {
-            text-align: left;
-            margin-top: 20px;
-        }
-
-        .term a {
-            text-decoration: none;
-        }
-
-    .back {
-        margin-top: 204px;
-        margin-left: 630px;
+@media (max-width: 480px) {
+    .term {
+        padding: 20px 10px;
+        margin: 20px 10px;
     }
 
-        .back a {
-            display: inline-block;
-            background: linear-gradient(135deg, #ff00cc, #3333ff);
-            /*background-color: #ff69b4;*/ /* Hot Pink */
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
+    .term h2 {
+        font-size: 20px;
+    }
 
-            .back a:hover {
-                transform: scale(1.02);
-                opacity: 0.95;
-                /*background-color: #ff1493;*/ /* Deeper Pink */
-            }
+    .term p, .term ul li {
+        font-size: 14px;
+    }
 
+    .back a {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
 </style>
 
 <div class="term">
@@ -66,7 +107,5 @@
 
     <div class="back">
         <a href="{% url 'license_check_view' %}">Back</a>
-
     </div>
-
 </div>

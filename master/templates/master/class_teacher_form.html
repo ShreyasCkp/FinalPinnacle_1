@@ -15,15 +15,19 @@
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
-    .container {
+    /* Mobile-only container */
+    .mobile-container {
+        display: block;
+        max-width: 100%;
+        margin: 20px auto;
+        padding: 20px;
         background: #fff;
-        padding: 30px;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        max-width: 400px;
-        margin: 40px auto;
         box-sizing: border-box;
     }
 
@@ -31,7 +35,7 @@
         text-align: center;
         font-weight: 700;
         color: #800000;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         font-size: 22px;
     }
 
@@ -40,18 +44,16 @@
         margin-bottom: 5px;
         color: #333;
         font-weight: 600;
+        font-size: 13px;
     }
 
     select {
-        padding: 10px;
         width: 100%;
+        padding: 10px;
         margin-bottom: 15px;
         border: 1px solid #ccc;
         border-radius: 6px;
         font-size: 14px;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
         background-color: white;
         cursor: pointer;
         box-sizing: border-box;
@@ -69,58 +71,54 @@
         margin-top: 20px;
     }
 
+    .btn-back, .btn-submit {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        text-align: center;
+        transition: background-color 0.3s;
+    }
+
     .btn-back {
         background-color: #800000;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: bold;
-        transition: background-color 0.3s;
-        display: inline-block;
-        text-align: center;
-        cursor: pointer;
+        color: #fff;
     }
 
     .btn-back:hover {
         background-color: #a10000;
         text-decoration: none;
-        color: white;
+        color: #fff;
     }
 
     .btn-submit {
         background-color: #800000;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 13px;
-        cursor: pointer;
-        transition: background-color 0.3s;
+        color: #fff;
     }
 
     .btn-submit:hover {
         background-color: #a10000;
     }
 
-    .content {
-        margin-left: 200px;
-        padding: 17px 26px 40px;
-        min-height: 100vh;
-    }
-
-    /* Disabled submit in view mode */
+    /* Hide submit in view mode */
     {% if mode == 'view' %}
     .btn-submit {
         display: none;
     }
     {% endif %}
+
+    /* Hide on larger screens */
+    @media (min-width: 768px) {
+        .mobile-container {
+            display: none;
+        }
+    }
 </style>
 
-<div class="container">
+<div class="mobile-container">
     <h2>
       {% if mode == 'edit' %}
         Edit Class Teacher
@@ -176,7 +174,6 @@
 
         <div class="form-buttons">
             <a href="{% url 'class_teacher_list' %}" class="btn-back">Back</a>
-
             {% if mode != 'view' %}
             <button type="submit" class="btn-submit">
                 {% if mode == 'edit' %}Update{% else %}Save{% endif %}

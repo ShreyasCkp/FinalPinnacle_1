@@ -2,113 +2,165 @@
 
 {% block content %}
 <style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
     .compose-message-container {
         max-width: 600px;
-        margin: 4px auto;
+        margin: 10px auto;
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-        padding: 30px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 25px;
+        animation: fadeIn 0.5s ease-in-out;
     }
 
-        .compose-message-container h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 25px;
-        }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        .compose-message-container .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
+    .compose-message-container h2 {
+        text-align: center;
+        color: #8b0000;
+        margin-bottom: 25px;
+        font-size: 22px;
+        font-weight: bold;
+    }
 
-        .compose-message-container form {
-            border: 2px dashed #ccc;
-            padding: 9px;
-            border-radius: 10px;
-            background: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-        }
+    .compose-message-container form {
+        border: 2px dashed #ccc;
+        padding: 15px;
+        border-radius: 10px;
+        background: #f9f9f9;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .compose-message-container .form-group label {
-            font-weight: 600;
-            font-size: 12px;
-        }
+    .form-group {
+        margin-bottom: 18px;
+    }
 
-        .compose-message-container input[type="text"],
-        .compose-message-container textarea,
-        .compose-message-container select {
-            width: 57%;
-            border-radius: 10px;
-            padding: 5px;
-            font-size: 9px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease;
-            margin-bottom: 20px;
-        }
+    .compose-message-container .form-group label {
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+        margin-bottom: 5px;
+        display: block;
+    }
 
-        .compose-message-container button {
-            background-color: #007bff;
-            color: white;
-            padding: 2px 7px;
-            border: none;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+    .compose-message-container input[type="text"],
+    .compose-message-container textarea,
+    .compose-message-container select {
+        width: 100%;
+        border-radius: 10px;
+        padding: 8px;
+        font-size: 13px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: border 0.3s ease;
+    }
 
-        .compose-message-container .form-check-inline input {
-            transform: scale(1.2);
-            margin-right: 5px;
-        }
+    .compose-message-container input:focus,
+    .compose-message-container textarea:focus,
+    .compose-message-container select:focus {
+        outline: none;
+        border-color: #8b0000;
+        box-shadow: 0 0 6px rgba(139, 0, 0, 0.2);
+    }
 
-        .compose-message-container .form-check-inline label {
-            font-size: 12px;
-        }
+    .compose-message-container textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
 
-        .compose-message-container .form-check-inline {
-            margin-right: 20px;
-        }
+    .form-check-inline {
+        margin-right: 20px;
+    }
+
+    .form-check-inline input {
+        transform: scale(1.1);
+        margin-right: 5px;
+    }
+
+    .form-check-inline label {
+        font-size: 13px;
+        color: #333;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .compose-message-container button {
+        background-color: #8b0000;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s ease;
+    }
+
+    .compose-message-container button:hover {
+        background-color: #a10000;
+    }
 
     .success {
         color: green;
         font-weight: bold;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
+        text-align: center;
     }
 
     .error {
         color: red;
         font-weight: bold;
-        margin-bottom: 20px;
-    }
-    .sidebar {
-        width: 200px;
-        height: 100vh;
-        background: linear-gradient(135deg, #8B0000, #800000); /* Maroon gradient */
-
-        color: white;
-        padding-top: 0px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+        text-align: center;
     }
 
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 8px;
-            display: block;
-            font-weight: 500;
+    /* 📱 Mobile Adjustments */
+    @media (max-width: 768px) {
+        .compose-message-container {
+            width: 95%;
+            padding: 18px;
         }
 
+        .compose-message-container h2 {
+            font-size: 18px;
+            margin-bottom: 18px;
+        }
+
+        .compose-message-container input[type="text"],
+        .compose-message-container textarea,
+        .compose-message-container select {
+            font-size: 12px;
+            padding: 7px;
+        }
+
+        .compose-message-container label {
+            font-size: 12px;
+        }
+
+        .form-check-inline {
+            margin-right: 10px;
+        }
+
+        .compose-message-container button {
+            width: 100%;
+            font-size: 13px;
+            padding: 8px;
+        }
+    }
 </style>
 
 <div class="compose-message-container">
@@ -132,24 +184,18 @@
         <!-- Message -->
         <div class="form-group">
             <label for="message">Message</label>
-            <textarea id="message" name="message" class="form-control" rows="4" placeholder="Enter your message here" required oninput="capitalizeFirstLetter(this)">{{ entered_message }}</textarea>
+            <textarea id="message" name="message" class="form-control" placeholder="Enter your message here" required oninput="capitalizeFirstLetter(this)">{{ entered_message }}</textarea>
         </div>
 
-        <!-- For More Details (Editable so it submits) -->
+        <!-- Contact Info -->
         <div class="form-group">
             <label for="contact_info">For more details contact</label>
             <input type="text" name="contact_info" class="form-control" value="9876543210" required>
         </div>
 
-        <!-- Only SMS -->
-        <input type="hidden" name="sms" value="on">
-
-
-
-
-        <!-- Fixed SMS Notification (not editable) -->
+        <!-- Communication Channels -->
         <div class="form-group">
-            <label>Choose communication channels</label><br>
+            <label>Choose Communication Channels</label><br>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="checkbox" name="whatsapp" id="whatsapp" {% if 'whatsapp' in request.POST %}checked{% endif %}>
                 <label class="form-check-label" for="whatsapp">WhatsApp</label>
@@ -160,20 +206,19 @@
             </div>
         </div>
 
-        <!-- Department Dropdown -->
+        <!-- Department -->
         <div class="form-group">
             <label for="department">Select Department</label>
             <select name="department" class="form-control" required>
                 <option value="">-- Select Department --</option>
-                <option value="All">All</option>  <!-- Option for sending to all departments -->
+                <option value="All">All</option>
                 {% for dept in departments %}
                 <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
                 {% endfor %}
             </select>
         </div>
 
-
-        <!-- Submit Button -->
+        <!-- Submit -->
         <div class="form-actions">
             <button type="submit">Send Message</button>
         </div>
@@ -181,11 +226,11 @@
 </div>
 
 <script>
-    function capitalizeFirstLetter(input) {
-        let val = input.value;
-        if (val.length > 0) {
-            input.value = val.charAt(0).toUpperCase() + val.slice(1);
-        }
+function capitalizeFirstLetter(input) {
+    let val = input.value;
+    if (val.length > 0) {
+        input.value = val.charAt(0).toUpperCase() + val.slice(1);
     }
+}
 </script>
 {% endblock %}

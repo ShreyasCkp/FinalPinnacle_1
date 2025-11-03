@@ -26,9 +26,9 @@
         max-width: 1200px;
         background: #fff;
         border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         padding: 30px;
-        font-size: 12px;
+        font-size: 13px;
     }
 
     h2 {
@@ -36,6 +36,7 @@
         color: #800000;
         font-size: 22px;
         text-align: center;
+        margin-bottom: 20px;
     }
 
     table {
@@ -78,20 +79,9 @@
         border-color: #800000;
     }
 
-    .status-paid {
-        color: green;
-        font-weight: bold;
-    }
-
-    .status-pending {
-        color: red;
-        font-weight: bold;
-    }
-
-    .status-partial {
-        color: orange;
-        font-weight: bold;
-    }
+    .status-paid { color: green; font-weight: bold; }
+    .status-pending { color: red; font-weight: bold; }
+    .status-partial { color: orange; font-weight: bold; }
 
     .is-invalid {
         border: 2px solid #dc3545 !important;
@@ -118,6 +108,86 @@
         padding: 22px 26px 40px;
         min-height: 100vh;
     }
+
+    /* TABLE RESPONSIVENESS */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+    }
+
+    /* MOBILE VIEW STYLES */
+    @media (max-width: 768px) {
+        .container {
+            width: 98%;
+            padding: 15px 12px;
+            font-size: 12px;
+        }
+
+        h2 {
+            font-size: 18px;
+        }
+
+        .table-responsive {
+            margin-bottom: 15px;
+        }
+
+        th, td {
+            font-size: 11px;
+            padding: 4px;
+            white-space: nowrap;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            font-size: 11px;
+            padding: 6px 12px;
+        }
+
+        .content {
+            margin-left: 0;
+            padding: 70px 10px 30px;
+        }
+
+        .card h5 {
+            font-size: 14px !important;
+        }
+
+        /* Fix modal for mobile */
+        .modal-dialog {
+            margin: 1rem;
+            max-width: 95%;
+        }
+
+        .modal-body {
+            padding: 15px;
+        }
+
+        #qr-img {
+            width: 130px;
+            height: 130px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        h2 {
+            font-size: 16px;
+        }
+
+        th, td {
+            font-size: 10px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            font-size: 10.5px;
+            padding: 5px 10px;
+        }
+
+        .table {
+            font-size: 10.5px;
+        }
+    }
 </style>
 
 <div class="page-wrapper">
@@ -125,58 +195,50 @@
         <h2>Collect Fees</h2>
 
         <div class="card mb-3">
-            <h5 class="mb-2" style=" color: #800000; font-size: 16px; font-weight: 600; text-align: center; margin-top: 7px;">Student Details</h5>
+            <h5 class="mb-2" style="color: #800000; font-size: 16px; font-weight: 600; text-align: center; margin-top: 7px;">
+                Student Details
+            </h5>
 
-            <table class="table table-bordered table-sm">
-                <tbody>
-                    <tr>
-                        <th>Name</th>
-                        <td>{{ student.student_name }}</td>
-                        <th>Roll No</th>
-                        <td>{{ student.roll_number }}</td>
-
-                        <th>Course</th>
-                        <td>{{ student.admission_course }}</td>
-
-                        <th>
-                            {% if student.semester %}
-                            Semester
-                            {% elif student.current_year %}
-                            Year
-                            {% else %}
-                            Term
-                            {% endif %}
-                        </th>
-                        <td>
-                            {% if student.semester %}
-                            {{ student.admission_course }} {{ student.semester }}
-                            {% elif student.current_year %}
-                            {{ student.admission_course }} {{ student.current_year }}
-                            {% else %}
-                            -
-                            {% endif %}
-                        </td>
-                    </tr>
-                    </tr>
-                    <tr>
-                        <th>Course Type</th>
-                        <td>{{ student.admission_course_type }}</td>
-                        <th>Admission No</th>
-                        <td>{{ student.admission_no }}</td>
-                        <th>Mobile</th>
-                        <td>{{ student.admission_father_mobile_no }}</td>
-
-                        <th>Category</th>
-                        <td>{{ student.category }}</td>
-                    </tr>
-                    <tr>
-
-
-                        <th>Date</th>
-                        <td>{{ now|date:"d-m-Y" }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <td>{{ student.student_name }}</td>
+                            <th>Roll No</th>
+                            <td>{{ student.roll_number }}</td>
+                            <th>Course</th>
+                            <td>{{ student.admission_course }}</td>
+                            <th>
+                                {% if student.semester %}Semester{% elif student.current_year %}Year{% else %}Term{% endif %}
+                            </th>
+                            <td>
+                                {% if student.semester %}
+                                    {{ student.admission_course }} {{ student.semester }}
+                                {% elif student.current_year %}
+                                    {{ student.admission_course }} {{ student.current_year }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Course Type</th>
+                            <td>{{ student.admission_course_type }}</td>
+                            <th>Admission No</th>
+                            <td>{{ student.admission_no }}</td>
+                            <th>Mobile</th>
+                            <td>{{ student.admission_father_mobile_no }}</td>
+                            <th>Category</th>
+                            <td>{{ student.category }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date</th>
+                            <td>{{ now|date:"d-m-Y" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="card">
@@ -184,43 +246,45 @@
                 {% csrf_token %}
                 <input type="hidden" name="admission_no" value="{{ student.admission_no }}">
 
-                <table class="table table-bordered table-sm">
-                    <thead>
-                        <tr>
-                            <th>Sl No</th>
-                            <th>Fee Type</th>
-                            <th>Due Date</th>
-                            <th>Amount (₹)</th>
-                            <th>Discount (₹)</th>
-                            <th>Recieved (₹)</th>
-                            <th>Balance (₹)</th>
-                            <th>Status</th>
-                            <th>Pay Now (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for fee in fee_collections %}
-                        {% if fee.fee_type.name|lower != 'scholarship' %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ fee.fee_type.name }}</td>
-                            <td>{% if fee.due_date %}{{ fee.due_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
-                            <td>{{ fee.amount }}</td>
-                            <td class="discount" data-discount="{{ fee.applied_discount }}">{{ fee.applied_discount }}</td>
-                            <td class="paid" data-paid="{{ fee.paid_amount }}">{{ fee.paid_amount|add:fee.applied_discount }}</td>
-                            <td class="balance" data-amount="{{ fee.amount }}" data-discount="{{ fee.applied_discount }}" data-paid="{{ fee.paid_amount }}">{{ fee.balance_amount }}</td>
-                            <td class="{% if fee.status == 'Paid' %}status-paid{% elif fee.status == 'Pending' %}status-pending{% else %}status-partial{% endif %}">{{ fee.status }}</td>
-                            <td>
-                                {% if fee.status != 'Paid' %}
-                                <input type="hidden" name="selected_fees" value="{{ fee.id }}">
-                                <input type="number" step="0.01" min="0" max="{{ fee.balance_amount }}" class="form-control form-control-sm pay-now-input" name="paid_amount_{{ fee.id }}" data-fee-id="{{ fee.id }}">
-                                {% else %}-{% endif %}
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+                                <th>Fee Type</th>
+                                <th>Due Date</th>
+                                <th>Amount (₹)</th>
+                                <th>Discount (₹)</th>
+                                <th>Received (₹)</th>
+                                <th>Balance (₹)</th>
+                                <th>Status</th>
+                                <th>Pay Now (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fee in fee_collections %}
+                            {% if fee.fee_type.name|lower != 'scholarship' %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ fee.fee_type.name }}</td>
+                                <td>{% if fee.due_date %}{{ fee.due_date|date:"d-m-Y" }}{% else %}-{% endif %}</td>
+                                <td>{{ fee.amount }}</td>
+                                <td class="discount" data-discount="{{ fee.applied_discount }}">{{ fee.applied_discount }}</td>
+                                <td class="paid" data-paid="{{ fee.paid_amount }}">{{ fee.paid_amount|add:fee.applied_discount }}</td>
+                                <td class="balance" data-amount="{{ fee.amount }}" data-discount="{{ fee.applied_discount }}" data-paid="{{ fee.paid_amount }}">{{ fee.balance_amount }}</td>
+                                <td class="{% if fee.status == 'Paid' %}status-paid{% elif fee.status == 'Pending' %}status-pending{% else %}status-partial{% endif %}">{{ fee.status }}</td>
+                                <td>
+                                    {% if fee.status != 'Paid' %}
+                                    <input type="hidden" name="selected_fees" value="{{ fee.id }}">
+                                    <input type="number" step="0.01" min="0" max="{{ fee.balance_amount }}" class="form-control form-control-sm pay-now-input" name="paid_amount_{{ fee.id }}" data-fee-id="{{ fee.id }}">
+                                    {% else %}-{% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
                 <div class="text-center mt-3">
                     <button type="button" id="collect-btn" class="btn btn-primary">Collect Payment</button>
@@ -231,6 +295,7 @@
     </div>
 </div>
 
+<!-- PAYMENT MODAL -->
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <form id="payment-mode-form" class="modal-content">
@@ -247,7 +312,6 @@
                     <p style="margin-top: 8px; font-size: 12px;">Scan and pay using your UPI app</p>
                 </div>
 
-                <!-- Wrap transaction reference input -->
                 <div id="reference-wrapper" class="mt-2" style="display: none;">
                     <input type="text" class="form-control" id="payment_reference"
                            placeholder="Transaction Reference (if applicable)">
@@ -266,10 +330,8 @@
     $(document).ready(function () {
         const $collectBtn = $('#collect-btn');
 
-        // Initially disable collect button
         $collectBtn.prop('disabled', true);
 
-        // Validate inputs and update UI
         function validateAllInputs() {
             let isValid = true;
 
@@ -296,7 +358,6 @@
                     $input.next('.invalid-feedback').remove();
                 }
 
-                // Live balance update
                 let newTotalPaid = paidAlready + paidInput + discount;
                 let newBalance = Math.max(amount - newTotalPaid, 0);
                 row.find('.balance').text(newBalance.toFixed(2));
@@ -317,12 +378,8 @@
             return entered;
         }
 
-        // On input change
-        $('.pay-now-input').on('input', function () {
-            validateAllInputs();
-        });
+        $('.pay-now-input').on('input', validateAllInputs);
 
-        // Collect button click
         $('#collect-btn').click(function () {
             if ($collectBtn.prop('disabled')) {
                 alert("Fix input errors before continuing.");
@@ -331,7 +388,6 @@
             $('#paymentModal').modal('show');
         });
 
-        // Payment form submission
         $('#payment-mode-form').submit(function (e) {
             e.preventDefault();
             const mode = $('#payment_mode').val();
@@ -349,7 +405,6 @@
             $('#collect-fee-form').submit();
         });
 
-        // Handle payment mode changes
         $('#payment_mode').change(function () {
             let totalAmount = 0;
             $('.pay-now-input').each(function () {
@@ -369,6 +424,5 @@
         });
     });
 </script>
-
 
 {% endblock %}

@@ -1,15 +1,12 @@
 {% extends 'layout.html' %}
 {% load form_filters %}
 
-{% block title %} {% if mode == 'add' %}
- Add Fee Type Name
- {% elif mode == 'edit' %}
- Edit Fee Type Name
- {% elif mode == 'view' %}
- View Fee Type Name
- {% else %}
- Fee Type
- {% endif %}{% endblock %}
+{% block title %} 
+{% if mode == 'add' %} Add Fee Type Name
+{% elif mode == 'edit' %} Edit Fee Type Name
+{% elif mode == 'view' %} View Fee Type Name
+{% else %} Fee Type {% endif %}
+{% endblock %}
 
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,17 +17,19 @@
         font-family: 'Inter', sans-serif;
         background-color: #f4f6f9;
         color: #333;
+        margin: 0;
+        padding: 0;
     }
 
     .form-container {
         max-width: 800px;
+        width: 90%;
         margin: 25px auto;
         background: #ffffff;
-        padding: 30px;
+        padding: 30px 25px;
         border-radius: 12px;
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
     }
-
 
     h3 {
         font-weight: 600;
@@ -49,10 +48,10 @@
 
     .form-control, .form-select {
         font-size: 14px;
-        padding: 4px;
+        padding: 6px 8px;
         border-radius: 5px;
         border: 1px solid #ccc;
-        margin-bottom: 4px;
+        margin-bottom: 8px;
         width: 100%;
     }
 
@@ -66,42 +65,45 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 20px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .btn-back {
         background-color: #800000;
         color: #fff;
         border: 2px solid #800000;
-        padding: 2px 5px;
+        padding: 6px 12px;
         border-radius: 6px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
         text-decoration: none;
         transition: all 0.2s ease;
+        text-align: center;
     }
 
-        .btn-back:hover {
-            background-color: #800000;
-            color: white;
-        }
+    .btn-back:hover {
+        background-color: #a10000;
+        color: white;
+    }
 
     .btn-save {
         background-color: #800000;
         font-weight: 600;
-        padding: 2px 4px;
+        padding: 6px 12px;
         border-radius: 6px;
-        font-size: 12px;
+        font-size: 13px;
         color: white;
-        width: 59px;
+        width: auto;
         border: none;
         cursor: pointer;
+        text-align: center;
     }
 
-        .btn-save:hover {
-            background-color: #a10000;
-        }
-
+    .btn-save:hover {
+        background-color: #a10000;
+    }
 
     .is-invalid {
         border-color: red !important;
@@ -113,10 +115,53 @@
         min-height: 100vh;
     }
 
-    @media (min-width: 768px) {
-        .col-md-6 {
-            flex: 0 0 auto;
-            width: 50%;
+    /* ✅ Responsive adjustments */
+    @media (max-width: 768px) {
+        .content {
+            margin-left: 0;
+            padding: 15px;
+        }
+
+        .form-container {
+            width: 95%;
+            padding: 20px;
+            box-shadow: none;
+            border-radius: 8px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-control, .form-select {
+            font-size: 13px;
+            padding: 5px 8px;
+        }
+
+        .btn-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-back, .btn-save {
+            width: 100%;
+            font-size: 14px;
+            padding: 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-container {
+            padding: 15px;
+        }
+
+        h3 {
+            font-size: 17px;
         }
     }
 </style>
@@ -149,14 +194,13 @@
                 </div>
             </div>
         </div>
-        <span id="name-error" style="color:red; font-size: 13px;"></span>
+        <span id="name-error" class="error-message"></span>
 
         {% if messages %}
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">{{ message }}</div>
         {% endfor %}
         {% endif %}
-
 
         <div class="col-md-6 mb-3">
             <div class="form-check">
@@ -182,22 +226,16 @@
             </div>
         </div>
 
-
         <div class="btn-container">
             <a href="{% url 'fee_type_list' %}" class="btn-back">Back</a>
-
             {% if mode != 'view' %}
             <button type="submit" class="btn-save">
                 {% if mode == 'edit' %}Update{% else %}Save{% endif %}
             </button>
             {% endif %}
         </div>
-
-
     </form>
 </div>
-
-<!-- Inside the form, below the name field -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -205,7 +243,6 @@
         $('#id_name').on('input', function () {
             let name = $(this).val().trim();
 
-            // Auto-capitalize first letter
             if (name.length > 0) {
                 name = name.charAt(0).toUpperCase() + name.slice(1);
                 $(this).val(name);
@@ -213,7 +250,6 @@
 
             const $error = $('#name-error');
 
-            // AJAX check for uniqueness
             $.get("{% url 'check_fee_type_name' %}", { name: name }, function (data) {
                 if (data.exists) {
                     $error.text("This Fee Type already exists.");
@@ -224,6 +260,5 @@
         });
     });
 </script>
-
 
 {% endblock %}

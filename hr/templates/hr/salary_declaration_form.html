@@ -7,33 +7,36 @@
     <title>{{ title }}</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <style>
         body {
-            background-color: #f0f2f5;
+            background-color: #f5f7fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* Centered responsive form container */
         .form-card {
             background: #fff;
-            padding: 40px 50px;
-            border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 30px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
             max-width: 900px;
             margin: 40px auto;
         }
 
         .form-title {
             text-align: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: #800000;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
+        /* Responsive grid layout */
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px 30px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px 25px;
         }
 
         .form-group {
@@ -41,30 +44,34 @@
             flex-direction: column;
         }
 
-            .form-group label {
-                font-weight: 500;
-                margin-bottom: 6px;
-                color: #333;
-                font-size: 13px;
-            }
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 13px;
+        }
 
-            .form-group input, .form-group select {
-                padding: 8px 10px;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-                font-size: 13px;
-            }
+        .form-group input, 
+        .form-group select {
+            padding: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 13px;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
         .form-actions {
             margin-top: 30px;
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
         }
 
         .btn, .btn-back-link {
             font-size: 13px;
             font-weight: 600;
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 6px;
             border: none;
             cursor: pointer;
@@ -76,18 +83,42 @@
         .btn-back-link {
             text-decoration: none;
             border: 1px solid #800000;
-            display: inline-block;
+            background-color: transparent;
+            color: #800000;
         }
 
-            .btn:hover, .btn-back-link:hover {
-                background-color: #660000;
-                color: white;
+        .btn:hover, 
+        .btn-back-link:hover {
+            background-color: #660000;
+            color: white;
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 768px) {
+            .form-card {
+                padding: 20px 15px;
+                margin: 20px 10px;
             }
 
-        .content {
-            margin-left: 200px;
-            padding: 0px 26px 40px;
-            min-height: 100vh 585.333px;
+            .form-title {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .btn, .btn-back-link {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -115,7 +146,6 @@
                 <div class="form-group"><label>Basic Salary</label>{{ form.basic_salary }}</div>
                 <div class="form-group"><label>HRA (40%)</label><input type="text" id="hra_calc" value="{{ form.instance.hra }}" readonly></div>
                 <div class="form-group"><label>PF Contribution (12%)</label><input type="text" id="pf_calc" value="{{ form.instance.pf_contribution }}" readonly></div>
-
                 <div class="form-group"><label>Special Allowance</label>{{ form.special_allowance }}</div>
                 <div class="form-group"><label>Professional Tax</label>{{ form.professional_tax }}</div>
                 <div class="form-group"><label>LWF Contribution</label>{{ form.lwf_contribution }}</div>
@@ -187,16 +217,16 @@
                 $('#id_net_pay').val(netPay.toFixed(2));
             }
 
-            // 🔹 On dropdown change, fetch employee details
+            // On dropdown change, fetch employee details
             $('#id_employee').change(function () {
                 fetchEmployeeData($(this).val());
             });
 
-            // 🔹 Run once on page load (edit mode)
+            // Run once on page load
             fetchEmployeeData($('#id_employee').val());
             calculateSalary();
 
-            // 🔹 Recalculate whenever salary fields change
+            // Recalculate whenever salary fields change
             $('#id_basic_salary, #id_special_allowance, #id_professional_tax, #id_lwf_contribution, #id_income_tax')
                 .on('input', calculateSalary);
         });

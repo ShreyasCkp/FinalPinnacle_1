@@ -15,111 +15,117 @@
     }
 
     .form-container {
-        max-width: 800px;
-        margin: 25px auto;
-        background: #ffffff;
-        padding: 30px;
+        max-width: 600px;
+        margin: 20px auto;
+        background: #fff;
+        padding: 25px;
         border-radius: 12px;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
     }
 
     h3 {
         font-weight: 600;
         color: #8b0000;
+        text-align: center;
         margin-bottom: 20px;
         font-size: 22px;
-        text-align: center;
     }
 
     .form-label {
         font-weight: 500;
-        font-size: 14px;
+        font-size: 13px;
         margin-bottom: 6px;
         display: block;
     }
 
     .form-control, .form-select {
-        font-size: 14px;
-        padding: 4px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        margin-bottom: 4px;
         width: 100%;
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-size: 13px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: box-shadow 0.3s ease;
     }
 
-    .error-message {
-        color: red;
-        font-size: 13px;
-        margin-bottom: 12px;
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        border-color: #800000;
+        outline: none;
+    }
+
+    .error-message, .text-danger {
+        font-size: 12px;
+        margin-bottom: 10px;
     }
 
     .btn-container {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
+        margin-top: 15px;
+    }
+
+    .btn-back, .btn-save {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
     }
 
     .btn-back {
-        background-color: #800000;
+        background: #800000;
         color: #fff;
-        border: 2px solid #800000;
-        padding: 2px 5px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
+        border: none;
     }
 
-        .btn-back:hover {
-            background-color: #800000;
-            color: white;
-        }
+    .btn-back:hover {
+        background: #a10000;
+        color: white;
+    }
 
     .btn-save {
-        background-color: #800000;
-        font-weight: 600;
-        padding: 2px 4px;
-        border-radius: 6px;
-        font-size: 12px;
-        color: white;
-        width: 59px;
+        background: #800000;
+        color: #fff;
         border: none;
-        cursor: pointer;
     }
 
-        .btn-save:hover {
-            background-color: #a10000;
+    .btn-save:hover {
+        background: #a10000;
+    }
+
+    .form-check-label {
+        font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+        .form-container {
+            margin: 15px;
+            padding: 20px;
         }
 
+        h3 {
+            font-size: 20px;
+        }
 
-    .is-invalid {
-        border-color: red !important;
-    }
+        .btn-container {
+            flex-direction: column;
+            gap: 10px;
+        }
 
-    .content {
-        margin-left: 200px;
-        padding: 3px 26px 40px;
-        min-height: 100vh;
-    }
-
-    @media (min-width: 768px) {
-        .col-md-6 {
-            flex: 0 0 auto;
-            width: 50%;
+        .btn-back, .btn-save {
+            width: 100%;
         }
     }
 </style>
 
-<div class="container form-container">
+<div class="form-container">
     <h3>
-        {% if view_mode %}
-        View Combination
-        {% elif form.instance.pk %}
-        Edit Combination
-        {% else %}
-        Add Combination
+        {% if view_mode %}View Combination
+        {% elif form.instance.pk %}Edit Combination
+        {% else %}Add Combination
         {% endif %}
     </h3>
 
@@ -134,66 +140,52 @@
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-md-6">
-                <label for="id_course_type" class="form-label">Program Type</label>
-                {{ form.course_type|add_class:"form-select" }}
-                <div class="text-danger">{{ form.course_type.errors }}</div>
-            </div>
-
-            <div class="col-md-6">
-                <label for="{{ form.academic_year.id_for_label }}" class="form-label">Batch</label>
-                {{ form.academic_year|add_class:"form-control" }}
-                <div id="academic-year-error" class="text-danger mt-2" style="display: none;"></div>
-
-                <div class="text-danger">{{ form.academic_year.errors }}</div>
-            </div>
+        <div class="mb-2">
+            <label for="id_course_type" class="form-label">Program Type</label>
+            {{ form.course_type|add_class:"form-select" }}
+            <div class="text-danger">{{ form.course_type.errors }}</div>
         </div>
 
-        <div class="row mt-2">
-            <div class="col-md-6">
-                <label for="id_name" class="form-label">Combination Name</label>
-                {{ form.name|add_class:"form-control" }}
-                <div id="name-error" class="text-danger">{{ form.name.errors }}</div>
-            </div>
-
-            <div class="col-md-6">
-                <label for="id_duration_years" class="form-label">Durations (Years)</label>
-                {{ form.duration_years|add_class:"form-control" }}
-                <div class="text-danger">{{ form.duration_years.errors }}</div>
-                <div id="duration_error" class="text-danger mt-2" style="display: none;"></div>
-            </div>
+        <div class="mb-2">
+            <label for="{{ form.academic_year.id_for_label }}" class="form-label">Batch</label>
+            {{ form.academic_year|add_class:"form-control" }}
+            <div id="academic-year-error" class="text-danger mt-1" style="display: none;"></div>
+            <div class="text-danger">{{ form.academic_year.errors }}</div>
         </div>
 
-        <div class="row mt-2">
-            <div class="col-md-6" id="semester-field">
-                <label for="id_total_semesters" class="form-label">Semesters</label>
-                {{ form.total_semesters|add_class:"form-control" }}
-                <div class="text-danger">{{ form.total_semesters.errors }}</div>
-            </div>
+        <div class="mb-2">
+            <label for="id_name" class="form-label">Combination Name</label>
+            {{ form.name|add_class:"form-control" }}
+            <div id="name-error" class="text-danger">{{ form.name.errors }}</div>
         </div>
 
-        <div class="form-check mt-3">
-            <input type="radio" name="is_active" value="1" class="form-check-input"
-                   {% if form.instance.is_active %}checked{% endif %}
-                   {% if view_mode %}disabled{% endif %}>
+        <div class="mb-2">
+            <label for="id_duration_years" class="form-label">Durations (Years)</label>
+            {{ form.duration_years|add_class:"form-control" }}
+            <div class="text-danger">{{ form.duration_years.errors }}</div>
+            <div id="duration_error" class="text-danger mt-1" style="display: none;"></div>
+        </div>
+
+        <div class="mb-2" id="semester-field">
+            <label for="id_total_semesters" class="form-label">Semesters</label>
+            {{ form.total_semesters|add_class:"form-control" }}
+            <div class="text-danger">{{ form.total_semesters.errors }}</div>
+        </div>
+
+        <div class="form-check mb-1">
+            <input type="radio" name="is_active" value="1" class="form-check-input" {% if form.instance.is_active %}checked{% endif %} {% if view_mode %}disabled{% endif %}>
             <label class="form-check-label">Active</label>
         </div>
 
-        <div class="form-check">
-            <input type="radio" name="is_active" value="0" class="form-check-input"
-                   {% if not form.instance.is_active %}checked{% endif %}
-                   {% if view_mode %}disabled{% endif %}>
+        <div class="form-check mb-2">
+            <input type="radio" name="is_active" value="0" class="form-check-input" {% if not form.instance.is_active %}checked{% endif %} {% if view_mode %}disabled{% endif %}>
             <label class="form-check-label">Inactive</label>
         </div>
 
-        <div class="btn-container d-flex justify-content-between mt-4">
+        <div class="btn-container">
             <a href="{% url 'course_form_list' %}" class="btn-back">Back</a>
-
             {% if not view_mode %}
-            <button type="submit" class="btn-save">
-                {% if form.instance.pk %}Update{% else %}Save{% endif %}
-            </button>
+            <button type="submit" class="btn-save">{% if form.instance.pk %}Update{% else %}Save{% endif %}</button>
             {% endif %}
         </div>
     </form>
@@ -210,14 +202,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const academicErrorBox = document.getElementById('academic-year-error');
     const nameErrorBox = document.getElementById('name-error');
     const semesterFieldDiv = document.getElementById('semester-field');
-
     let isDuplicate = false;
 
-    // 🔁 Name + CourseType Duplicate Validation (AJAX)
     function validateCombination(callback = null) {
         const name = nameInput.value.trim();
         const course_type = courseTypeInput.value;
-
         if (name && course_type) {
             fetch("{% url 'validate_course' %}", {
                 method: "POST",
@@ -230,9 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     course_type: course_type,
                     course_id: "{{ form.instance.pk|default:'' }}"
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
+            }).then(response => response.json()).then(data => {
                 isDuplicate = data.exists;
                 if (data.exists) {
                     nameErrorBox.innerText = data.message;
@@ -258,69 +245,42 @@ document.addEventListener('DOMContentLoaded', function () {
         toggleSemesterVisibility();
     });
 
-    // ✅ Duration & Academic Year Validation
     function validateCourseAndBatch() {
         const courseText = courseTypeInput.options[courseTypeInput.selectedIndex]?.text.toLowerCase();
         const academicText = academicYearInput.options[academicYearInput.selectedIndex]?.text;
         const duration = parseInt(durationInput.value);
-
-        // Reset errors
         durationErrorBox.style.display = "none";
         durationErrorBox.textContent = "";
         academicErrorBox.style.display = "none";
         academicErrorBox.textContent = "";
-
-        // Only validate if user has selected something in academic year AND duration
-        const hasSelectedAcademicYear = academicYearInput.selectedIndex > 0;
-        const hasEnteredDuration = durationInput.value.trim() !== "";
-
-        if (!hasSelectedAcademicYear && !hasEnteredDuration) return;
-
+        if (!academicText || !duration) return;
         let startYear, endYear, span = 0;
         const match = academicText?.match(/(\d{4})\s*-\s*(\d{2,4})/);
         if (match) {
             startYear = parseInt(match[1]);
             endYear = parseInt(match[2]);
-            if (endYear < 100) { // e.g., 25 becomes 2025
-                endYear = parseInt(String(startYear).slice(0, 2) + match[2]);
-            }
+            if (endYear < 100) endYear = parseInt(String(startYear).slice(0,2) + match[2]);
             span = endYear - startYear;
         }
-
         if (courseText.includes("pu") || courseText.includes("puc")) {
-            if (hasEnteredDuration && duration !== 2) {
-                durationErrorBox.textContent = "PU courses must have a duration of 2 years.";
-                durationErrorBox.style.display = "block";
-            }
-            if (hasSelectedAcademicYear && span !== 2) {
-                academicErrorBox.textContent = "PU batch must span 2 academic years.";
-                academicErrorBox.style.display = "block";
-            }
+            if (duration !== 2) { durationErrorBox.textContent = "PU courses must have a duration of 2 years."; durationErrorBox.style.display = "block"; }
+            if (span !== 2) { academicErrorBox.textContent = "PU batch must span 2 academic years."; academicErrorBox.style.display = "block"; }
         } else if (courseText.includes("degree") || courseText.includes("school of commerce") || courseText.includes("ug")) {
-            if (hasEnteredDuration && duration !== 3) {
-                durationErrorBox.textContent = "Degree courses must have a duration of 3 years.";
-                durationErrorBox.style.display = "block";
-            }
-            if (hasSelectedAcademicYear && span !== 3) {
-                academicErrorBox.textContent = "Degree batch must span 3 academic years.";
-                academicErrorBox.style.display = "block";
-            }
+            if (duration !== 3) { durationErrorBox.textContent = "Degree courses must have a duration of 3 years."; durationErrorBox.style.display = "block"; }
+            if (span !== 3) { academicErrorBox.textContent = "Degree batch must span 3 academic years."; academicErrorBox.style.display = "block"; }
         }
     }
-
 
     academicYearInput.addEventListener('change', validateCourseAndBatch);
     durationInput.addEventListener('input', validateCourseAndBatch);
 
-    // Show/hide semester field for PU
     function toggleSemesterVisibility() {
         const selectedText = courseTypeInput.options[courseTypeInput.selectedIndex]?.text.toLowerCase();
         semesterFieldDiv.style.display = selectedText.includes("pu") ? "none" : "block";
     }
     toggleSemesterVisibility();
 
-    // Prevent duplicate submit
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
         validateCombination(() => {
             if (!isDuplicate) form.submit();
@@ -328,5 +288,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-
 {% endblock %}

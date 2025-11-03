@@ -1,16 +1,92 @@
 {% if user.is_authenticated %}
-<form id="logoutForm" action="/logout/" method="post" class="navbar-right">
+<form id="logoutForm" action="/logout/" method="post" class="navbar-right auth-navbar">
     {% csrf_token %}
-    <ul class="nav navbar-nav navbar-right">
-        <li><span class="navbar-brand">Hello {{ user.username }}!</span></li>
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+    <ul class="nav navbar-nav navbar-right auth-list">
+        <li class="user-greeting">👋 Hello <b>{{ user.username }}</b></li>
+        <li>
+            <a href="javascript:document.getElementById('logoutForm').submit()" class="logout-btn">Log off</a>
+        </li>
     </ul>
 </form>
-
 {% else %}
-
-<ul class="nav navbar-nav navbar-right">
-    <li><a href="{% url 'login' %}">Log in</a></li>
+<ul class="nav navbar-nav navbar-right auth-list">
+    <li><a href="{% url 'login' %}" class="login-btn">Log in</a></li>
 </ul>
-
 {% endif %}
+
+<style>
+    /* 🔹 Navbar container */
+    .auth-navbar, .auth-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .auth-list li {
+        margin-left: 15px;
+    }
+
+    /* 🔹 Greeting text */
+    .user-greeting {
+        color: #800000;
+        font-weight: 600;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+
+    /* 🔹 Buttons (Login/Logout links) */
+    .login-btn, .logout-btn {
+        text-decoration: none;
+        color: #fff;
+        background-color: #800000;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        transition: background-color 0.3s ease;
+        display: inline-block;
+    }
+
+    .login-btn:hover, .logout-btn:hover {
+        background-color: #a10000;
+    }
+
+    /* 🔹 Responsive (Mobile First) */
+    @media (max-width: 768px) {
+        .auth-navbar, .auth-list {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .auth-list li {
+            margin: 6px 0;
+        }
+
+        .user-greeting {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .login-btn, .logout-btn {
+            width: 100%;
+            max-width: 180px;
+            font-size: 14px;
+            padding: 8px 10px;
+        }
+    }
+
+    /* 🔹 Optional: top spacing when used in fixed navbar */
+    @media (max-width: 480px) {
+        .auth-navbar {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+    }
+</style>

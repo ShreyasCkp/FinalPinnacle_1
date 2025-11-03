@@ -5,56 +5,81 @@
 <style>
     body {
         background-color: #f8f9fa;
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
     }
 
     .content {
-        padding: 42px 37px 3px;
+        padding: 40px 20px;
         flex-grow: 1;
-        margin-left: 75px;
-    }
-
-    input, select, textarea, .form-select, .form-control {
-        font-size: 12px !important;
-        padding: 4px 8px;
-        height: auto;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
     }
 
     .heading {
         color: #800000;
-        font-size: 22px;
+        font-size: 24px;
         text-align: center;
-        margin-bottom: 15px;
-        margin-top: 10px;
+        margin-bottom: 20px;
+        font-weight: 600;
     }
 
-    .filter-form .form-select {
-        display: inline-block;
-        width: auto;
-        min-width: 220px;
-        margin: 8px;
+    /* Filter Form */
+    #filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    #filter-form label {
+        font-weight: 500;
+        color: #333;
+        font-size: 13px;
+        margin-right: 5px;
+    }
+
+    #filter-form select {
+        font-size: 13px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        min-width: 180px;
+    }
+
+    .table {
+        font-size: 13px;
+        border-collapse: collapse;
+        margin-bottom: 0;
     }
 
     .table th, .table td {
         vertical-align: middle;
-        padding: 4px;
-        font-size: 12px;
+        padding: 6px;
+        text-align: center;
+    }
+
+    .table thead th {
+        background: #800000;
+        color: white;
+        text-align: center;
+        font-weight: 600;
+        font-size: 13px;
     }
 
     .subject-box {
         background: #fff;
         border: 1px solid #dee2e6;
-        border-radius: 6px;
+        border-radius: 8px;
         margin-bottom: 6px;
-        padding: 3px 5px;
+        padding: 5px 7px;
         text-align: left;
+        font-size: 12px;
     }
 
     .subject-name {
         font-weight: 600;
+        color: #800000;
     }
 
     .faculty-name {
@@ -66,70 +91,135 @@
         color: #084298;
         font-size: 11px;
         border-radius: 4px;
-        padding: 2px 4px;
+        padding: 2px 5px;
+        display: inline-block;
     }
 
-    .table thead th {
-        background: #800000;
-        color: #fff;
-        text-align: center;
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        overflow-x: auto;
+    }
+
+    .alert-warning {
+        font-size: 14px;
+        border-radius: 8px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .heading {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        #filter-form {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        #filter-form label {
+            font-size: 12px;
+        }
+
+        #filter-form select {
+            width: 100%;
+            font-size: 12px;
+        }
+
+        .table {
+            font-size: 12px;
+        }
+
+        .subject-box {
+            padding: 4px 6px;
+        }
+
+        .subject-name {
+            font-size: 12px;
+        }
+
+        .room-badge {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .heading {
+            font-size: 18px;
+        }
+
+        #filter-form select {
+            font-size: 11px;
+            padding: 5px 8px;
+        }
+
+        .table th, .table td {
+            padding: 4px;
+        }
+
+        .subject-box {
+            font-size: 11px;
+            border-radius: 6px;
+        }
     }
 </style>
 
-<div class="container mt-5" style="margin-left: 119px;">
+<div class="container mt-5 px-3 px-md-5">
     <h2 class="heading">Weekly Timetable</h2>
 
-            <form method="get" id="filter-form">
-                {% csrf_token %}
-                <!-- Course Type -->
-                <label for="id_program_type">Program Type:</label>
-                <select name="program_type" id="id_program_type">
-                    <option value="">-- Select Course Type --</option>
-                    {% for ct in program_types %}
-                    <option value="{{ ct.id }}" {% if ct.id|stringformat:"s" == selected_program_type %}selected{% endif %}>
-                        {{ ct.name }}
-                    </option>
-                    {% endfor %}
-                </select>
+    <form method="get" id="filter-form">
+        {% csrf_token %}
+        <div>
+            <label for="id_program_type">Program Type:</label>
+            <select name="program_type" id="id_program_type">
+                <option value="">-- Select Course Type --</option>
+                {% for ct in program_types %}
+                <option value="{{ ct.id }}" {% if ct.id|stringformat:"s" == selected_program_type %}selected{% endif %}>
+                    {{ ct.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
 
-                <!-- Academic Year -->
-                <label for="id_academic_year">Batch:</label>
-                <select name="academic_year" id="id_academic_year">
-                    <option value="">-- Select Batch --</option>
-                    {% for ay in academic_years %}
-                    <option value="{{ ay.id }}" {% if ay.id|stringformat:"s" == selected_academic_year %}selected{% endif %}>
-                        {{ ay.year }}
-                    </option>
-                    {% endfor %}
-                </select>
+        <div>
+            <label for="id_academic_year">Batch:</label>
+            <select name="academic_year" id="id_academic_year">
+                <option value="">-- Select Batch --</option>
+                {% for ay in academic_years %}
+                <option value="{{ ay.id }}" {% if ay.id|stringformat:"s" == selected_academic_year %}selected{% endif %}>
+                    {{ ay.year }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
 
-                <!-- Course -->
-                <label for="id_course">Combination:</label>
-                <select name="course" id="id_course">
-                    <option value="">-- Select Combination --</option>
-                    {% for course in courses %}
-                    <option value="{{ course.id }}" {% if course.id|stringformat:"s" == selected_course_id %}selected{% endif %}>
-                        {{ course.name }}
-                    </option>
-                    {% endfor %}
-                </select>
+        <div>
+            <label for="id_course">Combination:</label>
+            <select name="course" id="id_course">
+                <option value="">-- Select Combination --</option>
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if course.id|stringformat:"s" == selected_course_id %}selected{% endif %}>
+                    {{ course.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
 
-                <!-- Semester -->
-                <label for="id_semester">Sem/Year:</label>
-                <select name="semester" id="id_semester" onchange="this.form.submit()">
-                    <option value="">-- Select Sem/Year --</option>
-                    {% for sem in semesters %}
-                    <option value="{{ sem.number }}" {% if sem.number|stringformat:"s" == selected_semester_number %}selected{% endif %}>
-                        {{ sem.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </form>
+        <div>
+            <label for="id_semester">Sem/Year:</label>
+            <select name="semester" id="id_semester" onchange="this.form.submit()">
+                <option value="">-- Select Sem/Year --</option>
+                {% for sem in semesters %}
+                <option value="{{ sem.number }}" {% if sem.number|stringformat:"s" == selected_semester_number %}selected{% endif %}>
+                    {{ sem.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
 
-
-    <!--<button type="submit" class="btn btn-primary mt-2">View</button>
-    </form>-->
-    <!-- Timetable Table -->
     {% if time_slots %}
     <div class="card shadow border-0 mt-4">
         <div class="card-body p-0">
@@ -197,7 +287,6 @@
         }
 
         const initialValues = getQueryParams();
-        console.log("Initial values from URL:", initialValues);
 
         function loadAcademicYearsAndCourses(programTypeId, callback) {
             $.get("{% url 'get_courses_and_years_by_program_type' %}", {
@@ -220,7 +309,6 @@
                     }));
                 });
 
-                // Explicitly set selected values AFTER options are loaded
                 if (initialValues.academic_year) {
                     academicYearSelect.val(initialValues.academic_year);
                 }
@@ -246,7 +334,6 @@
                     }));
                 });
 
-                // Explicitly set selected semester
                 if (initialValues.semester) {
                     semesterSelect.val(initialValues.semester);
                 }
@@ -255,10 +342,8 @@
             });
         }
 
-        // Load everything if redirected with params
         if (initialValues.program_type) {
             programTypeSelect.val(initialValues.program_type);
-
             loadAcademicYearsAndCourses(initialValues.program_type, function () {
                 if (initialValues.course) {
                     loadSemesters(initialValues.course);
@@ -266,13 +351,11 @@
             });
         }
 
-        // Dynamic changes
         programTypeSelect.change(function () {
             const programTypeId = $(this).val();
             academicYearSelect.find('option:not(:first)').remove();
             courseSelect.find('option:not(:first)').remove();
             semesterSelect.find('option:not(:first)').remove();
-
             if (!programTypeId) return;
             loadAcademicYearsAndCourses(programTypeId);
         });
@@ -280,7 +363,6 @@
         courseSelect.change(function () {
             const courseId = $(this).val();
             semesterSelect.find('option:not(:first)').remove();
-
             if (!courseId) return;
             loadSemesters(courseId);
         });
@@ -298,5 +380,4 @@
         });
     });
 </script>
-
 {% endblock %}

@@ -1,5 +1,16 @@
-{% extends 'layout.html' %}
-{% block content %}
+﻿{% extends 'layout.html' %}
+
+
+<style>
+@media (max-width: 768px) {
+  .topbar { left: 0; }
+  .main-area, .content, .footer { margin-left: 0 !important; padding: 70px 16px 24px !important; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .container { max-width: 100%; margin: 0; border-radius: 0; padding: 16px; }
+}
+</style>
 
 <!-- Reports Heading -->
 <h2 style="color: #800000; font-weight: bold; margin-top: -30px; margin-bottom: -30px; margin-left: -189px;">Reports</h2>

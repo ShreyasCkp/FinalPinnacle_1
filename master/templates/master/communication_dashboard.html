@@ -7,331 +7,308 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Communication </title>
+    <title>Communication</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body {
             background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        .dashboard-section {
-            display: flex;
-            gap: 0.5rem;
-            animation: fadeIn 0.5s ease-in-out;
-            flex-wrap: nowrap;
-        }
-
-        .py-5 {
-            padding-top: 0rem !important;
-            padding-bottom: 3rem !important;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h5, h2 {
-            font-size: 14px;
-        }
-
-        .mt-4 {
-            margin-top: 0.5rem !important;
+        .container {
+            padding: 15px;
         }
 
         .text-primary {
             color: #8b0000 !important;
-            font-size: 21px;
-            margin-left: 315px;
-            margin-top: -16px;
-        }
-
-        .text-secondary {
-            color: #8b0000 !important;
+            font-size: 20px;
             text-align: center;
-            font-size: 16px;
+            margin-top: 10px;
         }
 
-        .table-bordered > :not(caption) > * > * {
-            border-width: 0 var(--bs-border-width);
-            font-size: 12px;
+        .plus-btn a {
+            font-size: 13px;
+            border-radius: 7px;
+            background: #800000;
+            padding: 8px 12px;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .plus-btn a:hover {
+            background-color: #a10000;
+        }
+
+        .dashboard-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h5, h2 {
+            font-size: 15px;
             text-align: center;
-            padding: 1px;
-        }
-
-        canvas {
-            max-height: 150px;
+            color: #8b0000;
         }
 
         .card {
             border: none;
-            border-radius: 1rem;
-            transition: transform 0.3s ease;
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
-        }
-
-            .card:hover {
-                transform: scale(1.03);
-            }
-
-        .bg-gradient-green {
-            color: #1b4332;
-        }
-
-        .bg-gradient-blue {
-            color: #0c2d48;
-        }
-
-        .bg-gradient-purple {
-            color: #2e1065;
-        }
-
-        .bg-gradient-yellow {
-            color: #5c4700;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 15px;
+            background-color: white;
         }
 
         .text-white {
             color: #8b0000 !important;
-            text-align: center;
         }
 
         .badge {
-            font-size: 0.75rem;
-            padding: 0.4em 0.6em;
+            font-size: 11px;
+            padding: 0.3em 0.6em;
         }
 
-        .badge-success {
-            background-color: #28a745;
-        }
-
-        .badge-danger {
-            background-color: #8b0000;
-        }
-
-        .bg-warning {
-            background-color: #8b0000 !important;
-        }
-
-        .col-md-4 {
-            flex: 0 0 auto;
-            width: 29.333333%;
-        }
-
-        .col-md-3 {
-            flex: 0 0 auto;
-        }
-
-        .plus-btn a {
-            font-size: 12px;
-            border-radius: 7px;
-            background: #800000;
-            padding: -1.5rem 1rem;
-        }
+        .badge-success { background-color: #28a745; }
+        .badge-danger { background-color: #b30000; }
+        .bg-warning { background-color: #ffc107 !important; color: #000; }
 
         .scroll-table {
-            max-height: 250px;
-            overflow-y: auto;
             overflow-x: auto;
         }
 
-        .dropdown-item.active {
-            color: var(--bs-dropdown-link-active-color);
-            text-decoration: none;
+        table {
+            width: 100%;
+            font-size: 11px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: center;
+            padding: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        thead {
             background-color: #800000;
+            color: white;
+        }
+
+        /* Chart canvas control */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            max-height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Adjust layout for small screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .text-primary {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .dashboard-section {
+                flex-direction: column;
+            }
+
+            .card h2 {
+                font-size: 18px;
+            }
+
+            table th, table td {
+                font-size: 10px;
+                padding: 3px;
+            }
+
+            .plus-btn {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+
+            /* Restrict chart height on small screens */
+            .chart-container {
+                height: 180px;
+                max-height: 200px;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-primary">Communication</h2>
-            <div class="plus-btn">
-                <a href="{% url 'upload_excel' %}" class="btn btn-success" title="Upload Excel for Communication">
-                    <i class="bi bi-file-earmark-arrow-up"></i>Bulk Upload 
-                </a>
-            </div>
+    <div class="container py-3">
+        <h2 class="fw-bold text-primary">Communication</h2>
+        <div class="plus-btn mb-3">
+            <a href="{% url 'upload_excel' %}" title="Upload Excel for Communication">
+                <i class="bi bi-file-earmark-arrow-up"></i> Bulk Upload
+            </a>
         </div>
-        <!-- 🔽 Filter Dropdown -->
-        <!--<div class="mb-4 d-flex justify-content-end">
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary px-4 py-2 dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-funnel"></i> Filter
-                </button>
-                <ul class="dropdown-menu" style=" width: 100%;     font-size: 10px;" aria-labelledby="filterDropdown">
-                    <li><a class="dropdown-item {% if active_filter == 'day' %}active{% endif %}" href="?filter=day">Per Day</a></li>
-                    <li><a class="dropdown-item {% if active_filter == 'week' %}active{% endif %}" href="?filter=week">Per Week</a></li>
-                    <li><a class="dropdown-item {% if active_filter == 'month' %}active{% endif %}" href="?filter=month">Per Month</a></li>
-                    <li><a class="dropdown-item {% if active_filter == 'all' %}active{% endif %}" href="?filter=all">All</a></li>
-                </ul>
-            </div>
-        </div>-->
+
         <!-- KPI Cards -->
-        <div class="row mb-4 dashboard-section">
-            <div class="col-md-3">
-                <div class="card bg-gradient-purple text-white p-3">
-                    <h5>Total Messages Sent</h5>
-                    <h2>{{ total_messages_sent }}</h2>
-                </div>
+        <div class="dashboard-section">
+            <div class="card text-white text-center">
+                <h5>Total Messages Sent</h5>
+                <h2>{{ total_messages_sent }}</h2>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-gradient-green text-white p-3">
-                    <h5>Enquiry WhatsApp Messages Sent</h5>
-                    <h2>{{ enquiry_total_sent }}</h2>
-                </div>
+            <div class="card text-white text-center">
+                <h5>Enquiry WhatsApp Messages Sent</h5>
+                <h2>{{ enquiry_total_sent }}</h2>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-gradient-blue text-white p-3">
-                    <h5>Admission Open Messages Sent</h5>
-                    <h2>{{ sentmessage_sent }}</h2>
-                </div>
+            <div class="card text-white text-center">
+                <h5>Admission Open Messages Sent</h5>
+                <h2>{{ sentmessage_sent }}</h2>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-gradient-yellow text-white p-3">
-                    <h5>Pending Admission Messages</h5>
-                    <h2>{{ sentmessage_pending }}</h2>
-                </div>
+            <div class="card text-white text-center">
+                <h5>Pending Admission Messages</h5>
+                <h2>{{ sentmessage_pending }}</h2>
             </div>
         </div>
 
-        <!-- Recent Messages Tables & Status Charts -->
-        <div class="row dashboard-section">
+        <!-- Recent Messages -->
+        <div class="dashboard-section mt-4">
             <!-- Enquiry Section -->
-            <div class="col-md-6">
-                <div class="card p-3 mb-3">
-                    <h5 class="text-secondary mb-3">Recent Enquiry WhatsApp Messages</h5>
-                    <div class="scroll-table">
-                        <table class="table table-hover table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Enquiry No</th>
-                                    <th>Student Name</th>
-                                    <th>Parent Phone</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for msg in recent_enquiry_msgs %}
-                                <tr>
-                                    <td>{{ msg.enquiry_no }}</td>
-                                    <td>{{ msg.student_name }}</td>
-                                    <td>{{ msg.parent_phone }}</td>
-                                    <td>
-                                        <span class="badge
-                                    {% if msg.whatsapp_status|lower == 'sent' %} badge-success
-                                    {% elif msg.whatsapp_status|lower == 'failed' %} badge-danger
-                                    {% else %} bg-warning
-                                    {% endif %}">
-                                            {{ msg.whatsapp_status|title }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="4" class="text-center">No recent enquiry messages found.</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="card mb-3">
+                <h5 class="text-secondary mb-2">Recent Enquiry WhatsApp Messages</h5>
+                <div class="scroll-table">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Enquiry No</th>
+                                <th>Student</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for msg in recent_enquiry_msgs %}
+                            <tr>
+                                <td>{{ msg.enquiry_no }}</td>
+                                <td>{{ msg.student_name }}</td>
+                                <td>{{ msg.parent_phone }}</td>
+                                <td>
+                                    <span class="badge
+                                        {% if msg.whatsapp_status|lower == 'sent' %} badge-success
+                                        {% elif msg.whatsapp_status|lower == 'failed' %} badge-danger
+                                        {% else %} bg-warning
+                                        {% endif %}">{{ msg.whatsapp_status|title }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4">No recent enquiry messages found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card p-3">
-                    <h5 class="text-secondary mb-3">Enquiry Open Messages Status Breakdown</h5>
-                    <canvas id="enquiryStatusChart" height="110"></canvas>
+            </div>
+
+            <div class="card mb-3">
+                <h5 class="text-secondary mb-2">Enquiry Message Status</h5>
+                <div class="chart-container">
+                    <canvas id="enquiryStatusChart"></canvas>
                 </div>
             </div>
 
             <!-- Admission Section -->
-            <div class="col-md-6">
-                <div class="card p-3 mb-3">
-                    <h5 class="text-secondary mb-3">Recent Admission WhatsApp Messages</h5>
-                    <div class="scroll-table">
-                        <table class="table table-hover table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Phone</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for msg in recent_sentmessage_msgs %}
-                                <tr>
-                                    <td>{{ msg.phone }}</td>
-                                    <td>
-                                        <span class="badge
-                                    {% if msg.status|lower == 'sent' %} badge-success
-                                    {% elif msg.status|lower == 'failed' %} badge-danger
-                                    {% else %} bg-warning
-                                    {% endif %}">
-                                            {{ msg.status|title }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="2" class="text-center">No recent admission messages found.</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="card mb-3">
+                <h5 class="text-secondary mb-2">Recent Admission WhatsApp Messages</h5>
+                <div class="scroll-table">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Phone</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for msg in recent_sentmessage_msgs %}
+                            <tr>
+                                <td>{{ msg.phone }}</td>
+                                <td>
+                                    <span class="badge
+                                        {% if msg.status|lower == 'sent' %} badge-success
+                                        {% elif msg.status|lower == 'failed' %} badge-danger
+                                        {% else %} bg-warning
+                                        {% endif %}">{{ msg.status|title }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="2">No recent admission messages found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card p-3">
-                    <h5 class="text-secondary mb-3">Admission Open Messages Status Breakdown</h5>
-                    <canvas id="statusChart" height="110"></canvas>
+            </div>
+
+            <div class="card">
+                <h5 class="text-secondary mb-2">Admission Message Status</h5>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Chart.js Status Chart Script -->
+    <!-- Chart.js Script -->
     <script>
-    // Admission Chart
-    var ctx = document.getElementById('statusChart').getContext('2d');
-    var statusChart = new Chart(ctx, {
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true } }
+    };
+
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctx, {
         type: 'bar',
         data: {
             labels: {{ status_labels|safe }},
             datasets: [{
-                label: 'Message Count',
                 data: {{ status_counts|safe }},
-                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
-                borderColor: ['#218838', '#e0a800', '#c82333', '#343a40'],
-                borderWidth: 1
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
             }]
         },
-        options: {
-            indexAxis: 'y',
-            scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } },
-            plugins: { legend: { display: false } }
-        }
+        options: chartOptions
     });
 
-    // Enquiry Chart
-    var ctx2 = document.getElementById('enquiryStatusChart').getContext('2d');
-    var enquiryStatusChart = new Chart(ctx2, {
+    const ctx2 = document.getElementById('enquiryStatusChart').getContext('2d');
+    new Chart(ctx2, {
         type: 'bar',
         data: {
             labels: {{ enquiry_status_labels|safe }},
             datasets: [{
-                label: 'Message Count',
                 data: {{ enquiry_status_counts|safe }},
-                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
-                borderColor: ['#218838', '#e0a800', '#c82333', '#343a40'],
-                borderWidth: 1
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
             }]
         },
-        options: {
-            indexAxis: 'y',
-            scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } },
-            plugins: { legend: { display: false } }
-        }
+        options: chartOptions
     });
     </script>
 </body>

@@ -2,72 +2,101 @@
 {% block title %}View Attendance{% endblock %}
 {% block content %}
 
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <style>
-    .calendar-container {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 9px;
-        margin-top: 16px;
+    /* === Container & Layout === */
+    .container {
+        padding: 16px;
+        margin: 0 auto;
     }
 
+    h5.mb-3 {
+        font-weight: 600;
+        color: #800;
+        font-size: 20px;
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    /* === Dropdowns === */
+    .dropdown form {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .form-select, .form-selectss {
+        background-color: #800;
+        color: #fff;
+        border-radius: 5px;
+        text-align: center;
+        padding: 4px 6px;
+        border: 1px solid #800;
+        font-size: 14px;
+    }
+
+    /* === Calendar === */
     .calendar-weekdays {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
         font-weight: 600;
         text-align: center;
-        margin-bottom: 5px;
+        margin-bottom: 6px;
         color: #495057;
-        margin-top: 28px;
         font-size: 13px;
     }
 
+    .calendar-container {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+    }
+
     .calendar-day {
-        min-height: 65px;
-        border: 1px solid #800; /* maroon border */
+        min-height: 70px;
+        border: 1px solid #800; 
         border-radius: 8px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        font-size: 11px;
+        font-size: 12px;
         cursor: default;
+        position: relative;
+        overflow: hidden;
+        background: transparent;
         transition: transform 0.2s, box-shadow 0.2s;
-        position: relative; /* for .fill positioning */
-        overflow: hidden; /* clip the fill inside */
-        background: transparent; /* no background at all */
+        padding: 4px 2px;
     }
-
 
     .calendar-day .fill {
         position: absolute;
         bottom: 0;
         width: 100%;
-        height: 10%;  /* tiny semi-fill */
-        border-radius: 8px 8px 0 0; /* only top corners rounded */
-        z-index: 0;   /* behind text */
+        height: 10%;
+        border-radius: 8px 8px 0 0;
+        z-index: 0;
     }
 
-    /* Fill colors per status */
-    .present .fill {
-        background-color: darkgreen;
-    }    /* green */
-    .absent .fill { background-color: crimson; }    /* maroon */
-    .late .fill { background-color: #ffa500; }      /* orange */
-    .leave .fill {
-        background-color: #808080;
-    }     /* blue */
-    .holiday .fill {
-        background-color: black;
-    }   /* gray */
+    .present .fill { background-color: darkgreen; }
+    .absent .fill { background-color: crimson; }
+    .late .fill { background-color: #ffa500; }
+    .leave .fill { background-color: #5A5A5A; }
+    .holiday .fill { background-color: black; }
 
+    .day-number, .day-status { position: relative; z-index: 1; font-size: 12px; text-align: center; }
+    .day-status { margin-top: 4px; }
 
+    .empty-day { min-height: 70px; }
+
+    /* === Legend === */
     .attendance-legend {
         display: flex;
         flex-wrap: wrap;
-        gap: 15px;
+        gap: 12px;
         margin: 20px 0;
         justify-content: center;
         font-size: 14px;
@@ -80,7 +109,7 @@
         gap: 6px;
     }
 
-    .attendance-legend .color-box {
+    .color-box {
         width: 16px;
         height: 16px;
         border-radius: 4px;
@@ -88,94 +117,33 @@
         border: 1px solid #333;
     }
 
-    .color-present {
-        background-color: darkgreen;
-    }
+    .color-present { background-color: darkgreen; }
     .color-absent { background-color: crimson; }
     .color-late { background-color: #ffa500; }
     .color-leave { background-color: #5A5A5A; }
     .color-holiday { background-color: black; }
 
-
-    /* Text stays above fill */
-    .day-number, .day-status {
-        position: relative;
-        z-index: 1;
+    /* === Responsive adjustments === */
+    @media (max-width: 768px) {
+        .calendar-day { min-height: 60px; font-size: 11px; }
+        .calendar-weekdays { font-size: 11px; }
+        .form-select, .form-selectss { width: 100%; font-size: 13px; }
+        .dropdown form { flex-direction: column; gap: 10px; }
+        .attendance-legend { flex-direction: column; gap: 8px; }
     }
 
-
-    .empty-day { min-height: 65px; }
-
-    .form-select {
-        background-color: #800;
-        color: #fff;
-        text-align: center;
-        border-radius: 5px;
+    @media (max-width: 480px) {
+        .calendar-day { min-height: 55px; font-size: 10px; }
+        .day-status { font-size: 10px; }
     }
-    .dropdown {
-        margin-left: 20px;
-        margin-right: 38px;
-        padding: 30px 6px 7px;
-    }
-    .form-selectss {
-        background-color: #800;
-        color: #fff;
-        text-align: center;
-        border-radius: 5px;
-        width: 74px;
-        height: 19px;
-        margin-left: 20px;
-    }
-    .mb-3 {
-        font-weight: 600;
-        color: #800;
-        font-size: 20px;
-        text-align: center;
-        margin-bottom: -28px;
-        margin-top: -21px;
-    }
-        /* Theme-based Attendance Colors */
-    /* Attendance Status Colors - Semi Shaded Theme */
-
-    /* Present → light greenish tint with maroon overlay */
-    /*.present {
-        background: linear-gradient(135deg, rgba(0,128,0,0.08), rgba(128,0,0,0.08));
-        color: #2e7d32;*/ /* dark green */
-    /*}*/
-
-    /* Absent → maroon shading */
-    /*.absent {
-        background: linear-gradient(135deg, rgba(128,0,0,0.15), rgba(128,0,0,0.25));
-        color: #800;*/ /* theme maroon */
-    /*}*/
-
-    /* Late → amber shade blended with maroon */
-    /*.late {
-        background: linear-gradient(135deg, rgba(255,165,0,0.15), rgba(128,0,0,0.1));
-        color: #e65100;*/ /* deep orange */
-    /*}*/
-
-    /* Leave → bluish with maroon tint */
-    /*.leave {
-        background: linear-gradient(135deg, rgba(30,144,255,0.12), rgba(128,0,0,0.08));
-        color: #0d47a1;*/ /* navy */
-    /*}*/
-
-    /* Holiday → neutral gray with maroon tint */
-    /*.holiday {
-        background: linear-gradient(135deg, rgba(200,200,200,0.15), rgba(128,0,0,0.08));
-        color: #800;*/ /* theme maroon */
-    /*}*/
-
-
-
 </style>
 
 <div class="container mt-4">
-     <h5 class="mb-3">View Attendance</h5>
+    <h5 class="mb-3">View Attendance</h5>
+
     <!-- Month & Year Selector -->
     <div class="dropdown">
-        <form method="get" class="d-flex gap-2">
+        <form method="get">
             <select name="month" class="form-select" onchange="this.form.submit()">
                 {% for m in months %}
                     <option value="{{ m.num }}" {% if m.num == selected_month %}selected{% endif %}>{{ m.name }}</option>
@@ -202,9 +170,8 @@
 
     <!-- Calendar Days -->
     <div class="calendar-container">
-        {# Empty placeholders before 1st of month #}
         {% for i in calendar_data.0.date.weekday|add:"0"|make_list %}
-        <div class="empty-day"></div>
+            <div class="empty-day"></div>
         {% endfor %}
 
         {% for day in calendar_data %}
@@ -214,38 +181,28 @@
             {% elif day.status == 'Absent' %}absent
             {% elif day.status == 'Leave' %}leave
             {% elif day.status == 'Holiday' %}holiday{% endif %}">
-            <div class="fill" style="height: 10%;"></div> <!-- Semi fill from bottom -->
+            <div class="fill"></div>
             <div class="day-number">{{ day.date.day }}</div>
             <div class="day-status">
                 {% if day.status == 'Present' %}✅ Present
                 {% elif day.status == 'Late' %}⏰ Late
                 {% elif day.status == 'Absent' %}❌ Absent
                 {% elif day.status == 'Leave' %}📝 {{ day.leave_type }}
-                {% elif day.status == 'Holiday' %}{{ day.icon }} {{ day.leave_type }}
+                {% elif day.status == 'Holiday' %}🎉 {{ day.leave_type }}
                 {% endif %}
             </div>
         </div>
         {% endfor %}
-
     </div>
-            <!-- Legend -->
-        <div class="attendance-legend">
-            <div class="legend-item">
-                <span class="color-box color-present"></span> Present
-            </div>
-            <div class="legend-item">
-                <span class="color-box color-absent"></span> Absent
-            </div>
-            <div class="legend-item">
-                <span class="color-box color-late"></span> Late
-            </div>
-            <div class="legend-item">
-                <span class="color-box color-leave"></span> Leave
-            </div>
-            <div class="legend-item">
-                <span class="color-box color-holiday"></span> Holiday
-            </div>
-        </div>
+
+    <!-- Legend -->
+    <div class="attendance-legend">
+        <div class="legend-item"><span class="color-box color-present"></span> Present</div>
+        <div class="legend-item"><span class="color-box color-absent"></span> Absent</div>
+        <div class="legend-item"><span class="color-box color-late"></span> Late</div>
+        <div class="legend-item"><span class="color-box color-leave"></span> Leave</div>
+        <div class="legend-item"><span class="color-box color-holiday"></span> Holiday</div>
+    </div>
 </div>
 
 {% endblock %}

@@ -5,7 +5,7 @@
     <title>{% block title %}Pinnacle School - Employee Portal{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* --- Reuse your existing styles with minor tweaks for employee --- */
+        /* --- Base Styles --- */
         * {
             margin: 0;
             padding: 0;
@@ -33,16 +33,17 @@
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
             overflow-y: auto;
             z-index: 999;
+            transition: left 0.3s ease;
         }
 
-            .sidebar::-webkit-scrollbar {
-                width: 6px;
-            }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
 
-            .sidebar::-webkit-scrollbar-thumb {
-                background-color: rgba(255,255,255,0.4);
-                border-radius: 4px;
-            }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: rgba(255,255,255,0.4);
+            border-radius: 4px;
+        }
 
         .sidebar-title {
             padding: 12px;
@@ -54,12 +55,12 @@
             justify-content: center;
         }
 
-            .sidebar-title img {
-                width: 100%;
-                height: auto;
-                object-fit: contain;
-                display: block;
-            }
+        .sidebar-title img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
 
         strong {
             font-weight: 600;
@@ -84,34 +85,34 @@
             transition: all 0.3s ease;
         }
 
-            .sidebar a i,
-            .sidebar .dropdown-btn i,
-            .sidebar .dropdown-container a i {
-                font-size: 15px !important;
-                width: 18px;
-            }
+        .sidebar a i,
+        .sidebar .dropdown-btn i,
+        .sidebar .dropdown-container a i {
+            font-size: 15px !important;
+            width: 18px;
+        }
 
-            .sidebar a:hover,
-            .sidebar .dropdown-btn:hover,
-            .sidebar .dropdown-container a:hover {
-                background-color: #a50000;
-                border-left: 3px solid #fff;
-            }
+        .sidebar a:hover,
+        .sidebar .dropdown-btn:hover,
+        .sidebar .dropdown-container a:hover {
+            background-color: #a50000;
+            border-left: 3px solid #fff;
+        }
 
-            .sidebar a.active,
-            .sidebar .dropdown-btn.active,
-            .sidebar .dropdown-container a.active {
-                background-color: #a50000 !important;
-                border-left: 3px solid #fff !important;
-                color: #fff !important;
-                font-weight: 600 !important;
-            }
+        .sidebar a.active,
+        .sidebar .dropdown-btn.active,
+        .sidebar .dropdown-container a.active {
+            background-color: #a50000 !important;
+            border-left: 3px solid #fff !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+        }
 
-                .sidebar a.active i,
-                .sidebar .dropdown-btn.active i,
-                .sidebar .dropdown-container a.active i {
-                    color: #fff !important;
-                }
+        .sidebar a.active i,
+        .sidebar .dropdown-btn.active i,
+        .sidebar .dropdown-container a.active i {
+            color: #fff !important;
+        }
 
         .dropdown-container {
             display: none;
@@ -138,15 +139,15 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-            .topbar a {
-                font-weight: 500 !important;
-                text-decoration: none;
-                font-size: 14px !important;
-            }
+        .topbar a {
+            font-weight: 500 !important;
+            text-decoration: none;
+            font-size: 14px !important;
+        }
 
-                .topbar a:hover {
-                    text-decoration: underline;
-                }
+        .topbar a:hover {
+            text-decoration: underline;
+        }
 
         .main-area, .content {
             margin-left: 200px;
@@ -168,19 +169,52 @@
         }
 
         #user-icon::after {
-            /*content: "\f107";*/ /* FontAwesome down arrow */
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
             margin-left: 5px;
             font-size: 12px;
         }
 
-        /* Notification and user popup styles reuse from your student layout */
-        /* ... same as your provided styles ... */
-        /* Add your dark mode styles if needed */
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -220px; /* hide sidebar by default */
+            }
+
+            .sidebar.active {
+                left: 0; /* show sidebar when active */
+            }
+
+            .main-area, .content {
+                margin-left: 0;
+                padding: 70px 15px 40px;
+            }
+
+            .topbar {
+                left: 0;
+                right: 0;
+                padding: 0 12px;
+            }
+
+            .topbar .menu-toggle {
+                display: block;
+                font-size: 22px;
+                cursor: pointer;
+            }
+
+            .sidebar a, .sidebar .dropdown-btn {
+                font-size: 16px;
+                padding: 12px 15px;
+            }
+
+            .footer {
+                margin-left: 0;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-title">
             <img src="{% static 'image/logo.png' %}" alt="Logo">
@@ -226,38 +260,32 @@
             <i class="fa-solid fa-pen-nib"></i> Exam Marks
         </a>
 
-        <!--<a href="{% url 'leave_approval_list' %}" class="{% if request.resolver_match.url_name == 'leave_approval_list' %}active{% endif %}">
-            <i class="fa-solid fa-thumbs-up"></i> Leave Requests
-        </a>-->
-
         <a href="{% url 'employee_annual_dashboard' %}" class="{% if request.resolver_match.url_name == 'employee_annual_dashboard' %}active{% endif %}">
             <i class="fa-solid fa-money-check-dollar"></i> Payroll
         </a>
-
-        <!--<a href="{% url 'show_page' %}" class="{% if request.resolver_match.url_name == 'show_page' %}active{% endif %}">
-            <i class="fa-solid fa-clipboard-list"></i> Marks
-        </a>-->
 
         <a href="{% url 'employee_calendar' %}" class="{% if request.resolver_match.url_name == 'employee_calendar' %}active{% endif %}">
             <i class="fa-solid fa-calendar-days"></i> Calendar
         </a>
 
         <a href="{% url 'settings' %}" class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
-            <i class="fa-solid fa-calendar-days"></i> Settings
+            <i class="fa-solid fa-gear"></i> Settings
         </a>
 
-
-        <a href="{% url 'student_marks_list' %}"
-           class="btn btn-maroon px-4 py-3 {% if 'student_marks_list' in request.resolver_match.url_name %}active{% endif %}">
-            <i class="fa-solid fa-graduation-cap me-2" style="text-align:center !important;"></i> Student Marks List
+        <a href="{% url 'student_marks_list' %}" class="{% if 'student_marks_list' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fa-solid fa-graduation-cap"></i> Student Marks List
         </a>
     </div>
 
-
+    <!-- Topbar -->
     <div class="topbar">
-        <div style="font-size: large; font-weight: 700;">Pinnacle School - Employee Portal</div>
-        <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-bars menu-toggle" style="display: none;"></i>
+            <div style="font-size: large; font-weight: 700;">Pinnacle School - Employee Portal</div>
+        </div>
 
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <!-- Notifications -->
             <div style="position: relative;">
                 <i class="fa-solid fa-bell" id="notification-icon" style="font-size: 20px; cursor: pointer;"></i>
                 {% if notification_count > 0 %}
@@ -284,6 +312,7 @@
                 </div>
             </div>
 
+            <!-- User -->
             <div style="position: relative;">
                 <i class="fas fa-user-circle" id="user-icon" style="font-size: 24px; cursor: pointer;"></i>
                 <div id="user-popup" style="display: none; position: absolute; top: 43px; right: 0; background: white; color: #333; border: 1px solid #ccc; border-radius: 8px; width: 220px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 15px; z-index: 1000; text-align: center;">
@@ -294,44 +323,74 @@
                         <strong>{{ logged_in_employee.name }}</strong>
                     </p>
                     <p style="font-size: 13px; color: #555;">Employee ID: {{ logged_in_employee.employee_userid }}</p>
-                    <a href="{% url 'employee_logout' %}" style="background: #800000; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 7px;">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                    {% else %}
-                    <p style="margin: 0; font-size: 14px; color: #800000;"><strong>Unknown User</strong></p>
+                    <a href="{% url 'employee_logout' %}" style="background: #800000; color: white; border-radius: 6px; padding: 5px 10px; font-size: 14px; display: inline-block; margin-top: 5px;">Logout</a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="content">
-        {% block content %}{% endblock %}
+    <!-- Main Area -->
+    <div class="main-area">
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
 
+    <!-- Footer -->
     <div class="footer">
-        Designed and Developed by CKP Software Technologies &copy; 2025. All rights reserved.
+        &copy; {{ year }} Pinnacle School. All rights reserved.
     </div>
 
+    <!-- JS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const userIcon = document.getElementById("user-icon");
+            const userPopup = document.getElementById("user-popup");
+            const menuToggle = document.querySelector(".menu-toggle");
+            const sidebar = document.querySelector(".sidebar");
+            const notificationIcon = document.getElementById("notification-icon");
+            const notificationPopup = document.getElementById("notification-popup");
 
+            // Toggle user popup
+            userIcon.addEventListener("click", function (e) {
+                e.stopPropagation();
+                userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!userPopup.contains(e.target) && e.target !== userIcon) {
+                    userPopup.style.display = "none";
+                }
+                if (!notificationPopup.contains(e.target) && e.target !== notificationIcon) {
+                    notificationPopup.style.display = "none";
+                }
+            });
+
+            // Toggle notifications
+            notificationIcon.addEventListener("click", function (e) {
+                e.stopPropagation();
+                notificationPopup.style.display = notificationPopup.style.display === "block" ? "none" : "block";
+            });
+
+            // Mobile sidebar toggle
+            if(menuToggle){
+                menuToggle.addEventListener("click", function () {
+                    sidebar.classList.toggle("active");
+                });
+            }
+
+            // Dropdowns
+            const dropdownBtns = document.querySelectorAll(".dropdown-btn");
+            dropdownBtns.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    const dropdownContent = this.nextElementSibling;
+                    dropdownContent.classList.toggle("show");
+                });
+            });
+        });
+    </script>
 </body>
 </html>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const userIcon = document.getElementById("user-icon");
-        const userPopup = document.getElementById("user-popup");
-
-        // Toggle popup on icon click
-        userIcon.addEventListener("click", function (e) {
-            e.stopPropagation();
-            userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
-        });
-
-        // Close popup if clicked outside
-        document.addEventListener("click", function (e) {
-            if (!userPopup.contains(e.target) && e.target !== userIcon) {
-                userPopup.style.display = "none";
-            }
-        });
-    });
-</script>

@@ -4,9 +4,7 @@
 {% block title %}Daily Timetable{% endblock %}
 
 {% block content %}
-<!-- ? Optional: Debug form_permissions -->
-<!-- Remove after confirming sidebar shows up -->
-<pre style="display:none;">{{ form_permissions|safe }}</pre>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
     body {
@@ -20,9 +18,8 @@
         padding: 30px;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 10px;
-        margin-left: 200px;
-        margin-right: 20px;
+        margin: 20px auto;
+        max-width: 1100px;
     }
 
     h2 {
@@ -30,24 +27,25 @@
         font-weight: 700;
         color: #800000;
         margin-bottom: 24px;
-        margin-top: -17px;
         font-size: 22px;
     }
 
-    .form-select {
-        font-size: 12px !important;
-        padding: 4px 8px;
+    /* Dropdowns */
+    .form-control, .form-select {
+        font-size: 13px !important;
+        padding: 7px 10px;
         height: auto;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        transition: border-color 0.3s;
     }
 
-        .form-select:focus {
-            border-color: #800000;
-            box-shadow: 0 0 0 0.2rem rgba(128, 0, 0, 0.25);
-            outline: none;
-        }
+    .form-control:focus, .form-select:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 0.15rem rgba(128, 0, 0, 0.25);
+    }
 
+    /* Table */
     table {
         width: 100%;
         font-size: 12px;
@@ -57,12 +55,12 @@
     th, td {
         vertical-align: middle !important;
         text-align: center;
-        padding: 5px;
+        padding: 6px 8px;
         border: 1px solid #dee2e6;
     }
 
     td {
-        font-size: 10px;
+        font-size: 11px;
     }
 
     thead {
@@ -74,36 +72,13 @@
         background-color: #f8f9fa;
     }
 
-    .content {
-        margin-left: 200px;
-        padding: 38px 26px 40px;
-        min-height: 100vh;
-    }
-
-    .search-form {
-        position: absolute;
-        left: 0;
-        padding: 6px 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 13px;
-        width: 200px;
-    }
-
-        .search-form input {
-            padding: 6px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 13px;
-            width: 200px;
-        }
-
+    /* Search bar + header */
     .header-flex {
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .search-form {
@@ -111,13 +86,19 @@
         left: 0;
         padding: 6px 10px;
         border: 1px solid #ccc;
-        border-radius: 4px;
+        border-radius: 6px;
         font-size: 13px;
-        width: 200px;
-        top: 14px;
+        width: 220px;
     }
-</style>
-<style>
+
+    /* Filter row */
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* Buttons and icons */
     .icon-btn {
         border: 1px solid #dee2e6;
         background-color: #fff;
@@ -130,33 +111,19 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
-
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
-
-    .alert {
-        color: #800000;
+    .icon-btn i {
         font-size: 11px;
-        font-weight: 500;
-        padding: 10px 0;
-        text-align: center;
+        color: #800000;
     }
 
-    .content {
-        margin-left: 0px;
-        padding: 29px 24px 40px;
-        min-height: 100vh;
+    .icon-btn.text-danger i {
+        color: #b30000;
     }
 
+    /* Confirmation + Snackbar */
     #overlay {
         position: fixed;
-        top: 0;
-        left: 0;
+        top: 0; left: 0;
         width: 100vw;
         height: 100vh;
         background: rgba(0,0,0,0.5);
@@ -191,10 +158,10 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
 
     #snackbar {
         visibility: hidden;
@@ -212,37 +179,88 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
-    .form-control {
-        font-size: 12px !important;
-        padding: 4px 8px;
-        height: auto;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        margin-bottom: 15px;
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
     }
 
-    .filter-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 29px; /* THIS is where gap works */
+    @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+    }
+
+    /* ---------- RESPONSIVE DESIGN ---------- */
+    @media (max-width: 992px) {
+        .container {
+            padding: 25px;
+            margin: 10px;
+        }
+        .search-form {
+            width: 180px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            max-width: 95%;
+            padding: 20px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .filter-row {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .form-control, .form-select {
+            width: 100%;
+            font-size: 13px;
+            padding: 8px 10px;
+        }
+        .search-form {
+            position: static;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .header-flex {
+            flex-direction: column;
+        }
+        table {
+            font-size: 11px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+
+    @media (max-width: 480px) {
+        h2 {
+            font-size: 18px;
+        }
+        .form-control, .form-select {
+            font-size: 12px;
+            padding: 7px 9px;
+        }
+        table th, table td {
+            padding: 5px 4px;
+        }
     }
 </style>
+
 <div class="container">
     <div class="header-flex">
         <input type="text" id="timetableSearch" class="search-form" placeholder="Search Subject, Faculty, or Room...">
         <h2>Daily Timetable</h2>
     </div>
 
-
     <form method="get" id="daily-filter-form">
         <div class="filter-row">
-
-            <!-- Program Type -->
-            <!--<label for="id_course_type">Program Type:</label>-->
             <select name="course_type" id="id_course_type" class="form-control">
                 <option value="">Select Program Type</option>
                 {% for pt in program_types %}
@@ -250,8 +268,6 @@
                 {% endfor %}
             </select>
 
-            <!-- Academic Year -->
-            <!--<label for="id_academic_year">Academic Year:</label>-->
             <select name="academic_year" id="id_academic_year" class="form-control">
                 <option value="">-- Select Academic Year --</option>
                 {% for ay in academic_years %}
@@ -259,8 +275,6 @@
                 {% endfor %}
             </select>
 
-            <!-- Course -->
-            <!--<label for="id_course">Course:</label>-->
             <select name="course" id="id_course" class="form-control">
                 <option value="">Select Course</option>
                 {% for c in courses %}
@@ -268,8 +282,6 @@
                 {% endfor %}
             </select>
 
-            <!-- Semester -->
-            <!--<label for="id_semester">Semester:</label>-->
             <select name="semester" id="id_semester" class="form-control">
                 <option value="">Select Semester</option>
                 {% for sem in semesters %}
@@ -277,23 +289,17 @@
                 {% endfor %}
             </select>
 
-            <!-- Day -->
-            <!--<label for="id_day">Day:</label>-->
             <select name="day" id="id_day" class="form-control">
                 {% for day in week_days %}
                 <option value="{{ day }}" {% if day == selected_day %}selected{% endif %}>{{ day }}</option>
                 {% endfor %}
             </select>
-
-           
         </div>
     </form>
 
-
-
     {% if entries %}
     <div class="table-responsive mt-4">
-        <table>
+        <table class="table table-bordered table-striped align-middle">
             <thead>
                 <tr>
                     <th>Time</th>
@@ -313,51 +319,26 @@
                     <td>
                         {{ entry.faculty.name }}
                         {% if entry.is_substituted %}
-                        <span style="
-                            background-color: #800000;
-                            color: #fff;
-                            padding: 2px 8px;
-                            font-size: 11px;
-                            border-radius: 999px;
-                            display: inline-block;
-                        ">
-                            Substitute
-                        </span>
+                        <span style="background-color: #800000; color: #fff; padding: 2px 8px; font-size: 11px; border-radius: 999px;">Substitute</span>
                         {% endif %}
                     </td>
-
-
                     <td>
                         <span class="{% if entry.attendance_status == 'Present' %}text-success{% else %}text-danger{% endif %}">
                             {{ entry.attendance_status }}
                         </span>
-
                     </td>
                     <td>{{ entry.room }}</td>
                     <td>
                         {% if form_permissions.timetable_form.edit %}
-                        <a href="{% url 'timetable_form_edit' entry.id %}?date={{ selected_date|date:'Y-m-d' }}" class="icon-btn" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
+                        <a href="{% url 'timetable_form_edit' entry.id %}?date={{ selected_date|date:'Y-m-d' }}" class="icon-btn" title="Edit"><i class="fas fa-edit"></i></a>
                         {% endif %}
-
                         {% if entry.is_substituted %}
                         {% if form_permissions.timetable_form.view %}
-                        <a href="{% url 'timetable_form_view' entry.id %}" class="icon-btn" title="View">
-                            <i class="fas fa-eye"></i>
-                        </a>
+                        <a href="{% url 'timetable_form_view' entry.id %}" class="icon-btn" title="View"><i class="fas fa-eye"></i></a>
                         {% endif %}
-
                         {% if form_permissions.timetable_form.delete %}
-                        <form id="sub-delete-form-{{ entry.substitution_id }}" method="POST" action="{% url 'timetable_form_delete' entry.substitution_id %}" style="display: none;">
-                            {% csrf_token %}
-                        </form>
-
-                        <a href="#" class="icon-btn text-danger" title="Delete"
-                           onclick="confirmSubDelete('{{ entry.substitution_id }}', '{{ entry.subject.name }}')">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-
+                        <form id="sub-delete-form-{{ entry.substitution_id }}" method="POST" action="{% url 'timetable_form_delete' entry.substitution_id %}" style="display: none;">{% csrf_token %}</form>
+                        <a href="#" class="icon-btn text-danger" title="Delete" onclick="confirmSubDelete('{{ entry.substitution_id }}', '{{ entry.subject.name }}')"><i class="fas fa-trash-alt"></i></a>
                         {% endif %}
                         {% endif %}
                     </td>
@@ -366,316 +347,62 @@
                 {% endfor %}
             </tbody>
         </table>
-
-        <!-- ? Add confirmation popup below the table -->
-        <div id="overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000;"></div>
-
-        <div id="confirm-popup" style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%); background:#fff; padding:20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index:1001;">
-            <p id="confirm-popup-message" style="margin-bottom: 1rem; border:red;"></p>
-            <button id="confirm-yes" style="margin-right: 1rem;">Yes</button>
-            <button id="confirm-no">No</button>
-        </div>
     </div>
     {% else %}
     <div class="alert alert-warning text-center mt-4">No timetable entries found. Please apply filters.</div>
     {% endif %}
 </div>
 
-<script>
-    let deleteSubId = null;
-
-    function confirmSubDelete(id, subjectName) {
-        deleteSubId = id;
-        document.getElementById('confirm-popup').style.display = 'block';
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete substitution for <b>${subjectName}</b>?`;
-    }
-
-    document.getElementById('confirm-yes').addEventListener('click', () => {
-        if (deleteSubId) {
-            document.getElementById(`sub-delete-form-${deleteSubId}`).submit();
-        } else if (deleteYearId) {
-            document.getElementById(`academic-year-delete-form-${deleteYearId}`).submit();
-        }
-    });
-
-    document.getElementById('confirm-no').addEventListener('click', () => {
-        document.getElementById('confirm-popup').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-        deleteSubId = null;
-        deleteYearId = null;
-    });
-</script>
-
-
-<script>
-    document.getElementById('timetableSearch').addEventListener('input', function () {
-        const filter = this.value.toLowerCase();
-        const rows = document.querySelectorAll('table tbody tr');
-
-        rows.forEach(row => {
-            const subjectCell = row.querySelector('td:nth-child(2)');
-            const facultyCell = row.querySelector('td:nth-child(3)');
-            const roomCell = row.querySelector('td:nth-child(5)');
-
-            const subject = subjectCell ? subjectCell.textContent.toLowerCase() : '';
-            const faculty = facultyCell ? facultyCell.textContent.toLowerCase() : '';
-            const room = roomCell ? roomCell.textContent.toLowerCase() : '';
-
-            if (subject.includes(filter) || faculty.includes(filter) || room.includes(filter)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
-</script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    // Confirm delete popup logic
-let deleteSubId = null;
-
-function confirmSubDelete(subId, subjectName) {
-    deleteSubId = subId;
-    $('#overlay').show();
-    $('#confirm-popup').show();
-    $('#confirm-popup-message').html(`Are you sure you want to delete substitute for <b>${subjectName}</b>?`);
-}
-
-$('#confirm-yes').click(function () {
-    if (deleteSubId !== null) {
-        const form = document.getElementById(`sub-delete-form-${deleteSubId}`);
-        if (form) {
-            form.submit();
-        } else {
-            alert("Delete form not found!");
-        }
-    }
-});
-
-$('#confirm-no').click(function () {
-    $('#overlay').hide();
-    $('#confirm-popup').hide();
-    deleteSubId = null;
-});
-
-
-    </script>
-
+<!-- Confirm popup -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
 
 <div id="snackbar"></div>
 
-<script>
-    function showSnackbar(message) {
-        const snackbar = document.getElementById("snackbar");
-        snackbar.textContent = message;
-        snackbar.className = "show";
-        setTimeout(() => {
-            snackbar.className = snackbar.className.replace("show", "");
-        }, 3000);
-    }
-
-    {% if messages %}
-        {% for message in messages %}
-            showSnackbar("{{ message|escapejs }}");
-        {% endfor %}
-    {% endif %}
-</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        const programTypeSelect = $('#id_course_type');
-        const academicYearSelect = $('#id_academic_year');
-        const courseSelect = $('#id_course');
-        const semesterSelect = $('#id_semester');
-        const daySelect = $('#id_day');  // 👈 NEW
+let deleteSubId = null;
+function confirmSubDelete(id, subjectName) {
+    deleteSubId = id;
+    $('#overlay').show();
+    $('#confirm-popup').show();
+    $('#confirm-popup-message').html(`Are you sure you want to delete substitution for <b>${subjectName}</b>?`);
+}
+$('#confirm-yes').click(() => {
+    if (deleteSubId) document.getElementById(`sub-delete-form-${deleteSubId}`).submit();
+});
+$('#confirm-no').click(() => {
+    $('#overlay, #confirm-popup').hide();
+    deleteSubId = null;
+});
 
-        // Get query params from URL
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                course_type: params.get("course_type"),
-                academic_year: params.get("academic_year"),
-                course: params.get("course"),
-                semester: params.get("semester"),
-                day: params.get("day")
-            };
-        }
-
-        // Pre-select values in dropdowns if available
-        const initialValues = getQueryParams();
-
-        if (initialValues.course_type) programTypeSelect.val(initialValues.course_type);
-
-        // Trigger initial program type change to load courses + years
-        if (initialValues.course_type) {
-            $.get("{% url 'get_courses_and_years_by_program_type' %}", {
-                program_type_id: initialValues.course_type
-            }, function (data) {
-                academicYearSelect.empty().append($('<option>', { value: '', text: 'Select Batch' }));
-                $.each(data.academic_years, function (_, year) {
-                    academicYearSelect.append($('<option>', {
-                        value: year.id,
-                        text: year.year,
-                        selected: (year.id.toString() === initialValues.academic_year)
-                    }));
-                });
-
-                courseSelect.empty().append($('<option>', { value: '', text: 'Select Combination' }));
-                $.each(data.courses, function (_, course) {
-                    courseSelect.append($('<option>', {
-                        value: course.id,
-                        text: course.name,
-                        selected: (course.id.toString() === initialValues.course)
-                    }));
-                });
-
-                if (initialValues.course) {
-                    $.post("{% url 'get_semesters_by_course' %}", {
-                        course_id: initialValues.course,
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    }, function (semData) {
-                        semesterSelect.empty().append($('<option>', { value: '', text: 'Select Sem/Year' }));
-                        $.each(semData.semesters, function (_, semester) {
-                            semesterSelect.append($('<option>', {
-                                value: semester.number,
-                                text: semester.name,
-                                selected: (semester.number.toString() === initialValues.semester)
-                            }));
-
-                            if (initialValues.semester && initialValues.day) {
-                                daySelect.val(initialValues.day);
-                            }
-                        });
-                    });
-                }
-            });
-        }
-
-        // User selects program_type
-        programTypeSelect.change(function () {
-            const programTypeId = $(this).val();
-            if (!programTypeId) return;
-
-            academicYearSelect.empty().append($('<option>', { value: '', text: 'Select Batch' }));
-            courseSelect.empty().append($('<option>', { value: '', text: 'Select Combination' }));
-            semesterSelect.empty().append($('<option>', { value: '', text: 'Select Sem/Year' }));
-
-            $.get("{% url 'get_courses_and_years_by_program_type' %}", {
-                program_type_id: programTypeId
-            }, function (data) {
-                $.each(data.academic_years, function (_, year) {
-                    academicYearSelect.append($('<option>', {
-                        value: year.id,
-                        text: year.year
-                    }));
-                });
-
-                $.each(data.courses, function (_, course) {
-                    courseSelect.append($('<option>', {
-                        value: course.id,
-                        text: course.name
-                    }));
-                });
-            });
-        });
-
-        // User selects course
-        courseSelect.change(function () {
-            const courseId = $(this).val();
-            if (!courseId) return;
-
-            semesterSelect.empty().append($('<option>', { value: '', text: 'Select Sem/Year' }));
-
-            $.post("{% url 'get_semesters_by_course' %}", {
-                course_id: courseId,
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function (data) {
-                $.each(data.semesters, function (_, semester) {
-                    semesterSelect.append($('<option>', {
-                        value: semester.number,
-                        text: semester.name
-                    }));
-                });
-            });
-        });
-
-        // User selects semester
-        semesterSelect.change(function () {
-            const course_type = programTypeSelect.val();
-            const academic_year = academicYearSelect.val();
-            const course = courseSelect.val();
-            const semester = semesterSelect.val();
-            const day = daySelect.val();
-
-            if (course_type && academic_year && course && semester && day) {
-                const url = `?course_type=${course_type}&academic_year=${academic_year}&course=${course}&semester=${semester}&day=${day}`;
-                window.location.href = url;
-            }
-        });
-
-        // If user changes day after all other fields
-        daySelect.change(function () {
-            const course_type = programTypeSelect.val();
-            const academic_year = academicYearSelect.val();
-            const course = courseSelect.val();
-            const semester = semesterSelect.val();
-            const day = $(this).val();
-
-            if (course_type && academic_year && course && semester && day) {
-                const url = `?course_type=${course_type}&academic_year=${academic_year}&course=${course}&semester=${semester}&day=${day}`;
-                window.location.href = url;
-            }
-        });
+// Search filter
+$('#timetableSearch').on('input', function () {
+    const filter = this.value.toLowerCase();
+    $('table tbody tr').each(function () {
+        const subject = $(this).find('td:nth-child(2)').text().toLowerCase();
+        const faculty = $(this).find('td:nth-child(3)').text().toLowerCase();
+        const room = $(this).find('td:nth-child(5)').text().toLowerCase();
+        $(this).toggle(subject.includes(filter) || faculty.includes(filter) || room.includes(filter));
     });
+});
+
+// Snackbar for messages
+function showSnackbar(msg) {
+    const sb = document.getElementById("snackbar");
+    sb.textContent = msg;
+    sb.className = "show";
+    setTimeout(() => sb.className = sb.className.replace("show", ""), 3000);
+}
+{% if messages %}
+{% for message in messages %}
+showSnackbar("{{ message|escapejs }}");
+{% endfor %}
+{% endif %}
 </script>
-
-
-<style>
-    #snackbar {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: #800000;
-        color: #fff;
-        text-align: center;
-        border-radius: 4px;
-        padding: 14px 24px;
-        position: fixed;
-        z-index: 9999;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 14px;
-    }
-
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
-
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-</style>
-    {% endblock %}
+{% endblock %}

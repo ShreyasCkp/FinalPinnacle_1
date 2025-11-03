@@ -6,15 +6,19 @@
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
+    /* Card-style container */
     .container {
         background: #fff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        max-width: 500px;
+        padding: 30px 20px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        max-width: 420px;
         margin: 40px auto;
+        box-sizing: border-box;
     }
 
     h2 {
@@ -22,7 +26,7 @@
         font-weight: 700;
         color: #800000;
         margin-bottom: 24px;
-        font-size: 22px;
+        font-size: 24px;
     }
 
     label {
@@ -30,22 +34,30 @@
         margin-bottom: 5px;
         color: #333;
         font-weight: 600;
+        font-size: 14px;
     }
 
     input[type="text"],
     select,
     input[type="date"],
     input[type="number"] {
-        padding: 10px;
+        padding: 14px;
         width: 100%;
-        margin-bottom: 15px;
+        margin-bottom: 16px;
         border: 1px solid #ccc;
-        border-radius: 6px;
+        border-radius: 10px;
         font-size: 14px;
         box-sizing: border-box;
+        transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    /* Error styling */
+    input:focus,
+    select:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 3px rgba(128,0,0,0.1);
+        outline: none;
+    }
+
     .text-danger {
         font-size: 13px;
         margin-top: -10px;
@@ -57,48 +69,44 @@
         display: flex;
         justify-content: space-between;
         margin-top: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .back-button, .submit-button {
+        flex: 1 1 45%;
+        padding: 14px 0;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
     }
 
     .back-button {
         background-color: #800000;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: bold;
-        transition: background-color 0.3s;
-        cursor: pointer;
-        text-align: center;
-        display: inline-block;
-        width: 45%;
+        color: #fff;
     }
 
-        .back-button:hover {
-            background-color: #5a0000;
-            color: white;
-            text-decoration: none;
-        }
+    .back-button:hover {
+        background-color: #5a0000;
+        transform: scale(1.02);
+    }
 
     .submit-button {
         background-color: #800000;
-        color: white;
-        padding: 8px 16px;
+        color: #fff;
         border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 13px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        width: 45%;
     }
 
-        .submit-button:hover {
-            background-color: #a10000;
-        }
+    .submit-button:hover {
+        background-color: #a10000;
+        transform: scale(1.02);
+    }
 
-    /* Modal popup styles */
+    /* Modal popup */
     #overlay {
         position: fixed;
         top: 0;
@@ -115,45 +123,53 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: white;
-        padding: 20px 30px;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        background: #fff;
+        padding: 24px 20px;
+        border-radius: 14px;
+        box-shadow: 0 0 25px rgba(0,0,0,0.3);
         display: none;
         z-index: 9999;
-        max-width: 350px;
+        max-width: 320px;
         text-align: center;
         font-size: 16px;
         color: #333;
     }
 
-        #confirm-popup button {
-            margin: 10px 15px 0 15px;
-            padding: 8px 18px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-        }
+    #confirm-popup button {
+        margin: 10px 0 0 0;
+        padding: 12px 0;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+    }
 
-    #confirm-yes {
+    #confirm-ok {
         background-color: #800000;
         color: white;
     }
 
-        #confirm-yes:hover {
-            background-color: #a10000;
-        }
-
-    #confirm-no {
-        background-color: #ccc;
-        color: #333;
+    #confirm-ok:hover {
+        background-color: #a10000;
     }
 
-        #confirm-no:hover {
-            background-color: #aaa;
+    /* Responsive */
+    @media (max-width: 480px) {
+        .container {
+            margin: 20px;
+            padding: 24px 16px;
         }
+
+        .form-buttons {
+            flex-direction: column;
+        }
+
+        .back-button, .submit-button {
+            flex: 1 1 100%;
+        }
+    }
 </style>
 
 <div class="container">
@@ -170,17 +186,17 @@
         {% endfor %}
 
         <div class="form-buttons">
-            <a href="{% url 'book_list' %}" class="back-button">Back </a>
+            <a href="{% url 'book_list' %}" class="back-button">Back</a>
             <button type="submit" class="submit-button">Submit</button>
         </div>
     </form>
 </div>
 
-<!-- Modal popup HTML -->
+<!-- Modal popup -->
 <div id="overlay"></div>
 <div id="confirm-popup">
     <p id="confirm-popup-message"></p>
-    <button id="confirm-ok" style="background:#800000; color:white;">OK</button>
+    <button id="confirm-ok">OK</button>
 </div>
 
 <script>
@@ -190,7 +206,6 @@
         const bookField = form.querySelector('select[name="book"]');
         const studentField = form.querySelector('select[name="student"]');
 
-        // Elements for modal popup
         const overlay = document.getElementById('overlay');
         const popup = document.getElementById('confirm-popup');
         const popupMessage = document.getElementById('confirm-popup-message');
@@ -207,13 +222,8 @@
             popup.style.display = 'none';
         }
 
-        popupOkBtn.addEventListener('click', function () {
-            hidePopup();
-        });
-
-        overlay.addEventListener('click', function () {
-            hidePopup();
-        });
+        popupOkBtn.addEventListener('click', hidePopup);
+        overlay.addEventListener('click', hidePopup);
 
         form.addEventListener('submit', function (e) {
             const bookId = bookField.value;
@@ -228,12 +238,11 @@
                 }
             }
         });
-    // ✅ Disable past dates
-    const dateInputs = document.querySelectorAll('input[type="date"]');
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    dateInputs.forEach(input => {
-        input.setAttribute('min', today);
-    });
+
+        // Disable past dates
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        const today = new Date().toISOString().split('T')[0];
+        dateInputs.forEach(input => input.setAttribute('min', today));
     });
 </script>
 {% endblock %}

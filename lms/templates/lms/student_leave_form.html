@@ -3,6 +3,7 @@
 
 {% block content %}
 <style>
+    /* General Container */
     .leave-form-container {
         max-width: 600px;
         margin: 40px auto;
@@ -14,49 +15,54 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-        .leave-form-container h2 {
-            text-align: center;
-            color: #800000;
-            margin-bottom: 20px;
-        }
+    .leave-form-container h2 {
+        text-align: center;
+        color: #800000;
+        margin-bottom: 20px;
+        font-size: 22px;
+    }
 
-        .leave-form-container label {
-            font-weight: bold;
-            display: block;
-            margin-top: 15px;
-            color: #333;
-        }
+    .leave-form-container label {
+        font-weight: 600;
+        display: block;
+        margin-top: 15px;
+        color: #333;
+        font-size: 15px;
+    }
 
-        .leave-form-container input[type="date"],
-        .leave-form-container textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
+    .leave-form-container input[type="date"],
+    .leave-form-container textarea,
+    .leave-form-container select,
+    .leave-form-container input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 6px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
 
-        .leave-form-container textarea {
-            resize: vertical;
-        }
+    .leave-form-container textarea {
+        resize: vertical;
+    }
 
-        .leave-form-container button[type="submit"] {
-            background-color: #800000;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            margin-top: 25px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
+    .leave-form-container button[type="submit"] {
+        background-color: #800000;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        margin-top: 25px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
 
-            .leave-form-container button[type="submit"]:hover {
-                background-color: #a00000;
-            }
+    .leave-form-container button[type="submit"]:hover {
+        background-color: #a00000;
+    }
 
     .error-msg {
         color: red;
@@ -65,7 +71,7 @@
         display: none;
     }
 
-    /* Modal */
+    /* MODAL */
     #confirmationModal {
         display: none;
         position: fixed;
@@ -95,11 +101,11 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.25);
     }
 
-        .modal-box p {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 20px;
-        }
+    .modal-box p {
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 20px;
+    }
 
     .modal-buttons button {
         margin: 0 10px;
@@ -110,15 +116,16 @@
         font-weight: bold;
     }
 
-        .modal-buttons button:first-child {
-            background-color: #800000;
-            color: white;
-        }
+    .modal-buttons button:first-child {
+        background-color: #800000;
+        color: white;
+    }
 
-        .modal-buttons button:last-child {
-            background-color: #ccc;
-        }
+    .modal-buttons button:last-child {
+        background-color: #ccc;
+    }
 
+    /* Snackbar */
     #snackbar {
         visibility: hidden;
         min-width: 250px;
@@ -135,10 +142,10 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
         from {
@@ -163,10 +170,75 @@
             opacity: 0;
         }
     }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 768px) {
+        .leave-form-container {
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .leave-form-container h2 {
+            font-size: 20px;
+        }
+
+        .leave-form-container label {
+            font-size: 14px;
+        }
+
+        .leave-form-container input,
+        .leave-form-container textarea {
+            font-size: 13px;
+        }
+
+        .leave-form-container button[type="submit"] {
+            font-size: 15px;
+            padding: 10px;
+        }
+
+        .modal-box {
+            width: 90%;
+            margin: 40% auto;
+            padding: 15px;
+        }
+
+        .modal-box p {
+            font-size: 15px;
+        }
+
+        .modal-buttons button {
+            padding: 8px 14px;
+            font-size: 14px;
+        }
+
+        #snackbar {
+            font-size: 13px;
+            padding: 12px 18px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .leave-form-container {
+            width: 95%;
+            padding: 15px;
+            margin: 10px auto;
+        }
+
+        .modal-box {
+            margin: 50% auto;
+            width: 92%;
+        }
+
+        .leave-form-container h2 {
+            font-size: 18px;
+        }
+    }
 </style>
 
 <div class="leave-form-container">
     <h2>Apply for Leave</h2>
+
     {% if not attendance_allowed %}
     <div class="error-msg" style="display:block; color: red; font-weight: bold; text-align: center;">
         You cannot apply for leave because your attendance ({{ attendance_rate }}%) is less than 75%.
@@ -193,9 +265,9 @@
     </form>
 </div>
 
-<!-- Modal -->
+<!-- Confirmation Modal -->
 <div id="confirmationModal">
-    <div class="modal-overlay"></div>
+    <div class="modal-overlay" onclick="closeModal()"></div>
     <div class="modal-box">
         <p>Are you sure you want to submit this leave request?</p>
         <div class="modal-buttons">
@@ -211,11 +283,13 @@
     // Disable past dates
     document.addEventListener('DOMContentLoaded', () => {
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById("id_from_date").setAttribute('min', today);
-        document.getElementById("id_to_date").setAttribute('min', today);
+        const fromDateField = document.getElementById("id_from_date");
+        const toDateField = document.getElementById("id_to_date");
+        if (fromDateField) fromDateField.setAttribute('min', today);
+        if (toDateField) toDateField.setAttribute('min', today);
     });
 
-    // Leave records from backend
+    // Existing leaves data
     const existingLeaves = [
         {% for leave in leaves %}
         {
@@ -226,27 +300,22 @@
     ];
 
     function isDateOverlapping(fromDate, toDate) {
-        for (const leave of existingLeaves) {
-            if (toDate >= leave.from && fromDate <= leave.to) {
-                return true;
-            }
-        }
-        return false;
+        return existingLeaves.some(leave => toDate >= leave.from && fromDate <= leave.to);
     }
 
     function validateLeaveDates() {
-        const fromDateValue = document.getElementById("id_from_date").value;
-        const toDateValue = document.getElementById("id_to_date").value;
+        const fromValue = document.getElementById("id_from_date").value;
+        const toValue = document.getElementById("id_to_date").value;
         const errorDiv = document.getElementById("date-error");
 
-        if (!fromDateValue || !toDateValue) {
+        if (!fromValue || !toValue) {
             errorDiv.innerText = "Both From and To dates are required.";
             errorDiv.style.display = "block";
             return false;
         }
 
-        const fromDate = new Date(fromDateValue);
-        const toDate = new Date(toDateValue);
+        const fromDate = new Date(fromValue);
+        const toDate = new Date(toValue);
 
         if (fromDate > toDate) {
             errorDiv.innerText = "From Date cannot be after To Date.";
@@ -255,7 +324,7 @@
         }
 
         if (isDateOverlapping(fromDate, toDate)) {
-            errorDiv.innerText = "You have already applied for leave during these dates.";
+            errorDiv.innerText = "You already applied for leave during these dates.";
             errorDiv.style.display = "block";
             return false;
         }
@@ -264,23 +333,22 @@
         return true;
     }
 
+    // Snackbar function
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
         snackbar.className = "show";
-        setTimeout(() => {
-            snackbar.className = snackbar.className.replace("show", "");
-        }, 3000);
+        setTimeout(() => snackbar.className = snackbar.className.replace("show", ""), 3000);
     }
 
-    // Handle Django messages
+    // Django messages
     {% if messages %}
         {% for message in messages %}
             showSnackbar("{{ message|escapejs }}");
         {% endfor %}
     {% endif %}
 
-    // Confirmation modal
+    // Modal functions
     function showCustomConfirmation() {
         const attendanceAllowed = {{ attendance_allowed|yesno:"true,false"|lower }};
         if (!attendanceAllowed) {
@@ -288,12 +356,10 @@
             return false;
         }
 
-        if (!validateLeaveDates()) {
-            return false;
-        }
+        if (!validateLeaveDates()) return false;
 
         document.getElementById("confirmationModal").style.display = "block";
-        return false; // Prevent form submission
+        return false;
     }
 
     function closeModal() {

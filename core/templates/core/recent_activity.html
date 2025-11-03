@@ -46,9 +46,9 @@
         transition: background 0.2s ease;
     }
 
-        .activity-item:last-child {
-            border-bottom: none;
-        }
+    .activity-item:last-child {
+        border-bottom: none;
+    }
 
     .activity-avatar {
         width: 42px;
@@ -100,33 +100,36 @@
         padding: 40px 0;
     }
 
-    @media (max-width: 600px) {
-        .activities-container {
-            padding: 20px 15px;
-        }
-
-        .activities-header {
-            font-size: 1.5em;
-        }
-
-        .activity-text {
-            font-size: 1em;
-        }
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        list-style: none;
+        padding: 0;
+        margin-top: 25px;
+        flex-wrap: wrap;
     }
 
     .pagination li {
         display: inline-block;
-        margin: 0 3px;
     }
 
-    .pagination a, .pagination strong {
+    .pagination a,
+    .pagination strong {
         color: #800000;
         text-decoration: none;
-        padding: 4px 8px;
+        padding: 5px 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
         font-weight: 500;
-        font-size: 12px;
+        font-size: 13px;
+        transition: all 0.2s ease;
+    }
+
+    .pagination a:hover {
+        background: #800000;
+        color: #fff;
     }
 
     .pagination strong {
@@ -135,11 +138,118 @@
         border-color: #800000;
     }
 
+    /* Adjust content alignment inside layout */
     .content {
         margin-left: 200px;
-        padding: 0px 0px 40px;
+        padding: 80px 20px 40px;
         min-height: 100vh;
+        background: #f9f9f9;
     }
+
+    /* MOBILE VIEW */
+    @media (max-width: 768px) {
+        .activities-container {
+            max-width: 100%;
+            margin: 20px 10px;
+            padding: 20px 15px;
+            border-radius: 10px;
+        }
+
+        .activities-header {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .activity-item {
+            flex-direction: row;
+            gap: 12px;
+            padding: 15px 0;
+        }
+
+        .activity-avatar {
+            width: 38px;
+            height: 38px;
+            font-size: 1em;
+        }
+
+        .activity-text {
+            font-size: 0.98em;
+            line-height: 1.4;
+        }
+
+        .activity-action {
+            font-size: 0.85em;
+            padding: 1px 8px;
+            margin: 0 3px;
+        }
+
+        .activity-time {
+            font-size: 0.85em;
+        }
+
+        .pagination a,
+        .pagination strong {
+            font-size: 11.5px;
+            padding: 4px 7px;
+        }
+
+        .content {
+            margin-left: 0;
+            padding: 70px 12px 30px;
+        }
+    }
+
+    /* VERY SMALL DEVICES (Phones < 480px) */
+    @media (max-width: 480px) {
+        .activities-container {
+            padding: 15px 10px;
+        }
+
+        .activity-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .activity-avatar {
+            margin-bottom: 8px;
+        }
+
+        .activities-header {
+            font-size: 1.3em;
+        }
+
+        .activity-text {
+            font-size: 0.95em;
+        }
+
+        .pagination a,
+        .pagination strong {
+            font-size: 11px;
+            padding: 3px 6px;
+        }
+    }
+
+    @media (max-width: 768px) {
+    .content {
+        margin-left: 0;
+        padding: 21px 7px 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .activity-item {
+        /* flex-direction: column; */
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .activity-item {
+        flex-direction: row;
+        gap: 12px;
+        padding: 15px 0;
+    }
+}
 </style>
 
 <div class="activities-container">
@@ -171,34 +281,29 @@
     {% endif %}
 
     {% if page_obj.has_other_pages %}
-    <div style="text-align: center; margin-top: 20px;">
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center" style="gap: 6px; list-style: none; padding: 0;">
-                {% if page_obj.number > 1 %}
-                <li><a href="?page=1">first</a></li>
-                <li><a href="?page={{ page_obj.previous_page_number }}">prev</a></li>
-                {% endif %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.number > 1 %}
+            <li><a href="?page=1">first</a></li>
+            <li><a href="?page={{ page_obj.previous_page_number }}">prev</a></li>
+            {% endif %}
 
-                {% for i in page_obj.paginator.page_range %}
-                {% if i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
-                {% if i == page_obj.number %}
-                <li><strong>{{ i }}</strong></li>
-                {% else %}
-                <li><a href="?page={{ i }}">{{ i }}</a></li>
-                {% endif %}
-                {% endif %}
-                {% endfor %}
+            {% for i in page_obj.paginator.page_range %}
+            {% if i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
+            {% if i == page_obj.number %}
+            <li><strong>{{ i }}</strong></li>
+            {% else %}
+            <li><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
 
-                {% if page_obj.has_next %}
-                <li><a href="?page={{ page_obj.next_page_number }}">next</a></li>
-                <li><a href="?page={{ page_obj.paginator.num_pages }}">last</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
+            {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}">next</a></li>
+            <li><a href="?page={{ page_obj.paginator.num_pages }}">last</a></li>
+            {% endif %}
+        </ul>
+    </nav>
     {% endif %}
 </div>
-
-
-
 {% endblock %}

@@ -1,14 +1,97 @@
 {% extends 'master/bare.html' %}
 {% block title %}Choose Passcode{% endblock %}
+
 {% block content %}
-<h2>Choose a Passcode</h2>
-{% if error %}
-<div class="alert">{{ error }}</div>
-{% endif %}
-<form method="post">
-    {% csrf_token %}
-    <label for="passcode">Passcode (at least 4 digits):</label>
-    <input type="password" name="passcode" id="passcode" minlength="4" maxlength="10" pattern="\d{4,10}" required autofocus>
-    <button type="submit">Set Passcode</button>
-</form>
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Mobile container */
+    .mobile-container {
+        display: block;
+        max-width: 100%;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        box-sizing: border-box;
+    }
+
+    h2 {
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .alert {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px 15px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        font-size: 13px;
+        text-align: center;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    label {
+        font-size: 13px;
+        color: #333;
+    }
+
+    input[type="password"] {
+        padding: 8px 10px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    button {
+        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: bold;
+        background-color: #800000;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #a10000;
+    }
+
+    /* Hide container on larger screens */
+    @media (min-width: 768px) {
+        .mobile-container {
+            display: none;
+        }
+    }
+</style>
+
+<div class="mobile-container">
+    <h2>Choose a Passcode</h2>
+    {% if error %}
+    <div class="alert">{{ error }}</div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label for="passcode">Passcode (at least 4 digits):</label>
+        <input type="password" name="passcode" id="passcode" minlength="4" maxlength="10" pattern="\d{4,10}" required autofocus>
+        <button type="submit">Set Passcode</button>
+    </form>
+</div>
 {% endblock %}

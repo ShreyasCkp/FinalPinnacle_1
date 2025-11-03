@@ -20,6 +20,7 @@
         padding: 30px;
         border-radius: 12px;
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        box-sizing: border-box;
     }
 
     h3 {
@@ -45,6 +46,7 @@
         border: 1px solid #ccc;
         margin-bottom: 16px;
         width: 100%;
+        box-sizing: border-box;
     }
 
     .btn-save {
@@ -57,9 +59,9 @@
         border-radius: 8px;
     }
 
-        .btn-save:hover {
-            background-color: #8a1f1f;
-        }
+    .btn-save:hover {
+        background-color: #8a1f1f;
+    }
 
     .btn-back {
         background-color: #800000;
@@ -69,22 +71,54 @@
         color: white;
         border-radius: 8px;
         text-decoration: none;
+        text-align: center;
     }
 
-        .btn-back:hover {
-            background-color: #6e0000;
-            color: white;
-        }
+    .btn-back:hover {
+        background-color: #6e0000;
+        color: white;
+    }
 
     .btn-container {
         display: flex;
         justify-content: space-between;
         margin-top: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .content {
         padding: 2px 26px 40px;
         margin-left: 200px;
+    }
+
+    /* Responsive adjustments for mobile */
+    @media (max-width: 767px) {
+        .form-container {
+            margin: 15px;
+            padding: 20px;
+            width: auto;
+        }
+
+        h3 {
+            font-size: 20px;
+        }
+
+        .btn-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-back, .btn-save {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .content {
+            margin-left: 0;
+            padding: 15px 10px 30px;
+        }
     }
 </style>
 
@@ -98,6 +132,7 @@
         Add Program Type
         {% endif %}
     </h3>
+
     <form method="post">
         {% csrf_token %}
         {{ form.non_field_errors }}
@@ -165,4 +200,4 @@
     });
 </script>
 
-    {% endblock %}
+{% endblock %}

@@ -1,29 +1,32 @@
 {% extends 'layout.html' %}
-{% block title %}        {% if action == 'edit' %}Edit Role{% elif action == 'view' %}View Role{% else %}Add New Role{% endif %}
-{% endblock %}
+{% block title %} {% if action == 'edit' %}Edit Role{% elif action == 'view' %}View Role{% else %}Add New Role{% endif %} {% endblock %}
 
 {% block content %}
 <style>
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
     .container {
         background: #fff;
-        padding: 30px;
+        padding: 20px;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         max-width: 400px;
-        margin: 40px auto;
+        margin: 20px auto;
+        width: 90%;
+        box-sizing: border-box;
     }
 
     h2 {
         text-align: center;
         font-weight: 700;
         color: #800000;
-        margin-bottom: 24px;
-        font-size: 22px;
+        margin-bottom: 20px;
+        font-size: 20px;
     }
 
     label {
@@ -31,6 +34,7 @@
         margin-bottom: 5px;
         color: #333;
         font-weight: 600;
+        font-size: 14px;
     }
 
     input[type="text"],
@@ -41,6 +45,7 @@
         border: 1px solid #ccc;
         border-radius: 6px;
         font-size: 14px;
+        box-sizing: border-box;
     }
 
     input[readonly] {
@@ -48,60 +53,79 @@
         color: #495057;
     }
 
-    button[type="submit"] {
-        background-color: #800000;
-        color: white;
-        padding: 5px 9px;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 12px;
-        width: 17%;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    /*  button[type="submit"]:hover {
-            background-color: #a10000;
-        }*/
-
     .form-buttons {
         display: flex;
         justify-content: space-between;
-        margin-top: 20px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .back-button, .submit-button {
+        flex: 1 1 48%;
+        text-align: center;
+        padding: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
     }
 
     .back-button {
         background-color: #800000;
         color: white;
-        padding: 8px 16px;
         border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: bold;
-        transition: background-color 0.3s;
     }
 
-    /* .back-button:hover {
-            background-color: #5a6268;
-        }*/
+    .back-button:hover {
+        background-color: #a10000;
+    }
 
     .submit-button {
         background-color: #800000;
         color: white;
-        padding: 8px 16px;
         border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 13px;
-        cursor: pointer;
-        transition: background-color 0.3s;
     }
 
-        .submit-button:hover {
-            background-color: #a10000;
+    .submit-button:hover {
+        background-color: #a10000;
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 15px;
+            margin: 10px auto;
         }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 13px;
+        }
+
+        input[type="text"], select {
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        .back-button, .submit-button {
+            flex: 1 1 100%;
+            font-size: 13px;
+            padding: 8px;
+        }
+    }
+
+@media (max-width: 768px) {
+    .content {
+        margin-left: 0;
+        padding: 25px 18px 8px;
+    }
+}
 </style>
 
 <div class="container">
@@ -161,11 +185,6 @@
         const passwordInput = document.getElementById('password');
 
         function validatePassword(password) {
-            // Password must:
-            // - Start with a capital letter
-            // - Include at least one special character from !@#$%^&*(),.?":{}|<>
-            // - End with a digit
-            // - Be 8-16 characters long
             const pattern = /^[A-Z][a-z]*[!@#$%^&*(),.?":{}|<>][a-zA-Z0-9]*[0-9]$/;
             return pattern.test(password) && password.length >= 8 && password.length <= 16;
         }
@@ -205,7 +224,6 @@
             }
         });
 
-        // Optional: live feedback while typing
         passwordInput.addEventListener('input', function () {
             if (validatePassword(this.value.trim())) {
                 clearError();

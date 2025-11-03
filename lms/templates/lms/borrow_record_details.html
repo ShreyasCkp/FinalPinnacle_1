@@ -12,16 +12,17 @@
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
     .container {
-        margin-left: 200px;
-        max-width: calc(100% - 200px);
-        padding: 30px;
-        background: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        margin-top: 40px;
+        background: #fff;
+        margin: 20px auto;
+        padding: 24px 16px;
+        border-radius: 16px;
+        max-width: 420px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         box-sizing: border-box;
     }
 
@@ -30,18 +31,18 @@
         color: #800000;
         font-size: 24px;
         font-weight: 700;
-        margin-bottom: 30px;
+        margin-bottom: 24px;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 14px;
         margin-bottom: 25px;
+        font-size: 14px;
     }
 
     th, td {
-        padding: 10px 15px;
+        padding: 12px 10px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
@@ -50,7 +51,6 @@
         background-color: #800000;
         color: white;
         font-weight: 600;
-        width: 200px;
     }
 
     tr:nth-child(even) {
@@ -67,30 +67,6 @@
         font-weight: bold;
     }
 
-    .btn-group {
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-    }
-
-    .btn-action {
-        background-color: #800000;
-        color: #fff;
-        font-size: 14px;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-        .btn-action:hover {
-            background-color: #a10000;
-        }
-
     .not-returned {
         color: #a10000;
         font-weight: bold;
@@ -99,37 +75,62 @@
     .btn-group-outer {
         display: flex;
         justify-content: space-between;
-        margin-top: 40px;
-        align-items: center;
         flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
     }
 
-    .left-btn,
-    .right-btn {
-        display: flex;
+    .btn-action {
+        flex: 1 1 48%;
+        text-align: center;
+        padding: 14px 0;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 12px;
+        color: #fff;
+        background-color: #800000;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+    }
+
+    .btn-action:hover {
+        background-color: #a10000;
+        transform: scale(1.02);
     }
 
     .left-btn {
-        justify-content: flex-start;
+        order: 1;
     }
 
     .right-btn {
-        justify-content: flex-end;
+        order: 2;
     }
 
-    .content {
-        margin-left: 0px;
-        padding: 0px 26px 40px;
-        min-height: 100vh;
+    @media (max-width: 480px) {
+        .container {
+            margin: 10px;
+            padding: 20px 14px;
+        }
+        .btn-action {
+            flex: 1 1 100%;
+        }
+        th, td {
+            padding: 10px 8px;
+        }
+        .page-title {
+            font-size: 20px;
+        }
     }
 </style>
 
 <div class="container">
     <h2 class="page-title">
         {% if borrow_record.returned %}
-        Book Returned
+            Book Returned
         {% else %}
-        Return Book
+            Return Book
         {% endif %}
     </h2>
 
@@ -166,9 +167,9 @@
             <th>Return Date:</th>
             <td>
                 {% if borrow_record.return_date %}
-                {{ borrow_record.return_date }}
+                    {{ borrow_record.return_date }}
                 {% else %}
-                <span class="not-returned">Not Returned Yet</span>
+                    <span class="not-returned">Not Returned Yet</span>
                 {% endif %}
             </td>
         </tr>
@@ -176,9 +177,9 @@
             <th>Status:</th>
             <td>
                 {% if borrow_record.returned %}
-                <span class="status-returned">Returned</span>
+                    <span class="status-returned">Returned</span>
                 {% else %}
-                <span class="status-pending">Pending</span>
+                    <span class="status-pending">Pending</span>
                 {% endif %}
             </td>
         </tr>
@@ -194,6 +195,5 @@
         </form>
         {% endif %}
     </div>
-
 </div>
 {% endblock %}

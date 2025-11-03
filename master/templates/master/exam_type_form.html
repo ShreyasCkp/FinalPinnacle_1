@@ -1,5 +1,4 @@
-﻿<!-- templates/exam_type_form.html -->
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 {% block title %}
     {% if form_type == 'create' %}Create Exam Type{% elif form_type == 'edit' %}Edit Exam Type{% elif form_type == 'view' %}View Exam Type{% else %}Delete Exam Type{% endif %}
 {% endblock %}
@@ -19,6 +18,7 @@
         padding: 30px;
         border-radius: 12px;
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        box-sizing: border-box;
     }
 
     h3 {
@@ -44,9 +44,9 @@
         border: 1px solid #ccc;
         margin-bottom: 16px;
         width: 100%;
+        box-sizing: border-box;
     }
 
-    /* 🚀 remove the ugly box around fieldset */
     fieldset {
         border: none;
         padding: 0;
@@ -62,11 +62,13 @@
         color: white;
         border: none;
         border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
     }
 
-        .btn-save:hover {
-            background-color: #8a1f1f;
-        }
+    .btn-save:hover {
+        background-color: #8a1f1f;
+    }
 
     .btn-back {
         background-color: #800000;
@@ -76,25 +78,97 @@
         color: white;
         border-radius: 8px;
         text-decoration: none;
+        text-align: center;
+        transition: background-color 0.3s;
     }
 
-        .btn-back:hover {
-            background-color: #6e0000;
-            color: white;
-        }
+    .btn-back:hover {
+        background-color: #6e0000;
+        color: white;
+    }
 
     .btn-container {
         display: flex;
         justify-content: space-between;
         margin-top: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-container .btn-save, 
+    .btn-container .btn-back, 
+    .btn-container .btn-danger {
+        flex: 1 1 auto;
+        text-align: center;
     }
 
     .content {
         padding: 25px 26px 40px;
         margin-left: 200px;
     }
-</style>
 
+    /* --- Mobile Styles --- */
+    @media (max-width: 992px) {
+        .form-container {
+            margin: 20px 15px;
+            padding: 20px;
+        }
+
+        h3 {
+            font-size: 20px;
+        }
+
+        .form-control, .form-select {
+            font-size: 13px;
+            padding: 5px;
+        }
+
+        .btn-save, .btn-back {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .form-container {
+            margin: 15px 10px;
+            padding: 15px;
+        }
+
+        h3 {
+            font-size: 18px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-control, .form-select {
+            font-size: 12px;
+            padding: 4px;
+        }
+
+        .btn-container {
+            flex-direction: column;
+        }
+
+        .btn-container .btn-save,
+        .btn-container .btn-back,
+        .btn-container .btn-danger {
+            width: 100%;
+        }
+
+        .btn-save, .btn-back, .btn-danger {
+            padding: 6px;
+            font-size: 12px;
+        }
+
+        .content {
+            padding: 15px;
+            margin-left: 0;
+        }
+    }
+</style>
 
 <div class="container form-container">
     <h3>
@@ -105,30 +179,30 @@
         {% csrf_token %}
 
         {% if form_type == 'create' or form_type == 'edit' %}
-        {{ form.as_p }}
-        <div class="btn-container">
-            <a href="{% url 'exam_type_list' %}" class="btn-back">Back</a>
-            <button type="submit" class="btn-save">
-                {% if form.instance.pk %}Update{% else %}Save{% endif %}
-            </button>
-        </div>
+            {{ form.as_p }}
+            <div class="btn-container">
+                <a href="{% url 'exam_type_list' %}" class="btn-back">Back</a>
+                <button type="submit" class="btn-save">
+                    {% if form.instance.pk %}Update{% else %}Save{% endif %}
+                </button>
+            </div>
 
         {% elif form_type == 'view' %}
-        <fieldset disabled>
-            {{ form.as_p }}
-        </fieldset>
-        <div class="btn-container">
-            <a href="{% url 'exam_type_list' %}" class="btn-back">Back</a>
-        </div>
+            <fieldset disabled>
+                {{ form.as_p }}
+            </fieldset>
+            <div class="btn-container">
+                <a href="{% url 'exam_type_list' %}" class="btn-back">Back</a>
+            </div>
 
         {% elif form_type == 'delete' %}
-        <fieldset disabled>
-            {{ form.as_p }}
-        </fieldset>
-        <div class="btn-container">
-            <button type="submit" class="btn btn-danger">Confirm Delete</button>
-            <a href="{% url 'exam_type_list' %}" class="btn-back">Cancel</a>
-        </div>
+            <fieldset disabled>
+                {{ form.as_p }}
+            </fieldset>
+            <div class="btn-container">
+                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                <a href="{% url 'exam_type_list' %}" class="btn-back">Cancel</a>
+            </div>
         {% endif %}
     </form>
 </div>

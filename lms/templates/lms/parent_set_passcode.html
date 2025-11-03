@@ -2,88 +2,123 @@
 {% block title %}Set Parent Passcode{% endblock %}
 
 {% block content %}
-<style>
-    body {
-        background-color: #f0f2f5;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+<!-- Add viewport meta -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
+body {
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    max-width: 400px;
+    width: 90%;
+    margin: 40px auto;
+    box-sizing: border-box;
+}
+
+h2 {
+    text-align: center;
+    font-weight: 700;
+    color: #800000;
+    margin-bottom: 24px;
+    font-size: 22px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 600;
+}
+
+input[type="password"] {
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+button[type="submit"] {
+    background-color: #800000;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 14px;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #a10000;
+}
+
+a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #800000;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #a10000;
+}
+
+.alert {
+    font-weight: 600;
+    color: red;
+    margin-bottom: 15px;
+}
+
+#error_passcode {
+    color: red;
+    margin-top: -12px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
     .container {
-        background: #fff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        max-width: 400px;
-        margin: 40px auto;
+        padding: 20px;
+        margin: 20px auto;
     }
 
     h2 {
-        text-align: center;
-        font-weight: 700;
-        color: #800000;
-        margin-bottom: 24px;
-        font-size: 22px;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 5px;
-        color: #333;
-        font-weight: 600;
+        font-size: 20px;
+        margin-bottom: 20px;
     }
 
     input[type="password"] {
-        padding: 10px;
-        width: 100%;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
+        font-size: 13px;
+        padding: 8px;
     }
 
     button[type="submit"] {
-        background-color: #800000;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
         font-size: 13px;
-        width: 100%;
-        cursor: pointer;
-        transition: background-color 0.3s;
+        padding: 8px;
     }
-
-        button[type="submit"]:hover {
-            background-color: #a10000;
-        }
 
     a {
-        display: inline-block;
-        margin-top: 10px;
-        color: #800000;
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-        a:hover {
-            text-decoration: underline;
-            color: #a10000;
-        }
-
-    .alert {
-        font-weight: 600;
-        color: red;
-        margin-bottom: 15px;
-    }
-
-    #error_passcode {
-        color: red;
-        margin-top: -12px;
-        margin-bottom: 15px;
         font-size: 13px;
-        font-weight: 600;
     }
+}
 </style>
 
 <div class="container">
@@ -112,47 +147,47 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('form');
-        const passcodeInput = document.getElementById('parent_passcode');
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const passcodeInput = document.getElementById('parent_passcode');
 
-        function validatePasscode(code) {
-            return /^\d{4,}$/.test(code);
+    function validatePasscode(code) {
+        return /^\d{4,}$/.test(code);
+    }
+
+    function showError(message) {
+        let errorDiv = document.getElementById('error_passcode');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.id = 'error_passcode';
+            passcodeInput.parentNode.insertBefore(errorDiv, passcodeInput.nextSibling);
         }
+        errorDiv.textContent = message;
+    }
 
-        function showError(message) {
-            let errorDiv = document.getElementById('error_passcode');
-            if (!errorDiv) {
-                errorDiv = document.createElement('div');
-                errorDiv.id = 'error_passcode';
-                passcodeInput.parentNode.insertBefore(errorDiv, passcodeInput.nextSibling);
-            }
-            errorDiv.textContent = message;
+    function clearError() {
+        const errorDiv = document.getElementById('error_passcode');
+        if (errorDiv) {
+            errorDiv.textContent = '';
         }
+    }
 
-        function clearError() {
-            const errorDiv = document.getElementById('error_passcode');
-            if (errorDiv) {
-                errorDiv.textContent = '';
-            }
+    form.addEventListener('submit', function (e) {
+        const code = passcodeInput.value.trim();
+        if (!validatePasscode(code)) {
+            e.preventDefault();
+            showError("Passcode must be at least 4 digits and numeric only.");
+            passcodeInput.focus();
+        } else {
+            clearError();
         }
-
-        form.addEventListener('submit', function (e) {
-            const code = passcodeInput.value.trim();
-            if (!validatePasscode(code)) {
-                e.preventDefault();
-                showError("Passcode must be at least 4 digits and numeric only.");
-                passcodeInput.focus();
-            } else {
-                clearError();
-            }
-        });
-
-        passcodeInput.addEventListener('input', function () {
-            if (validatePasscode(this.value.trim())) {
-                clearError();
-            }
-        });
     });
+
+    passcodeInput.addEventListener('input', function () {
+        if (validatePasscode(this.value.trim())) {
+            clearError();
+        }
+    });
+});
 </script>
 {% endblock %}

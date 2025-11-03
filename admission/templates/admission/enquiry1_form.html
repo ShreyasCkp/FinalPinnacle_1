@@ -1,8 +1,19 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 
 {% block title %}PU Enquiry Form{% endblock %}
 
-{% block content %}
+
+
+<style>
+@media (max-width: 768px) {
+  .topbar { left: 0; }
+  .main-area, .content, .footer { margin-left: 0 !important; padding: 70px 16px 24px !important; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .container { max-width: 100%; margin: 0; border-radius: 0; padding: 16px; }
+}
+</style>
 
 <style>
     .error-message {
@@ -68,7 +79,7 @@
     .form-group {
         display: flex;
         flex-direction: column;
-        width: 100%; /* ✅ Ensure each field spans full grid cell */
+        width: 100%; /* âœ… Ensure each field spans full grid cell */
     }
 
 
@@ -272,7 +283,7 @@
 <div style="width: 100vw; padding: 2rem;">
     <div class="form-card mx-auto" style="width: 67%; max-width: 100%; margin-left: 2px; margin-top: -52px; ">
 
-        <!-- ✅ LOGO AND HEADING -->
+        <!-- âœ… LOGO AND HEADING -->
         <div class="logo-container">
             <img src="https://i.postimg.cc/4xSpKtqg/college-logo-with-name-white-page-0001.jpg" alt="College Logo">
             <h2>PU Enquiry Form</h2>
@@ -327,7 +338,7 @@
                     {{ form.parent_name }}
                 </div>
 
-                <!-- ✅ Error placeholder below input -->
+                <!-- âœ… Error placeholder below input -->
                 <div class="form-group">
                     <label for="id_parent_phone" id="label_parent_phone">Parent Phone</label>
                     {{ form.parent_phone }}
@@ -375,7 +386,7 @@
                 <div class="form-group">
                     <label for="{{ form.email.id_for_label }}">Email ID</label>
                     {{ form.email }}
-                    <div id="error_id_email" class="error-message"></div>  <!-- 🔴 Error placeholder -->
+                    <div id="error_id_email" class="error-message"></div>  <!-- ðŸ”´ Error placeholder -->
                 </div>
                 <div class="form-group">
                     <label for="{{ form.source.id_for_label }}">How did you hear about us?</label>
@@ -801,3 +812,4 @@
 
 
 {% endblock %}
+

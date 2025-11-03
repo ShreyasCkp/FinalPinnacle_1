@@ -7,7 +7,18 @@
  Schedule Follow-up
 {% endif %}{% endblock %}
 
-{% block content %}
+
+
+<style>
+@media (max-width: 768px) {
+  .topbar { left: 0; }
+  .main-area, .content, .footer { margin-left: 0 !important; padding: 70px 16px 24px !important; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .container { max-width: 100%; margin: 0; border-radius: 0; padding: 16px; }
+}
+</style>
 <!DOCTYPE html>
 <html>
 <head>
@@ -209,3 +220,4 @@
 
 
 {% endblock %}
+

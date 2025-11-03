@@ -11,86 +11,78 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
+    /* Responsive calendar container */
     .calendar-container {
         display: flex;
-        flex-wrap: nowrap; /* make boxes stay side by side */
-        gap: 2rem;
+        flex-wrap: wrap; /* now boxes can wrap on small screens */
+        gap: 1rem;
         padding: 7px;
         margin-top: 25px;
-        justify-content: center; /* center the row */
+        justify-content: center;
     }
 
+    /* Calendar box responsive */
     .calendar-box {
-        flex: 0 0 60%; /* takes 60% width */
+        flex: 1 1 100%; /* default full width */
+        max-width: 700px; /* limit max width */
         padding: 10px;
         border-radius: 15px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         text-align: center;
     }
 
+    /* Event box responsive */
+    .event-box {
+        flex: 1 1 100%;
+        max-width: 400px;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        overflow-y: auto;
+    }
+
     .calendar-header {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 10px;
     }
 
-        .calendar-header h2 {
-            color: #8b0000;
-            font-weight: 700;
-            font-size: 25px;
-            margin: 0;
-            /*margin-left: 387px;
-            margin-top: -25px;*/
-        }
-
-    .month-year {
+    .calendar-header h2 {
         color: #8b0000;
         font-weight: 700;
-        font-size: 16px;
-        margin-bottom: 1px;
+        font-size: 25px;
+        margin: 0.5rem 0;
+        text-align: center;
+        flex: 1 1 100%;
     }
 
     .btn-add {
         background-color: #8b0000;
         color: white;
         border: none;
-        padding: 6px 3px;
+        padding: 6px 8px;
         border-radius: 6px;
         text-decoration: none;
         font-size: 13px;
         transition: background-color 0.3s ease;
-        margin-right: 41px;
-        margin-top: 4px;
+        margin: 5px;
     }
-
-    .bg-info {
-        --bs-bg-opacity: 1;
-        background-color: #8b0000 !important;
-        padding: 6px;
-    }
-
-    .border-warning {
-        --bs-border-opacity: 1;
-        border-color: #fff !important;
-    }
-
-    /* .btn-add:hover {
-            background-color: #5e35b1;
-        }*/
 
     .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 10px;
-        margin-right: 0px;
+        gap: 8px;
+        margin-top: 10px;
     }
 
     .calendar-day-name {
         font-weight: 500;
         background-color: #8b0000;
         color: white;
-        padding: 2px 0;
+        padding: 4px 0;
         border-radius: 6px;
         font-size: 11px;
     }
@@ -98,198 +90,26 @@
     .calendar-day {
         background-color: #ffffff;
         border: 1px solid #d1c4e9;
-        padding: 4px 0;
+        padding: 6px 0;
         border-radius: 8px;
         color: #333;
         font-size: 12px;
         transition: background-color 0.2s ease;
         text-align: center;
         cursor: pointer;
+        position: relative;
     }
 
-        .calendar-day:hover {
-            background-color: #ede7f6;
-        }
-
-        .calendar-day.today {
-            background-color: #8b0000;
-            color: #fff;
-            border: 2px solid #8b0000;
-            font-weight: bold;
-        }
-
-    .bg-warning {
-        --bs-bg-opacity: 1;
-        background-color: #dc3545 !important;
-    }
-
-    .bg-primary {
-        --bs-bg-opacity: 1;
-        background-color: #8b0000 !important;
-        padding: 6px;
-    }
-
-    .btn:hover {
-        color: var(--bs-btn-hover-color);
+    .calendar-day.today {
         background-color: #8b0000;
-        border-color: #8b0000;
-    }
-
-    .event-box {
-        flex: 0 0 35%; /* takes 35% width */
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        max-height: 470px;
-        overflow-y: auto;
-    }
-
-        /* Optional: Style the scrollbar */
-        .event-box::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .event-box::-webkit-scrollbar-thumb {
-            background-color: #ccc;
-            border-radius: 3px;
-        }
-
-        .event-box::-webkit-scrollbar-track {
-            background-color: transparent;
-        }
-
-
-        .event-box h3 {
-            color: #8b0000;
-            font-weight: 700;
-            font-size: 20px;
-            margin-bottom: 19px;
-            margin-top: -26px;
-        }
-
-    .event-item {
-        background-color: #fff;
-        padding: 14px 6px;
+        color: #fff;
         border: 2px solid #8b0000;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        transition: transform 0.2s;
-        color: #8b0000;
-    }
-
-    h5 {
-        font-size: 18px;
-    }
-
-    .event-item:hover {
-        transform: scale(1.02);
-    }
-
-    .event-item h4 {
-        margin: 0;
-        font-size: 16px;
-        color: #8b0000;
-    }
-
-    .event-item small {
-        color: #8b0000;
-        font-size: 13px;
-    }
-
-    .badge {
-        margin-top: 6px;
-        font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 4px;
-    }
-
-    .btn-add {
-        background-color: #8b0000;
-        color: white;
-        border: none;
-        padding: 6px 3px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 13px;
-        transition: background-color 0.3s ease;
-        margin-right: 41px;
-        margin-top: 4px;
-    }
-
-    .modal-footer {
-        display: flex;
-        flex-shrink: 0;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-end;
-        /* padding: calc(var(--bs-modal-padding) - var(--bs-modal-footer-gap) * .5); */
-        background-color: var(--bs-modal-footer-bg);
-        border-top: var(--bs-modal-footer-border-width) solid var(--bs-modal-footer-border-color);
-        border-bottom-right-radius: var(--bs-modal-inner-border-radius);
-        border-bottom-left-radius: var(--bs-modal-inner-border-radius);
-    }
-
-    .modal-content {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        width: 52%;
-        color: var(--bs-modal-color);
-        pointer-events: auto;
-        background-color: var(--bs-modal-bg);
-        background-clip: padding-box;
-        border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
-        border-radius: var(--bs-modal-border-radius);
-        outline: 0;
-        margin-left: 341px;
-        /* margin-right: -45px; */
-    }
-
-    .p-3 {
-        padding: 0rem !important;
-    }
-
-    .modal-body {
-        position: relative;
-        flex: 1 1 auto;
-        padding: var(--bs-modal-padding);
-        font-size: 14px;
-    }
-
-    .px-4 {
-        /*padding-right: 6.5rem !important;*/
-        padding-left: 0.5rem !important;
-    }
-
-    .custom-modal-size {
-        max-width: 700px; /* Adjust as needed */
-        width: 100%;
-    }
-
-    .holiday-highlight {
-        background-color: #fff0f0 !important;
-        border: 2px solid #dc3545;
-        color: #8b0000 !important;
         font-weight: bold;
     }
 
-    .fee-due-day {
-        background-color: #ff4d4d;
-        color: white;
-        font-weight: bold;
-    }
-
-    .assignment‑due‑day {
-        background-color: orange;
-        color: black;
-        font-weight: bold;
-    }
-
-    .library‑return‑day {
-        background-color: rebeccapurple;
-        color: white;
-        font-weight: bold;
-    }
+    .fee-due-day { background-color: #ff4d4d; color: white; font-weight: bold; }
+    .assignment-due-day { background-color: orange; color: black; font-weight: bold; }
+    .library-return-day { background-color: rebeccapurple; color: white; font-weight: bold; }
 
     .tooltip-custom {
         position: absolute;
@@ -308,14 +128,20 @@
         transition: opacity 0.2s ease-in-out;
     }
 
-    .calendar-day:hover .tooltip-custom {
-        opacity: 1;
+    .calendar-day:hover .tooltip-custom { opacity: 1; }
+
+    .event-item { margin-bottom: 15px; }
+    
+    /* Responsive modals */
+    .custom-modal-size {
+        max-width: 90%;
+        width: 100%;
+        margin: auto;
     }
 </style>
 
 <div class="calendar-header">
     <a href="{% url 'student_leave_list' %}" class="btn-add">View Leave Request's</a>
-
     <h2>Student Calendar</h2>
     <a href="{% url 'student_leave_create' %}" class="btn-add">Apply Leave</a>
 </div>
@@ -326,13 +152,12 @@
 <div class="container calendar-container">
     <!-- Calendar -->
     <div class="calendar-box">
-        <div class="calendar-header" style="justify-content: center; gap:10px; margin-bottom:15px;">
+        <div class="calendar-header justify-content-center gap-2 mb-3">
             <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn btn-sm btn-outline-secondary">&lt;</a>
             <div class="month-year">{{ month_name }} {{ year }}</div>
             <a href="?month={{ next_month }}&year={{ next_year }}" class="btn btn-sm btn-outline-secondary">&gt;</a>
         </div>
 
-        <!-- Days -->
         <div class="calendar-grid">
             {% for day in weekdays %}
             <div class="calendar-day-name">{{ day }}</div>
@@ -352,7 +177,7 @@
         </div>
 
         {% if month_holidays %}
-        <div style="margin-top: 12px; text-align:center;">
+        <div class="mt-3 text-center">
             <strong>Government Holidays:</strong><br>
             {% for h in month_holidays %}
             {{ h.date|date:"d-M" }} - {{ h.name }}<br>
@@ -361,9 +186,9 @@
         {% endif %}
     </div>
 
+    <!-- Event Box -->
     <div class="event-box">
         <h5>📅 Upcoming Due Dates</h5>
-
         {% if combined_events %}
         {% for e in combined_events %}
         {% if e.event_type in due_date_types %}
@@ -375,13 +200,11 @@
                   {% elif e.event_type == "LibraryReturn" %}bg-info text-white
                   {% elif e.event_type == "FeeDue" %}bg-danger text-white
                   {% else %}bg-secondary text-white
-                  {% endif %}">
-                {{ e.event_type }}
-            </span>
+                  {% endif %}">{{ e.event_type }}</span>
             {% if e.event_type == "LibraryReturn" %}
             <div class="mt-2 text-danger small">Timely return of library materials is appreciated to avoid any overdue charges.</div>
             {% elif e.url %}
-            <div style="margin-top: 8px;">
+            <div class="mt-2">
                 <a href="{{ e.url }}" class="btn btn-sm btn-outline-danger view-btn" data-event-type="{{ e.event_type }}" data-url="{{ e.url }}">View</a>
             </div>
             {% endif %}
@@ -392,85 +215,65 @@
         <p class="text-muted">No upcoming due dates.</p>
         {% endif %}
     </div>
-
-    <!-- Day Event Modal -->
-    <div class="modal fade" id="dayEventModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered custom-modal-size">
-            <div class="modal-content">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title">Events on <span id="selectedDate"></span></h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="dayEventContent"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Modal for Library Book Message -->
-    <div class="modal fade" id="libraryReturnModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title">Library Reminder</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    Please return the book on time in library.
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 
-<!-- ✅ JavaScript to handle click interception -->
+<!-- Modals (same, responsive handled via CSS) -->
+<div class="modal fade" id="dayEventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered custom-modal-size">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Events on <span id="selectedDate"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="dayEventContent"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="libraryReturnModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Library Reminder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Please return the book on time in library.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const viewButtons = document.querySelectorAll('.view-btn');
-        viewButtons.forEach(function (btn) {
+        viewButtons.forEach(btn => {
             btn.addEventListener('click', function (e) {
-                const eventType = btn.getAttribute('data-event-type');
-                const url = btn.getAttribute('data-url');
-
+                const eventType = btn.dataset.eventType;
+                const url = btn.dataset.url;
                 if (eventType === 'LibraryReturn') {
-                    e.preventDefault(); // Stop the redirect
-                    const libraryModal = new bootstrap.Modal(document.getElementById('libraryReturnModal'));
-                    libraryModal.show();
+                    e.preventDefault();
+                    new bootstrap.Modal(document.getElementById('libraryReturnModal')).show();
                 } else {
-                    // Let it redirect
                     window.location.href = url;
                 }
             });
         });
-    });
-</script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
         const events = JSON.parse(document.getElementById('event-data').textContent);
         const uniqueEventsByDate = {};
+        events.forEach(evt => (uniqueEventsByDate[evt.date] ||= []).push(evt));
 
-        // Group events by date
-        events.forEach(evt => {
-            (uniqueEventsByDate[evt.date] ||= []).push(evt);
-        });
-
-        // Apply classes to dates
         document.querySelectorAll('.calendar-day[data-date]').forEach(dayEl => {
-            const date = dayEl.getAttribute('data-date');
+            const date = dayEl.dataset.date;
             const todaysEvents = uniqueEventsByDate[date];
             if (!todaysEvents) return;
 
-            // Priority: FeeDue > AssignmentDue > LibraryReturn
-            if (todaysEvents.some(e => e.event_type === 'FeeDue')) {
-                dayEl.classList.add('fee-due-day');
-            } else if (todaysEvents.some(e => e.event_type === 'AssignmentDue')) {
-                dayEl.classList.add('assignment-due-day');
-            } else if (todaysEvents.some(e => e.event_type === 'LibraryReturn')) {
-                dayEl.classList.add('library-return-day');
-            }
+            if (todaysEvents.some(e => e.event_type === 'FeeDue')) dayEl.classList.add('fee-due-day');
+            else if (todaysEvents.some(e => e.event_type === 'AssignmentDue')) dayEl.classList.add('assignment-due-day');
+            else if (todaysEvents.some(e => e.event_type === 'LibraryReturn')) dayEl.classList.add('library-return-day');
 
-            // Set tooltip to summarize event titles
             const tooltip = document.createElement('div');
             tooltip.className = 'tooltip-custom';
             tooltip.innerText = todaysEvents.map(e => e.title).join('\n');

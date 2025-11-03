@@ -1,37 +1,34 @@
-<!DOCTYPE html>
-
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="utf-8" />
-    <title></title>
-</head>
-<body>
-
-</body>
-</html>{% extends 'master/bare.html' %}
+{% extends 'master/bare.html' %}
 {% block title %}Change Passcode{% endblock %}
 
 {% block content %}
+<!-- Meta viewport for mobile scaling -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
     .container {
         background: #fff;
-        padding: 30px;
+        padding: 25px;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         max-width: 400px;
         margin: 40px auto;
+        width: 90%;
+        box-sizing: border-box;
     }
 
     h2 {
         text-align: center;
         font-weight: 700;
         color: #800000;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         font-size: 22px;
     }
 
@@ -40,6 +37,7 @@
         margin-bottom: 5px;
         color: #333;
         font-weight: 600;
+        font-size: 14px;
     }
 
     input[type="text"] {
@@ -49,35 +47,55 @@
         border: 1px solid #ccc;
         border-radius: 6px;
         font-size: 14px;
+        box-sizing: border-box;
     }
 
     button[type="submit"] {
         background-color: #800000;
         color: white;
-        padding: 8px 16px;
+        padding: 10px 16px;
         border: none;
         border-radius: 6px;
         font-weight: bold;
-        font-size: 13px;
+        font-size: 14px;
         width: 100%;
         cursor: pointer;
         transition: background-color 0.3s;
     }
 
-        button[type="submit"]:hover {
-            background-color: #a10000;
-        }
+    button[type="submit"]:hover {
+        background-color: #a10000;
+    }
 
     .alert {
         font-weight: 600;
         color: red;
         margin-bottom: 15px;
+        font-size: 13px;
     }
 
     .success {
         font-weight: 600;
         color: green;
         margin-bottom: 15px;
+        font-size: 13px;
+    }
+
+    /* Responsive adjustments for very small screens */
+    @media (max-width: 480px) {
+        .container {
+            padding: 20px;
+            margin: 20px auto;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        input[type="text"], button[type="submit"] {
+            font-size: 13px;
+            padding: 8px 12px;
+        }
     }
 </style>
 
@@ -85,10 +103,10 @@
     <h2>Change Passcode</h2>
 
     {% if error %}
-    <div class="alert">{{ error }}</div>
+        <div class="alert">{{ error }}</div>
     {% endif %}
     {% if success %}
-    <div class="success">{{ success }}</div>
+        <div class="success">{{ success }}</div>
     {% endif %}
 
     <form method="post">

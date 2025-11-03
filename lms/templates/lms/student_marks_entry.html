@@ -1,1013 +1,425 @@
 {% extends 'lms/employee_layout.html' %}
 {% load static %}
-
 {% block content %}
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
- 
-    .form-section {
-
-        background: #fff;
-
-        padding: 31px;
-
-        border-radius: 12px;
-
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-
-        margin-top: 40px;
-
-        margin-left: 179px;
-
-        margin-right: 4px;
-
-        width: 1037px;
-
-    }
- 
-    label {
-
-        font-weight: 600;
-
-        margin-right: -10px;
-
-        font-size: 12px;
-
-    }
- 
-    select, input[type="date"] {
-
-        padding: 6px;
-
-        margin: 5px 10px 10px 0;
-
-        min-width: 180px;
-
-        border: 1px solid #ccc;
-
-        border-radius: 4px;
-
-    }
- 
-    input[readonly] {
-
-        background-color: #e9ecef;
-
-    }
- 
-    .table-section {
-
-        margin-top: 20px;
-
-        margin-left: 10px;
-
-        margin-right: 10px;
-
-        /*        overflow-x: auto;
- 
-    */ width: 100%;
-
-    }
- 
-    table {
-
-        width: 100%;
-
-        border-collapse: collapse;
-
-        font-size: 12px;
-
-        table-layout: fixed;
-
-    }
- 
-    th {
-
-        padding: 8px;
-
-        border: 1px solid #dee2e6;
-
-        text-align: center;
-
-        vertical-align: middle;
-
-        word-wrap: break-word;
-
-        /*        text-overflow: ellipsis;
- 
-    */ white-space: nowrap;
-
-        max-width: 150px;
-
-    }
- 
-    td {
-
-        border: 1px solid #dee2e6;
-
-        text-align: center;
-
-        text-overflow: ellipsis;
-
-        white-space: nowrap;
-
-    }
- 
-    .table-responsive {
-
-        margin-top: 20px;
-
-    }
- 
-    th {
-
-        background-color: #800000;
-
-        color: white;
-
-        padding: 4px;
-
-        font-size: 11px;
-
-    }
- 
-    .btn-submit {
-
-        background-color: #800000;
-
-        color: white;
-
-        padding: 7px 20px;
-
-        border: none;
-
-        border-radius: 6px;
-
-        font-size: 12px;
-
-        margin-top: 12px;
-
-        cursor: pointer;
-
-        text-decoration: none; /* remove underline */
-
-    }
- 
-        .btn-submit:hover {
-
-            background-color: #660000;
-
-        }
- 
- 
-    .btn-container {
-
-        display: flex;
-
-        justify-content: flex-end;
-
-    }
- 
-    .btn-container-fixed {
-
-        display: flex;
-
-        justify-content: space-between;
-
-        align-items: center;
-
-        margin-top: 20px;
-
-        width: 100%;
-
-    }
- 
- 
-    .firsts {
-
-        display: flex;
-
-        flex-wrap: nowrap;
-
-        align-items: center;
-
-        gap: 12px;
-
-        margin: 20px;
-
-    }
- 
-        .firsts select,
-
-        .firsts input[type="date"],
-
-        .firsts input[type="text"] {
-
-            min-width: 140px;
-
-            max-width: 185px;
-
-            font-size: 13px;
-
-            padding: 6px 8px;
-
-            flex-shrink: 0;
-
-        }
- 
-    .content {
-
-        padding: 10px 26px 18px;
-
-        /* background-color: #EEE; */
- 
-        margin-left: 128px;
-
-        flex-grow: 1;
-
-    }
- 
-    td input[type="radio"] {
-
-        margin-bottom: 2px;
-
-    }
- 
-    td label {
-
-        display: flex;
-
-        flex-direction: row;
-
-        align-items: center;
-
-        font-size: 12px;
-
-        gap: 4px;
-
-    }
- 
-    .status-options {
-
-        display: flex;
-
-        /* justify-content: center; */
- 
-        gap: 13px;
-
-    }
-</style>
- 
-<style>
-
     body {
-
         background-color: #f0f2f5;
-
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
         margin: 0;
-
         padding: 0;
-
     }
- 
-    .container {
 
-        margin-left: 200px;
-
-        padding: 30px;
-
-        max-width: calc(100% - 200px);
-
+    /* ---------- Main Container ---------- */
+    .form-section {
         background: #fff;
-
+        padding: 25px;
         border-radius: 12px;
-
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-
-        margin-top: 20px;
-
+        margin: 20px auto;
+        width: 95%;
+        max-width: 1200px;
         box-sizing: border-box;
-
     }
- 
-    .header-flex {
 
-        display: flex;
-
-        justify-content: center;
-
-        align-items: center;
-
-        position: relative;
-
-        margin-bottom: 20px;
-
-    }
- 
-        .header-flex h2 {
-
-            flex-grow: 1;
-
-            margin: 0;
-
-            font-weight: 700;
-
-            font-size: 22px;
-
-            color: #800000;
-
-            text-align: center;
-
-        }
- 
-    .btn-add {
-
-        position: absolute;
-
-        right: 0;
-
-        background-color: #800000;
-
-        color: #fff;
-
-        font-size: 13px;
-
-        padding: 6px 12px;
-
-        border: none;
-
-        border-radius: 4px;
-
-        font-weight: bold;
-
-        text-decoration: none;
-
-        cursor: pointer;
-
-    }
- 
-        .btn-add:hover {
-
-            background-color: #a10000;
-
-        }
- 
-    .search-form {
-
-        position: absolute;
-
-        left: 0;
-
-        padding: 6px 10px;
-
-        border: 1px solid #ccc;
-
-        border-radius: 4px;
-
-        font-size: 13px;
-
-        width: 200px;
-
-    }
- 
- 
-        .search-form input {
-
-            padding: 6px 10px;
-
-            border: 1px solid #ccc;
-
-            border-radius: 4px;
-
-            font-size: 13px;
-
-            width: 200px;
-
-        }
- 
-        .search-form button {
-
-            padding: 6px 10px;
-
-            border: none;
-
-            background-color: #800000;
-
-            color: #fff;
-
-            border-radius: 4px;
-
-            font-size: 13px;
-
-            cursor: pointer;
-
-            margin-left: 5px;
-
-        }
- 
-            .search-form button:hover {
-
-                background-color: #a10000;
-
-            }
- 
-    table {
-
-        width: 100%;
-
-        font-size: 12px;
-
-        border-collapse: collapse;
-
-        margin-top: 10px;
-
-    }
- 
-    th, td {
-
-        padding: 1px;
-
-        text-align: center;
-
-        border: 1px solid #dee2e6;
-
-        vertical-align: middle;
-
-    }
- 
-    thead {
-
-        background: linear-gradient(#8B0000, #800000);
-
-        color: white;
-
-    }
- 
-    tr:nth-child(even) {
-
-        background-color: #f8f9fa;
-
-    }
- 
-    /* Snackbar */
-
-    #snackbar {
-
-        visibility: hidden;
-
-        min-width: 250px;
-
-        background-color: #800000;
-
-        color: #fff;
-
-        text-align: center;
-
-        border-radius: 4px;
-
-        padding: 14px 24px;
-
-        position: fixed;
-
-        z-index: 9999;
-
-        left: 50%;
-
-        bottom: 30px;
-
-        transform: translateX(-50%);
-
-        font-size: 14px;
-
-    }
- 
-        #snackbar.show {
-
-            visibility: visible;
-
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-
-        }
- 
-    #overlay {
-
-        position: fixed;
-
-        top: 0;
-
-        left: 0;
-
-        width: 100vw;
-
-        height: 100vh;
-
-        background: rgba(0,0,0,0.5);
-
-        display: none;
-
-        z-index: 1000;
-
-    }
- 
-    #confirm-popup {
-
-        position: fixed;
-
-        top: 50%;
-
-        left: 50%;
-
-        transform: translate(-50%, -50%);
-
-        background: #fff;
-
-        padding: 20px;
-
-        border-radius: 8px;
-
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
-
-        display: none;
-
-        z-index: 1001;
-
-        text-align: center;
-
-    }
- 
-    #confirm-yes, #confirm-no {
-
-        margin: 0 5px;
-
-        padding: 6px 12px;
-
-        font-size: 12px;
-
-        border-radius: 4px;
-
-        cursor: pointer;
-
-        background: transparent;
-
+    h4 {
         color: #800000;
+        font-size: 22px;
+        text-align: center;
+        margin-bottom: 25px;
+    }
 
+    /* ---------- Labels & Inputs ---------- */
+    label {
         font-weight: 600;
-
-        border: 2px solid #800000;
-
-        transition: all 0.2s ease;
-
-    }
- 
-        #confirm-yes:hover, #confirm-no:hover {
-
-            background-color: #800000;
-
-            color: white;
-
-        }
- 
-    .icon-btn {
-
-        border: 1px solid #dee2e6;
-
-        background-color: #fff;
-
-        padding: 3px 5px;
-
-        margin: 2px;
-
-        border-radius: 6px;
-
-        cursor: pointer;
-
-        transition: background-color 0.2s;
-
-        display: inline-block;
-
-        text-decoration: none;
-
-    }
- 
-        .icon-btn i {
-
-            font-size: 11px;
-
-            color: #800000;
-
-        }
- 
-        .icon-btn.text-danger i {
-
-            color: #b30000;
-
-        }
- 
-    .content {
-
-        margin-left: 0px;
-
-        padding: 28px 26px 40px;
-
-        min-height: 100vh;
-
-    }
- 
-    @keyframes fadein {
-
-        from {
-
-            bottom: 0;
-
-            opacity: 0;
-
-        }
- 
-        to {
-
-            bottom: 30px;
-
-            opacity: 1;
-
-        }
-
-    }
- 
-    @keyframes fadeout {
-
-        from {
-
-            bottom: 30px;
-
-            opacity: 1;
-
-        }
- 
-        to {
-
-            bottom: 0;
-
-            opacity: 0;
-
-        }
-
-    }
- 
-    .btn-save {
-
-        background-color: #800;
-
-        font-weight: 500;
-
-        padding: 5px 16px;
-
-        font-size: 14px;
-
-        color: white;
-
-        border: none;
-
-        border-radius: 8px;
-
-    }
- 
-        .btn-save:hover {
-
-            background-color: #660000;
-
-        }
- 
-    .btn-back {
-
-        background-color: #800000;
-
-        color: #fff;
-
-        border: 2px solid #800000;
-
-        padding: 4px 10px;
-
-        border-radius: 6px;
-
         font-size: 13px;
-
-        font-weight: 600;
-
-        text-decoration: none;
-
-        transition: all 0.2s ease;
-
+        margin-bottom: 4px;
+        display: block;
     }
- 
-        .btn-back:hover {
 
-            background-color: #660000;
-
-        }
- 
-    .table thead.table-dark th {
-
-        background-color: #800 !important;
-
-        color: #fff !important;
-
+    select, input[type="date"], input[type="text"], input[type="number"] {
+        padding: 7px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     input[readonly] {
-
-        background-color: #fff;
-
-        border: none;
-
-        text-align: center;
-
-        outline: none;
-
-        appearance: none;
-
-        -moz-appearance: textfield;
-
-         width: 100%;
-
+        background-color: #e9ecef;
     }
 
-    .btn-success {
+    /* ---------- Responsive Grid ---------- */
+    .row.g-3 {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 15px;
+    }
 
-        --bs-btn-color: #fff !important;
+    .col-md-3 {
+        flex: 1 1 220px;
+        min-width: 180px;
+    }
 
-        --bs-btn-bg: #800 !important;
+    /* ---------- Table ---------- */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 20px;
+    }
 
-        --bs-btn-border-color: #800 !important;
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        text-align: center;
+    }
 
-        --bs-btn-hover-color: #fff !important;
+    thead {
+        background: linear-gradient(#8B0000, #800000);
+        color: white;
+    }
 
-        --bs-btn-hover-bg: #660000 !important;
+    th, td {
+        border: 1px solid #dee2e6;
+        padding: 6px;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
 
-        --bs-btn-hover-border-color: #660000 !important;
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
 
-        --bs-btn-focus-shadow-rgb: 128, 0, 0 !important;
+    td input[type="number"] {
+        width: 90px;
+        text-align: center;
+    }
 
-        --bs-btn-active-color: #fff !important;
+    .error-message {
+        color: red;
+        font-size: 10px;
+        display: none;
+    }
 
-        --bs-btn-active-bg: #660000 !important;
-
-        --bs-btn-active-border-color: #660000 !important;
-
-        --bs-btn-disabled-color: #fff !important;
-
-        --bs-btn-disabled-bg: #800 !important;
-
-        --bs-btn-disabled-border-color: #800 !important;
-
+    /* ---------- Buttons ---------- */
+    .btn-maroon-outline, .btn-success {
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .btn-maroon-outline {
-
-        --bs-btn-color: #fff; /* white text */
-
-        --bs-btn-border-color: #800; /* maroon border */
-
-        --bs-btn-hover-color: #fff; /* text stays white on hover */
-
-        --bs-btn-hover-bg: #800; /* background stays maroon */
-
-        --bs-btn-hover-border-color: #800;
-
-        --bs-btn-focus-shadow-rgb: 128, 0, 0;
-
-        --bs-btn-active-color: #fff; /* text stays white when active */
-
-        --bs-btn-active-bg: #660000; /* darker maroon when clicked */
-
-        --bs-btn-active-border-color: #660000;
-
-        /* Remove all transitions */
-
-        transition: none !important;
-
-        background-color: #800 !important; /* always maroon */
-
-        border-color: #800 !important; /* always maroon */
-
-        color: #fff !important; /* always white */
-
+        background-color: #800000;
+        color: #fff !important;
+        border: 2px solid #800000;
+        text-decoration: none;
     }
- 
-        /* Also override hover/focus/active to keep background & text consistent */
 
-        .btn-maroon-outline:hover,
+    .btn-maroon-outline:hover {
+        background-color: #660000;
+        border-color: #660000;
+    }
 
-        .btn-maroon-outline:focus,
+    .btn-success {
+        background-color: #800000 !important;
+        border: none;
+        color: #fff !important;
+    }
 
-        .btn-maroon-outline:active {
+    .btn-success:hover {
+        background-color: #660000 !important;
+    }
 
-            background-color: #800 !important;
+    /* ---------- Bottom Buttons ---------- */
+    .d-flex {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+    }
 
-            border-color: #800 !important;
+    /* ---------- Alerts ---------- */
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+        padding: 10px;
+        border-radius: 5px;
+    }
 
-            color: #fff !important;
+    /* ---------- Popup ---------- */
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1000;
+    }
 
-            box-shadow: none !important;
+    #confirm-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
+        z-index: 1001;
+        text-align: center;
+        width: 90%;
+        max-width: 300px;
+    }
 
+    #confirm-yes, #confirm-no {
+        margin: 5px;
+        padding: 6px 14px;
+        font-size: 12px;
+        border-radius: 4px;
+        border: 2px solid #800000;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
+
+    /* ---------- Media Queries ---------- */
+    @media (max-width: 992px) {
+        .form-section {
+            padding: 20px;
+            width: 96%;
         }
 
-    .btn-small {
+        table th, table td {
+            font-size: 12px;
+            padding: 4px;
+        }
 
-        padding: 0.25rem 0.5rem !important; /* !important ensures it overrides Bootstrap */
-
-        font-size: 11px !important;
-
+        td input[type="number"] {
+            width: 75px;
+        }
     }
- 
- 
+
+    @media (max-width: 768px) {
+        .form-section {
+            padding: 18px;
+            margin: 10px auto;
+        }
+
+        h4 {
+            font-size: 20px;
+        }
+
+        .col-md-3 {
+            flex: 1 1 100%;
+        }
+
+        .row.g-3 {
+            flex-direction: column;
+        }
+
+        table {
+            font-size: 11.5px;
+        }
+
+        th, td {
+            padding: 5px;
+        }
+
+        td input[type="number"] {
+            width: 65px;
+        }
+
+        .d-flex {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-maroon-outline, .btn-success {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-section {
+            padding: 15px;
+        }
+
+        h4 {
+            font-size: 18px;
+        }
+
+        table {
+            font-size: 11px;
+        }
+
+        th, td {
+            padding: 4px;
+        }
+    }
 </style>
 
- 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
- 
+
 <div class="form-section">
-<h4 class="text-center" style="font-size: 22px; color: #800; margin-top: -17px;">
-        Student Marks Entry
-</h4>
- 
-    <!-- ?? Filter Dropdowns -->
-<form method="get" class="row g-3 align-items-center mb-4">
-<!-- Program Type -->
-<div class="col-md-3">
-<label for="course_type" class="form-label fw-bold">Program Type:</label>
-<select name="course_type" id="course_type" class="form-select" onchange="this.form.submit()">
-<option value="">-- Select Program Type --</option>
+    <h4>Student Marks Entry</h4>
+
+    <!-- Filters -->
+    <form method="get" class="row g-3 align-items-center mb-4">
+        <div class="col-md-3">
+            <label for="course_type">Program Type:</label>
+            <select name="course_type" id="course_type" onchange="this.form.submit()">
+                <option value="">-- Select Program Type --</option>
                 {% for ct in course_types %}
-<option value="{{ ct.id }}" {% if ct.id|stringformat:"s" == selected.program_type %}selected{% endif %}>
-                    {{ ct.name }}
-</option>
+                    <option value="{{ ct.id }}" {% if ct.id|stringformat:"s" == selected.program_type %}selected{% endif %}>{{ ct.name }}</option>
                 {% endfor %}
-</select>
-</div>
- 
-        <!-- Academic Year -->
-<div class="col-md-3">
-<label for="academic_year" class="form-label fw-bold">Academic Year:</label>
-<select name="academic_year" id="academic_year" class="form-select" onchange="this.form.submit()">
-<option value="">Batch</option>
-                {% for year in academic_years %}
-<option value="{{ year }}" {% if year == selected.academic_year %}selected{% endif %}>
-                    {{ year }}
-</option>
-                {% endfor %}
-</select>
-</div>
- 
-        <!-- Course -->
-<div class="col-md-3">
-<label for="course" class="form-label fw-bold">Course:</label>
-<select name="course" id="course" class="form-select" onchange="this.form.submit()">
-<option value="">-- Select Course --</option>
-                {% for c in courses %}
-<option value="{{ c.id }}" {% if c.id|stringformat:"s" == selected.course %}selected{% endif %}>
-                    {{ c.name }}
-</option>
-                {% endfor %}
-</select>
-</div>
- 
-        <!-- Semester -->
-<div class="col-md-3">
-<label for="semester" class="form-label fw-bold">Semester / Year:</label>
-<select name="semester" id="semester" class="form-select" onchange="this.form.submit()">
-<option value="">-- Select Semester / Year --</option>
-                {% for sem in semesters %}
-<option value="{{ sem.id }}" {% if sem.id|stringformat:"s" == selected.semester|stringformat:"s" %}selected{% endif %}>{{ sem.label }}</option>
-                {% endfor %}
-</select> <!-- moved properly -->
- 
- 
+            </select>
         </div>
- 
-                <!-- Subject -->
-<div class="col-md-3">
-<label for="subject" class="form-label fw-bold">Subject:</label>
-<select name="subject" id="subject" class="form-select" onchange="this.form.submit()">
-<option value="">-- Select Subject --</option>
-                {% for sub in subjects %}
-<option value="{{ sub.id }}" {% if sub.id|stringformat:"s" == selected.subject|stringformat:"s" %}selected{% endif %}>{{ sub.name }}</option>
+
+        <div class="col-md-3">
+            <label for="academic_year">Academic Year:</label>
+            <select name="academic_year" id="academic_year" onchange="this.form.submit()">
+                <option value="">Batch</option>
+                {% for year in academic_years %}
+                    <option value="{{ year }}" {% if year == selected.academic_year %}selected{% endif %}>{{ year }}</option>
                 {% endfor %}
-</select>
-</div>
- 
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="course">Course:</label>
+            <select name="course" id="course" onchange="this.form.submit()">
+                <option value="">-- Select Course --</option>
+                {% for c in courses %}
+                    <option value="{{ c.id }}" {% if c.id|stringformat:"s" == selected.course %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="semester">Semester / Year:</label>
+            <select name="semester" id="semester" onchange="this.form.submit()">
+                <option value="">-- Select Semester / Year --</option>
+                {% for sem in semesters %}
+                    <option value="{{ sem.id }}" {% if sem.id|stringformat:"s" == selected.semester|stringformat:"s" %}selected{% endif %}>{{ sem.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="subject">Subject:</label>
+            <select name="subject" id="subject" onchange="this.form.submit()">
+                <option value="">-- Select Subject --</option>
+                {% for sub in subjects %}
+                    <option value="{{ sub.id }}" {% if sub.id|stringformat:"s" == selected.subject|stringformat:"s" %}selected{% endif %}>{{ sub.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </form>
-<!-- ?? End Filters -->
- 
-    <!-- Assignment Selection -->
+
+    <!-- Class Dropdown -->
     {% if assignments and assignments|length > 1 %}
-<form method="get" class="mb-3 d-flex justify-content-center">
-<label for="assignment" class="me-2 fw-bold">Select Class:</label>
-<select name="assignment" id="assignment" class="form-select w-auto me-2" onchange="this.form.submit()">
-<option value="">-- Select Class --</option>
-            {% for assign in assignments %}
-<option value="{{ assign.id }}" {% if assignment and assignment.id == assign.id %}selected{% endif %}>
-                {{ assign.course.name }} - Semester {{ assign.semester }}
-</option>
-            {% endfor %}
-</select>
-<noscript><button type="submit" class="btn btn-primary">Proceed</button></noscript>
-</form>
+        <form method="get" class="mb-3 d-flex justify-content-center">
+            <label for="assignment" class="me-2 fw-bold">Select Class:</label>
+            <select name="assignment" id="assignment" class="form-select w-auto me-2" onchange="this.form.submit()">
+                <option value="">-- Select Class --</option>
+                {% for assign in assignments %}
+                    <option value="{{ assign.id }}" {% if assignment and assignment.id == assign.id %}selected{% endif %}>
+                        {{ assign.course.name }} - Semester {{ assign.semester }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
     {% endif %}
- 
+
     <!-- Students Table -->
     {% if students %}
-<form method="post">
-        {% csrf_token %}
-<div class="table-responsive">
-<table class="table table-bordered table-hover mt-3 align-middle text-center">
-<thead class="table-dark">
-<tr>
-<th>Roll No</th>
-<th>Student Name</th>
-<th>Academic Year</th>
-<th>Course / Semester</th>
-<th>Subject</th>
-<th>Internal Max</th>
-<th>Internal Obtained</th>
-<th>Final Max</th>
-<th>Final Obtained</th>
-</tr>
-</thead>
-<tbody>
-                    {% for pair in student_form_pairs %}
-<tr>
-<td>{{ pair.student.student_userid }}</td>
-<td>{{ pair.student.student_name }}</td>
-<td>{{ pair.student.academic_year }}</td>
-<td>
-                        {{ pair.student.course }} -
-                        {% if pair.student.semester %}{{ pair.student.semester }}{% else %}{{ pair.student.current_year }}{% endif %}
-</td>
-<td>
-                        {% if pair.subject %}{{ pair.subject.name }}{% else %}-{% endif %}
-</td>
- 
-                    <!-- Internal Max (readonly from DB or calculated) -->
-<td>
-                        {{ pair.internal_max|default:"-" }}
-</td>
- 
-                    <!-- Internal Obtained (calculated best 2 of 3) -->
-<td>
-                        {{ pair.internal_obtained|default:"0.0" }}
-</td>
- 
-                    <td>
-<input type="number" name="max_marks_{{ pair.student.id }}" value="{{ pair.form.initial.max_marks }}" readonly>
-</td>
-<td>
-<div class="marks-input">
-<input type="number" 
-                                   name="marks_obtained_{{ pair.student.id }}" 
-                                   value="{{ pair.form.initial.marks_obtained }}" 
-                                   min="0" 
-                                   max="{{ pair.form.initial.max_marks }}" 
-                                   style="width:88px;">
-<div class="error-message" style="color:red; font-size:9px; display:none;"></div>
-</div>
-</td>
- 
- 
-                </tr>
- 
-                    {% endfor %}
-</tbody>
-</table>
-</div>
-<div class="d-flex justify-content-between mt-4">
-<a href="{% url 'student_marks_list' %}" class="btn btn-maroon-outline btn-small">
-<i class="bi bi-arrow-left"></i> Back
-</a>
- 
-            <button type="submit" class="btn btn-success btn-small">
-<i class="bi bi-save"></i> Save Marks
-</button>
-</div>
-</form>
+        <form method="post">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mt-3 align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Student Name</th>
+                            <th>Academic Year</th>
+                            <th>Course / Semester</th>
+                            <th>Subject</th>
+                            <th>Internal Max</th>
+                            <th>Internal Obtained</th>
+                            <th>Final Max</th>
+                            <th>Final Obtained</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pair in student_form_pairs %}
+                            <tr>
+                                <td>{{ pair.student.student_userid }}</td>
+                                <td>{{ pair.student.student_name }}</td>
+                                <td>{{ pair.student.academic_year }}</td>
+                                <td>{{ pair.student.course }} -
+                                    {% if pair.student.semester %}{{ pair.student.semester }}{% else %}{{ pair.student.current_year }}{% endif %}
+                                </td>
+                                <td>{% if pair.subject %}{{ pair.subject.name }}{% else %}-{% endif %}</td>
+                                <td>{{ pair.internal_max|default:"-" }}</td>
+                                <td>{{ pair.internal_obtained|default:"0.0" }}</td>
+                                <td><input type="number" name="max_marks_{{ pair.student.id }}" value="{{ pair.form.initial.max_marks }}" readonly></td>
+                                <td>
+                                    <div class="marks-input">
+                                        <input type="number" name="marks_obtained_{{ pair.student.id }}" value="{{ pair.form.initial.marks_obtained }}" min="0" max="{{ pair.form.initial.max_marks }}">
+                                        <div class="error-message"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex mt-4">
+                <a href="{% url 'student_marks_list' %}" class="btn-maroon-outline">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+                <button type="submit" class="btn-success">
+                    <i class="bi bi-save"></i> Save Marks
+                </button>
+            </div>
+        </form>
     {% elif assignments and not students %}
-<div class="alert alert-warning mt-3 text-center fw-bold">
-        ?? No students found for your class.
-</div>
+        <div class="alert alert-warning text-center fw-bold">
+            ⚠️ No students found for your class.
+        </div>
     {% endif %}
 </div>
- 
+
 <script>
 document.addEventListener("input", function(e) {
     if (e.target.name.startsWith("marks_obtained_")) {
         let max = parseFloat(e.target.getAttribute("max"));
         let val = parseFloat(e.target.value);
         let errorDiv = e.target.parentElement.querySelector(".error-message");
- 
+
         if (val > max) {
-            errorDiv.innerText = "marks below (" + max + ")";
+            errorDiv.innerText = "Marks cannot exceed " + max;
             errorDiv.style.display = "block";
         } else if (val < 0) {
             errorDiv.innerText = "Marks cannot be negative";

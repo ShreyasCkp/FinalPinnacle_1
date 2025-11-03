@@ -1,145 +1,109 @@
 {% extends 'master/bare.html' %}
 {% block title %}Student Login{% endblock %}
-
 {% block content %}
-<h2>
-    {% if reset and passcode_verified %}Set New Password
-    {% elif reset %}Reset Password
-    {% else %}Student Login
-    {% endif %}
-</h2>
-
-{% if error %}
-<div class="alert" style="color: red; margin-bottom: 15px;">{{ error }}</div>
-{% endif %}
-
-{% if success_message %}
-<div class="alert" style="color: green; margin-bottom: 15px;">{{ success_message }}</div>
-{% endif %}
-
-<form method="post" novalidate>
-    {% csrf_token %}
-
-    {# Login form or Forgot password step 1 (ask username/passcode) #}
-    {% if not reset %}
-    <label for="username">Student User ID</label>
-    <input type="text"
-           name="username"
-           id="username"
-           class="input-field"
-           placeholder="Student User ID"
-           required
-           value="{{ selected_user|default:'' }}"
-           autocomplete="username">
-
-    <label for="password">Password</label>
-    <input type="password"
-           name="password"
-           id="password"
-           placeholder="Password"
-           class="input-field"
-           required
-           autocomplete="current-password">
-
-    <button type="submit">Login</button>
-
-    <div style="margin-top: 10px;">
-        <a id="forgot-link" href="{% url 'student_password_reset_view' %}" style="color: red;">Forgot Password?</a>
-    </div>
-
-    {% elif reset and not passcode_verified %}
-    <input type="text"
-           name="username"
-           id="username"
-           class="input-field"
-           placeholder="Student User ID"
-           readonly
-           value="{{ selected_user|default:'' }}">
-
-    <input type="password"
-           name="passcode"
-           class="input-field"
-           placeholder="Enter 4-digit passcode"
-           required
-           pattern="\d{4}"
-           title="Enter your 4-digit passcode.">
-
-    <button type="submit" name="verify_passcode">Verify Passcode</button>
-    <a href="{% url 'student_login_view' %}?username={{ selected_user }}">Back to Login</a>
-
-    {% elif reset and passcode_verified %}
-    <input type="text"
-           name="username"
-           class="input-field"
-           readonly
-           value="{{ selected_user|default:'' }}">
-
-    <input type="password" name="new_password" placeholder="Enter New Password"
-           class="input-field" required
-           pattern="^[A-Z][a-z]*[!@#$%^&*(),.?\" :{}|<>][a-zA-Z0-9]*[0-9]+$"
-    minlength="8" maxlength="16"
-    title="Start with capital letter, then lowercase, include one special character, and one number. Length 8-16.">
-
-    <input type="password" name="confirm_password" placeholder="Confirm New Password" class="input-field" required>
-
-    <input type="hidden" name="password_reset_submit" value="1">
-    <button type="submit">Set New Password</button>
-    <a href="{% url 'student_login_view' %}?username={{ selected_user }}">Back to Login</a>
-    {% endif %}
-</form>
-
-<!-- Popup -->
-<div id="overlay"></div>
-<div id="confirm-popup">
-    <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
-    <button id="confirm-yes-login">OK</button>
-</div>
-
-<script>
-    document.getElementById('forgot-link')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        if (username) {
-            window.location.href = "{% url 'student_password_reset_view' %}?username=" + encodeURIComponent(username);
-        } else {
-            document.getElementById('confirm-popup-message').innerText = "Please enter your Student User ID first.";
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('confirm-popup').style.display = 'block';
-        }
-    });
-
-    document.getElementById('confirm-yes-login').addEventListener('click', function () {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('confirm-popup').style.display = 'none';
-    });
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+    /* ---------- General Layout ---------- */
+    body {
+        background-color: #f9f9f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .login-container {
+        max-width: 400px;
+        margin: 60px auto;
+        padding: 30px 25px;
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    h2 {
+        color: #800000;
+        margin-bottom: 25px;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .alert {
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    /* ---------- Form Elements ---------- */
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    label {
+        align-self: flex-start;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #333;
+    }
+
     .input-field {
         display: block;
         width: 100%;
-        max-width: 320px;
-        padding: 8px 12px;
-        margin-bottom: 12px;
+        padding: 10px 12px;
+        margin-bottom: 15px;
         border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
+        border-radius: 5px;
+        font-size: 15px;
+        box-sizing: border-box;
+        transition: 0.3s;
+    }
+
+    .input-field:focus {
+        border-color: #800000;
+        outline: none;
+        box-shadow: 0 0 5px rgba(128, 0, 0, 0.3);
     }
 
     button {
-        padding: 8px 20px;
-        background-color: #007bff;
+        padding: 10px 20px;
+        background-color: #800000;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 5px;
         cursor: pointer;
         font-weight: 600;
+        font-size: 15px;
+        width: 100%;
+        transition: background-color 0.2s;
     }
 
-        button:hover {
-            background-color: #0056b3;
-        }
+    button:hover {
+        background-color: #a00000;
+    }
 
+    a {
+        color: #800000;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    /* ---------- Forgot Password Link ---------- */
+    #forgot-link {
+        margin-top: 10px;
+        display: inline-block;
+        color: #d9534f;
+    }
+
+    /* ---------- Popup Overlay ---------- */
     #overlay {
         position: fixed;
         top: 0;
@@ -158,30 +122,188 @@
         transform: translate(-50%, -50%);
         background: #fff;
         padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         display: none;
         z-index: 1001;
         text-align: center;
+        width: 90%;
+        max-width: 300px;
     }
 
-        #confirm-popup button {
-            margin: 0 5px;
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            background: transparent;
-            color: #800000;
-            font-weight: 600;
-            border: 2px solid #800000;
-            transition: all 0.2s ease;
+    #confirm-popup-message {
+        font-size: 15px;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    #confirm-popup button {
+        padding: 8px 18px;
+        border: 2px solid #800000;
+        border-radius: 5px;
+        background: transparent;
+        color: #800000;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    #confirm-popup button:hover {
+        background: #800000;
+        color: white;
+    }
+
+    /* ---------- Responsive Design ---------- */
+    @media (max-width: 768px) {
+        .login-container {
+            width: 90%;
+            margin: 50px auto;
+            padding: 25px 20px;
         }
 
-            #confirm-popup button:hover {
-                background-color: #800000;
-                color: white;
-            }
+        h2 {
+            font-size: 22px;
+        }
+
+        .input-field {
+            font-size: 14px;
+            padding: 9px;
+        }
+
+        button {
+            font-size: 14px;
+            padding: 9px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-container {
+            width: 92%;
+            margin: 40px auto;
+            padding: 20px 15px;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        label {
+            font-size: 13px;
+        }
+
+        .input-field {
+            font-size: 13px;
+        }
+
+        button {
+            font-size: 13px;
+        }
+
+        #forgot-link {
+            font-size: 13px;
+        }
+    }
 </style>
 
+<div class="login-container">
+    <h2>
+        {% if reset and passcode_verified %}
+            Set New Password
+        {% elif reset %}
+            Reset Password
+        {% else %}
+            Student Login
+        {% endif %}
+    </h2>
+
+    {% if error %}
+        <div class="alert" style="color: red;">{{ error }}</div>
+    {% endif %}
+    {% if success_message %}
+        <div class="alert" style="color: green;">{{ success_message }}</div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if not reset %}
+            <!-- Login Form -->
+            <label for="username">Student User ID</label>
+            <input type="text" name="username" id="username" class="input-field"
+                   placeholder="Student User ID" required
+                   value="{{ selected_user|default:'' }}" autocomplete="username">
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password"
+                   placeholder="Password" class="input-field"
+                   required autocomplete="current-password">
+
+            <button type="submit">Login</button>
+
+            <a id="forgot-link" href="{% url 'student_password_reset_view' %}">Forgot Password?</a>
+
+        {% elif reset and not passcode_verified %}
+            <!-- Verify Passcode Step -->
+            <input type="text" name="username" id="username"
+                   class="input-field" readonly
+                   value="{{ selected_user|default:'' }}">
+
+            <input type="password" name="passcode"
+                   class="input-field"
+                   placeholder="Enter 4-digit passcode"
+                   required pattern="\d{4}"
+                   title="Enter your 4-digit passcode.">
+
+            <button type="submit" name="verify_passcode">Verify Passcode</button>
+            <a href="{% url 'student_login_view' %}?username={{ selected_user }}">Back to Login</a>
+
+        {% elif reset and passcode_verified %}
+            <!-- Set New Password Step -->
+            <input type="text" name="username"
+                   class="input-field" readonly
+                   value="{{ selected_user|default:'' }}">
+
+            <input type="password" name="new_password"
+                   placeholder="Enter New Password"
+                   class="input-field"
+                   required minlength="8" maxlength="16"
+                   pattern="^[A-Z][a-z]*[!@#$%^&*(),.?\":{}|<>][a-zA-Z0-9]*[0-9]+$"
+                   title="Start with capital letter, then lowercase, include one special character, and one number. Length 8-16.">
+
+            <input type="password" name="confirm_password"
+                   placeholder="Confirm New Password"
+                   class="input-field" required>
+
+            <input type="hidden" name="password_reset_submit" value="1">
+            <button type="submit">Set New Password</button>
+            <a href="{% url 'student_login_view' %}?username={{ selected_user }}">Back to Login</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Popup -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message"></p>
+    <button id="confirm-yes-login">OK</button>
+</div>
+
+<script>
+    document.getElementById('forgot-link')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username')?.value;
+        if (username) {
+            window.location.href = "{% url 'student_password_reset_view' %}?username=" + encodeURIComponent(username);
+        } else {
+            document.getElementById('confirm-popup-message').innerText = "Please enter your Student User ID first.";
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('confirm-popup').style.display = 'block';
+        }
+    });
+
+    document.getElementById('confirm-yes-login').addEventListener('click', function () {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('confirm-popup').style.display = 'none';
+    });
+</script>
 {% endblock %}

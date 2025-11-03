@@ -6,11 +6,13 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{% static 'css/payslip.css' %}">
     <style>
+        /* Print settings */
         @page {
             size: A4 portrait;
             margin: 15mm;
         }
 
+        /* General styles */
         body {
             font-family: Arial, sans-serif;
             padding: 0;
@@ -49,26 +51,26 @@
             background-color: white;
         }
 
-            /* Employee details */
-            .payslip-table td,
-            .payslip-table th {
-                border: 1px solid #000;
-                padding: 6px 10px;
-                font-size: 13px;
-            }
+        /* Employee details */
+        .payslip-table td,
+        .payslip-table th {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
 
-            /* Earnings/Deductions header */
-            .payslip-table .ed-header th {
-                border: 1px solid #000;
-                font-weight: bold;
-                font-size: 13px;
-                background: #f2f2f2;
-                text-align: left;
-            }
+        /* Earnings/Deductions header */
+        .payslip-table .ed-header th {
+            border: 1px solid #000;
+            font-weight: bold;
+            font-size: 13px;
+            background: #f2f2f2;
+            text-align: left;
+        }
 
-                .payslip-table .ed-header th:first-child {
-                    text-align: left; /* ✅ align Earnings & Allowances to left */
-                }
+        .payslip-table .ed-header th:first-child {
+            text-align: left;
+        }
 
         /* Totals Row */
         .total-row td {
@@ -94,20 +96,18 @@
             margin-top: 20px;
         }
 
-            .summary-table td {
-                border: 2px solid #000;
-                padding: 6px 10px;
-                text-align: left;
-            }
+        .summary-table td {
+            border: 2px solid #000;
+            padding: 6px 10px;
+            text-align: left;
+        }
 
         .footer {
             margin-top: 20px;
             font-size: 11px;
         }
-    </style>
 
-
-    <style>
+        /* Snackbar */
         #snackbar {
             visibility: hidden;
             min-width: 300px;
@@ -125,32 +125,86 @@
             box-shadow: 0px 3px 8px rgba(0,0,0,0.3);
         }
 
-            #snackbar.show {
-                visibility: visible;
-                animation: fadein 0.5s, fadeout 0.5s 4s;
-            }
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 4s;
+        }
 
         @keyframes fadein {
-            from {
-                bottom: 0;
-                opacity: 0;
-            }
-
-            to {
-                bottom: 30px;
-                opacity: 1;
-            }
+            from { bottom: 0; opacity: 0; }
+            to { bottom: 30px; opacity: 1; }
         }
 
         @keyframes fadeout {
-            from {
-                bottom: 30px;
-                opacity: 1;
+            from { bottom: 30px; opacity: 1; }
+            to { bottom: 0; opacity: 0; }
+        }
+
+        /* ====================== */
+        /* Mobile Responsive CSS */
+        /* ====================== */
+        @media only screen and (max-width: 768px) {
+            body {
+                font-size: 12px;
+                padding: 10px;
             }
 
-            to {
-                bottom: 0;
-                opacity: 0;
+            .payslip-box {
+                padding: 10px;
+                border-width: 1px;
+                font-size: 12px;
+            }
+
+            .center {
+                font-size: 13px;
+                margin-top: -50px;
+                margin-bottom: 8px;
+            }
+
+            .header-title {
+                font-size: 14px;
+                margin: 8px 0;
+            }
+
+            .payslip-table td,
+            .payslip-table th {
+                padding: 4px 6px;
+                font-size: 12px;
+            }
+
+            .total-row td,
+            .netpay-row td {
+                font-size: 12px;
+                padding: 6px 4px;
+            }
+
+            .summary-table td {
+                padding: 4px 6px;
+                font-size: 12px;
+            }
+
+            .footer {
+                font-size: 10px;
+            }
+
+            /* Make tables scrollable on small screens */
+            .payslip-table,
+            .summary-table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            /* Logo resizing */
+            .payslip-box img {
+                height: 50px;
+            }
+
+            /* Snackbar adjustments */
+            #snackbar {
+                min-width: 220px;
+                font-size: 13px;
+                padding: 10px;
             }
         }
     </style>
@@ -158,8 +212,6 @@
     <div id="snackbar"></div>
 </head>
 <body>
-
-
 
     {% if salary_slip %}
     <div class="payslip-box">
@@ -170,6 +222,7 @@
                  alt="Company Logo"
                  style="height: 70px; padding: 0px;"><br>
         </div>
+
         <!-- Company Info -->
         <div class="center">
             <p style="margin-bottom: -7px;">Pinnacle School of Commerce & Management</p><br>
@@ -227,11 +280,10 @@
                     Net Pay in Words: <span id="netpay-words">{{ salary_slip.net_pay_in_words }}</span>
                 </td>
             </tr>
-
         </table>
 
         <!-- Bank Summary -->
-        <p style="margin-bottom: -7px; font-weight: bold; font-size: 15px; }">Bank Details</p><br>
+        <p style="margin-bottom: -7px; font-weight: bold; font-size: 15px;">Bank Details</p><br>
 
         <table class="summary-table">
             <tr>
@@ -261,7 +313,7 @@
     </div>
     {% endif %}
 
-    <!-- ✅ JS fallback: works in browser, ignored in PDF -->
+    <!-- JS fallback: convert digits to words if missing -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             let wordsElement = document.getElementById("netpay-words");
@@ -301,16 +353,14 @@
         }
     </script>
 
-
-
     {% if error %}
     <script>
-document.addEventListener("DOMContentLoaded", function() {
-    var snackbar = document.getElementById("snackbar");
-    snackbar.innerText = "{{ error }}";
-    snackbar.classList.add("show");
-    setTimeout(function(){ snackbar.classList.remove("show"); }, 4500);
-});
+        document.addEventListener("DOMContentLoaded", function() {
+            var snackbar = document.getElementById("snackbar");
+            snackbar.innerText = "{{ error }}";
+            snackbar.classList.add("show");
+            setTimeout(function(){ snackbar.classList.remove("show"); }, 4500);
+        });
     </script>
     {% endif %}
 

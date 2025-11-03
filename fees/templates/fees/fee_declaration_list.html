@@ -2,7 +2,6 @@
 {% block title %}Fee Declaration{% endblock %}
 {% block content %}
 <style>
-    /* Same styles as employee list (copy-pasted) */
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -30,14 +29,14 @@
         flex-wrap: wrap;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .btn-add {
         position: absolute;
@@ -55,9 +54,9 @@
         white-space: nowrap;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
     .table {
         width: 100%;
@@ -70,16 +69,16 @@
         text-align: center;
         vertical-align: middle;
         border: 1px solid #dee2e6;
-        padding: 1px 2px;
+        padding: 5px;
         word-wrap: break-word;
-        font-size: 10px;
+        font-size: 11px;
     }
 
     td {
         text-align: center;
         vertical-align: middle;
         border: 1px solid #dee2e6;
-        padding: 0px 0px;
+        padding: 6px 4px;
         word-wrap: break-word;
         font-size: 11px;
     }
@@ -103,17 +102,17 @@
         transition: background-color 0.2s;
         text-decoration: none;
         display: inline-block;
-        font-size:9px;
+        font-size: 10px;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     .search-form {
         position: absolute;
@@ -125,7 +124,6 @@
         width: 200px;
     }
 
-    /* Snackbar + overlay & popup styles reused */
     #snackbar {
         visibility: hidden;
         min-width: 250px;
@@ -142,33 +140,19 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
     }
 
     .content {
@@ -177,12 +161,7 @@
         min-height: 100vh;
     }
 
-    .fee-detail-table {
-        background-color: #fafafa;
-        border: 1px solid #ddd;
-    }
-
-    /* Confirm popup styles */
+    /* Delete Confirmation Modal */
     #overlay {
         position: fixed;
         top: 0;
@@ -221,10 +200,76 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
+
+    /* 📱 MOBILE RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+        .container {
+            margin: 0;
+            padding: 15px;
+            width: 100%;
+            max-width: 100%;
+            box-shadow: none;
+            border-radius: 0;
         }
+
+        .header-flex {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .header-flex h2 {
+            font-size: 18px;
+        }
+
+        .btn-add {
+            position: static;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .search-form {
+            position: static;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            border: none;
+        }
+
+        th, td {
+            font-size: 12px;
+            padding: 6px;
+        }
+
+        td div {
+            line-height: 1.4;
+        }
+
+        .icon-btn {
+            font-size: 11px;
+            padding: 5px 8px;
+            margin: 3px;
+        }
+
+        .fee-row td:nth-child(1)::before { content: "Batch: "; font-weight: bold; }
+        .fee-row td:nth-child(2)::before { content: "Course Type: "; font-weight: bold; }
+        .fee-row td:nth-child(3)::before { content: "Course: "; font-weight: bold; }
+        .fee-row td:nth-child(4)::before { content: "Sem/Year: "; font-weight: bold; }
+        .fee-row td:nth-child(5)::before { content: "Fee Types: "; font-weight: bold; }
+        .fee-row td:nth-child(6)::before { content: "Amounts: "; font-weight: bold; }
+        .fee-row td:nth-child(7)::before { content: "Due Dates: "; font-weight: bold; }
+        .fee-row td:nth-child(8)::before { content: "Actions: "; font-weight: bold; }
+    }
 </style>
 
 <div class="container mt-4">
@@ -256,27 +301,25 @@
                 <td>{{ item.course_type }}</td>
                 <td>{{ item.course }}</td>
                 <td>{{ item.semester|default:item.current_year }}</td>
-
                 {% if item.fee_details.all %}
                 <td>
                     {% for fee in item.fee_details.all %}
-                    <div>{{ fee.fee_type.name }}</div>
+                        <div>{{ fee.fee_type.name }}</div>
                     {% endfor %}
                 </td>
                 <td>
                     {% for fee in item.fee_details.all %}
-                    <div>{{ fee.amount }}</div>
+                        <div>{{ fee.amount }}</div>
                     {% endfor %}
                 </td>
                 <td>
                     {% for fee in item.fee_details.all %}
-                    <div>{{ fee.due_date|date:"d-m-Y" }}</div>
+                        <div>{{ fee.due_date|date:"d-m-Y" }}</div>
                     {% endfor %}
                 </td>
                 {% else %}
                 <td colspan="3" class="text-muted">No fee details</td>
                 {% endif %}
-
                 <td>
                     <a href="{% url 'fee_declaration_edit' item.id %}" class="icon-btn" title="Edit">
                         <i class="fas fa-edit"></i>
@@ -284,20 +327,16 @@
                     <form id="delete-form-{{ item.id }}" action="{% url 'fee_declaration_delete' item.id %}" method="post" style="display:inline;">
                         {% csrf_token %}
                     </form>
-                    <a href="#" class="icon-btn text-danger" title="Delete"
-                       onclick="confirmFeeDelete('{{ item.id }}')">
+                    <a href="#" class="icon-btn text-danger" title="Delete" onclick="confirmFeeDelete('{{ item.id }}')">
                         <i class="fas fa-trash-alt"></i>
                     </a>
                 </td>
             </tr>
             {% empty %}
-            <tr>
-                <td colspan="8" class="text-center text-muted">No fee declarations found.</td>
-            </tr>
+            <tr><td colspan="8" class="text-center text-muted">No fee declarations found.</td></tr>
             {% endfor %}
         </tbody>
     </table>
-
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -311,7 +350,6 @@
 <div id="snackbar"></div>
 
 <script>
-    // Reuse snackbar
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
@@ -327,22 +365,17 @@
         {% endfor %}
     {% endif %}
 
-    // Search logic
     document.getElementById('feeSearch').addEventListener('input', function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('.fee-row');
-
         rows.forEach(row => {
             const cells = row.querySelectorAll('td');
             let rowText = '';
-            cells.forEach(cell => {
-                rowText += cell.textContent.toLowerCase() + ' ';
-            });
+            cells.forEach(cell => rowText += cell.textContent.toLowerCase() + ' ');
             row.style.display = rowText.includes(filter) ? '' : 'none';
         });
     });
 
-    // Delete confirmation
     let deleteFeeId = null;
     function confirmFeeDelete(id) {
         deleteFeeId = id;

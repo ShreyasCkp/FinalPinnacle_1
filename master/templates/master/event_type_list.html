@@ -29,6 +29,8 @@
         align-items: center;
         position: relative;
         margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
         .header-flex h2 {
@@ -41,8 +43,6 @@
         }
 
     .btn-add {
-        position: absolute;
-        right: 0;
         background-color: #800000;
         color: #fff;
         font-size: 13px;
@@ -53,6 +53,7 @@
         text-decoration: none;
         cursor: pointer;
         transition: background-color 0.3s;
+        display: inline-block;
     }
 
         .btn-add:hover {
@@ -60,8 +61,6 @@
         }
 
     .search-input {
-        position: absolute;
-        left: 0;
         padding: 6px 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
@@ -167,7 +166,6 @@
             color: white;
         }
 
-
     #snackbar {
         visibility: hidden;
         min-width: 250px;
@@ -190,26 +188,72 @@
         }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* --- Mobile Styles --- */
+    @media (max-width: 992px) {
+        .container {
+            margin-left: 15px;
+            max-width: calc(100% - 30px);
+            padding: 20px;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        .header-flex {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-input, .btn-add {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        table, th, td {
+            font-size: 10px;
+        }
+
+        td {
+            padding: 4px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        h2 {
+            font-size: 18px;
+        }
+
+        table, th, td {
+            font-size: 9px;
+        }
+
+        .icon-btn i {
+            font-size: 10px;
+        }
+
+        .btn-add, .search-input {
+            font-size: 12px;
+            padding: 6px;
+        }
+
+        #confirm-popup {
+            width: 90%;
+            padding: 15px;
+        }
+
+        #confirm-yes, #confirm-no {
+            font-size: 11px;
+            padding: 5px 10px;
         }
     }
 </style>
@@ -238,28 +282,17 @@
             <tr>
                 <td>{{ type.name }}</td>
                 <td>
-                    {% if type.is_active %}
-                    <span>Active</span>
-                    {% else %}
-                    <span >Inactive</span>
-                    {% endif %}
+                    {% if type.is_active %}Active{% else %}Inactive{% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'event_type_view' type.pk %}" class="icon-btn" title="View">
-                        <i class="fas fa-eye"></i>
-                    </a>
-
-                    <a href="{% url 'event_type_edit' type.pk %}" class="icon-btn" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
+                    <a href="{% url 'event_type_view' type.pk %}" class="icon-btn" title="View"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'event_type_edit' type.pk %}" class="icon-btn" title="Edit"><i class="fas fa-edit"></i></a>
 
                     <form id="delete-form-{{ type.id }}" method="POST" action="{% url 'event_type_delete' type.pk %}" style="display: none;">
                         {% csrf_token %}
                     </form>
                     <a href="#" class="icon-btn text-danger" title="Delete"
-                       onclick="confirmDelete('{{ type.id }}', '{{ type.name }}')">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
+                       onclick="confirmDelete('{{ type.id }}', '{{ type.name }}')"><i class="fas fa-trash-alt"></i></a>
                 </td>
             </tr>
             {% endfor %}
@@ -301,37 +334,28 @@
         deleteId = null;
     });
 
-    // Search bar filter
     document.getElementById('eventSearch').addEventListener('input', function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('table tbody tr');
-
         rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            const rowText = Array.from(cells).map(td => td.textContent.toLowerCase()).join(' ');
+            const rowText = Array.from(row.querySelectorAll('td')).map(td => td.textContent.toLowerCase()).join(' ');
             row.style.display = rowText.includes(filter) ? '' : 'none';
         });
     });
-</script>
 
-
-<div id="snackbar"></div>
-
-<script>
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
         snackbar.className = "show";
-        setTimeout(() => {
-            snackbar.className = snackbar.className.replace("show", "");
-        }, 3000);
+        setTimeout(() => snackbar.className = snackbar.className.replace("show",""), 3000);
     }
 
-    // Django messages support
     {% if messages %}
         {% for message in messages %}
             showSnackbar("{{ message|escapejs }}");
         {% endfor %}
     {% endif %}
 </script>
+
+<div id="snackbar"></div>
 {% endblock %}

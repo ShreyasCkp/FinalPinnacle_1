@@ -21,7 +21,7 @@
     }
 
     h3 {
-        margin-top: 0px;
+        margin-top: 0;
         font-weight: 600;
         color: #8b0000;
         margin-bottom: 20px;
@@ -36,7 +36,8 @@
         display: block;
     }
 
-    .form-control, .form-select {
+    .form-control, 
+    .form-select {
         font-size: 14px;
         padding: 6px;
         border-radius: 5px;
@@ -53,11 +54,12 @@
         color: white;
         border: none;
         border-radius: 8px;
+        transition: all 0.2s ease-in-out;
     }
 
-        .btn-save:hover {
-            background-color: #8a1f1f;
-        }
+    .btn-save:hover {
+        background-color: #8a1f1f;
+    }
 
     .btn-back {
         background-color: #800000;
@@ -67,12 +69,13 @@
         color: white;
         border-radius: 8px;
         text-decoration: none;
+        transition: all 0.2s ease-in-out;
     }
 
-        .btn-back:hover {
-            background-color: #6e0000;
-            color: white;
-        }
+    .btn-back:hover {
+        background-color: #6e0000;
+        color: white;
+    }
 
     .btn-container {
         display: flex;
@@ -84,17 +87,80 @@
         margin-top: 10px;
     }
 
-    .content {
-        padding: 25px 26px 40px;
-        margin-left: 200px;
+    .form-check-input {
+        margin-right: 6px;
     }
 
-    /* Error message style */
     .error-message {
         color: red;
         font-size: 13px;
         margin-top: -12px;
         margin-bottom: 12px;
+    }
+
+    .content {
+        padding: 25px 26px 40px;
+        margin-left: 200px;
+    }
+
+    /* ===== MOBILE RESPONSIVE DESIGN ===== */
+    @media (max-width: 768px) {
+        .content {
+            margin-left: 0 !important;
+            padding: 16px !important;
+        }
+
+        .form-container {
+            width: 90%;
+            margin: 15px auto;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-control, 
+        .form-select {
+            font-size: 13px;
+            padding: 8px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .form-check-label {
+            font-size: 13px;
+        }
+
+        .btn-container {
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-back, 
+        .btn-save {
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-back {
+            order: 1;
+        }
+
+        .btn-save {
+            order: 2;
+        }
     }
 </style>
 
@@ -106,17 +172,16 @@
         {{ form.non_field_errors }}
 
         {% for field in form %}
-        {% if field.name != 'is_active' %}
-        <div class="mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field.errors }}
-            {{ field|add_class:"form-control" }}
-
-            {% if field.name == 'year' %}
-            <div id="year-error" class="error-message"></div>
+            {% if field.name != 'is_active' %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field.errors }}
+                    {{ field|add_class:"form-control" }}
+                    {% if field.name == 'year' %}
+                        <div id="year-error" class="error-message"></div>
+                    {% endif %}
+                </div>
             {% endif %}
-        </div>
-        {% endif %}
         {% endfor %}
 
         <div class="form-check">
@@ -140,7 +205,6 @@
     </form>
 </div>
 
-
 <script>
     const form = document.getElementById('academicYearForm');
     const yearInput = form.querySelector('input[name="year"]');
@@ -160,13 +224,11 @@
         const endYear = parseInt(endShort, 10);
         const startLastTwo = startYear % 100;
 
-        // Rule 1: Start year must be >= 2025
         if (startYear < 2025) {
             errorDiv.textContent = `Academic year cannot start before 2025.`;
             return false;
         }
 
-        // Rule 2: End year (short) must be greater than last two digits of start year
         if (endYear <= startLastTwo) {
             errorDiv.textContent = `End year (${endYear}) must be greater than start year (${startLastTwo}).`;
             return false;
@@ -178,81 +240,6 @@
 
     yearInput.addEventListener('input', validateYear);
 
-    form.addEventListener('submit', function (event) {
-        if (!validateYear()) {
-            event.preventDefault();
-            yearInput.focus();
-        }
-    });
-</script>
-
-
-
-
-<!--<script>
-    const form = document.getElementById('academicYearForm');
-    const yearInput = form.querySelector('input[name="year"]'); // adjust if needed
-    const errorDiv = document.getElementById('year-error');
-    const submitBtn = document.getElementById('submitBtn');
-
-    const pattern = /^\d{4}-\d{2}$/;
-
-    function validateYear() {
-        const value = yearInput.value.trim();
-        const currentYear = new Date().getFullYear();
-
-        if (!pattern.test(value)) {
-            errorDiv.textContent = 'Please enter the Batch in the format YYYY-YY, e.g., 2025-26.';
-            return false;
-        }
-
-        const startYear = parseInt(value.split('-')[0]);
-
-        if (startYear < currentYear) {
-            errorDiv.textContent = `Academic year cannot start before ${currentYear}.`;
-            return false;
-        }
-
-        errorDiv.textContent = '';
-        return true;
-    }
-
-    // Live feedback
-    yearInput.addEventListener('input', validateYear);
-
-    // Final check on submit
-    form.addEventListener('submit', function (event) {
-        if (!validateYear()) {
-            event.preventDefault();
-            yearInput.focus();
-        }
-    });
-</script>-->
-
-<script>
-    const form = document.getElementById('academicYearForm');
-    const yearInput = form.querySelector('input[name="year"]'); // adjust if your field name differs
-    const errorDiv = document.getElementById('year-error');
-    const submitBtn = document.getElementById('submitBtn');
-
-    // Regex for format like 2025-26
-    const pattern = /^\d{4}-\d{2}$/;
-
-    function validateYear() {
-        const value = yearInput.value.trim();
-        if (!pattern.test(value)) {
-            errorDiv.textContent = 'Please enter the year in the format YYYY-YY, e.g., 2025-26.';
-            return false;
-        } else {
-            errorDiv.textContent = '';
-            return true;
-        }
-    }
-
-    // Real-time validation on input event
-    yearInput.addEventListener('input', validateYear);
-
-    // Final validation on submit
     form.addEventListener('submit', function (event) {
         if (!validateYear()) {
             event.preventDefault();

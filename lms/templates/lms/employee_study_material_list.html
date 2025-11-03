@@ -2,7 +2,6 @@
 {% block title %}Study Material List{% endblock %}
 {% block content %}
 
-
 <style>
     body {
         background-color: #f0f2f5;
@@ -13,13 +12,14 @@
 
     .container {
         margin-left: 200px;
-        padding: 27px;
+        padding: 24px;
         max-width: calc(100% - 200px);
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         margin-top: 20px;
         box-sizing: border-box;
+        overflow-x: auto;
     }
 
     .header-flex {
@@ -28,16 +28,17 @@
         align-items: center;
         position: relative;
         margin-bottom: 20px;
+        flex-wrap: wrap;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .btn-add {
         position: absolute;
@@ -54,19 +55,20 @@
         transition: background-color 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
     table {
         width: 100%;
-        font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        font-size: 12px;
+        min-width: 800px; /* for scroll on small screens */
     }
 
     th, td {
-        padding: 1px;
+        padding: 6px;
         text-align: center;
         border: 1px solid #dee2e6;
         vertical-align: middle;
@@ -81,14 +83,10 @@
         background-color: #f8f9fa;
     }
 
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
-
     .icon-btn {
         border: 1px solid #dee2e6;
         background-color: #fff;
-        padding: 3px 5px;
+        padding: 4px 6px;
         margin: 2px;
         border-radius: 6px;
         cursor: pointer;
@@ -97,72 +95,16 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
-
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
-
-    .alert {
-        color: #800000;
-        font-size: 11px;
-        font-weight: 500;
-        padding: 10px 0;
-        text-align: center;
-    }
-
-    .content {
-        margin-left: 0px;
-        padding: 29px 24px 40px;
-        min-height: 100vh;
-    }
-
-    #overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0,0,0,0.5);
-        display: none;
-        z-index: 1000;
-    }
-
-    #confirm-popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        display: none;
-        z-index: 1001;
-        text-align: center;
-    }
-
-    #confirm-yes, #confirm-no {
-        margin: 0 5px;
-        padding: 6px 12px;
+    .icon-btn i {
         font-size: 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        background: transparent;
         color: #800000;
-        font-weight: 600;
-        border: 2px solid #800000;
-        transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
+    /* Snackbar styling */
     #snackbar {
         visibility: hidden;
         min-width: 250px;
@@ -179,97 +121,169 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* ===== Responsive Styling ===== */
+    @media (max-width: 992px) {
+        .container {
+            margin-left: -200px;
+            max-width: 142%;
+            padding: 16px;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        .header-flex {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-add {
+            position: relative;
+            margin-top: 10px;
+            right: auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        table {
+            font-size: 11px;
+            min-width: 650px;
+        }
+        th, td {
+            padding: 5px 4px;
+        }
+        .btn-add {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        table {
+            font-size: 10px;
+            min-width: 500px;
+        }
+        th, td {
+            padding: 4px 3px;
+        }
+        .btn-add {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+        .icon-btn i {
+            font-size: 9px;
+        }
+    }
+
+    /* Optional: Card View for extra-small screens */
+    @media (max-width: 480px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead {
+            display: none;
+        }
+
+        tr {
+            background: #fff;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        td {
+            border: none;
+            text-align: left;
+            padding: 6px 8px;
+            position: relative;
+        }
+
+        td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: #800000;
+            display: block;
+            margin-bottom: 2px;
         }
     }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og=="
       crossorigin="anonymous" />
 
 <div class="container mt-4">
     <div class="header-flex">
-        <h2>Employee Study Materials</h2>
-        <a href="{% url 'create_study_material' %}" class="btn-add">
+        <h2>Employee Study Materials
+        <a href="{% url 'create_study_material' %}" class="btn-add" style="margin-left: 200px;">
             <i class="fas fa-plus me-2"></i> Add Study Material
-        </a>
+        </a></h2>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Subject</th>
-                <th>Faculty</th>
-                <th>Type</th>
-                <th>Attachment/Link</th>
-                <th>Created</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for mat in study_materials %}
-            <tr>
-                <td>{{ mat.title }}</td>
-                <td>{{ mat.subject.name }}</td>
-                <td>{{ mat.faculty.name }}</td>
-                <td>{{ mat.get_material_type_display }}</td>
-                <td>
-                    {% if mat.material_type == "link" %}
-                    <a href="{{ mat.link_url }}" target="_blank">Open Link</a>
-                    {% else %}
-                    <a href="{{ mat.attachment.url }}" download>Download</a>
-                    {% endif %}
-                </td>
-                <td>{{ mat.created_at }}</td>
-                <td>
-                    <!-- Edit Icon -->
-                    <a href="{% url 'edit_study_material' mat.id %}" class="icon-btn" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Faculty</th>
+                    <th>Type</th>
+                    <th>Attachment / Link</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mat in study_materials %}
+                <tr>
+                    <td data-label="Title">{{ mat.title }}</td>
+                    <td data-label="Subject">{{ mat.subject.name }}</td>
+                    <td data-label="Faculty">{{ mat.faculty.name }}</td>
+                    <td data-label="Type">{{ mat.get_material_type_display }}</td>
+                    <td data-label="Attachment / Link">
+                        {% if mat.material_type == "link" %}
+                        <a href="{{ mat.link_url }}" target="_blank">Open Link</a>
+                        {% else %}
+                        <a href="{{ mat.attachment.url }}" download>Download</a>
+                        {% endif %}
+                    </td>
+                    <td data-label="Created">{{ mat.created_at }}</td>
+                    <td data-label="Actions">
+                        <a href="{% url 'edit_study_material' mat.id %}" class="icon-btn" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
 
-                    <!-- Hidden Delete Form -->
-                    <form id="delete-form-{{ mat.id }}" method="POST" action="{% url 'delete_employee_study_material' mat.id %}" style="display: none;">
-                        {% csrf_token %}
-                    </form>
+                        <form id="delete-form-{{ mat.id }}" method="POST"
+                              action="{% url 'delete_employee_study_material' mat.id %}"
+                              style="display:none;">
+                            {% csrf_token %}
+                        </form>
 
-                    <!-- Delete Icon -->
-                    <a href="#" class="icon-btn text-danger" title="Delete"
-                       onclick="confirmDelete('{{ mat.id }}', '{{ mat.title }}')">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-                </td>
-
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                        <a href="#" class="icon-btn text-danger" title="Delete"
+                           onclick="confirmDelete('{{ mat.id }}', '{{ mat.title }}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -280,4 +294,4 @@
     }
 </script>
 
-    {% endblock %}
+{% endblock %}

@@ -7,142 +7,150 @@
     {% load static %}
 
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url("{% static 'images/CKP 1.png' %}") no-repeat top center fixed;
+            background-size: 360px auto;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 200px;
+            box-sizing: border-box;
+        }
+
+        .form-container {
+            padding: 20px;
+            border-radius: 12px;
+            background-image: linear-gradient(#f4f4f4, #f4f4f4), linear-gradient(135deg, #ff00cc, #3333ff);
+            border: 2px solid transparent;
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .card-header-gradient {
+            background: linear-gradient(135deg, #ff00cc, #3333ff);
+            padding: 10px;
+            text-align: center;
+            border-radius: 7px;
+            margin-bottom: 20px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #ff00cc, #3333ff);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 7px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            transform: scale(1.02);
+            opacity: 0.95;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"] {
+            height: 35px;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .form-check-label {
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        .card-body {
+            margin-top: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
             body {
-                font-family: Arial, sans-serif;
-                background: url("{% static 'images/CKP 1.png' %}") no-repeat top center fixed;
-                background-size: 360px auto; /* Adjust logo size */
-                background-color: #f0f2f5;
-                display: flex;
-                justify-content: center;
-                align-items: flex-start; /* Align to top */
-                min-height: 100vh;
-                margin: 0;
-                padding-top: 200px; /* Push content down to make space for logo */
-                box-sizing: border-box;
+                padding-top: 150px;
+                background-size: 250px auto;
             }
 
             .form-container {
                 padding: 15px;
-                border-radius: 12px;
-                background-image: linear-gradient(#f4f4f4, #f4f4f4), /* Inner content */
-                linear-gradient(135deg, #ff00cc, #3333ff); /* Border */
-                border: 2px solid transparent;
-                background-origin: border-box;
-                background-clip: padding-box, border-box;
-                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+                margin: 0 10px;
             }
 
+            .btn-gradient {
+                font-size: 14px;
+                padding: 8px;
+            }
 
-            /*.form-container {
-        padding: 15px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #ff00cc, #3333ff) border-box, #f4f4f4 padding-box;*/ /* inner background */
-            /*border: 3px solid transparent;
-        background-origin: border-box;
-        background-clip: padding-box, border-box;
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-        }*/
+            input[type="text"], input[type="email"], input[type="password"] {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+        }
 
-
-            .card {
-                border: 2px solid #ff00cc;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        @media (max-width: 480px) {
+            body {
+                padding-top: 120px;
+                background-size: 200px auto;
             }
 
             .card-header-gradient {
-                background: linear-gradient(135deg, #ff00cc, #3333ff);
-                padding: 1px;
-                text-align: center;
-                margin-bottom: 30px;
-                border-radius: 7px;
-                font-size: 17px;
+                font-size: 16px;
             }
-
-                .card-header-gradient h4 {
-                    margin: 7px;
-                    color: #fff;
-                    font-size: 17px;
-                }
-
-            .btn-gradient {
-                background: linear-gradient(135deg, #ff00cc, #3333ff);
-                padding: 1px;
-                text-align: center;
-                margin-bottom: 30px;
-                border-radius: 7px;
-                font-size: 17px;
-                color: white;
-                border: none;
-                width: 50%;
-                margin-left: 95px;
-            }
-
-                .btn-gradient:hover {
-                    transform: scale(1.02);
-                    opacity: 0.95;
-                }
-
-            .form-label {
-                font-weight: 500;
-            }
-
-            .form-check-label {
-                font-weight: 400;
-            }
-
 
             input[type="text"], input[type="email"], input[type="password"] {
-                height: 26px !important;
-                font-size: 9px !important;
-                padding: 6px 21px !important;
-                border-radius: 6px !important;
-                border: 1px solid #ccc !important;
-                width: 100% !important;
-                max-width: 200px !important;
-                margin-bottom: 13px !important;
+                font-size: 12px;
+                padding: 5px 8px;
             }
 
-
-            input.form-control {
-                height: 35px !important;
-                font-size: 14px !important;
-                max-width: 400px !important;
+            .btn-gradient {
+                font-size: 13px;
+                padding: 7px;
             }
-
-            .card-body {
-                margin-top: 20px;
-            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container mt-5">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-10">
 
                 <div class="form-container">
-                    <!--<div class="card-header-gradient">
-                        <h4>License Key</h4>
-                    </div>-->
+                    <div class="card-header-gradient">
+                        Activate License
+                    </div>
 
                     <div class="card-body">
                         <form method="POST">
                             {% csrf_token %}
-
                             {{ form.as_p }}
-                            <p>
-                                <label>
-                                    <input type="checkbox" name="accept_terms" required>
 
+                            <div class="form-check mb-3">
+                                <input type="checkbox" name="accept_terms" class="form-check-input" required>
+                                <label class="form-check-label">
                                     I accept the
                                     <a href="{% url 'terms_and_conditions' %}" target="_blank">Terms and Conditions</a> and
                                     <a href="{% url 'privacy_policy' %}" target="_blank">Privacy Policy</a>
                                 </label>
-                            </p>
+                            </div>
 
-                            <button type="submit" class="btn btn-gradient mt-3">Activate License</button>
+                            <button type="submit" class="btn btn-gradient">Activate License</button>
                         </form>
 
                         {% if error %}
@@ -157,5 +165,3 @@
 
 </body>
 </html>
-
-<!--Privacy Policy-->

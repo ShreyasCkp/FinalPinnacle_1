@@ -4,6 +4,7 @@
 <head>
     <title>{% block title %}Login{% endblock %}</title>
     {% load static %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         html, body {
             height: 100%;
@@ -19,28 +20,31 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
         .login-box {
             background-color: rgba(255, 255, 255, 0.95);
-            padding: 18px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-            width: 85%;
-            max-width: 320px;
+            width: 100%;
+            max-width: 350px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             transition: all 0.5s ease;
+            box-sizing: border-box;
         }
 
-            .login-box img {
-                max-width: 70%;
-                height: auto;
-                margin-bottom: 12px;
-                transition: transform 0.5s ease;
-            }
+        .login-box img {
+            max-width: 70%;
+            height: auto;
+            margin-bottom: 12px;
+            transition: transform 0.5s ease;
+        }
 
         .login-content {
             opacity: 0;
@@ -60,22 +64,21 @@
         }
 
         .form-group {
-            width: 75%;
-            max-width: 200px;
+            width: 90%;
             margin-bottom: 12px;
             text-align: left;
         }
 
-            .form-group label {
-                display: block;
-                font-size: 14px;
-                color: #444;
-                margin-bottom: 4px;
-            }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 4px;
+        }
 
         .input-field {
-            width: 62%;
-            padding: 8px 10px;
+            width: 100%;
+            padding: 10px;
             font-size: 15px;
             border-radius: 6px;
             border: 1px solid #ccc;
@@ -90,9 +93,8 @@
         }
 
         .login-box button {
-            width: 75%;
-            max-width: 200px;
-            padding: 8px;
+            width: 90%;
+            padding: 10px;
             background: linear-gradient(135deg, #8B0000, #800000);
             color: white;
             border: none;
@@ -100,19 +102,18 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 10px;
             transition: background 0.3s ease;
             box-sizing: border-box;
         }
 
-            .login-box button:hover {
-                background: #600000;
-            }
+        .login-box button:hover {
+            background: #600000;
+        }
 
         .alert {
             font-size: 13px;
-            width: 75%;
-            max-width: 200px;
+            width: 90%;
             text-align: center;
             color: red;
             margin-bottom: 12px;
@@ -126,9 +127,44 @@
             display: block;
         }
 
-            a:hover {
-                text-decoration: underline;
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* MOBILE RESPONSIVE STYLING */
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 15px;
+                max-width: 95%;
             }
+
+            .login-box img {
+                max-width: 60%;
+                margin-bottom: 10px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            .input-field {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .login-box button {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            .alert {
+                font-size: 12px;
+            }
+
+            a {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -148,12 +184,12 @@
 
                     <div class="form-group">
                         <label for="id_username">Username</label>
-                        {{ form.username }}
+                        {{ form.username|add_class:"input-field" }}
                     </div>
 
                     <div class="form-group">
                         <label for="id_password">Password</label>
-                        {{ form.password }}
+                        {{ form.password|add_class:"input-field" }}
                     </div>
 
                     <button type="submit">Login</button>

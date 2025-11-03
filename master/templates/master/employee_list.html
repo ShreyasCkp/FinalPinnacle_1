@@ -3,277 +3,184 @@
 
 {% block content %}
 <style>
-    body {
-        background-color: #f0f2f5;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 0;
-    }
-
+/* --- Mobile Styles --- */
+@media (max-width: 768px) {
     .container {
-        margin-left: 200px;
-        padding: 30px;
-        max-width: calc(100% - 200px);
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 20px;
-        box-sizing: border-box;
+        margin-left: 10px;
+        padding: 20px 10px;
+        max-width: 100%;
+        overflow-x: auto;
     }
 
     .header-flex {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
         .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 18px;
+        color: #800000;
+    }
 
     .btn-add {
-        position: absolute;
-        right: 0;
-        background-color: #800000;
-        color: #fff;
-        font-size: 13px;
-        padding: 6px 12px;
-        border: none;
-        border-radius: 4px;
-        font-weight: bold;
-        text-decoration: none;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        white-space: nowrap;
+        position: static;
+        margin-bottom: 10px;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
-
-    .table {
+    table {
+        font-size: 10px;
+        display: block;
         width: 100%;
-        font-size: 12px;
-        border-collapse: collapse;
-        table-layout: fixed; /* Allow columns to shrink */
+        overflow-x: auto;
     }
 
-    th {
-        text-align: center;
-        vertical-align: middle;
-        border: 1px solid #dee2e6;
-        padding: 1px 2px;
-        word-wrap: break-word;
-        word-break: break-word;
-        font-size: 11px;
+    th, td {
+        padding: 4px 6px;
+        font-size: 10px;
     }
 
-    td {
-        text-align: center;
-        vertical-align: middle;
-        border: 1px solid #dee2e6;
-        padding: 1px 2px;
-        word-wrap: break-word;
-        word-break: break-word;
-        font-size: 9px;
-    }
-
-    thead {
-        background: linear-gradient(135deg, #8B0000, #800000);
-        color: white;
-    }
-
-    tr:nth-child(even) {
-        background-color: #f8f9fa;
-    }
-
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
-
-    .icon-btn {
-        border: 1px solid #dee2e6;
-        background-color: #fff;
-        padding: 2px 2px;
-        margin: 2px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
+    @media (max-width: 480px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
         }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
+        thead {
+            display: none;
         }
 
-    .search-form {
-        position: absolute;
-        left: 0;
-        padding: 6px 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 13px;
-        width: 200px;
+        tr {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        td {
+            text-align: left;
+            padding: 4px 8px;
+            position: relative;
+            padding-left: 50%;
+            white-space: normal;
+        }
+
+        td::before {
+            position: absolute;
+            top: 4px;
+            left: 8px;
+            width: 45%;
+            white-space: nowrap;
+            font-weight: bold;
+            font-size: 9px;
+            color: #555;
+        }
+
+        td:nth-of-type(1)::before { content: "Employee ID"; }
+        td:nth-of-type(2)::before { content: "Name"; }
+        td:nth-of-type(3)::before { content: "User Id"; }
+        td:nth-of-type(4)::before { content: "Password"; }
+        td:nth-of-type(5)::before { content: "Category"; }
+        td:nth-of-type(6)::before { content: "Designation"; }
+        td:nth-of-type(7)::before { content: "Role"; }
+        td:nth-of-type(8)::before { content: "Email"; }
+        td:nth-of-type(9)::before { content: "Phone"; }
+        td:nth-of-type(10)::before { content: "Employment Type"; }
+        td:nth-of-type(11)::before { content: "Combination"; }
+        td:nth-of-type(12)::before { content: "Sem/Year"; }
+        td:nth-of-type(13)::before { content: "Subject"; }
+        td:nth-of-type(14)::before { content: "Actions"; }
     }
+}
 
-    #snackbar {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: #800000;
-        color: #fff;
-        text-align: center;
-        border-radius: 4px;
-        padding: 14px 24px;
-        position: fixed;
-        z-index: 9999;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 14px;
-    }
-
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
-
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-
+@media (max-width: 768px) {
     .content {
-        margin-left: 0px;
-        padding: 24px 20px 40px;
-        min-height: 100vh;
+        margin-left: 0;
+        padding: 47px 18px 8px;
     }
+}
 
-    #snackbar {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: #800000;
-        color: #fff;
-        text-align: center;
-        border-radius: 4px;
-        padding: 14px 24px;
-        position: fixed;
-        z-index: 9999;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 14px;
-    }
+/* --- Delete Confirmation Modal --- */
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
+}
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+#confirm-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 8px;
+    z-index: 1000;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+}
 
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
+#confirm-popup button {
+    margin: 5px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
 
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
+#confirm-yes {
+    background-color: #d9534f;
+    color: white;
+}
 
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
+#confirm-no {
+    background-color: #5bc0de;
+    color: white;
+}
 
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
+/* --- Snackbar --- */
+#snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 12px;
+    position: fixed;
+    z-index: 1001;
+    left: 50%;
+    bottom: 30px;
+    font-size: 14px;
+}
 
-    #overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0,0,0,0.5);
-        display: none;
-        z-index: 1000;
-    }
+#snackbar.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
 
-    #confirm-popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        display: none;
-        z-index: 1001;
-        text-align: center;
-    }
+@keyframes fadein {
+    from { bottom: 0; opacity: 0; } 
+    to { bottom: 30px; opacity: 1; }
+}
 
-    #confirm-yes, #confirm-no {
-        margin: 0 5px;
-        padding: 6px 12px;
-        font-size: 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        background: transparent;
-        color: #800000;
-        font-weight: 600;
-        border: 2px solid #800000;
-        transition: all 0.2s ease;
-    }
-
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
+@keyframes fadeout {
+    from { bottom: 30px; opacity: 1; }
+    to { bottom: 0; opacity: 0; }
+}
 </style>
-
 
 <div class="container mt-4">
     <div class="header-flex">
-        <input type="text" id="employeeSearch" class="search-form" placeholder="Search Employees...">
+    <input type="text" id="employeeSearch" class="search-form" style="width: 100%;" placeholder="Search Employees...">
         <h2>Employee List</h2>
     </div>
 
@@ -299,105 +206,61 @@
         <tbody>
             {% for emp in employees %}
             {% if emp.subject_assignments.exists %}
-            {% for assign in emp.subject_assignments.all %}
-            <tr class="employee-row" data-emp-id="{{ emp.id }}">
-                <td>{{ emp.emp_code }}</td>
-                <td>{{ emp.name }}</td>
-
-                <!-- User Id -->
-                <td>
-                    {% if emp.category == 'Teaching Staff' %}
-                    {{ emp.employee_userid|default:"-" }}
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-
-                <!-- Password -->
-                <td>
-                    {% if emp.category == 'Teaching Staff' %}
-                    {{ emp.employee_password|default:"-" }}
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-
-                <td>{{ emp.category }}</td>
-                <td>{{ emp.designation }}</td>
-                <td>{{ emp.role }}</td>
-                <td>{{ emp.email }}</td>
-                <td>{{ emp.phone }}</td>
-                <td>{{ emp.employment_type }}</td>
-                <td>{{ assign.course.name }}</td>
-                <td>{{ assign.course.name }} {{ assign.semester }}</td>
-                <td>{{ assign.subject.name }}</td>
-                <td>
-                    <a href="{% url 'employee_form_view' emp.id %}" class="icon-btn" title="View">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{% url 'employee_form_edit' emp.id %}" class="icon-btn" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <form id="delete-form-{{ emp.id }}" action="{% url 'employee_form_delete' emp.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <a href="#" class="icon-btn text-danger" title="Delete"
-                           onclick="confirmDelete('{{ emp.id }}', '{{ emp.name }}')">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
+                {% for assign in emp.subject_assignments.all %}
+                <tr class="employee-row" data-emp-id="{{ emp.id }}">
+                    <td>{{ emp.emp_code }}</td>
+                    <td>{{ emp.name }}</td>
+                    <td>{% if emp.category == 'Teaching Staff' %}{{ emp.employee_userid|default:"-" }}{% else %}-{% endif %}</td>
+                    <td>{% if emp.category == 'Teaching Staff' %}{{ emp.employee_password|default:"-" }}{% else %}-{% endif %}</td>
+                    <td>{{ emp.category }}</td>
+                    <td>{{ emp.designation }}</td>
+                    <td>{{ emp.role }}</td>
+                    <td>{{ emp.email }}</td>
+                    <td>{{ emp.phone }}</td>
+                    <td>{{ emp.employment_type }}</td>
+                    <td>{{ assign.course.name }}</td>
+                    <td>{{ assign.course.name }} {{ assign.semester }}</td>
+                    <td>{{ assign.subject.name }}</td>
+                    <td>
+                        <a href="{% url 'employee_form_view' emp.id %}" class="icon-btn" title="View"><i class="fas fa-eye"></i></a>
+                        <a href="{% url 'employee_form_edit' emp.id %}" class="icon-btn" title="Edit"><i class="fas fa-edit"></i></a>
+                        <form id="delete-form-{{ emp.id }}" action="{% url 'employee_form_delete' emp.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <a href="javascript:void(0);" class="icon-btn text-danger" title="Delete" onclick="confirmDelete('{{ emp.id }}', '{{ emp.name }}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
             {% else %}
-            <tr class="employee-row" data-emp-id="{{ emp.id }}">
-                <td>{{ emp.emp_code }}</td>
-                <td>{{ emp.name }}</td>
-
-                <!-- User Id -->
-                <td>
-                    {% if emp.category == 'Teaching Staff' %}
-                    {{ emp.employee_userid|default:"-" }}
+                <tr class="employee-row" data-emp-id="{{ emp.id }}">
+                    <td>{{ emp.emp_code }}</td>
+                    <td>{{ emp.name }}</td>
+                    <td>{% if emp.category == 'Teaching Staff' %}{{ emp.employee_userid|default:"-" }}{% else %}-{% endif %}</td>
+                    <td>{% if emp.category == 'Teaching Staff' %}{{ emp.employee_password|default:"-" }}{% else %}-{% endif %}</td>
+                    <td>{{ emp.category }}</td>
+                    <td>{{ emp.designation }}</td>
+                    <td>{{ emp.role }}</td>
+                    <td>{{ emp.email }}</td>
+                    <td>{{ emp.phone }}</td>
+                    <td>{{ emp.employment_type }}</td>
+                    {% if emp.category == 'Non-Teaching Staff' %}
+                    <td colspan="3" class="text-muted">Assignments not applicable</td>
                     {% else %}
-                    -
+                    <td colspan="3" class="text-muted">No subject assignments</td>
                     {% endif %}
-                </td>
-
-                <!-- Password -->
-                <td>
-                    {% if emp.category == 'Teaching Staff' %}
-                    {{ emp.employee_password|default:"-" }}
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-
-                <td>{{ emp.category }}</td>
-                <td>{{ emp.designation }}</td>
-                <td>{{ emp.role }}</td>
-                <td>{{ emp.email }}</td>
-                <td>{{ emp.phone }}</td>
-                <td>{{ emp.employment_type }}</td>
-                {% if emp.category == 'Non-Teaching Staff' %}
-                <td colspan="3" class="text-muted">Assignments not applicable</td>
-                {% else %}
-                <td colspan="3" class="text-muted">No subject assignments</td>
-                {% endif %}
-                <td>
-                    <a href="{% url 'employee_form_view' emp.id %}" class="icon-btn" title="View">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{% url 'employee_form_edit' emp.id %}" class="icon-btn" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <form id="delete-form-{{ emp.id }}" action="{% url 'employee_form_delete' emp.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <a href="#" class="icon-btn text-danger" title="Delete"
-                           onclick="confirmDelete('{{ emp.id }}', '{{ emp.name }}')">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                    </form>
-                </td>
-            </tr>
+                    <td>
+                        <a href="{% url 'employee_form_view' emp.id %}" class="icon-btn" title="View"><i class="fas fa-eye"></i></a>
+                        <a href="{% url 'employee_form_edit' emp.id %}" class="icon-btn" title="Edit"><i class="fas fa-edit"></i></a>
+                        <form id="delete-form-{{ emp.id }}" action="{% url 'employee_form_delete' emp.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <a href="javascript:void(0);" class="icon-btn text-danger" title="Delete" onclick="confirmDelete('{{ emp.id }}', '{{ emp.name }}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </form>
+                    </td>
+                </tr>
             {% endif %}
             {% empty %}
             <tr>
@@ -405,93 +268,29 @@
             </tr>
             {% endfor %}
         </tbody>
-
     </table>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<!-- Confirmation Popup -->
 <div id="overlay"></div>
 <div id="confirm-popup">
-    <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
+    <p id="confirm-popup-message"></p>
     <button id="confirm-yes">Yes</button>
     <button id="confirm-no">No</button>
 </div>
 
-
-<div id="snackbar"></div>
-
-
-<script>
-    let deleteId = null;
-
-    function confirmDelete(id, name) {
-        deleteId = id;
-        document.getElementById('confirm-popup').style.display = 'block';
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
-    }
-
-    document.getElementById('confirm-yes').addEventListener('click', () => {
-        if (deleteId) {
-            document.getElementById(`delete-form-${deleteId}`).submit();
-        }
-    });
-
-    document.getElementById('confirm-no').addEventListener('click', () => {
-        document.getElementById('confirm-popup').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-        deleteId = null;
-    });
-</script>
+<!-- Snackbar -->
 <div id="snackbar"></div>
 
 <script>
-function showSnackbar(message) {
-    const snackbar = document.getElementById("snackbar");
-    snackbar.textContent = message;
-    snackbar.className = "show";
-    setTimeout(() => {
-        snackbar.className = snackbar.className.replace("show", "");
-    }, 3000);
-}
-
-// 🧾 Django messages
-/* {% if messages %} */
-/* {% for message in messages %} */
-showSnackbar("{{ message|escapejs }}");
-/* {% endfor %} */
-/* {% endif %} */
-
-document.addEventListener('DOMContentLoaded', function () {
-    // 🔍 Employee search filter
-    const searchInput = document.getElementById('employeeSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', function () {
-            const filter = this.value.toLowerCase();
-            const rows = document.querySelectorAll('.employee-row');
-            rows.forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                let found = false;
-                for (let i = 0; i < cells.length; i++) {
-                    if (cells[i].textContent.toLowerCase().includes(filter)) {
-                        found = true;
-                        break;
-                    }
-                }
-                row.style.display = found ? '' : 'none';
-            });
-        });
-    }
-
-    // 🗑️ Delete confirmation popup
+document.addEventListener('DOMContentLoaded', function() {
     let deleteId = null;
+
     window.confirmDelete = function(id, name) {
         deleteId = id;
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
         document.getElementById('confirm-popup').style.display = 'block';
         document.getElementById('overlay').style.display = 'block';
-        document.getElementById('confirm-popup-message').innerHTML =
-            `Are you sure you want to delete <b>${name}</b>?`;
     };
 
     document.getElementById('confirm-yes').addEventListener('click', () => {
@@ -505,39 +304,40 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('overlay').style.display = 'none';
         deleteId = null;
     });
-});
-</script>
 
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('employeeSearch');
-
-        searchInput.addEventListener('input', function () {
+    // Employee search filter
+    const searchInput = document.getElementById('employeeSearch');
+    if(searchInput) {
+        searchInput.addEventListener('input', function() {
             const filter = this.value.toLowerCase();
             const allRows = document.querySelectorAll('.employee-row');
-
-            // Group rows by employee ID
             const empGroups = {};
-
             allRows.forEach(row => {
                 const empId = row.dataset.empId;
-                if (!empGroups[empId]) empGroups[empId] = [];
+                if(!empGroups[empId]) empGroups[empId] = [];
                 empGroups[empId].push(row);
             });
-
-            // Loop through each group (all rows for one employee)
             Object.values(empGroups).forEach(group => {
-                // Combine all text content in all rows of that employee
                 const combinedText = group.map(row => row.innerText.toLowerCase()).join(' ');
                 const match = combinedText.includes(filter);
-
-                group.forEach(row => {
-                    row.style.display = match ? '' : 'none';
-                });
+                group.forEach(row => row.style.display = match ? '' : 'none');
             });
         });
-    });
-</script>
+    }
 
+    // Snackbar for messages
+    {% if messages %}
+        {% for message in messages %}
+        showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+});
+
+function showSnackbar(message) {
+    const snackbar = document.getElementById("snackbar");
+    snackbar.textContent = message;
+    snackbar.className = "show";
+    setTimeout(() => snackbar.className = snackbar.className.replace("show",""), 3000);
+}
+</script>
 {% endblock %}

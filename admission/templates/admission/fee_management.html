@@ -1,11 +1,22 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 {% block title %}Fee Management{% endblock %}
-{% block content %}
+
+
+<style>
+@media (max-width: 768px) {
+  .topbar { left: 0; }
+  .main-area, .content, .footer { margin-left: 0 !important; padding: 70px 16px 24px !important; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .container { max-width: 100%; margin: 0; border-radius: 0; padding: 16px; }
+}
+</style>
 
 <div class="container py-5">
     <h2 class="fw-bold mb-7">Fee Monitoring & Collection</h2>
 
-    <!-- 🔽 Filter Dropdown -->
+    <!-- ðŸ”½ Filter Dropdown -->
     <!--<div class="mb-4 d-flex justify-content-end">
         <div class="dropdown">
             <button class="btn btn-outline-secondary px-4 py-2 dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -26,7 +37,7 @@
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
                     <h6 class="text-muted">Total Declared Fee <i class="fa-solid fa-indian-rupee-sign icon-font"></i></h6>
-                    <h3 class="fw-bold">₹{{ total_declared_fee|floatformat:0 }}</h3>
+                    <h3 class="fw-bold">â‚¹{{ total_declared_fee|floatformat:0 }}</h3>
                     <h6 class="text-mute">Declared Amount</h6>
                     <!--<h6 class="text-mute">
                         {% if active_filter == 'day' %}Today{% elif active_filter == 'week' %}This Week{% elif active_filter == 'month' %}This Month{% else %}All Time{% endif %}
@@ -39,7 +50,7 @@
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
                     <h6 class="text-muted">Total Collected <i class="fa-solid fa-check-circle icon-font"></i></h6>
-                    <h3 class="fw-bold">₹{{ total_collected_fee|floatformat:0 }}</h3>
+                    <h3 class="fw-bold">â‚¹{{ total_collected_fee|floatformat:0 }}</h3>
                     <h6 class="text-mute">{{ collected_fee_percentage }}% of declared fees collected</h6>
                     <!--<h6 class="text-mute">
                         {% if active_filter == 'day' %}Today{% elif active_filter == 'week' %}This Week{% elif active_filter == 'month' %}This Month{% else %}All Time{% endif %}
@@ -52,7 +63,7 @@
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
                     <h6 class="text-muted">Total Pending <i class="fa-solid fa-hourglass-half icon-font"></i></h6>
-                    <h3 class="fw-bold">₹{{ total_pending_fee|floatformat:0 }}</h3>
+                    <h3 class="fw-bold">â‚¹{{ total_pending_fee|floatformat:0 }}</h3>
                     <h6 class="text-mute">{{ remaining_fee_percentage }}% of fees still pending</h6>
                     <!--<h6 class="text-mute">
                         {% if active_filter == 'day' %}Today{% elif active_filter == 'week' %}This Week{% elif active_filter == 'month' %}This Month{% else %}All Time{% endif %}
@@ -225,3 +236,4 @@
 </style>
 
 {% endblock %}
+

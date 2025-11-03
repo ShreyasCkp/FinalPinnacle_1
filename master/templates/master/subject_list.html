@@ -20,6 +20,7 @@
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         margin-top: 20px;
         box-sizing: border-box;
+        overflow-x: auto; /* allow horizontal scroll on small screens */
     }
 
     .header-flex {
@@ -28,11 +29,12 @@
         align-items: center;
         position: relative;
         margin-bottom: 20px;
+        flex-wrap: wrap; /* wrap elements on smaller screens */
     }
 
         .header-flex h2 {
             flex-grow: 1;
-            margin: 0;
+            margin: 10px 0;
             font-weight: 700;
             font-size: 22px;
             color: #800000;
@@ -58,11 +60,23 @@
             background-color: #a10000;
         }
 
+    .search-input {
+        position: absolute;
+        left: 0;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 220px;
+        margin-bottom: 10px;
+    }
+
     table {
         width: 100%;
         font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        min-width: 600px; /* ensures table scrolls horizontally on small screens */
     }
 
     th, td {
@@ -84,10 +98,6 @@
     tr:nth-child(even) {
         background-color: #f8f9fa;
     }
-
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
 
     .icon-btn {
         border: 1px solid #dee2e6;
@@ -153,20 +163,74 @@
             color: white;
         }
 
-    .content {
-        margin-left: 0px;
-        padding: 27px 24px 40px;
-        min-height: 100vh;
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
     }
 
-    .search-input {
-        position: absolute;
-        left: 0;
-        padding: 6px 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 13px;
-        width: 220px;
+        #snackbar.show {
+            visibility: visible;
+            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+        }
+
+    @keyframes fadein {
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
+    }
+
+    @keyframes fadeout {
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .container {
+            margin-left: 0;
+            padding: 15px;
+        }
+
+        .header-flex {
+            flex-direction: column;
+        }
+
+        .btn-add {
+            position: relative;
+            right: auto;
+            margin-top: 10px;
+        }
+
+        .search-input {
+            position: relative;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        table {
+            font-size: 10px;
+            min-width: 100%;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            padding: 4px 6px;
+        }
+
+        td {
+            font-size: 10px;
+        }
     }
 </style>
 
@@ -180,7 +244,6 @@
         </a>
         {% endif %}
     </div>
-
 
     <table class="table table-bordered table-striped table-hover mt-3">
         <thead>
@@ -201,11 +264,7 @@
                 <td>{{ subject.name }}</td>
                 <td>{{subject.subject_code}}</td>
                 <td>
-                    {% if subject.is_active %}
-                    Active
-                    {% else %}
-                    Inactive
-                    {% endif %}
+                    {% if subject.is_active %}Active{% else %}Inactive{% endif %}
                 </td>
                 <td>
                     {% if form_permissions.subject_form.view %}
@@ -260,9 +319,7 @@
         document.getElementById('overlay').style.display = 'none';
         deleteSubjectId = null;
     });
-</script>
 
-<script>
     document.getElementById('subjectSearch').addEventListener('input', function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('table tbody tr');
@@ -283,58 +340,7 @@
             row.style.display = match ? '' : 'none';
         });
     });
-</script>
 
-<style>
-    #snackbar {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: #800000;
-        color: #fff;
-        text-align: center;
-        border-radius: 4px;
-        padding: 14px 24px;
-        position: fixed;
-        z-index: 9999;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 14px;
-    }
-
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
-
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-</style>
-
-<div id="snackbar"></div>
-
-<script>
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
@@ -344,7 +350,6 @@
         }, 3000);
     }
 
-    // Django message support
     {% if messages %}
         {% for message in messages %}
             showSnackbar("{{ message|escapejs }}");
@@ -352,4 +357,5 @@
     {% endif %}
 </script>
 
+<div id="snackbar"></div>
 {% endblock %}

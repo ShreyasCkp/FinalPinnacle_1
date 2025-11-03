@@ -1,239 +1,166 @@
 {% extends 'layout.html' %}
- 
+
 {% block title %}Upload File & Select Template{% endblock %}
- 
+
 {% block content %}
- 
- 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>WhatsApp Bulk Sender</title>
 <style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
 
-        body {
+    .form-box {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 15px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        overflow-x: auto; /* scroll for small screens */
+    }
 
-            font-family: Arial;
+    h2 {
+        color: #800;
+        font-size: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-            padding: 20px;
+    .form-inline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 15px;
+    }
 
-            background: #f5f5f5;
+    .form-inline label {
+        font-weight: bold;
+        min-width: 60px;
+    }
 
-        }
-
-        .content {
-
-            padding: 23px 26px 18px;
-
-            flex-grow: 1;
-
-        }
- 
-        h2 {
-
-            color: #800;
-
-            font-size: medium;
-
-        }
- 
-        table {
-
-            border-collapse: collapse;
-
-            width: 100%;
-
-            background: #fff;
-
-        }
- 
-        table, th, td {
-
-            border: 1px solid #ccc;
-
-        }
- 
-        td {
-
-            padding: 1px;
-
-            text-align: center;
-
-            font-size: 9px;
-
-        }
- 
-        th {
-
-            padding: 1px;
-
-            text-align: center;
-
-            font-size: 12px;
-
-        }
- 
-        .form-box {
-
-            background: #fff;
-
-            padding: 20px;
-
-            border-radius: 5px;
-
-            margin-bottom: 30px;
-
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-
-        }
+    .form-inline input[type="file"],
+    .form-inline select {
+        flex: 1 1 200px;
+        padding: 5px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
 
     .btn {
-        padding: 6px 11px;
+        padding: 8px 14px;
         border: none;
         background: #800;
         color: #fff;
         cursor: pointer;
         border-radius: 4px;
-        margin-right: 10px;
+        margin-top: 10px;
     }
 
-    .form-inline {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 10px;
-        margin-top: 25px;
+    .btn:hover {
+        opacity: 0.9;
     }
-        .btn-danger {
 
-            background: #dc3545;
+    .btn-danger {
+        background: #dc3545;
+    }
 
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 12px;
+        min-width: 600px; /* ensure horizontal scroll on mobile */
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 5px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    th {
+        background: #800;
+        color: #fff;
+        font-size: 13px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f8f8;
+    }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+        .form-inline {
+            flex-direction: column;
+            align-items: flex-start;
         }
- 
-        .btn:hover {
 
-            opacity: 0.9;
-
+        .form-inline input[type="file"],
+        .form-inline select {
+            width: 100%;
         }
 
-    select, input[type="file"], input[type="text"], textarea {
-        width: 24%;
-        padding: 2px;
-        margin-top: 5px;
-        margin-right: 239px;
+        .btn {
+            width: 100%;
+        }
+
+        table {
+            font-size: 11px;
+            min-width: 100%;
+        }
     }
 </style>
- 
-    <style>
 
-        .form-inline {
-
-            display: flex;
-
-            justify-content: flex-start;
-
-            align-items: center;
-
-            gap: 10px;
-
-        }
- 
-            .form-inline label {
-
-                margin-right: 5px;
-
-            }
- 
-            .form-inline input,
-
-            .form-inline select {
-
-                margin: 0;
-
-            }
- 
-            .form-inline select {
-
-                margin-left: auto;
-
-            }
- 
-    </style>
-</head>
-<body>
- 
 <div class="form-box">
-<h2>Upload File & Select Template</h2>
-<form method="POST" enctype="multipart/form-data">
+    <h2>Upload File & Select Template</h2>
 
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
- 
-      <div class="form-inline">
-<label for="file"><strong>File:</strong></label>
-<input type="file" name="file" id="file" required>
- 
-        
-<select name="template_name" id="template_name" required>
-<option value="">-- Select Template --</option>
-<option value="admissions_open_2025_26_pscm" {% if message and message.template_name == "admissions_open_2025_26_pscm" %}selected{% endif %}>
+        <div class="form-inline">
+            <label for="file">File:</label>
+            <input type="file" name="file" id="file" required>
 
-            Admissions Open 2025
-</option>
-</select>
-</div>
- 
-        <br><br>
- 
+            <select name="template_name" id="template_name" required>
+                <option value="">-- Select Template --</option>
+                <option value="admissions_open_2025_26_pscm" {% if message and message.template_name == "admissions_open_2025_26_pscm" %}selected{% endif %}>
+                    Admissions Open 2025
+                </option>
+            </select>
+        </div>
+
         <button type="submit" class="btn">Upload & Preview</button>
-</form>
- 
- 
+    </form>
+</div>
+
 {% if message and data_headers and data_rows %}
- 
 <div class="form-box">
+    <form method="POST" action="{% url 'send_message' message.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="template_name" value="{{ message.template_name }}">
+        <button type="submit" class="btn">Send WhatsApp Message</button>
+    </form>
 
- 
-        <form method="POST" action="{% url 'send_message' message.id %}">
-
-            {% csrf_token %}
-<input type="hidden" name="template_name" value="{{ message.template_name }}">
-<button type="submit" class="btn">Send WhatsApp Message</button>
-</form>
-</div>
-<br>
- 
-        <table>
-<thead>
-<tr>
-
-                    {% for header in data_headers %}
-<th>{{ header }}</th>
-
-                    {% endfor %}
-</tr>
-</thead>
-<tbody>
-
-                {% for row in data_rows %}
-<tr>
-
-                    {% for value in row %}
-<td>{{ value }}</td>
-
-                    {% endfor %}
-</tr>
-
+    <table>
+        <thead>
+            <tr>
+                {% for header in data_headers %}
+                    <th>{{ header }}</th>
                 {% endfor %}
-</tbody>
-</table>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data_rows %}
+            <tr>
+                {% for value in row %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-
-    {% endif %}
- 
-</body>
-</html>
-
+{% endif %}
 {% endblock %}
-
- 

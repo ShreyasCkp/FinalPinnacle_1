@@ -10,35 +10,46 @@
         background-color: #f4f6f9;
     }
 
+    /* ---------- Main Form Container ---------- */
     .form-container {
         max-width: 700px;
-        margin: 30px auto;
+        margin: 40px auto;
         background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 8px rgba(0,0,0,0.05);
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     }
 
     h3 {
         font-weight: 600;
         color: #8b0000;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         font-size: 22px;
     }
 
     .form-label {
         font-weight: 500;
-        font-size: 13px;
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 4px;
     }
 
     select, input, textarea {
         font-size: 14px;
-        padding: 6px 10px;
-        border-radius: 5px;
+        padding: 8px 10px;
+        border-radius: 6px;
         border: 1px solid #ccc;
-        margin-bottom: 12px;
+        margin-bottom: 15px;
         width: 100%;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+        background-color: #fff;
+    }
+
+    select:focus, input:focus, textarea:focus {
+        border-color: #8b0000;
+        outline: none;
+        box-shadow: 0 0 0 0.15rem rgba(139, 0, 0, 0.2);
     }
 
     .btn-save {
@@ -47,54 +58,105 @@
         font-weight: 500;
         border: none;
         border-radius: 5px;
-        padding: 6px 12px;
+        padding: 8px 16px;
         font-size: 14px;
+        transition: 0.3s;
     }
 
-        .btn-save:hover {
-            background-color: #8a1f1f;
-        }
+    .btn-save:hover {
+        background-color: #8a1f1f;
+        transform: scale(1.02);
+    }
 
     .text-danger {
         font-size: 13px;
     }
 
-    .content {
-        margin-left: 200px;
-        padding: 12px 26px 40px;
-        min-height: 100vh;
-    }
-
-    .btn-save {
-        background-color: #a23030;
-        color: white;
-        font-weight: 500;
-        border: none;
-        border-radius: 5px;
-        padding: 6px 12px;
-        font-size: 14px;
-    }
-
-        .btn-save:hover {
-            background-color: #8a1f1f;
+    /* ---------- Responsive Design ---------- */
+    @media (max-width: 768px) {
+        .form-container {
+            max-width: 90%;
+            padding: 20px;
+            margin-top: 25px;
         }
 
+        h3 {
+            font-size: 20px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        select, input, textarea {
+            font-size: 13px;
+            padding: 7px 9px;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        select {
+            height: 38px; /* Ensures dropdown fits well on mobile */
+        }
+
+        .btn-save {
+            width: 100%;
+            font-size: 13px;
+            padding: 8px;
+            margin-top: 5px;
+        }
+
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-container {
+            max-width: 95%;
+            padding: 18px;
+        }
+
+        h3 {
+            font-size: 18px;
+        }
+
+        select, input, textarea {
+            font-size: 12px;
+            padding: 6px 8px;
+            border-radius: 4px;
+        }
+
+        select {
+            height: 36px;
+        }
+
+        .btn-save {
+            font-size: 12px;
+            padding: 7px;
+        }
+    }
 </style>
 
 <div class="container form-container">
     <h3>Add Timetable</h3>
+
     <form method="post">
         {% csrf_token %}
+
         {% if form.non_field_errors %}
         <div class="alert alert-danger">
             {% for error in form.non_field_errors %}
-            <div>{{ error }}</div>
+                <div>{{ error }}</div>
             {% endfor %}
         </div>
         {% endif %}
+
         <div class="row">
             {% for field in form %}
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12">
                 <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
                 {% if field.errors %}
@@ -103,17 +165,15 @@
             </div>
             {% endfor %}
         </div>
-        <!-- Button Row -->
-<div class="d-flex justify-content-between mt-3">
-    <!-- Back Button -->
-    <a href="{% url 'timetable_dashboard' %}" class="btn btn-save">Back</a>
 
-    <!-- Save Button -->
-    <button type="submit" class="btn btn-save">Save</button>
-</div>
-
+        <!-- Buttons -->
+        <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'timetable_dashboard' %}" class="btn btn-save">Back</a>
+            <button type="submit" class="btn btn-save">Save</button>
+        </div>
     </form>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
@@ -131,26 +191,14 @@ $(document).ready(function () {
             $.get("{% url 'get_courses_and_years_by_program_type' %}", {
                 program_type_id: programTypeId
             }, function (data) {
-                academicYearSelect.empty().append($('<option>', {
-                    value: '',
-                    text: 'Select Batch'
-                }));
+                academicYearSelect.empty().append($('<option>', { value: '', text: 'Select Batch' }));
                 $.each(data.academic_years, function (index, year) {
-                    academicYearSelect.append($('<option>', {
-                        value: year.id,
-                        text: year.year
-                    }));
+                    academicYearSelect.append($('<option>', { value: year.id, text: year.year }));
                 });
 
-                courseSelect.empty().append($('<option>', {
-                    value: '',
-                    text: 'Select Combination'
-                }));
+                courseSelect.empty().append($('<option>', { value: '', text: 'Select Combination' }));
                 $.each(data.courses, function (index, course) {
-                    courseSelect.append($('<option>', {
-                        value: course.id,
-                        text: course.name
-                    }));
+                    courseSelect.append($('<option>', { value: course.id, text: course.name }));
                 });
 
                 semesterSelect.empty().append($('<option>', { value: '', text: 'Select Sem/Year' }));
@@ -170,10 +218,7 @@ $(document).ready(function () {
             }, function (data) {
                 semesterSelect.empty().append($('<option>', { value: '', text: 'Select Sem/Year' }));
                 $.each(data.semesters, function (index, semester) {
-                    semesterSelect.append($('<option>', {
-                        value: semester.number,
-                        text: semester.name
-                    }));
+                    semesterSelect.append($('<option>', { value: semester.number, text: semester.name }));
                 });
 
                 subjectSelect.empty().append($('<option>', { value: '', text: 'Select Subject' }));
@@ -194,10 +239,7 @@ $(document).ready(function () {
             }, function (data) {
                 subjectSelect.empty().append($('<option>', { value: '', text: 'Select Subject' }));
                 $.each(data.subjects, function (index, subject) {
-                    subjectSelect.append($('<option>', {
-                        value: subject.id,
-                        text: subject.name
-                    }));
+                    subjectSelect.append($('<option>', { value: subject.id, text: subject.name }));
                 });
 
                 facultySelect.empty().append($('<option>', { value: '', text: 'Select Faculty' }));
@@ -227,8 +269,5 @@ $(document).ready(function () {
     });
 });
 </script>
-
-
-
 
 {% endblock %}

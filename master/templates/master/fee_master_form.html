@@ -11,78 +11,109 @@
         font-family: 'Inter', sans-serif;
         background-color: #f4f6f9;
         color: #333;
+        margin: 0;
+        padding: 0;
     }
 
     .form-container {
+        width: 95%;
         max-width: 800px;
-        margin: 25px auto;
+        margin: 15px auto;
         background: #ffffff;
-        padding: 30px;
+        padding: 20px;
         border-radius: 12px;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        box-sizing: border-box;
     }
 
     h3 {
         font-weight: 600;
         color: #8b0000;
         margin-bottom: 20px;
-        font-size: 22px;
+        font-size: 20px;
         text-align: center;
     }
 
     .form-label {
         font-weight: 500;
-        font-size: 14px;
-        margin-bottom: 6px;
+        font-size: 13px;
+        margin-bottom: 4px;
         display: block;
     }
 
     .form-control, .form-select {
         font-size: 14px;
-        padding: 4px;
-        border-radius: 5px;
+        padding: 6px 8px;
+        border-radius: 6px;
         border: 1px solid #ccc;
-        margin-bottom: 4px;
+        margin-bottom: 10px;
         width: 100%;
     }
 
     .btn-save {
         background-color: #800000;
         font-weight: 500;
-        padding: 5px 16px;
+        padding: 8px 18px;
         font-size: 14px;
         color: white;
         border: none;
         border-radius: 8px;
     }
 
-        .btn-save:hover {
-            background-color: #a10000;
-        }
+    .btn-save:hover {
+        background-color: #a10000;
+    }
 
     .btn-container {
-        text-align: right;
+        text-align: center;
         margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .btn-back {
         background-color: #800000;
         color: #fff;
         border: 2px solid #800000;
-        padding: 2px 5px;
+        padding: 6px 12px;
         border-radius: 6px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
         text-decoration: none;
+        text-align: center;
+        flex: 1;
     }
 
-        .btn-back:hover {
-            background-color: #a10000;
-            color: white;
+    .btn-back:hover {
+        background-color: #a10000;
+        color: white;
+    }
+
+    /* Responsive layout */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 15px;
         }
+
+        .btn-container {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .row > .col-md-6 {
+            flex: 1 1 100%;
+            max-width: 100%;
+        }
+
+        h3 {
+            font-size: 18px;
+        }
+    }
 </style>
 
-<div class="container form-container">
+<div class="form-container">
     <h3>{{ title }}</h3>
 
     <form method="post" id="feeForm">
@@ -102,14 +133,11 @@
         </div>
 
         <div class="row">
-            <!-- Program Type -->
             <div class="col-md-6">
                 <label class="form-label" for="id_program_type">{{ form.program_type.label }}</label>
                 {{ form.program_type }}
                 <div class="text-danger">{{ form.program_type.errors }}</div>
             </div>
-
-            <!-- Combination -->
             <div class="col-md-6">
                 <label class="form-label" for="id_combination">{{ form.combination.label }}</label>
                 {{ form.combination }}
@@ -117,7 +145,6 @@
             </div>
         </div>
 
-        <!-- Semester Selection -->
         <div class="row">
             <div class="col-md-6">
                 <label class="form-label" for="id_semester">Semester</label>
@@ -134,13 +161,11 @@
         </div>
 
         <div class="row">
-            <!-- Due Date -->
             <div class="col-md-6">
                 <label class="form-label" for="id_due_date">{{ form.due_date.label }}</label>
                 {{ form.due_date }}
                 <div class="text-danger">{{ form.due_date.errors }}</div>
             </div>
-            <!-- Academic Year -->
             <div class="col-md-6">
                 <label class="form-label" for="id_academic_year">{{ form.academic_year.label }}</label>
                 {{ form.academic_year }}
@@ -148,7 +173,7 @@
             </div>
         </div>
 
-        <div class="btn-container d-flex justify-content-between mt-4">
+        <div class="btn-container">
             <a href="{% url 'fee_detail_list' %}" class="btn-back">Back</a>
             {% if not view_mode %}
             <button type="submit" class="btn-save">

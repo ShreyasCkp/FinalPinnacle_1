@@ -10,133 +10,108 @@
         font-family: 'Inter', sans-serif;
         background-color: #f4f6f9;
         color: #333;
+        margin: 0;
+        padding: 0;
     }
 
     .form-container {
-        max-width: 900px;
-        margin: 0 auto;
-        background: #ffffff;
+        width: 100%;
+        max-width: 480px; /* mobile width */
+        margin: 20px auto;
+        background: #fff;
         padding: 15px;
         border-radius: 12px;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     h3 {
         font-weight: 600;
         color: #8b0000;
-        margin-bottom: 19px;
-        font-size: 20px;
+        margin-bottom: 16px;
+        font-size: 18px;
         text-align: center;
     }
 
     .form-label {
         font-weight: 500;
         font-size: 12px;
-        margin-bottom: 2px;
+        margin-bottom: 4px;
     }
-
 
     input, textarea, select {
-        font-size: 10px;
+        font-size: 12px;
         width: 100%;
-        border-radius: 4px;
+        border-radius: 6px;
         border: 1px solid #ccc;
-        padding: 3px 5px;
-        margin-top: -1px;
-        margin-bottom: 0rem !important;
-        line-height: 1.5;
+        padding: 6px 8px;
+        margin-bottom: 12px;
+        box-sizing: border-box;
     }
 
-    .form-control {
-        font-size: 10px;
-        padding: 3px 5px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
+    textarea {
+        resize: vertical;
     }
 
-    .form-select {
-        font-size: 10px;
-        padding: 3px 5px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-    }
-
-    .mb-3 {
-        margin-bottom: 0rem !important;
-        margin-top: -1px;
+    .btn-save, .btn-cancel {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: none;
     }
 
     .btn-save {
-        background-color: #800;
-        font-weight: 500;
-        padding: 5px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-        color: white;
-        margin-top: 12px;
+        background-color: #800000;
+        color: #fff;
     }
 
-        .btn-save:hover {
-            background-color: #8b0000;
-        }
+    .btn-save:hover {
+        background-color: #a10000;
+    }
 
     .btn-cancel {
-        font-size: 11px;
-        padding: 5px 12px;
+        background-color: #ccc;
+        color: #333;
         margin-left: 10px;
-        margin-top: 12px;
-        background: #800;
     }
 
-    .content {
-        padding: 46px 26px 18px;
-        flex-grow: 1;
+    .d-flex {
+        display: flex;
+        justify-content: space-between;
     }
 
-    .px-4 {
-        padding-right: 1.5rem !important;
-        padding-left: 0.5rem !important;
+    .text-danger {
+        font-size: 10px;
+        margin-top: -6px;
+        margin-bottom: 6px;
     }
 
-    .mt-3 {
-        margin-top: 0rem !important;
+    /* Responsive adjustments */
+    @media (min-width: 481px) {
+        .form-container {
+            display: none; /* hide on larger screens */
+        }
     }
 </style>
 
-<div class="container form-container">
+<div class="form-container">
     <h3>Add Academic Event</h3>
     <form method="post">
         {% csrf_token %}
-        <div class="row">
-            {% for field in form %}
-            {% if field.name != 'description' %}
-            <div class="col-md-6 mb-3">
+        {% for field in form %}
+            <div>
                 <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
                 {% if field.errors %}
                 <div class="text-danger">{{ field.errors }}</div>
                 {% endif %}
             </div>
-            {% endif %}
-            {% endfor %}
+        {% endfor %}
 
-            <!-- Description moved to last -->
-            {% if form.description %}
-            <div class="col-md-12 mb-3">
-                <label class="form-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
-                {{ form.description }}
-                {% if form.description.errors %}
-                <div class="text-danger">{{ form.description.errors }}</div>
-                {% endif %}
-            </div>
-            {% endif %}
+        <div class="d-flex">
+            <a href="{% url 'calendar_form' %}" class="btn-cancel">Back</a>
+            <button type="submit" class="btn-save">Save</button>
         </div>
-
-        <div class="d-flex justify-content-between mt-3">
-            <a href="{% url 'calendar_form' %}" class="btn btn-secondary btn-cancel">Back</a>
-            <button type="submit" class="btn btn-save">Save</button>
-        </div>
-
     </form>
 </div>
 
@@ -145,28 +120,25 @@
         const dateInput = document.querySelector("input[type='date']");
         const timeInput = document.querySelector("input[type='time']");
 
-        const setMinTimeIfToday = () => {
-            const selectedDate = new Date(dateInput.value);
-            const now = new Date();
+        if(dateInput && timeInput){
+            const setMinTimeIfToday = () => {
+                const selectedDate = new Date(dateInput.value);
+                const now = new Date();
 
-            if (selectedDate.toDateString() === now.toDateString()) {
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                timeInput.min = `${hours}:${minutes}`;
-            } else {
-                timeInput.removeAttribute("min");
-            }
-        };
+                if (selectedDate.toDateString() === now.toDateString()) {
+                    const hours = now.getHours().toString().padStart(2, '0');
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    timeInput.min = `${hours}:${minutes}`;
+                } else {
+                    timeInput.removeAttribute("min");
+                }
+            };
 
-        // Prevent past date
-        const todayStr = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute("min", todayStr);
-
-        // Update min time when date changes
-        dateInput.addEventListener("change", setMinTimeIfToday);
-
-        // Also run on page load
-        setMinTimeIfToday();
+            const todayStr = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute("min", todayStr);
+            dateInput.addEventListener("change", setMinTimeIfToday);
+            setMinTimeIfToday();
+        }
     });
 </script>
 

@@ -29,25 +29,28 @@
     .card {
         border-radius: 12px;
         transition: transform 0.2s ease-in-out;
+        margin-bottom: 15px;
     }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
 
     .table thead th {
         color: #8b0000;
         border: 1px solid #dee2e6;
         font-size: 12px;
         text-align: center;
+        white-space: nowrap;
     }
 
     td {
-        padding: 7px 7px 7px 7px;
+        padding: 5px 7px;
         border: 1px solid #ddd;
         text-align: center;
         font-size: 9px;
+        white-space: nowrap;
     }
 
     .py-5 {
@@ -55,81 +58,84 @@
         padding-bottom: 3rem !important;
     }
 
-
     .badge {
         font-size: 0.85em;
         padding: 0.4em 0.7em;
         border-radius: 0.4rem;
     }
 
-        .badge.bg-success {
-            background-color: #198754;
-            color: #fff;
-        }
-
-        .badge.bg-primary {
-            background-color: #0d6efd;
-            color: #fff;
-        }
-
-        .badge.bg-warning {
-            background-color: #ffc107;
-            color: #212529;
-        }
+    .badge.bg-success { background-color: #198754; color: #fff; }
+    .badge.bg-primary { background-color: #0d6efd; color: #fff; }
+    .badge.bg-warning { background-color: #ffc107; color: #212529; }
 
     caption {
         font-size: 16px;
         color: #6c757d;
         text-align: center;
     }
+
+    /* MOBILE RESPONSIVENESS */
+    @media (max-width: 768px) {
+        .fw-bold { font-size: 20px; }
+        .card h6 { font-size: 12px; }
+        .card h2 { font-size: 18px; }
+        td, th { font-size: 8px; padding: 3px 4px; }
+        .table-responsive { overflow-x: auto; }
+    }
+
+    @media (max-width: 576px) {
+        .fw-bold { font-size: 18px; }
+        .badge { font-size: 0.7em; padding: 0.3em 0.5em; }
+        td, th { font-size: 7px; padding: 2px 3px; }
+    }
 </style>
 
-<div class="container py-5">
-    <h2 class="fw-bold mb-4">{{ logged_in_student.student_name }} Grades</h2>
+<div class="container-fluid py-5">
+    <h2 class="fw-bold mb-4 text-center">{{ logged_in_student.student_name }} Grades</h2>
 
     <!-- Summary Cards -->
-    <div class="row mb-5">
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-muted mb-0">Total Exams</h6>
+    <div class="row mb-4 g-2">
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Total Exams</h6>
                     <h2 class="fw-bold">{{ total_exams }}</h2>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-muted mb-0">Upcoming</h6>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Upcoming</h6>
                     <h2 class="fw-bold">{{ upcoming }}</h2>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-muted mb-0">Graded</h6>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Graded</h6>
                     <h2 class="fw-bold">{{ graded }}</h2>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-muted mb-0">Average Score</h6>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Average Score</h6>
                     <h2 class="fw-bold">{{ avg_score }}%</h2>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Combined Table: Assignments + Exams -->
-    <div class="card shadow-sm border-0 p-4" style="max-width: 1000px; margin: 0 auto; background-color: #fff; border-radius: 12px;">
+    <!-- Combined Table -->
+    <div class="card shadow-sm border-0 p-3" style="background-color: #fff; border-radius: 12px;">
         <div class="table-responsive">
-            <table class="table table-bordered table-hover text-center align-middle">
+            <table class="table table-bordered table-hover text-center align-middle mb-0">
                 <thead>
                     <tr>
                         <th>Title</th>
@@ -151,7 +157,7 @@
                         <td>{{ assignment.title }}</td>
                         <td>{{ assignment.academic_year }}</td>
                         <td>{{ assignment.course.name }}</td>
-                        <td>{{ assignment.course.name }} {{assignment.semester_number}}</td>
+                        <td>{{ assignment.course.name }} {{ assignment.semester_number }}</td>
                         <td>{{ assignment.subject.name }}</td>
                         <td>{{ assignment.due_date|date:"M d, Y" }}</td>
                         <td>-</td>
@@ -169,17 +175,16 @@
                         <td>
                             {% with submission=submission_dict|dict_get:assignment.id %}
                             {% if submission %}
-                            {% if submission.student_status|lower == 'graded' %}
-                            <span class="badge bg-success">{{ submission.student_status|title }}</span>
+                                {% if submission.student_status|lower == 'graded' %}
+                                    <span class="badge bg-success">{{ submission.student_status|title }}</span>
+                                {% else %}
+                                    <span class="badge bg-warning">{{ submission.student_status|title }}</span>
+                                {% endif %}
                             {% else %}
-                            <span class="badge bg-warning">{{ submission.student_status|title }}</span>
-                            {% endif %}
-                            {% else %}
-                            <span class="badge bg-warning">Not Submitted</span>
+                                <span class="badge bg-warning">Not Submitted</span>
                             {% endif %}
                             {% endwith %}
                         </td>
-
                     </tr>
                     {% endfor %}
 
@@ -195,19 +200,19 @@
                         <td>{{ item.max_marks }}</td>
                         <td>
                             {% if item.score %}
-                            {{ item.score }}
+                                {{ item.score }}
                             {% else %}
-                            -
+                                -
                             {% endif %}
                         </td>
                         <td>{{ item.exam.exam_type.title }}</td>
                         <td>
                             {% if item.status == 'Graded' %}
-                            <span class="badge bg-success">{{ item.status }}</span>
+                                <span class="badge bg-success">{{ item.status }}</span>
                             {% elif item.status == 'Scheduled' %}
-                            <span class="badge bg-primary">{{ item.status }}</span>
+                                <span class="badge bg-primary">{{ item.status }}</span>
                             {% else %}
-                            <span class="badge bg-warning">{{ item.status }}</span>
+                                <span class="badge bg-warning">{{ item.status }}</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -215,11 +220,7 @@
                 </tbody>
             </table>
         </div>
-        <!--<div class="text-end mb-3">
-            <a href="{% url 'student_certificate_view' %}" class="btn btn-secondary btn-sm">
-                Download
-            </a>
-        </div>-->
     </div>
+</div>
 
-    {% endblock %}
+{% endblock %}

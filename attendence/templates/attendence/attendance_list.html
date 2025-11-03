@@ -1,7 +1,18 @@
-{% extends 'layout.html' %}
+﻿{% extends 'layout.html' %}
 {% block title %}Employee Attendance Records List{% endblock %}
 
-{% block content %}
+
+
+<style>
+@media (max-width: 768px) {
+  .topbar { left: 0; }
+  .main-area, .content, .footer { margin-left: 0 !important; padding: 70px 16px 24px !important; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+  .container { max-width: 100%; margin: 0; border-radius: 0; padding: 16px; }
+}
+</style>
 <style>
     .icon-btn {
         border: 1px solid #dee2e6;
@@ -395,7 +406,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     let deleteAttendanceId = null;
 
-    // 🗑️ Handle Delete Button Click
+    // ðŸ—‘ï¸ Handle Delete Button Click
     document.querySelectorAll(".delete-btn").forEach(button => {
         button.addEventListener("click", function (event) {
             event.preventDefault(); // prevent anchor link jump
@@ -412,7 +423,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ✅ Confirm delete
+    // âœ… Confirm delete
     document.getElementById("confirm-yes").addEventListener("click", function () {
         if (deleteAttendanceId) {
             const form = document.getElementById(`attendance-delete-form-${deleteAttendanceId}`);
@@ -420,14 +431,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ❌ Cancel delete
+    // âŒ Cancel delete
     document.getElementById("confirm-no").addEventListener("click", function () {
         document.getElementById("confirm-popup").style.display = "none";
         document.getElementById("overlay").style.display = "none";
         deleteAttendanceId = null;
     });
 
-    // 🔍 Search filter
+    // ðŸ” Search filter
     const searchInput = document.getElementById('attendanceSearch');
     if (searchInput) {
         searchInput.addEventListener('input', function () {
@@ -505,7 +516,7 @@ function showSnackbar(message) {
     }, 3000);
 }
 
-// 🧾 Django messages — wrapped inside a string so VS Code ignores it
+// ðŸ§¾ Django messages â€” wrapped inside a string so VS Code ignores it
 // The `/* */` comments silence JS parser errors
 /* {% if messages %} */
 /* {% for message in messages %} */
@@ -518,3 +529,4 @@ showSnackbar("{{ message|escapejs }}");
 
 
 {% endblock %}
+
