@@ -2,7 +2,6 @@
 {% load permission_tags %}
 {% load custom_tags %}
 
-
 {% block title %}Role Permissions{% endblock %}
 
 {% block content %}
@@ -10,36 +9,35 @@
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin-left: 91px;
+        margin: 0;
+        padding: 0;
     }
 
     .container {
         background: #fff;
-        padding: 30px;
+        padding: 20px;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 10px;
-        margin-left: -64px;
-        margin-right: 27px;
-        margin-top: -15px;
+        margin: 15px;
+        overflow-x: auto; /* horizontal scroll for mobile */
     }
 
     h2 {
         text-align: center;
         font-weight: 700;
         color: #800000;
-        margin-bottom: 24px;
-        margin-top: -17px;
-        font-size: 22px;
+        margin-bottom: 20px;
+        font-size: 20px;
     }
 
     select {
-        padding: 6px;
-        font-size: 12px;
+        padding: 6px 10px;
+        font-size: 14px;
         border-radius: 6px;
         border: 1px solid #ccc;
         margin-bottom: 15px;
-        width: 250px;
+        width: 100%;
+        max-width: 250px;
     }
 
     table {
@@ -47,6 +45,7 @@
         font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        min-width: 600px; /* ensures table scrolls on small screens */
     }
 
     th, td {
@@ -54,6 +53,7 @@
         text-align: center;
         padding: 5px;
         border: 1px solid #dee2e6;
+        white-space: nowrap;
     }
 
     thead {
@@ -65,164 +65,55 @@
         background-color: #f8f9fa;
     }
 
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
-
     .submit-btn {
-        padding: 6px 3px;
+        padding: 6px 12px;
         background-color: #800000;
         color: white;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 13px;
+        font-size: 14px;
         margin-top: 15px;
-        margin-left: 780px;
+        display: block;
+        width: 100%;
+        max-width: 200px;
+        text-align: center;
     }
 
-        .submit-btn:hover {
-            background-color: #a52a2a;
+    .submit-btn:hover {
+        background-color: #a52a2a;
+    }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+        body {
+            margin-left: 0;
         }
 
-    .content {
-        margin-left: 200px;
-        padding: 67px 26px 40px;
-        min-height: 100vh;
-    }
-</style>
+        .container {
+            margin: 10px;
+            padding: 15px;
+        }
 
-<div class="container mt-4">
-    <h2>Role Permissions</h2>
+        h2 {
+            font-size: 18px;
+        }
 
-    <form method="get" action="{% url 'user_rights_view' 0 %}" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-        <label for="user_id"
-               style="color: #800000; font-weight: bold; height: 23px; display: flex; align-items: center;">
-            Select a Role:
-        </label>
+        table {
+            font-size: 11px;
+        }
 
-        <select name="user_id" id="user_id"
-                onchange="window.location.href='{% url 'user_rights_view' 0 %}'.replace('0', this.value)"
-                style="height: 23px; padding: 3px 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; margin-top: 13px;">
-            <option value="">-- Select Role --</option>
-            {% for u in all_users %}
-            <option value="{{ u.id }}" {% if selected_user and selected_user.id == u.id %}selected{% endif %}>
-                {{ u.username }}
-            </option>
-            {% endfor %}
-        </select>
-    </form>
+        select {
+            width: 100%;
+        }
 
-
-    {% if selected_user %}
-    {% if selected_user.id != 1 %}
-    <h3 style="color: #800000; font-size: 14px;">Set Permissions for <span style="color: green;">{{ selected_user.username }}</span></h3>
-    {% endif %}
-
-
-    <form method="post">
-        {% csrf_token %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Form Name</th>
-                    <th>View</th>
-                    <th>Add</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for form in all_forms %}
-                <tr>
-                    <td>{{ form_display_names|get_item:form }}</td>
-                    {% if form == 'communication_dashboard' or form == 'calendar_form' or form == 'promotion_history' or form == 'student_database' or form == 'recent_activity_view'  %}
-                    <td colspan="4">
-                        {% with perms|get_item:form as form_perm %}
-                        <input type="checkbox" name="{{ form }}_access"
-                               {% if form_perm.access %}checked{% endif %}> Access
-                        {% endwith %}
-                    </td>
-
-                    {% else %}
-
-                    {% get_value perms form "view" as can_view %}
-                    <td><input type="checkbox" class="perm-view" data-form="{{ form }}" name="{{ form }}_view" {% if can_view %}checked{% endif %}></td>
-
-                    {% get_value perms form "add" as can_add %}
-                    <td><input type="checkbox" class="perm-add" data-form="{{ form }}" name="{{ form }}_add" {% if can_add %}checked{% endif %}></td>
-
-                    {% get_value perms form "edit" as can_edit %}
-                    <td><input type="checkbox" class="perm-edit" data-form="{{ form }}" name="{{ form }}_edit" {% if can_edit %}checked{% endif %}></td>
-
-                    {% get_value perms form "delete" as can_delete %}
-                    <td><input type="checkbox" class="perm-delete" data-form="{{ form }}" name="{{ form }}_delete" {% if can_delete %}checked{% endif %}></td>
-                    {% endif %}
-                </tr>
-
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <button type="submit" class="submit-btn">Save Permissions</button>
-    </form>
-    {% endif %}
-</div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const addCheckboxes = document.querySelectorAll(".perm-add");
-
-        addCheckboxes.forEach(function (addCheckbox) {
-            const formName = addCheckbox.getAttribute("data-form");
-            const view = document.querySelector(`.perm-view[data-form="${formName}"]`);
-            const edit = document.querySelector(`.perm-edit[data-form="${formName}"]`);
-            const del = document.querySelector(`.perm-delete[data-form="${formName}"]`);
-
-            function updatePermissions() {
-                const isEnabled = addCheckbox.checked;
-
-                view.disabled = !isEnabled;
-                edit.disabled = !isEnabled;
-                del.disabled = !isEnabled;
-
-                if (!isEnabled) {
-                    view.checked = false;
-                    edit.checked = false;
-                    del.checked = false;
-                }
-            }
-
-            // Initialize on page load
-            updatePermissions();
-
-            // Re-evaluate on change
-            addCheckbox.addEventListener("change", updatePermissions);
-        });
-    });
-</script>
-
-
-<div id="snackbar"></div>
-
-<script>
-    function showSnackbar(message) {
-        const snackbar = document.getElementById("snackbar");
-        snackbar.textContent = message;
-        snackbar.className = "show";
-        setTimeout(() => {
-            snackbar.className = snackbar.className.replace("show", "");
-        }, 3000);
+        .submit-btn {
+            width: 100%;
+            margin-left: 0;
+        }
     }
 
-    // Django message support
-    {% if messages %}
-        {% for message in messages %}
-            showSnackbar("{{ message|escapejs }}");
-        {% endfor %}
-    {% endif %}
-</script>
-
-<style>
+    /* Snackbar */
     #snackbar {
         visibility: hidden;
         min-width: 250px;
@@ -239,35 +130,131 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
     }
 </style>
 
+<div class="container mt-4">
+    <h2>Role Permissions</h2>
+
+    <form method="get" action="{% url 'user_rights_view' 0 %}" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+        <label for="user_id"
+               style="color: #800000; font-weight: bold; height: 23px; display: flex; align-items: center;">
+            Select a Role:
+        </label>
+
+        <select name="user_id" id="user_id"
+                onchange="window.location.href='{% url 'user_rights_view' 0 %}'.replace('0', this.value)">
+            <option value="">-- Select Role --</option>
+            {% for u in all_users %}
+            <option value="{{ u.id }}" {% if selected_user and selected_user.id == u.id %}selected{% endif %}>
+                {{ u.username }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if selected_user %}
+        {% if selected_user.id != 1 %}
+            <h3 style="color: #800000; font-size: 14px;">Set Permissions for <span style="color: green;">{{ selected_user.username }}</span></h3>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Form Name</th>
+                        <th>View</th>
+                        <th>Add</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for form in all_forms %}
+                    <tr>
+                        <td>{{ form_display_names|get_item:form }}</td>
+                        {% if form == 'communication_dashboard' or form == 'calendar_form' or form == 'promotion_history' or form == 'student_database' or form == 'recent_activity_view' %}
+                        <td colspan="4">
+                            {% with perms|get_item:form as form_perm %}
+                            <input type="checkbox" name="{{ form }}_access" {% if form_perm.access %}checked{% endif %}> Access
+                            {% endwith %}
+                        </td>
+                        {% else %}
+                        {% get_value perms form "view" as can_view %}
+                        <td><input type="checkbox" class="perm-view" data-form="{{ form }}" name="{{ form }}_view" {% if can_view %}checked{% endif %}></td>
+                        {% get_value perms form "add" as can_add %}
+                        <td><input type="checkbox" class="perm-add" data-form="{{ form }}" name="{{ form }}_add" {% if can_add %}checked{% endif %}></td>
+                        {% get_value perms form "edit" as can_edit %}
+                        <td><input type="checkbox" class="perm-edit" data-form="{{ form }}" name="{{ form }}_edit" {% if can_edit %}checked{% endif %}></td>
+                        {% get_value perms form "delete" as can_delete %}
+                        <td><input type="checkbox" class="perm-delete" data-form="{{ form }}" name="{{ form }}_delete" {% if can_delete %}checked{% endif %}></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <button type="submit" class="submit-btn">Save Permissions</button>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addCheckboxes = document.querySelectorAll(".perm-add");
+
+        addCheckboxes.forEach(function (addCheckbox) {
+            const formName = addCheckbox.getAttribute("data-form");
+            const view = document.querySelector(`.perm-view[data-form="${formName}"]`);
+            const edit = document.querySelector(`.perm-edit[data-form="${formName}"]`);
+            const del = document.querySelector(`.perm-delete[data-form="${formName}"]`);
+
+            function updatePermissions() {
+                const isEnabled = addCheckbox.checked;
+                view.disabled = !isEnabled;
+                edit.disabled = !isEnabled;
+                del.disabled = !isEnabled;
+
+                if (!isEnabled) {
+                    view.checked = false;
+                    edit.checked = false;
+                    del.checked = false;
+                }
+            }
+
+            updatePermissions();
+            addCheckbox.addEventListener("change", updatePermissions);
+        });
+    });
+
+    function showSnackbar(message) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(() => { snackbar.className = snackbar.className.replace("show", ""); }, 3000);
+    }
+
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+</script>
+
+<div id="snackbar"></div>
 
 {% endblock %}

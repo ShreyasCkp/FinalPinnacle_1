@@ -29,6 +29,8 @@
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         padding: 30px;
         box-sizing: border-box;
+        overflow-x: auto;
+        margin: 0 auto; /* ✅ Center container */
     }
 
     h2 {
@@ -44,13 +46,15 @@
         font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        min-width: 1000px;
     }
 
     th, td {
         vertical-align: middle !important;
         text-align: center;
-        padding: 2px;
+        padding: 4px 6px;
         border: 1px solid #dee2e6;
+        white-space: nowrap;
     }
 
     td {
@@ -79,30 +83,30 @@
         margin-bottom: 20px;
     }
 
-        .search-form label {
-            font-size: 13px;
-            font-weight: 600;
-        }
+    .search-form label {
+        font-size: 13px;
+        font-weight: 600;
+    }
 
-        .search-form select,
-        .search-form button {
-            padding: 6px 10px;
-            font-size: 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+    .search-form select,
+    .search-form button {
+        padding: 6px 10px;
+        font-size: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
 
-        .search-form button {
-            background-color: #800000;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+    .search-form button {
+        background-color: #800000;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
 
-            .search-form button:hover {
-                background-color: #a52a2a;
-            }
+    .search-form button:hover {
+        background-color: #a52a2a;
+    }
 
     .collect-btn {
         display: inline-block;
@@ -115,20 +119,14 @@
         transition: background-color 0.2s;
     }
 
-        .collect-btn:hover {
-            background-color: #a52a2a;
-        }
+    .collect-btn:hover {
+        background-color: #a52a2a;
+    }
 
     p {
         text-align: center;
         font-size: 14px;
         font-weight: 500;
-    }
-
-    .content {
-        margin-left: 200px;
-        padding: 28px 0px 40px;
-        min-height: 100vh;
     }
 
     .search-input {
@@ -140,30 +138,129 @@
         border: 1px solid #ccc;
         border-radius: 4px;
     }
+
+    /* ✅ Responsive Design */
+    @media (max-width: 992px) {
+        .container {
+            padding: 20px;
+            width: 95%;
+            margin: 0 auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 15px;
+            width: 95%;
+            margin: 0 auto; /* ✅ Center container on tablet */
+        }
+
+        h2 {
+            font-size: 18px;
+        }
+
+        .search-input {
+            position: relative;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        form#filterForm {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+            width: 100%;
+            text-align: left;
+        }
+
+        form#filterForm label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        form#filterForm select,
+        form#filterForm button {
+            width: 100%;
+            font-size: 12px;
+            padding: 8px;
+        }
+
+        table {
+            font-size: 11px;
+            min-width: 800px;
+        }
+
+        .collect-btn {
+            font-size: 9px;
+            padding: 4px 6px;
+        }
+
+        .page-wrapper {
+            padding: 10px;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            width: 96%;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        h2 {
+            font-size: 16px;
+        }
+
+        .collect-btn {
+            font-size: 8px;
+            padding: 3px 5px;
+        }
+
+        td, th {
+            padding: 3px;
+            font-size: 10px;
+        }
+
+        table {
+            min-width: 700px;
+        }
+
+        .page-wrapper {
+            padding: 8px;
+            justify-content: center; /* ✅ Keeps it center on mobile */
+        }
+    }
+
+    @media (max-width: 768px) {
+    .content {
+        margin-left: 0;
+        padding: 29px 15px 8px;
+    }
+}
 </style>
+
 <div class="page-wrapper">
     <div class="container">
-       <div class="header-flex" style="position: relative; margin-bottom: 20px;">
-     <input type="text" id="confirmedAdmissionSearch" placeholder="Search Students fee..." class="search-input">
-     <h2 style="margin: 0; font-size: 22px; font-weight: bold; color: #800000; text-align: center; width: 100%;">Fee Tracker & Collection</h2>
- </div>
+        <div class="header-flex" style="position: relative; margin-bottom: 20px; text-align:center;">
+            <input type="text" id="confirmedAdmissionSearch" placeholder="Search Students fee..." class="search-input">
+            <h2>Fee Tracker & Collection</h2>
+        </div>
 
-        <form method="get" id="filterForm">
-            <!-- Academic Year -->
+        <form method="get" id="filterForm" class="search-form">
             <label for="academic_year">Batch:</label>
-            <select name="academic_year" id="academic_year" class="form-control">
+            <select name="academic_year" id="academic_year">
                 <option value="">Select Batch</option>
                 {% for year in academic_years %}
                 <option value="{{ year.id }}" {% if year.id|stringformat:"s" == request.GET.academic_year %}selected{% endif %}>
                     {{ year.year }}
-
                 </option>
                 {% endfor %}
             </select>
 
-            <!-- Course Type -->
             <label for="course_type">Program Type:</label>
-            <select name="course_type" id="course_type" class="form-control">
+            <select name="course_type" id="course_type">
                 <option value="">Select Program Type</option>
                 {% if course_types %}
                 {% for ct in course_types %}
@@ -174,9 +271,8 @@
                 {% endif %}
             </select>
 
-            <!-- Course -->
             <label for="course">Combination:</label>
-            <select name="course" id="course" class="form-control">
+            <select name="course" id="course">
                 <option value="">Select Combination</option>
                 {% if courses %}
                 {% for course in courses %}
@@ -187,9 +283,8 @@
                 {% endif %}
             </select>
 
-            <!-- Semester -->
             <label for="semester_select">Sem/Year:</label>
-            <select name="semester" id="semester_select" class="form-control">
+            <select name="semester" id="semester_select">
                 <option value="">Select Sem/Year</option>
                 {% if semesters %}
                 {% for sem in semesters %}
@@ -200,67 +295,63 @@
                 {% endif %}
             </select>
 
-
             <button type="submit">Search</button>
         </form>
 
         {% if students %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Sl No</th>
-                    <th>Admission No</th>
-                    <th>Student ID</th>
-                    <th>Student Name</th>
-                    <th>Program Type</th>
-                    <th>Combination</th>
-                    <th>Sem/Year</th>
-                    <th>Batch</th>
-                    <th>Father Name</th>
-                    <th>Father Phone No</th>
-                    {% for fee_name in fee_names %}
-                    <th>{{ fee_name }}</th>
+        <div style="overflow-x:auto; text-align:center;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Admission No</th>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Program Type</th>
+                        <th>Combination</th>
+                        <th>Sem/Year</th>
+                        <th>Batch</th>
+                        <th>Father Name</th>
+                        <th>Father Phone No</th>
+                        {% for fee_name in fee_names %}
+                        <th>{{ fee_name }}</th>
+                        {% endfor %}
+                        <th>Add Optional Fees</th>
+                        <th>Collect Fees</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ student.admission_no }}</td>
+                        <td>{{ student.student_id }}</td>
+                        <td>{{ student.student_name }}</td>
+                        <td>{{ student.admission_course_type }}</td>
+                        <td>{{ student.admission_course }}</td>
+                        <td>
+                            {{ student.course.name }}
+                            {% if student.course_type.name == "PUC Regular" %}
+                            {{ student.current_year }}
+                            {% else %}
+                            {{ student.semester }}
+                            {% endif %}
+                        </td>
+                        <td>{{ student.admission_academic_year }}</td>
+                        <td>{{ student.admission_father_name }}</td>
+                        <td>{{ student.admission_father_mobile_no }}</td>
+                        {% with student.fees as fee_dict %}
+                        {% for fee_name in fee_names %}
+                        <td>₹{{ fee_dict|get_safe:fee_name }}</td>
+                        {% endfor %}
+                        {% endwith %}
+                        <td><a href="{% url 'optional_fee' %}?admission_no={{ student.admission_no }}" class="collect-btn">Optional Fees</a></td>
+                        <td><a href="{% url 'fee_collection_collect' %}?admission_no={{ student.admission_no }}" class="collect-btn">Collect Fees</a></td>
+                    </tr>
                     {% endfor %}
-                    <th>Add Optional Fees</th>
-                    <th>Collect fees</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for student in students %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ student.admission_no }}</td>
-                    <td>{{ student.student_id }}</td>
-                    <td>{{ student.student_name }}</td>
-                    <td>{{ student.admission_course_type }}</td>
-                    <td>{{ student.admission_course }}</td>
-                    <td>
-                        {{ student.course.name }}
-                        {% if student.course_type.name == "PUC Regular" %}
-                        {{ student.current_year }}
-                        {% else %}
-                        {{ student.semester }}
-                        {% endif %}
-                    </td>
-                    <td>{{ student.admission_academic_year }}</td>
-                    <td>{{ student.admission_father_name }}</td>
-                    <td>{{ student.admission_father_mobile_no }}</td>
-                    {% with student.fees as fee_dict %}
-                    {% for fee_name in fee_names %}
-                    <td>₹{{ fee_dict|get_safe:fee_name }}</td>
-                    {% endfor %}
-                    {% endwith %}
-                    <td>
-                        <a href="{% url 'optional_fee' %}?admission_no={{ student.admission_no }}" class="collect-btn">Optional Fees</a>
-                    </td>
-                    <td>
-                        <a href="{% url 'fee_collection_collect' %}?admission_no={{ student.admission_no }}" class="collect-btn">collect Fees</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
+                </tbody>
+            </table>
+        </div>
         {% endif %}
     </div>
 </div>
@@ -289,8 +380,7 @@
         const selectedSemester = "{{ request.GET.semester|default:'' }}";
         const selectedCourse = "{{ request.GET.course|default:'' }}";
 
-        // Academic Year -> Course Types
-        $('#academic_year').off().on('change', function () {
+        $('#academic_year').on('change', function () {
             const academicYearId = $(this).val();
             $('#course_type').html('<option value="">Loading...</option>');
             $('#course').html('<option value="">Select Combination</option>');
@@ -312,8 +402,7 @@
             }
         });
 
-        // Course Type -> Courses
-        $('#course_type').off().on('change', function () {
+        $('#course_type').on('change', function () {
             const courseTypeId = $(this).val();
             $('#course').html('<option value="">Loading...</option>');
             $('#semester_select').html('<option value="">Select Sem/Year</option>');
@@ -328,26 +417,18 @@
                         options += `<option value="${course.id}">${course.name}</option>`;
                     });
                     $('#course').html(options);
-
-                    // Re-trigger semester load if course matches previous GET value
-                    if (selectedCourse) {
-                        $('#course').val(selectedCourse).trigger('change');
-                    }
+                    if (selectedCourse) $('#course').val(selectedCourse).trigger('change');
                 });
             } else {
                 $('#course').html('<option value="">Select Combination</option>');
             }
         });
 
-        // Course -> Semesters
-        $('#course').off().on('change', function () {
+        $('#course').on('change', function () {
             const courseId = $(this).val();
             $('#semester_select').html('<option value="">Loading...</option>');
-
             if (courseId) {
-                $.get("{% url 'get_sem_by_course' %}", {
-                    course_id: courseId
-                }, function (data) {
+                $.get("{% url 'get_sem_by_course' %}", { course_id: courseId }, function (data) {
                     let options = '<option value="">Select Sem/Year</option>';
                     if (data.semesters && data.semesters.length > 0) {
                         data.semesters.forEach(function (sem) {
@@ -364,19 +445,10 @@
             }
         });
 
-        // On page load: if course is selected, trigger change to load semesters
-        if (selectedCourse) {
-            $('#course').trigger('change');
-        }
+        if (selectedCourse) $('#course').trigger('change');
 
-        // Final Form Validation
-        $('#filterForm').off().on('submit', function (e) {
-            const academicYear = $('#academic_year').val();
-            const courseType = $('#course_type').val();
-            const course = $('#course').val();
-            const semester = $('#semester_select').val();
-
-            if (!academicYear || !courseType || !course || !semester) {
+        $('#filterForm').on('submit', function (e) {
+            if (!$('#academic_year').val() || !$('#course_type').val() || !$('#course').val() || !$('#semester_select').val()) {
                 alert("Please select all dropdowns including Semester.");
                 e.preventDefault();
             }
@@ -385,10 +457,9 @@
 </script>
 
 <script>
-    document.getElementById('studentSearch').addEventListener('input', function () {
+    document.getElementById('confirmedAdmissionSearch').addEventListener('input', function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('table tbody tr');
-
         rows.forEach(row => {
             const text = row.innerText.toLowerCase();
             row.style.display = text.includes(filter) ? '' : 'none';

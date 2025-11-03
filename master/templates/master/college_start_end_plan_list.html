@@ -3,6 +3,7 @@
 {% block content %}
 
 <style>
+    /* Mobile-first base styles */
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,40 +12,35 @@
     }
 
     .container {
-        margin-left: 200px;
-        padding: 30px;
-        max-width: calc(100% - 200px);
+        padding: 15px;
+        width: 100%;
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 20px;
+        margin: 10px auto;
         box-sizing: border-box;
+        overflow-x: auto;
     }
 
     .header-flex {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        position: relative;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        font-weight: 700;
+        font-size: 18px;
+        color: #800000;
+        margin: 0;
+    }
 
     .btn-add {
-        position: absolute;
-        right: 0;
         background-color: #800000;
         color: #fff;
-        font-size: 13px;
-        padding: 6px 12px;
+        font-size: 12px;
+        padding: 5px 10px;
         border: none;
         border-radius: 4px;
         font-weight: bold;
@@ -53,72 +49,65 @@
         transition: background-color 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
     table {
         width: 100%;
         font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        min-width: 800px; /* allow horizontal scroll on mobile */
     }
 
     th, td {
-        padding: 1px;
+        padding: 5px;
         text-align: center;
         border: 1px solid #dee2e6;
         vertical-align: middle;
+        white-space: nowrap;
     }
 
     thead {
         background: linear-gradient(135deg, #8B0000, #800000);
         color: white;
+        font-size: 11px;
     }
 
     tr:nth-child(even) {
         background-color: #f8f9fa;
     }
 
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
-
     .icon-btn {
         border: 1px solid #dee2e6;
         background-color: #fff;
-        padding: 3px 5px;
+        padding: 4px 6px;
         margin: 2px;
         border-radius: 6px;
         cursor: pointer;
-        transition: background-color 0.2s;
         display: inline-block;
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 12px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     .alert {
         color: #800000;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 500;
-        padding: 10px 0;
+        padding: 8px 0;
         text-align: center;
     }
 
-    .content {
-        margin-left: 0px;
-        padding: 29px 24px 40px;
-        min-height: 100vh;
-    }
-
+    /* Popup & snackbar */
     #overlay {
         position: fixed;
         top: 0;
@@ -136,17 +125,18 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background: #fff;
-        padding: 20px;
+        padding: 15px;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0,0,0,0.5);
         display: none;
         z-index: 1001;
         text-align: center;
+        font-size: 12px;
     }
 
     #confirm-yes, #confirm-no {
-        margin: 0 5px;
-        padding: 6px 12px;
+        margin: 5px;
+        padding: 5px 10px;
         font-size: 12px;
         border-radius: 4px;
         cursor: pointer;
@@ -157,68 +147,86 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
 
     #snackbar {
         visibility: hidden;
-        min-width: 250px;
+        min-width: 200px;
         background-color: #800000;
         color: #fff;
         text-align: center;
         border-radius: 4px;
-        padding: 14px 24px;
+        padding: 10px 15px;
         position: fixed;
         z-index: 9999;
         left: 50%;
-        bottom: 30px;
+        bottom: 20px;
         transform: translateX(-50%);
-        font-size: 14px;
+        font-size: 12px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 20px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        from { bottom: 20px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* Responsive for mobile only */
+    @media (max-width: 768px) {
+        .header-flex h2 {
+            font-size: 16px;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        .btn-add {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+
+        table {
+            font-size: 11px;
+            min-width: 600px;
+        }
+
+        th, td {
+            padding: 4px;
+        }
+
+        .icon-btn i {
+            font-size: 11px;
         }
     }
+    @media (max-width: 768px) {
+    .content {
+        margin-left: 0;
+        padding: 26px 18px 8px;
+    }
+}
 </style>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og=="
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" 
+      integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og==" 
       crossorigin="anonymous" />
 
-<div class="container mt-4">
+<div class="container">
     <div class="header-flex">
-        <h2>College Start-End Plan List</</h2>
+        <h2>College Start-End Plan List</h2>
         <a href="{% url 'college_start_end_plan_create' %}" class="btn-add">
-            <i class="fas fa-plus me-2"></i> Add New Plan
+            <i class="fas fa-plus me-1"></i> Add New
         </a>
     </div>
+
     <table>
         <thead>
             <tr>
@@ -244,26 +252,16 @@
                 <td>{{ plan.end_date }}</td>
                 <td>{{ plan.is_active|yesno:"True,False" }}</td>
                 <td>{{ plan.created_at|date:"Y-m-d H:i" }}</td>
-                <td class="text-center">
-                    <!-- View -->
+                <td>
                     <a href="{% url 'college_start_end_plan_view' plan.id %}" class="icon-btn" title="View">
                         <i class="fas fa-eye text-info"></i>
                     </a>
-
-                    <!-- Edit -->
                     <a href="{% url 'college_start_end_plan_edit' plan.id %}" class="icon-btn" title="Edit">
                         <i class="fas fa-edit text-warning"></i>
                     </a>
-
-                    <!-- Delete -->
-                    <form id="plan-delete-form-{{ plan.id }}"
-                          method="POST"
-                          action="{% url 'college_start_end_plan_delete' plan.id %}"
-                          style="display:none;">
+                    <form id="plan-delete-form-{{ plan.id }}" method="POST" action="{% url 'college_start_end_plan_delete' plan.id %}" style="display:none;">
                         {% csrf_token %}
                     </form>
-
-                    <!-- Delete (triggers custom overlay popup) -->
                     <a href="#" class="icon-btn text-danger" title="Delete"
                        onclick="confirmPlanDelete('{{ plan.id }}',
     '{{ plan.program_type.name|escapejs }} - {{ plan.academic_year|escapejs }} - {{ plan.course.name|escapejs }} {{ plan.semester_number|escapejs }} ({{ plan.start_date|date:'Y-m-d' }} ? {{ plan.end_date|date:'Y-m-d' }})'
@@ -271,7 +269,6 @@
                         <i class="fas fa-trash-alt"></i>
                     </a>
                 </td>
-
             </tr>
             {% empty %}
             <tr><td colspan="9">No plans found.</td></tr>
@@ -279,6 +276,7 @@
         </tbody>
     </table>
 </div>
+
 <div id="overlay"></div>
 <div id="confirm-popup">
     <p id="confirm-popup-message" style="margin-bottom:8px;"></p>
@@ -320,7 +318,6 @@
         }, 3000);
     }
 
-    // Django messages -> snackbar
     {% if messages %}
         {% for message in messages %}
             showSnackbar("{{ message|escapejs }}");
@@ -328,5 +325,4 @@
     {% endif %}
 </script>
 
-
-    {% endblock %}
+{% endblock %}

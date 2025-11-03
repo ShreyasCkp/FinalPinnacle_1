@@ -11,61 +11,57 @@
     }
 
     .container {
-        margin-left: 200px;
-        padding: 27px;
-        max-width: calc(100% - 200px);
+        margin: 20px auto;
+        padding: 20px;
+        max-width: 1200px;
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 20px;
         box-sizing: border-box;
     }
 
     .header-flex {
         display: flex;
-        justify-content: center;
+        flex-wrap: wrap;
+        justify-content: space-between;
         align-items: center;
-        position: relative;
         margin-bottom: 20px;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        font-size: 22px;
+        color: #800000;
+        margin: 0;
+        flex: 1;
+        text-align: center;
+    }
 
     .btn-add {
-        position: absolute;
-        right: 0;
         background-color: #800000;
         color: #fff;
         font-size: 13px;
         padding: 6px 12px;
         border: none;
-        border-radius: 4px;
+        border-radius: 6px;
         font-weight: bold;
         text-decoration: none;
         cursor: pointer;
         transition: background-color 0.3s;
-    }
-
-        .btn-add:hover {
-            background-color: #a10000;
-        }
-
-    table {
-        width: 100%;
-        font-size: 12px;
-        border-collapse: collapse;
         margin-top: 10px;
     }
 
+    .btn-add:hover {
+        background-color: #a10000;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
     th, td {
-        padding: 1px;
+        padding: 8px 10px;
         text-align: center;
         border: 1px solid #dee2e6;
         vertical-align: middle;
@@ -80,14 +76,10 @@
         background-color: #f8f9fa;
     }
 
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
-
     .icon-btn {
         border: 1px solid #dee2e6;
         background-color: #fff;
-        padding: 3px 5px;
+        padding: 4px 6px;
         margin: 2px;
         border-radius: 6px;
         cursor: pointer;
@@ -96,29 +88,16 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
-
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
-
-    .alert {
+    .icon-btn i {
+        font-size: 12px;
         color: #800000;
-        font-size: 11px;
-        font-weight: 500;
-        padding: 10px 0;
-        text-align: center;
     }
 
-    .content {
-        margin-left: -11px;
-        padding: 29px 24px 40px;
-        min-height: 100vh;
+    .icon-btn.text-danger i {
+        color: #b30000;
     }
 
+    /* Confirm popup overlay */
     #overlay {
         position: fixed;
         top: 0;
@@ -157,68 +136,81 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
-
-    #snackbar {
-        visibility: hidden;
-        min-width: 250px;
+    #confirm-yes:hover, #confirm-no:hover {
         background-color: #800000;
-        color: #fff;
-        text-align: center;
-        border-radius: 4px;
-        padding: 14px 24px;
-        position: fixed;
-        z-index: 9999;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 14px;
+        color: white;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .header-flex {
+            flex-direction: column;
+            align-items: center;
         }
 
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
+        .header-flex h2 {
+            text-align: center;
+            margin-bottom: 10px;
         }
 
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        .btn-add {
+            width: 100%;
+            text-align: center;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead {
+            display: none;
+        }
+
+        tr {
+            margin-bottom: 15px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 10px;
+        }
+
+        td {
+            padding: 6px 10px;
+            text-align: right;
+            position: relative;
+            border: none;
+            border-bottom: 1px solid #eee;
+        }
+
+        td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            width: 50%;
+            padding-left: 5px;
+            font-weight: 600;
+            text-align: left;
+            color: #555;
+        }
+
+        td:last-child {
+            text-align: center;
+            border-bottom: none;
         }
     }
 </style>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og=="
       crossorigin="anonymous" />
 
-<div class="container mt-4">
+<div class="container">
     <div class="header-flex">
         <h2>Exam Marks List</h2>
         <a href="{% url 'create_exam_marks' %}" class="btn-add">
             <i class="fas fa-plus me-2"></i> Add Exam Marks
         </a>
     </div>
-
 
     <table>
         <thead>
@@ -239,19 +231,17 @@
         <tbody>
             {% for mark in marks_list %}
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ mark.program_type.name }}</td>
-                <td>{{ mark.academic_year }}</td>
-                <td>{{ mark.course.name }}</td>
-                <td>{{ mark.course.name }} {{ mark.semester_number }}</td>
-                <td>{{ mark.subject.name }}</td>
-                <td>{{ mark.student.student_name }}</td>
-                <td>{{ mark.max_marks }}</td>
-                <td>{{ mark.marks_obtained }}</td>
-                <td>{{ mark.created_at|date:"d-m-Y" }}</td>
-                <td>
-
-
+                <td data-label="Sl No">{{ forloop.counter }}</td>
+                <td data-label="Program Type">{{ mark.program_type.name }}</td>
+                <td data-label="Academic Year">{{ mark.academic_year }}</td>
+                <td data-label="Course">{{ mark.course.name }}</td>
+                <td data-label="Sem/Year">{{ mark.course.name }} {{ mark.semester_number }}</td>
+                <td data-label="Subject">{{ mark.subject.name }}</td>
+                <td data-label="Student">{{ mark.student.student_name }}</td>
+                <td data-label="Total Marks">{{ mark.max_marks }}</td>
+                <td data-label="Marks Obtained">{{ mark.marks_obtained }}</td>
+                <td data-label="Exam Date">{{ mark.created_at|date:"d-m-Y" }}</td>
+                <td data-label="Actions">
                     <a href="{% url 'view_exam_marks' mark.id %}" class="icon-btn" title="View">
                         <i class="fas fa-eye"></i>
                     </a>
@@ -261,18 +251,15 @@
                     <form id="exam-mark-delete-form-{{ mark.id }}" method="POST" action="{% url 'delete_exam_marks' mark.id %}" style="display: none;">
                         {% csrf_token %}
                     </form>
-
                     <a href="#" class="icon-btn text-danger" title="Delete"
                        onclick="confirmDelete('{{ mark.id }}', '{{ mark.student.student_name }}')">
                         <i class="fas fa-trash-alt"></i>
                     </a>
-
                 </td>
             </tr>
-
             {% empty %}
             <tr>
-                <td colspan="10" class="text-center text-muted">No exam marks found.</td>
+                <td colspan="11" class="text-center text-muted">No exam marks found.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -284,7 +271,6 @@
         <button id="confirm-yes">Yes</button>
         <button id="confirm-no">No</button>
     </div>
-
 </div>
 
 <script>
@@ -310,4 +296,4 @@
     });
 </script>
 
-    {% endblock %}
+{% endblock %}

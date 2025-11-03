@@ -2,128 +2,17 @@
 {% block title %}Profile{% endblock %}
 {% block content %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Employee Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
+<div class="container py-4">
+    <div class="profile-card mx-auto p-3 p-md-4">
+        <!-- Header -->
+        <div class="profile-header text-center mb-3">
+            <h3 class="fw-bold">{{ employee.name }}</h3>
+            <p class="text-muted">{{ employee.designation }} | {{ employee.category }}</p>
+        </div>
 
-        .profile-card {
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
-            padding: 30px;
-        }
-
-        .profile-header {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #800;
-            font-size: 32px;
-        }
-
-            .profile-header h3 {
-                margin-top: 10px;
-                margin-bottom: 5px;
-            }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #800;
-            border-bottom: 2px solid #800;
-            display: inline-block;
-            padding-bottom: 3px;
-        }
-
-        .info-table th {
-            width: 30%;
-            color: #495057;
-        }
-
-        .info-table td {
-            color: #212529;
-        }
-
-        .btn-secondary {
-            color: #fff !important;
-            background-color: #800 !important;
-            border-color: #6c757d !important;
-            transition: none !important;
-        }
-
-            /* Override hover, focus, active, disabled */
-            .btn-secondary:hover,
-            .btn-secondary:focus,
-            .btn-secondary:active,
-            .btn-secondary:disabled {
-                color: #fff !important;
-                background-color: #800 !important;
-                border-color: #6c757d !important;
-                box-shadow: none !important; /* removes bootstrap glow */
-            }
-
-
-        .text-muted {
-            margin-top: -5px;
-            margin-bottom: 1rem;
-            font-size: 12px;
-        }
-
-        .btn-danger {
-            color: #fff !important;
-            background-color: #800 !important;
-            border-color: #800 !important;
-            transition: none !important;
-        }
-
-            /* Override hover, focus, active, disabled */
-            .btn-danger:hover,
-            .btn-danger:focus,
-            .btn-danger:active,
-            .btn-danger:disabled {
-                color: #fff !important;
-                background-color: #800 !important;
-                border-color: #800 !important;
-                box-shadow: none !important; /* removes glow */
-            }
-
-        .mt-5 {
-            margin-top: -3rem !important;
-        }
-
-        .btn-save {
-            background-color: #a23030;
-            font-weight: 500;
-            padding: 6px 16px;
-            font-size: 14px;
-            color: white;
-            border: none;
-            border-radius: 8px;
-        }
-
-            .btn-save:hover {
-                background-color: #8a1f1f;
-            }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="profile-card">
-            <!-- Header -->
-            <div class="profile-header">
-                <h3>{{ employee.name }}</h3>
-                <p class="text-muted">{{ employee.designation }} | {{ employee.category }}</p>
-            </div>
-
-            <!-- Employee Info -->
-            <h5 class="section-title">Employment Details</h5>
+        <!-- Employment Details -->
+        <h5 class="section-title">Employment Details</h5>
+        <div class="table-responsive">
             <table class="table table-sm info-table">
                 <tr><th>Employee Code</th><td>{{ employee.emp_code }}</td></tr>
                 <tr><th>User ID</th><td>{{ employee.employee_userid }}</td></tr>
@@ -132,9 +21,11 @@
                 <tr><th>Joining Date</th><td>{{ employee.joining_date }}</td></tr>
                 <tr><th>Location</th><td>{{ employee.location }}</td></tr>
             </table>
+        </div>
 
-            <!-- Personal Info -->
-            <h5 class="section-title">Personal Details</h5>
+        <!-- Personal Details -->
+        <h5 class="section-title">Personal Details</h5>
+        <div class="table-responsive">
             <table class="table table-sm info-table">
                 <tr><th>DOB</th><td>{{ employee.dob }}</td></tr>
                 <tr><th>Email</th><td>{{ employee.email }}</td></tr>
@@ -142,42 +33,102 @@
                 <tr><th>PAN</th><td>{{ employee.pan_number }}</td></tr>
                 <tr><th>Aadhaar</th><td>{{ employee.aadhaar_number }}</td></tr>
             </table>
-            <!-- Compliance Info -->
-            <h5 class="section-title">Compliance Numbers</h5>
+        </div>
+
+        <!-- Compliance Numbers -->
+        <h5 class="section-title">Compliance Numbers</h5>
+        <div class="table-responsive">
             <table class="table table-sm info-table">
                 <tr><th>UAN</th><td>{{ employee.uan_number }}</td></tr>
                 <tr><th>PF Number</th><td>{{ employee.pf_number }}</td></tr>
                 <tr><th>ESI Number</th><td>{{ employee.esi_number }}</td></tr>
             </table>
+        </div>
 
-            <!--<div class="text-center mt-4">
-                <a href="{% url 'employee_dashboard_view' %}" class="btn btn-secondary">Back to Dashboard</a>
-                <a href="{% url 'employee_logout' %}" class="btn btn-danger">Logout</a>
-            </div>-->
-            <h5 class="section-title">Bank Details</h5>
-
-            {% if bank_form %}
-            <!-- Show form if employee has not added bank details -->
-            <form method="post">
-                {% csrf_token %}
-                {{ bank_form.as_p }}
-                <button type="submit" class="btn-save" style=" font-size: 11px;">Save</button>
-            </form>
-            {% else %}
-            <!-- Show saved details if already added -->
+        <!-- Bank Details -->
+        <h5 class="section-title">Bank Details</h5>
+        {% if bank_form %}
+        <form method="post">
+            {% csrf_token %}
+            {{ bank_form.as_p }}
+            <button type="submit" class="btn-save">Save</button>
+        </form>
+        {% else %}
+        <div class="table-responsive">
             <table class="table table-sm info-table">
                 <tr><th>Bank Name</th><td>{{ employee.bank_name }}</td></tr>
                 <tr><th>IFSC Code</th><td>{{ employee.ifsc_code }}</td></tr>
                 <tr><th>Account No</th><td>{{ employee.bank_account_number }}</td></tr>
                 <tr><th>Branch</th><td>{{ employee.branch_name }}</td></tr>
             </table>
-            {% endif %}
-
-
-
-
         </div>
+        {% endif %}
     </div>
-</body>
-</html>
+</div>
+
+<style>
+/* Card */
+.profile-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Section titles */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #800;
+    border-bottom: 2px solid #800;
+    display: inline-block;
+    padding-bottom: 3px;
+}
+
+/* Info tables */
+.info-table th {
+    width: 40%;
+    color: #495057;
+    font-weight: 500;
+}
+.info-table td {
+    color: #212529;
+}
+
+/* Buttons */
+.btn-save {
+    background-color: #a23030;
+    font-weight: 500;
+    padding: 6px 16px;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+.btn-save:hover {
+    background-color: #8a1f1f;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .profile-header h3 {
+        font-size: 22px;
+    }
+    .profile-header p {
+        font-size: 14px;
+    }
+    .section-title {
+        font-size: 1rem;
+    }
+    .info-table th, .info-table td {
+        font-size: 13px;
+    }
+    .btn-save {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+}
+</style>
 {% endblock %}

@@ -4,223 +4,196 @@
 {% block title %}All Student Marks{% endblock %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+    }
 
     .form-section {
         background: #fff;
-        padding: 31px;
-        border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 40px;
-        margin-left: 101px;
-        margin-right: 4px;
-        width: 1125px;
+        padding: 24px 16px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        margin: 20px auto;
+        max-width: 1000px;
+        box-sizing: border-box;
     }
+
+    .form-section h4 {
+        text-align: center;
+        font-size: 22px;
+        color: #800000;
+        margin-bottom: 20px;
+    }
+
     .firsts {
         display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
+        flex-wrap: wrap;
         gap: 12px;
-        margin: 20px;
+        justify-content: center;
+        margin-bottom: 20px;
     }
 
-        .firsts select,
-        .firsts input[type="date"],
-        .firsts input[type="text"] {
-            min-width: 140px;
-            max-width: 200px;
-            font-size: 13px;
-            padding: 6px 8px;
-            flex-shrink: 0;
-        }
-
-</style>
-
-<style>
-    .table-section {
-        margin-top: 20px;
-        margin-left: 10px;
-        margin-right: 10px;
-/*        overflow-x: auto;
-*/        width: 100%;
-    }
-    select, input[type="date"] {
-        padding: 6px;
-        margin: 5px 10px 10px 0;
-        min-width: 180px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    input[readonly] {
-        background-color: #e9ecef;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 9px;
-        table-layout: fixed;
-    }
-
-    th {
-        padding: 8px;
-        border: 1px solid #dee2e6;
-        text-align: center;
-        vertical-align: middle;
-        word-wrap: break-word;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 150px;
-    }
-
-    td {
-        border: 1px solid #dee2e6;
-        text-align: center;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .table-responsive {
-        margin-top: 20px;
-    }
-
-    th {
-        background-color: #800000;
-        color: white;
-        padding: 4px;
-        font-size: 11px;
-    }
     .firsts select,
     .firsts input[type="date"],
     .firsts input[type="text"] {
         min-width: 140px;
         max-width: 200px;
-        font-size: 13px;
-        padding: 6px 8px;
-        flex-shrink: 0;
+        font-size: 14px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
     }
 
-    .content {
-        padding: 10px 26px 18px;
-        /* background-color: #EEE; */
-        margin-left: 128px;
-        flex-grow: 1;
+    .table-responsive {
+        overflow-x: auto;
+        max-height: 500px;
     }
 
-    td input[type="radio"] {
-        margin-bottom: 2px;
-    }
-
-    td label {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+    table {
+        width: 100%;
+        border-collapse: collapse;
         font-size: 12px;
-        gap: 4px;
+        min-width: 700px;
+    }
+
+    th {
+        background-color: #800000;
+        color: #fff;
+        padding: 8px;
+        font-size: 12px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 6px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    ul {
+        padding-left: 16px;
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+        .form-section {
+            margin: 10px;
+            padding: 16px 12px;
+        }
+        .firsts select,
+        .firsts input[type="date"],
+        .firsts input[type="text"] {
+            min-width: 120px;
+            max-width: 100%;
+        }
+        table {
+            font-size: 11px;
+        }
     }
 </style>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <div class="form-section">
-    <h4 style="text-align: center; font-size: 22px; color: #800; margin-top: -17px;">All Student Marks</h4>
+    <h4>All Student Marks</h4>
     <form method="get">
         <div class="firsts">
+            <select name="program_type" class="form-select" onchange="this.form.submit()">
+                <option value="">Select Program Type</option>
+                {% for pt in program_types %}
+                    <option value="{{ pt.id }}" {% if selected.program_type == pt.id|stringformat:"s" %}selected{% endif %}>
+                        {{ pt.name }}
+                    </option>
+                {% endfor %}
+            </select>
 
-                <select name="program_type" class="form-select" onchange="this.form.submit()">
-                    <option value="">Select Program Type</option>
-                    {% for pt in program_types %}
-                        <option value="{{ pt.id }}" {% if selected.program_type == pt.id|stringformat:"s" %}selected{% endif %}>
-                            {{ pt.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-           
-                <select name="batch" class="form-select" onchange="this.form.submit()">
-                    <option value="">Select Batch</option>
-                    {% for year in batches %}
-                        <option value="{{ year }}" {% if selected.batch == year|stringformat:"s" %}selected{% endif %}>
-                            {{ year }}
-                        </option>
-                    {% endfor %}
-                </select>
+            <select name="batch" class="form-select" onchange="this.form.submit()">
+                <option value="">Select Batch</option>
+                {% for year in batches %}
+                    <option value="{{ year }}" {% if selected.batch == year|stringformat:"s" %}selected{% endif %}>
+                        {{ year }}
+                    </option>
+                {% endfor %}
+            </select>
 
-           
-                 <select name="course" class="form-control" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
-                     <option value="">Select Combination</option>
-                     {% for c in courses %}
-                         <option value="{{ c.id }}" {% if selected.course == c.id|stringformat:"s" %}selected{% endif %}>
-                             {{ c.name }}
-                         </option>
-                     {% endfor %}
-                 </select>
+            <select name="course" class="form-control" onchange="this.form.submit()" {% if mode == 'view' %}disabled{% endif %}>
+                <option value="">Select Combination</option>
+                {% for c in courses %}
+                    <option value="{{ c.id }}" {% if selected.course == c.id|stringformat:"s" %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                {% endfor %}
+            </select>
 
-                <select name="sem_year" class="form-control" onchange="this.form.submit()">
-                    <option value="">Select Semester/Year</option>
-                    {% for sy in sem_years %}
-                        <option value="{{ sy.id }}" {% if selected.sem_year == sy.id|stringformat:"s" %}selected{% endif %}>
-                            {{ sy.name }}
-                        </option>
-                    {% endfor %}
-                </select>
+            <select name="sem_year" class="form-control" onchange="this.form.submit()">
+                <option value="">Select Semester/Year</option>
+                {% for sy in sem_years %}
+                    <option value="{{ sy.id }}" {% if selected.sem_year == sy.id|stringformat:"s" %}selected{% endif %}>
+                        {{ sy.name }}
+                    </option>
+                {% endfor %}
+            </select>
 
-                <select name="exam_type" class="form-control" onchange="this.form.submit()">
-                    <option value="">Select Marks Type</option>
-                    {% for et in exam_types %}
-                        <option value="{{ et.id }}" {% if selected.exam_type == et.id|stringformat:"s" %}selected{% endif %}>
-                            {{ et.title }}
-                        </option>
-                    {% endfor %}
-                </select>
-
+            <select name="exam_type" class="form-control" onchange="this.form.submit()">
+                <option value="">Select Marks Type</option>
+                {% for et in exam_types %}
+                    <option value="{{ et.id }}" {% if selected.exam_type == et.id|stringformat:"s" %}selected{% endif %}>
+                        {{ et.title }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
     </form>
 
-    <!-- Results -->
-        <div class="table-responsive" style="max-height: 500px;">
-            <table class="table table-bordered table-striped table-hover mt-3">
-                <thead>
-                    <tr>
-                        <th>Admission No</th>
-                        <th>Student Name</th>
-                        <th>Program Type</th>
-                        <th>Course</th>
-                        <th>Batch</th>
-                        <th>Semester/Year</th>
-                        <th>Marks </th>
-                        <!--<th>Exam Avg</th>-->
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in data %}
-                    <tr>
-                        <td>{{ row.student.get_admission_no }}</td>
-                        <td>{{ row.student.student_name }}</td>
-                        <td>{{ row.student.course_type }}</td>
-                        <td>{{ row.student.course }}</td>
-                        <td>{{ row.student.academic_year }}</td>
-                        <td>{{ row.student.course }} {{ row.student.semester|default:row.student.current_year }}</td>
-
-                        <td>
-                            {% if row.assignments %}
-                            <ul class="mb-0">
-                                {% for a in row.assignments %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Admission No</th>
+                    <th>Student Name</th>
+                    <th>Program Type</th>
+                    <th>Course</th>
+                    <th>Batch</th>
+                    <th>Semester/Year</th>
+                    <th>Marks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row.student.get_admission_no }}</td>
+                    <td>{{ row.student.student_name }}</td>
+                    <td>{{ row.student.course_type }}</td>
+                    <td>{{ row.student.course }}</td>
+                    <td>{{ row.student.academic_year }}</td>
+                    <td>{{ row.student.course }} {{ row.student.semester|default:row.student.current_year }}</td>
+                    <td>
+                        {% if row.assignments %}
+                        <ul class="mb-0">
+                            {% for a in row.assignments %}
                                 <li>{{ a.avg_score|floatformat:2 }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% else %}
+                            {% endfor %}
+                        </ul>
+                        {% else %}
                             -
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center">No records found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 {% endblock %}

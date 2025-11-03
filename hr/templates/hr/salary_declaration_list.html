@@ -98,7 +98,6 @@
         background-color: #f8f9fa;
     } 
 
-
     .icon-btn {
         border: 1px solid #dee2e6;
         background-color: #fff;
@@ -124,6 +123,61 @@
         margin-left: 0px;
         padding: 27px 20px 39px;
         min-height: 100vh;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .container {
+            margin-left: 0;
+            padding: 20px;
+        }
+
+        .header-flex {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-add {
+            position: static;
+        }
+
+        .search-form {
+            position: static;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-form input {
+            width: 100%;
+            max-width: 250px;
+        }
+
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        th, td {
+            font-size: 10px;
+            padding: 4px 6px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        table {
+            font-size: 9px;
+        }
+
+        .icon-btn i {
+            font-size: 9px;
+        }
+
+        .btn-add {
+            font-size: 12px;
+            padding: 5px 8px;
+        }
     }
 </style>
 
@@ -194,7 +248,6 @@
                         </button>
                     </form>
                 </td>
-
             </tr>
             {% empty %}
             <tr>
@@ -204,15 +257,6 @@
         </tbody>
     </table>
 </div>
-
-
-<!--{% if dec.payslip_url %}
-<a href="{% url 'download_payslip' dec.pk %}" class="icon-btn" title="Download Payslip">
-    <i class="fas fa-download"></i>
-</a>
-{% else %}
-<span class="text-muted">No Payslip</span>
-{% endif %}-->
 
 <script>
     document.getElementById('salarySearch').addEventListener('input', function () {

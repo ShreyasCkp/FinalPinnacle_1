@@ -5,10 +5,32 @@
     <title>{{ employee.name }}'s Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Mobile-friendly adjustments */
+        .modal-lg {
+            max-width: 95%; /* Take most of the screen on mobile */
+        }
+
+        .modal-body p {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header .modal-title {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 576px) {
+            .modal-header {
+                padding: 0.5rem 1rem;
+            }
+            .modal-body {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-
-
 
     <!-- Profile Modal -->
     <div class="modal fade" id="profileModal{{ employee.id }}" tabindex="-1" aria-labelledby="profileModalLabel{{ employee.id }}" aria-hidden="true">
@@ -33,8 +55,9 @@
     </div>
 
     <script>
-    const profileModal = new bootstrap.Modal(document.getElementById('profileModal{{ employee.id }}'));
-    profileModal.show();  // Automatically show the modal when page loads (optional)
+        // Show the modal automatically
+        const profileModal = new bootstrap.Modal(document.getElementById('profileModal{{ employee.id }}'));
+        profileModal.show();
     </script>
 
 </body>

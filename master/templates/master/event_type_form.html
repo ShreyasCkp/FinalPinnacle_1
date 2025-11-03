@@ -57,9 +57,9 @@
         border-radius: 8px;
     }
 
-        .btn-save:hover {
-            background-color: #8a1f1f;
-        }
+    .btn-save:hover {
+        background-color: #8a1f1f;
+    }
 
     .btn-back {
         background-color: #800000;
@@ -69,12 +69,13 @@
         color: white;
         border-radius: 8px;
         text-decoration: none;
+        display: inline-block;
     }
 
-        .btn-back:hover {
-            background-color: #6e0000;
-            color: white;
-        }
+    .btn-back:hover {
+        background-color: #6e0000;
+        color: white;
+    }
 
     .btn-container {
         display: flex;
@@ -85,6 +86,66 @@
     .content {
         padding: 25px 26px 40px;
         margin-left: 200px;
+    }
+
+    /* --- Mobile Styles --- */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 20px 15px;
+            margin: 15px 10px;
+        }
+
+        h3 {
+            font-size: 18px;
+        }
+
+        .btn-container {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-save, .btn-back {
+            width: 100%;
+            text-align: center;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-control, .form-select {
+            font-size: 13px;
+            padding: 5px;
+        }
+
+        .content {
+            margin-left: 0;
+            padding: 20px 10px 30px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-container {
+            padding: 15px 10px;
+        }
+
+        h3 {
+            font-size: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+        }
+
+        .form-control, .form-select {
+            font-size: 12px;
+            padding: 4px;
+        }
+
+        .btn-save, .btn-back {
+            padding: 6px;
+            font-size: 13px;
+        }
     }
 </style>
 
@@ -120,7 +181,6 @@
 
         <!-- Is Active Field -->
         <div class="mb-3">
-
             {{ form.is_active.errors }}
             {{ form.is_active }}
             {% if view_mode %}

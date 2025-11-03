@@ -29,14 +29,14 @@
         margin-bottom: 20px;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .btn-add {
         position: absolute;
@@ -53,9 +53,9 @@
         transition: background-color 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
     table {
         width: 100%;
@@ -65,10 +65,11 @@
     }
 
     th, td {
-        padding: 1px;
+        padding: 6px 4px;
         text-align: center;
         border: 1px solid #dee2e6;
         vertical-align: middle;
+        word-break: break-word;
     }
 
     thead {
@@ -79,10 +80,6 @@
     tr:nth-child(even) {
         background-color: #f8f9fa;
     }
-
-   /* tr:hover {
-        background-color: #e9ecef;
-    }*/
 
     .icon-btn {
         border: 1px solid #dee2e6;
@@ -96,14 +93,14 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     .alert {
         color: #800000;
@@ -115,7 +112,7 @@
 
     .content {
         margin-left: 0px;
-        padding: 29px 24px 40px;
+        padding: 20px 15px 40px;
         min-height: 100vh;
     }
 
@@ -157,10 +154,10 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
 
     #snackbar {
         visibility: hidden;
@@ -178,35 +175,74 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
     }
 
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .container {
+            margin-left: 15px;
+            padding: 15px;
+            max-width: 100%;
+        }
+
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead {
+            display: none;
+        }
+
+        tr {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+        }
+
+        td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 15px;
+            width: calc(50% - 30px);
+            padding-left: 10px;
+            font-weight: 600;
+            text-align: left;
+            color: #800000;
+        }
+
+        .header-flex {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-add {
+            position: static;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .icon-btn i {
+            font-size: 14px;
+        }
+    }
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
@@ -233,9 +269,9 @@
         <tbody>
             {% for year in years %}
             <tr>
-                <td>{{ year.year }}</td>
-                <td>{{ year.is_active }}</td>
-                <td>
+                <td data-label="Batch">{{ year.year }}</td>
+                <td data-label="Active">{{ year.is_active }}</td>
+                <td data-label="Actions">
                     <a href="{% url 'academic_year_edit' year.pk %}" class="icon-btn" title="Edit">
                         <i class="fas fa-edit"></i>
                     </a>
@@ -244,7 +280,6 @@
                        onclick="confirmYearDelete('{{ year.pk }}', '{{ year.year }}')">
                         <i class="fas fa-trash-alt"></i>
                     </a>
-
                 </td>
             </tr>
             {% endfor %}
@@ -295,7 +330,6 @@
         }, 3000);
     }
 
-    // Django messages support
     {% if messages %}
         {% for message in messages %}
             showSnackbar("{{ message|escapejs }}");

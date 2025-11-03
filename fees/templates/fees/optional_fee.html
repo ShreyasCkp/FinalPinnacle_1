@@ -3,7 +3,6 @@
 
 {% block content %}
 <style>
-    /* Styles from your Student Attendance form */
     .form-section {
         background: #fff;
         padding: 31px;
@@ -13,11 +12,11 @@
         box-shadow: 0 4px 24px rgba(0,0,0,0.08);
     }
 
-    .firsts {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 20px;
+    h3 {
+        text-align: center;
+        color: #800000;
+        font-weight: 700;
+        margin-bottom: 25px;
     }
 
     select, input[type="date"], input[type="number"] {
@@ -27,37 +26,6 @@
         border: 1px solid #ccc;
         border-radius: 4px;
     }
-
-    .btn-save {
-        background-color: #800000;
-        font-weight: 500;
-        padding: 5px 16px;
-        font-size: 14px;
-        color: white;
-        border: none;
-        border-radius: 8px;
-    }
-
-        .btn-save:hover {
-            background-color: #800000;
-        }
-
-    .btn-back {
-        background-color: #800000;
-        color: #fff;
-        border: 2px solid #800000;
-        padding: 2px 5px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-        .btn-back:hover {
-            background-color: #800000;
-            color: white;
-        }
 
     table {
         width: 100%;
@@ -73,16 +41,9 @@
     }
 
     th {
-        background: #800;
+        background: #800000;
         color: #fff;
     }
-
-    .content {
-        margin-left: 200px;
-        padding: 8px 26px 40px;
-        min-height: 100vh;
-    }
-
 
     .icon-btn {
         border: 1px solid #dee2e6;
@@ -96,64 +57,142 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
-
-        .icon-btn:hover {
-            background-color: #f3f3f3;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     .btn-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-top: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .btn-back {
         background-color: #800000;
         color: #fff;
         border: 2px solid #800000;
-        padding: 2px 5px;
+        padding: 5px 10px;
         border-radius: 6px;
         font-size: 12px;
         font-weight: 600;
         text-decoration: none;
         transition: all 0.2s ease;
+        cursor: pointer;
     }
 
-        .btn-back:hover {
-            background-color: #800000;
-            color: white;
-        }
+    .btn-back:hover {
+        background-color: #a10000;
+    }
 
     .btn-save {
         background-color: #800000;
         font-weight: 600;
-        padding: 2px 4px;
+        padding: 5px 12px;
         border-radius: 6px;
         font-size: 12px;
         color: white;
-        width: 59px;
         border: none;
         cursor: pointer;
+        transition: 0.3s;
     }
 
-        .btn-save:hover {
-            background-color: #a10000;
-        }
-</style>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    .btn-save:hover {
+        background-color: #a10000;
+    }
 
+    .error-border {
+        border: 1px solid red !important;
+    }
+
+    td > div {
+        margin-top: 2px;
+        font-size: 11px;
+        color: red;
+        text-align: left;
+    }
+
+    /* ✅ MOBILE RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+        .form-section {
+            width: 100%;
+            margin: 10px;
+            padding: 15px;
+            box-shadow: none;
+            border-radius: 8px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        table, thead, tbody, th, td, tr {
+            display: block;
+            width: 100%;
+        }
+
+        thead {
+            display: none;
+        }
+
+        tr {
+            background: #fff;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        td {
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            text-align: right;
+            font-size: 13px;
+        }
+
+        td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            text-align: left;
+            color: #800000;
+        }
+
+        .btn-container {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-back, .btn-save {
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        select, input[type="date"], input[type="number"] {
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .icon-btn {
+            font-size: 13px;
+            padding: 6px 10px;
+        }
+    }
+</style>
 
 <div class="form-section">
-    <h3 style="text-align: center; color: #800000;">Declare Fees for {{ student.student_name }}</h3>
+    <h3>Declare Fees for {{ student.student_name }}</h3>
     <form method="post">
         {% csrf_token %}
         <table>
@@ -165,20 +204,18 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="fee-rows">
-                <!-- 👇 This is empty now -->
-            </tbody>
+            <tbody id="fee-rows"></tbody>
         </table>
-        <div class="btn-container d-flex justify-content-between mt-4">
 
+        <div class="btn-container">
             <button type="button" class="btn-back" onclick="addRow()">Add Fee</button>
             <button type="submit" class="btn-save">Save</button>
         </div>
-
-
-
     </form>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
 let rowCount = 1;
 
@@ -188,83 +225,40 @@ const feeOptions = [
     {% endfor %}
 ];
 
-    function addRow() {
-        rowCount++;
-        const row = document.createElement('tr');
+function addRow() {
+    rowCount++;
+    const row = document.createElement('tr');
 
-        let optionsHtml = '<option value="">-- Select Fee Type --</option>';
-        for (const fee of feeOptions) {
-            optionsHtml += `<option value="${fee.id}" data-name="${fee.name}">${capitalize(fee.name)}</option>`;
-        }
-
-        row.innerHTML = `
-<td>
-    <select name="fee_type_${rowCount}" class="form-control fee-type">
-        ${optionsHtml}
-    </select>
-    <div class="fee-type-error" style="color: red; font-size: 11px; display: none;"></div>
-</td>
-<td>
-    <input type="number" step="0.01" name="amount_${rowCount}" class="form-control amount-input" placeholder="Enter amount">
-    <div class="amount-error" style="color: red; font-size: 11px; display: none;"></div>
-</td>
-<td>
-    <input type="date" name="due_date_${rowCount}" class="form-control due-date-input" min="${new Date().toISOString().split('T')[0]}">
-    <div class="due-date-error" style="color: red; font-size: 11px; display: none;"></div>
-</td>
-<td>
-    <a href="javascript:void(0);" class="icon-btn text-danger" title="Delete" onclick="removeRow(this)">
-        <i class="fas fa-trash-alt"></i>
-    </a>
-</td>
-`;
-
-        document.getElementById('fee-rows').appendChild(row);
-        handleMutualExclusion();
-
-        // ✅ Add live validation listeners:
-        row.querySelector('.fee-type').addEventListener('change', function () {
-            const errorDiv = row.querySelector('.fee-type-error');
-            errorDiv.style.display = this.value ? 'none' : 'block';
-            errorDiv.textContent = this.value ? '' : '⚠️ Fee Type is required.';
-            handleMutualExclusion();
-        });
-
-        row.querySelector('.amount-input').addEventListener('input', function () {
-            const errorDiv = row.querySelector('.amount-error');
-            errorDiv.style.display = this.value && parseFloat(this.value) > 0 ? 'none' : 'block';
-            errorDiv.textContent = (!this.value || parseFloat(this.value) <= 0) ? '⚠️ Amount must be greater than 0.' : '';
-        });
-
-        row.querySelector('.due-date-input').addEventListener('change', function () {
-            const feeType = row.querySelector('.fee-type');
-            const feeName = feeType.options[feeType.selectedIndex]?.getAttribute('data-name') || "";
-            const isDueRequired = feeName !== 'scholarship' && feeName !== 'discount';
-            const errorDiv = row.querySelector('.due-date-error');
-            const today = new Date().toISOString().split('T')[0];
-            // Due Date Validation (only if visible and required)
-            if (isDueRequired && dueDate.offsetParent !== null) {
-                if (!dueDate.value) {
-                    dueDateError.textContent = "Due Date is required.";
-                    dueDateError.style.display = "block";
-                    dueDate.classList.add('error-border');
-                    isValid = false;
-                } else if (dueDate.value < today) {
-                    dueDateError.textContent = "⚠️ Due Date cannot be in the past.";
-                    dueDateError.style.display = "block";
-                    dueDate.classList.add('error-border');
-                    isValid = false;
-                }
-            } else {
-                // Ensure no stale error if hidden
-                dueDateError.style.display = "none";
-                dueDate.classList.remove('error-border');
-            }
-
-        });
+    let optionsHtml = '<option value="">-- Select Fee Type --</option>';
+    for (const fee of feeOptions) {
+        optionsHtml += `<option value="${fee.id}" data-name="${fee.name}">${capitalize(fee.name)}</option>`;
     }
 
+    row.innerHTML = `
+        <td data-label="Fee Type">
+            <select name="fee_type_${rowCount}" class="form-control fee-type">
+                ${optionsHtml}
+            </select>
+            <div class="fee-type-error" style="display:none;"></div>
+        </td>
+        <td data-label="Amount">
+            <input type="number" step="0.01" name="amount_${rowCount}" class="form-control amount-input" placeholder="Enter amount">
+            <div class="amount-error" style="display:none;"></div>
+        </td>
+        <td data-label="Due Date">
+            <input type="date" name="due_date_${rowCount}" class="form-control due-date-input" min="${new Date().toISOString().split('T')[0]}">
+            <div class="due-date-error" style="display:none;"></div>
+        </td>
+        <td data-label="Action">
+            <a href="javascript:void(0);" class="icon-btn text-danger" onclick="removeRow(this)">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+        </td>
+    `;
 
+    document.getElementById('fee-rows').appendChild(row);
+    handleMutualExclusion();
+}
 
 function removeRow(btn) {
     btn.closest('tr').remove();
@@ -274,180 +268,56 @@ function removeRow(btn) {
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
-    function handleMutualExclusion() {
-        const selectedValues = [];
-        let hasHostel = false;
-        let hasTransport = false;
 
-        document.querySelectorAll('.fee-type').forEach(select => {
-            const selectedOption = select.options[select.selectedIndex];
-            const feeName = selectedOption.getAttribute('data-name');
-            const row = select.closest('tr');
-            const dueDateField = row.querySelector('input[type="date"]');
-            const rowSuffix = select.name.split('_')[2];  // Extract suffix from "fee_type_X"
+function handleMutualExclusion() {
+    const selectedValues = [];
+    let hasHostel = false, hasTransport = false;
 
-            // Hide due date for scholarship or discount and remove from submission
-            if (feeName === 'scholarship' || feeName === 'discount') {
-                dueDateField.style.display = 'none';
-                dueDateField.removeAttribute('name');
-            //    dueDateField.removeAttribute('required');
-            } else {
-                dueDateField.style.display = 'block';
-                dueDateField.setAttribute('name', `due_date_${rowSuffix}`);
-            //    dueDateField.setAttribute('required', 'required');
-            }
+    document.querySelectorAll('.fee-type').forEach(select => {
+        const selectedOption = select.options[select.selectedIndex];
+        const feeName = selectedOption?.getAttribute('data-name');
+        const row = select.closest('tr');
+        const dueDateField = row.querySelector('input[type="date"]');
+        const suffix = select.name.split('_')[2];
 
-
-            if (feeName === 'hostel') hasHostel = true;
-            if (feeName === 'transport') hasTransport = true;
-
-            if (select.value) {
-                selectedValues.push(select.value);
-            }
-        });
-
-        document.querySelectorAll('.fee-type').forEach(select => {
-            const currentValue = select.value;
-            Array.from(select.options).forEach(opt => {
-                const name = opt.getAttribute('data-name');
-                opt.disabled = false;
-
-                if (selectedValues.includes(opt.value) && opt.value !== currentValue) {
-                    opt.disabled = true;
-                }
-
-                // ✅ New condition: also disable if already collected from DB
-                if (alreadyCollectedFeeTypeIds.has(parseInt(opt.value))) {
-                    if (opt.value !== currentValue) {
-                        opt.disabled = true;
-                    }
-                }
-
-                // 👇 NEW: Disable if mutually excluded from backend
-                if (disabledFeeTypeIds.has(parseInt(opt.value))) {
-                    if (opt.value !== currentValue) {
-                        opt.disabled = true;
-                    }
-                }
-
-
-                if (hasHostel && name === 'transport') opt.disabled = true;
-                if (hasTransport && name === 'hostel') opt.disabled = true;
-            });
-        });
-    }
-</script>
-
-<script>
-const disabledFeeTypeIds = new Set([
-    {% for id in disabled_fee_type_ids %}
-    {{ id }}{% if not forloop.last %},{% endif %}
-    {% endfor %}
-]);
-</script>
-<script>
-const alreadyCollectedFeeTypeIds = new Set([
-    {% for id in collected_fee_types %}
-    {{ id }}{% if not forloop.last %},{% endif %}
-    {% endfor %}
-]);
-</script>
-
-<script>
-    if (feeName === 'scholarship') {
-        dueDateField.style.display = 'none';
-        dueDateField.removeAttribute('name');  // prevent submission
-    } else {
-        dueDateField.style.display = 'block';
-        dueDateField.setAttribute('name', `due_date_${rowCount}`);
-    }
-
-</script>
-<script>
-    document.querySelector('form').addEventListener('submit', function (e) {
-        const rows = document.querySelectorAll('#fee-rows tr');
-        let isValid = true;
-        const today = new Date().toISOString().split('T')[0];
-
-        if (rows.length === 0) {
-            alert("⚠️ Please add at least one fee row.");
-            e.preventDefault();
-            return;
+        if (feeName === 'scholarship' || feeName === 'discount') {
+            dueDateField.style.display = 'none';
+            dueDateField.removeAttribute('name');
+        } else {
+            dueDateField.style.display = 'block';
+            dueDateField.setAttribute('name', `due_date_${suffix}`);
         }
 
-        rows.forEach((row) => {
-            const feeType = row.querySelector('.fee-type');
-            const amount = row.querySelector('.amount-input');
-            const dueDate = row.querySelector('.due-date-input');
+        if (feeName === 'hostel') hasHostel = true;
+        if (feeName === 'transport') hasTransport = true;
 
-            const feeTypeError = row.querySelector('.fee-type-error');
-            const amountError = row.querySelector('.amount-error');
-            const dueDateError = row.querySelector('.due-date-error');
-
-            const feeName = feeType.options[feeType.selectedIndex]?.getAttribute('data-name') || "";
-            const isDueRequired = feeName !== 'scholarship' && feeName !== 'discount';
-
-            // Reset styles & messages
-            [feeType, amount, dueDate].forEach(input => input?.classList.remove('error-border'));
-            feeTypeError.textContent = "";
-            amountError.textContent = "";
-            dueDateError.textContent = "";
-
-            // Fee Type Validation
-            if (!feeType.value) {
-                feeTypeError.textContent = "Fee Type is required.";
-                feeTypeError.style.display = "block";
-                feeType.classList.add('error-border');
-                isValid = false;
-            }
-
-            // Amount Validation
-            if (!amount.value || parseFloat(amount.value) <= 0) {
-                amountError.textContent = "Amount must be greater than 0.";
-                amountError.style.display = "block";
-                amount.classList.add('error-border');
-                isValid = false;
-            }
-
-            // Due Date Validation (conditionally required)
-            if (isDueRequired) {
-                if (!dueDate.value) {
-                    dueDateError.textContent = "Due Date is required.";
-                    dueDateError.style.display = "block";
-                    dueDate.classList.add('error-border');
-                    isValid = false;
-                } else if (dueDate.value < today) {
-                    dueDateError.textContent = "⚠️ Due Date cannot be in the past.";
-                    dueDateError.style.display = "block";
-                    dueDate.classList.add('error-border');
-                    isValid = false;
-                }
-            }
-        });
-
-        if (!isValid) {
-            e.preventDefault(); // block form submit if any error found
-        }
+        if (select.value) selectedValues.push(select.value);
     });
+
+    document.querySelectorAll('.fee-type').forEach(select => {
+        const currentValue = select.value;
+        Array.from(select.options).forEach(opt => {
+            const name = opt.getAttribute('data-name');
+            opt.disabled = false;
+            if (selectedValues.includes(opt.value) && opt.value !== currentValue) opt.disabled = true;
+            if (hasHostel && name === 'transport') opt.disabled = true;
+            if (hasTransport && name === 'hostel') opt.disabled = true;
+        });
+    });
+}
 </script>
 
 <style>
-    .error-border {
-        border: 1px solid red !important;
-    }
-
-    td {
-        text-align: left; /* Make text alignment consistent */
-        vertical-align: top; /* So error messages come right below the input */
-    }
-
-        td > div {
-            margin-top: 2px;
-            font-size: 11px;
+    /* Ensure error messages and layout look good on mobile */
+    @media (max-width: 768px) {
+        .fee-type-error,
+        .amount-error,
+        .due-date-error {
+            font-size: 12px;
             color: red;
-            text-align: left; /* Ensure left alignment for errors */
+            text-align: right;
         }
+    }
 </style>
-
 
 {% endblock %}

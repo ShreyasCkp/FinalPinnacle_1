@@ -21,6 +21,7 @@
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         margin-top: 20px;
         box-sizing: border-box;
+        overflow-x: auto;
     }
 
     .header-flex {
@@ -31,14 +32,14 @@
         margin-bottom: 20px;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .btn-add {
         position: absolute;
@@ -55,9 +56,9 @@
         transition: background-color 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
     table {
         width: 100%;
@@ -74,7 +75,8 @@
     }
 
     td {
-        font-size: 9px;
+        font-size: 10px;
+        word-wrap: break-word;
     }
 
     thead {
@@ -85,10 +87,6 @@
     tr:nth-child(even) {
         background-color: #f8f9fa;
     }
-
-  /*  tr:hover {
-        background-color: #e9ecef;
-    }*/
 
     .icon-btn {
         border: 1px solid #dee2e6;
@@ -102,14 +100,14 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     #overlay {
         position: fixed;
@@ -149,10 +147,10 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
 
     .content {
         margin-left: 0px;
@@ -169,12 +167,113 @@
         font-size: 13px;
         width: 200px;
     }
+
+    /* Snackbar */
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #800000;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 14px 24px;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
+
+    @keyframes fadein {
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
+    }
+
+    @keyframes fadeout {
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 767px) {
+        .container {
+            margin-left: 10px;
+            padding: 15px;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .header-flex {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-flex h2 {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-add {
+            position: static;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        tr {
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        td {
+            border: none;
+            position: relative;
+            padding-left: 50%;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        td:before {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 45%;
+            white-space: nowrap;
+            font-weight: bold;
+            color: #800000;
+        }
+
+        td:nth-of-type(1):before { content: "Name"; }
+        td:nth-of-type(2):before { content: "Batch"; }
+        td:nth-of-type(3):before { content: "Actions"; }
+
+        .icon-btn {
+            margin: 2px 0;
+        }
+    }
 </style>
 
 <div class="container mt-4">
     <div class="header-flex">
-        <!--<input type="text" id="programSearch" class="search-input" placeholder="Search Program types...">-->
-
         <h2>Program Types List</h2>
 
         {% if form_permissions.course_type.add %}
@@ -183,7 +282,6 @@
         </a>
         {% endif %}
     </div>
-
 
     {% if types %}
     <table class="table table-bordered table-striped table-hover mt-3">
@@ -258,25 +356,6 @@
         deleteId = null;
     });
 
-    // Live search filter for program types
-    document.getElementById('programSearch').addEventListener('input', function () {
-        const filter = this.value.toLowerCase();
-        const rows = document.querySelectorAll('table tbody tr');
-
-        rows.forEach(row => {
-            const nameCell = row.querySelector('td:first-child');
-            if (nameCell) {
-                const name = nameCell.textContent.toLowerCase();
-                row.style.display = name.includes(filter) ? '' : 'none';
-            }
-        });
-    });
-
-</script>
-
-<div id="snackbar"></div>
-
-<script>
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
@@ -286,7 +365,6 @@
         }, 3000);
     }
 
-    // Django message support
     {% if messages %}
         {% for message in messages %}
             showSnackbar("{{ message|escapejs }}");
@@ -294,50 +372,5 @@
     {% endif %}
 </script>
 
-<style>
-    #snackbar {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: #800000;
-        color: #fff;
-        text-align: center;
-        border-radius: 4px;
-        padding: 14px 24px;
-        position: fixed;
-        z-index: 9999;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 14px;
-    }
-
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
-
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-</style>
+<div id="snackbar"></div>
 {% endblock %}

@@ -1,45 +1,88 @@
-﻿﻿<!-- student_leave_list.html -->
-{% extends 'lms/student_layout.html' %}
+﻿﻿{% extends 'lms/student_layout.html' %}
 {% block title %}My Leave Requests{% endblock %}
 {% block content %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
+    /* --- General Container --- */
     .leave-list-container {
         margin: 20px auto;
-        background-color: #fdfdfd;
+        background-color: #ffffff;
         border: 1px solid #ddd;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 20px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1000px;
     }
 
-        .leave-list-container h2 {
-            color: #800000;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .leave-list-container h2 {
+        color: #800000;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    /* --- Search Bar & Header --- */
+    .header-flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 10px 0;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
+
+    .search-form {
+        position: relative;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 250px;
+        margin-bottom: 10px;
+    }
+
+    /* --- Table Styling --- */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
 
     table.leave-table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 700px;
     }
 
-        table.leave-table thead {
-            background-color: #800000;
-            color: white;
-        }
+    table.leave-table thead {
+        background-color: #800000;
+        color: white;
+    }
 
-        table.leave-table th, table.leave-table td {
-            padding: 1px;
-            border: 1px solid #ddd;
-            text-align: center;
-            font-size: 9px;
-        }
+    table.leave-table th,
+    table.leave-table td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: center;
+        font-size: 14px;
+        white-space: nowrap;
+    }
 
-        table.leave-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+    table.leave-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
 
+    /* --- Status Colors --- */
     .status-approved {
         color: green;
         font-weight: bold;
@@ -55,12 +98,18 @@
         font-weight: bold;
     }
 
+    /* --- Action Icons --- */
     .action-icon {
         background: none;
         border: none;
         cursor: pointer;
-        font-size: 9px;
+        font-size: 16px;
         margin: 0 3px;
+        transition: transform 0.2s;
+    }
+
+    .action-icon:hover {
+        transform: scale(1.1);
     }
 
     .icon-edit {
@@ -76,6 +125,7 @@
         cursor: not-allowed;
     }
 
+    /* --- Modal --- */
     .custom-modal {
         display: none;
         position: fixed;
@@ -85,7 +135,7 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0,0,0,0.5);
+        background-color: rgba(0, 0, 0, 0.5);
     }
 
     .custom-modal-content {
@@ -93,9 +143,10 @@
         margin: 15% auto;
         padding: 20px;
         border: 1px solid #800000;
-        width: 300px;
+        width: 320px;
         border-radius: 8px;
         text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
     }
 
     .custom-modal h4 {
@@ -105,11 +156,11 @@
 
     .modal-btn {
         margin: 5px;
-        padding: 6px 12px;
+        padding: 8px 16px;
         border: none;
-        border-radius: 4px;
+        border-radius: 5px;
         cursor: pointer;
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .btn-confirm {
@@ -122,103 +173,141 @@
         color: #333;
     }
 
-    .header-flex {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        margin-bottom: 20px;
-    }
-
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
+    /* --- Responsive Design --- */
+    @media (max-width: 992px) {
+        .leave-list-container {
+            width: 95%;
+            padding: 15px;
         }
 
-    .search-form {
-        position: absolute;
-        left: 0;
-        padding: 6px 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 13px;
-        width: 200px;
+        .header-flex {
+            flex-direction: column;
+        }
+
+        .search-form {
+            width: 90%;
+            margin-bottom: 15px;
+        }
+
+        table.leave-table {
+            font-size: 13px;
+        }
     }
 
-    .content {
-        margin-left: 200px;
-        padding: 11px 26px 40px;
-        min-height: 100vh;
+    @media (max-width: 768px) {
+        .leave-list-container h2 {
+            font-size: 20px;
+        }
+
+        table.leave-table th,
+        table.leave-table td {
+            font-size: 12px;
+            padding: 6px;
+        }
+
+        .custom-modal-content {
+            width: 85%;
+            margin: 50% auto;
+            padding: 15px;
+        }
+
+        .modal-btn {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .action-icon {
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .leave-list-container {
+            width: 96%;
+            padding: 10px;
+        }
+
+        .search-form {
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .leave-list-container h2 {
+            font-size: 18px;
+        }
+
+        table.leave-table th,
+        table.leave-table td {
+            font-size: 11px;
+        }
+
+        .custom-modal-content {
+            width: 90%;
+            margin: 60% auto;
+        }
     }
 </style>
 
 <div class="leave-list-container">
     <div class="header-flex">
         <input type="text" id="leaveSearch" class="search-form" placeholder="Search Leaves...">
-        <h2>My Leave Request's</h2>
+        <h2>My Leave Requests</h2>
     </div>
-    <table class="leave-table">
-        <thead>
-            <tr>
-                <th>Sl No</th>
-                <th>Reason</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Status</th>
-                <th>Applied On</th>
-                <th>Remarks</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for leave in leaves %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ leave.reason }}</td>
-                <td>{{ leave.from_date }}</td>
-                <td>{{ leave.to_date }}</td>
-                <td>
-                    <span class="status-{{ leave.status }}">
-                        {{ leave.get_status_display }}
-                    </span>
-                </td>
-                <td>{{ leave.applied_on|date:"d M Y, H:i" }}</td>
-                <td>{{ leave.remarks|default:"-" }}</td>
-                <td>
-                    {% if leave.from_date > today %}
-                    {% if leave.status == 'approved' or leave.status == 'pending' %}
 
-                    <a href="{% url 'student_leave_edit' leave.id %}" title="Edit">
-                        <button class="action-icon icon-edit" type="button">✏️</button>
-                    </a>
-
-                    <button class="action-icon icon-cancel"
-                            title="Cancel"
-                            data-cancel-url="{% url 'student_leave_cancel' leave.id %}"
-                            onclick="openModal(this)">
-                        ❌
-                    </button>
-                    {% elif leave.status == 'rejected' %}
-                    <button class="action-icon icon-disabled" title="Rejected Leave - Cannot Cancel" disabled>❎</button>
-                    {% elif leave.status == 'cancelled' %}
-                    <button class="action-icon icon-disabled" title="Already Cancelled" disabled>🚫</button>
-                    {% endif %}
-                    {% else %}
-                    <button class="action-icon icon-disabled" title="Past leave - Cannot cancel/edit" disabled>⛔</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="8" style="text-align: center;">No leave requests submitted yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="leave-table">
+            <thead>
+                <tr>
+                    <th>Sl No</th>
+                    <th>Reason</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Status</th>
+                    <th>Applied On</th>
+                    <th>Remarks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in leaves %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ leave.reason }}</td>
+                    <td>{{ leave.from_date }}</td>
+                    <td>{{ leave.to_date }}</td>
+                    <td>
+                        <span class="status-{{ leave.status }}">{{ leave.get_status_display }}</span>
+                    </td>
+                    <td>{{ leave.applied_on|date:"d M Y, H:i" }}</td>
+                    <td>{{ leave.remarks|default:"-" }}</td>
+                    <td>
+                        {% if leave.from_date > today %}
+                            {% if leave.status == 'approved' or leave.status == 'pending' %}
+                                <a href="{% url 'student_leave_edit' leave.id %}" title="Edit">
+                                    <button class="action-icon icon-edit" type="button">✏️</button>
+                                </a>
+                                <button class="action-icon icon-cancel"
+                                        title="Cancel"
+                                        data-cancel-url="{% url 'student_leave_cancel' leave.id %}"
+                                        onclick="openModal(this)">❌</button>
+                            {% elif leave.status == 'rejected' %}
+                                <button class="action-icon icon-disabled" title="Rejected Leave" disabled>❎</button>
+                            {% elif leave.status == 'cancelled' %}
+                                <button class="action-icon icon-disabled" title="Already Cancelled" disabled>🚫</button>
+                            {% endif %}
+                        {% else %}
+                            <button class="action-icon icon-disabled" title="Past leave - Cannot modify" disabled>⛔</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center;">No leave requests submitted yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Cancel Modal -->
@@ -247,13 +336,10 @@
 
     window.onclick = function (event) {
         const modal = document.getElementById('cancelModal');
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
+        if (event.target === modal) modal.style.display = 'none';
     }
-</script>
 
-<script>
+    // Search Filter
     document.getElementById('leaveSearch').addEventListener('input', function () {
         const filter = this.value.trim().toLowerCase();
         const rows = document.querySelectorAll(".leave-table tbody tr");
@@ -278,6 +364,5 @@
         }
     });
 </script>
-
 
 {% endblock %}

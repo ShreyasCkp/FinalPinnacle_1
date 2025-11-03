@@ -18,9 +18,9 @@
         max-width: 900px;
         margin: -64px auto;
         background: #ffffff;
-        padding: 64px;
-        padding-bottom: 12px;
+        padding: 64px 40px 12px 40px;
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
     }
 
     h3 {
@@ -64,9 +64,9 @@
         margin-top: 10px;
     }
 
-        .btn-save:hover {
-            background-color: #8b0000;
-        }
+    .btn-save:hover {
+        background-color: #8b0000;
+    }
 
     .text-danger {
         font-size: 10px;
@@ -76,26 +76,23 @@
         display: none;
     }
 
-    /* 🔥 ADD THIS BLOCK */
     input[readonly], textarea[readonly], select[readonly] {
         background-color: #fff !important;
         color: #000;
     }
-    /* Make readonly checkboxes look fully blue (Bootstrap primary color) and block pointer events */
-    .form-check-input.view-mode-checkbox {
-    accent-color: #0d6efd !important; /* Bootstrap 5 primary blue */
-    pointer-events: none;
-    opacity: 1 !important;
-    background-color: #0d6efd !important;
-    border-color: #0d6efd !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='white' d='M12.03 4.97a.75.75 0 0 1 0 1.06L7.53 10.53a.75.75 0 0 1-1.06 0L3.97 8.03a.75.75 0 0 1 1.06-1.06L7 8.94l4.97-4.97a.75.75 0 0 1 1.06 0z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100% 100%;
-}
 
-</style>
-<style>
+    .form-check-input.view-mode-checkbox {
+        accent-color: #0d6efd !important;
+        pointer-events: none;
+        opacity: 1 !important;
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='white' d='M12.03 4.97a.75.75 0 0 1 0 1.06L7.53 10.53a.75.75 0 0 1-1.06 0L3.97 8.03a.75.75 0 0 1 1.06-1.06L7 8.94l4.97-4.97a.75.75 0 0 1 1.06 0z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 100% 100%;
+    }
+
     .form-control.error-border {
         border: 1px solid red !important;
     }
@@ -106,8 +103,51 @@
         margin-top: 2px;
         display: none;
     }
-</style>
 
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 32px 20px 12px 20px;
+            margin: 20px auto;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: -20px;
+        }
+
+        .form-label {
+            font-size: 11px;
+        }
+
+        input, textarea, select, .form-control, .form-select {
+            font-size: 11px;
+            padding: 6px 8px;
+        }
+
+        .btn-save {
+            font-size: 11px;
+            padding: 4px 8px;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-container {
+                  padding: 48px 15px 12px 15px;
+        margin: 10px auto;
+    }
+
+        h3 {
+            font-size: 16px;
+        }
+
+        input, textarea, select, .form-control, .form-select {
+            font-size: 10px;
+            padding: 5px 6px;
+        }
+    }
+</style>
 
 <div class="container form-container">
     <h3>{{ title }}</h3>
@@ -210,9 +250,6 @@
             {% endif %}
             {% endfor %}
 
-
-
-
             <!-- Employment Details -->
             <h6 style="font-weight: bold; margin-top: 20px;">Employment Information</h6>
             <div class="row">
@@ -238,8 +275,6 @@
                 <div class="col-md-6 mb-3">{{ form.esi_number.label_tag }} {{ form.esi_number }}</div>
             </div> <!-- Close Personal Details row -->
 
-
-
             <!-- Bank Details Section -->
             <div id="bank-details-wrapper" class="mt-4">
                 <h6 class="fw-bold mt-4">Bank Details</h6>
@@ -250,9 +285,6 @@
                     <div class="col-md-6 mb-3">{{ form.branch_name.label_tag }} {{ form.branch_name }}</div>
                 </div>
             </div>
-
-
-
 
             <!-- Subject Assignments -->
             <div id="subject-assignment-wrapper">

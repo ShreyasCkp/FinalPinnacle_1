@@ -4,113 +4,202 @@
 {% block content %}
 {% load static %}
 
-<html>
-<head>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f7fa;
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f2f5;
+    }
+
+    .container {
+        background: #fff;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin: 20px auto;
+        max-width: 1000px;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 25px;
+        font-size: 22px;
+    }
+
+    /* Filter Form Styling */
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .filter-form label {
+        font-size: 13px;
+        color: #333;
+        margin-right: 4px;
+    }
+
+    .filter-form select {
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        width: 180px;
+        transition: border 0.2s ease-in-out;
+    }
+
+    .filter-form select:focus {
+        border-color: #800000;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(128, 0, 0, 0.2);
+    }
+
+    /* Card Container */
+    .cards-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    /* Each Card */
+    .card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        padding: 15px;
+        width: 220px;
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(128, 0, 0, 0.2);
+    }
+
+    .faculty-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 6px;
+    }
+
+    .subject-name {
+        font-size: 12px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .subject-name small {
+        color: #800000;
+    }
+
+    .class-count {
+        background: #f9e6e6;
+        color: #800000;
+        font-weight: 600;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        display: inline-block;
+    }
+
+    /* Empty Message */
+    .no-data {
+        text-align: center;
+        color: gray;
+        font-size: 13px;
+        margin-top: 20px;
+    }
+
+    /* 🔹 Mobile View Adjustments */
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px 15px;
+            margin: 10px;
         }
 
-        .cards-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            gap: 16px;
-            margin-top: 29px;
-        }
-
-        .card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            padding: 7px 13px;
-            width: 210px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: box-shadow 0.2s;
-        }
-
-        .card:hover {
-            box-shadow: 0 6px 18px rgba(60, 130, 255, 0.16);
-        }
-
-        .faculty-name {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #800;
-        }
-
-        .subject-name {
-            font-size: 12px;
-            margin-bottom: 11px;
-            color: #800;
-            text-align: center;
-        }
-
-        .class-count {
-            background: #e6f2ff;
-            color: #be2f2f;
-            padding: 4px 9px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
+        h2 {
+            font-size: 18px;
         }
 
         .filter-form {
-            margin: 12px 75px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-form label {
+            margin-bottom: 4px;
         }
 
         .filter-form select {
-            padding: 2px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            width: 100%;
         }
 
-        .filter-form button {
-            padding: 3px 10px;
-            border-radius: 5px;
-            background: white;
-            color: black;
-            border: 1px solid #000;
+        .cards-container {
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
         }
 
-        .filter-form button:hover {
-            background: #800;
-            color: white;
+        .card {
+            width: 100%;
+            max-width: 320px;
+        }
+    }
+
+    /* 🔹 Extra Small Devices */
+    @media (max-width: 480px) {
+        h2 {
+            font-size: 17px;
         }
 
-        .content {
-            padding: 80px 26px 40px;
-            margin-left: 268px;
+        .faculty-name {
+            font-size: 14px;
         }
-    </style>
-</head>
-<body>
-    <h2 style="text-align: center; font-size: 22px; margin-top: -12px; color: #800;">
-        Faculty Schedule Overview
-    </h2>
+
+        .subject-name {
+            font-size: 11px;
+        }
+
+        .class-count {
+            font-size: 11px;
+        }
+    }
+</style>
+
+<div class="container">
+    <h2>Faculty Schedule Overview</h2>
 
     <form method="get" class="filter-form">
-        <label for="course">Course:</label>
-        <select name="course" id="course" onchange="this.form.submit()">
-            <option value="">All Courses</option>
-            {% for course in courses %}
-                <option value="{{ course.id }}" {% if course.id == selected_course_id %}selected{% endif %}>{{ course.name }}</option>
-            {% endfor %}
-        </select>
+        <div>
+            <label for="course">Course:</label>
+            <select name="course" id="course" onchange="this.form.submit()">
+                <option value="">All Courses</option>
+                {% for course in courses %}
+                    <option value="{{ course.id }}" {% if course.id == selected_course_id %}selected{% endif %}>
+                        {{ course.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-        <label for="semester">Semester:</label>
-        <select name="semester" id="semester" onchange="this.form.submit()">
-            <option value="">All Semesters</option>
-            {% for sem in semesters %}
-                <option value="{{ sem.number }}" {% if sem.number == selected_semester %}selected{% endif %}>
-                    {{ sem.name }}
-                </option>
-            {% endfor %}
-        </select>
+        <div>
+            <label for="semester">Semester:</label>
+            <select name="semester" id="semester" onchange="this.form.submit()">
+                <option value="">All Semesters</option>
+                {% for sem in semesters %}
+                    <option value="{{ sem.number }}" {% if sem.number == selected_semester %}selected{% endif %}>
+                        {{ sem.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
     </form>
 
     <div class="cards-container">
@@ -118,24 +207,17 @@
             <div class="card">
                 <div class="faculty-name">{{ entry.faculty__name }}</div>
                 <div class="subject-name">
-                    {{ entry.subject__name }} <br>
-                    <small style="color: #800000;">({{ entry.subject__course__name }})</small>
+                    {{ entry.subject__name }}<br>
+                    <small>({{ entry.subject__course__name }})</small>
                 </div>
                 <div class="class-count">
                     {{ entry.class_count }} class{{ entry.class_count|pluralize:",es" }} / week
                 </div>
             </div>
         {% empty %}
-            <p style="margin: 20px; color: gray;">No data available for the selected filters.</p>
+            <p class="no-data">No data available for the selected filters.</p>
         {% endfor %}
     </div>
-
-    <script>
-        $(document).ready(function () {
-            // future JS logic can go here
-        });
-    </script>
-</body>
-</html>
+</div>
 
 {% endblock %}

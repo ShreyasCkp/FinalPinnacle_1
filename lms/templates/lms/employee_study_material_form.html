@@ -1,382 +1,249 @@
-{% extends 'lms/employee_layout.html' %}
-{% block title %} {% if is_edit %}Edit Study Material{% else %}Add Study Material{% endif %}{% endblock %}
+{% extends 'master/bare.html' %}
+{% block title %}Reset Password{% endblock %}
 
 {% block content %}
-{% load lms_form_tags %}
-
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f4f6f9;
-        color: #333;
-    }
-
-    /*    .form-container {
-            max-width: 800px;
-            margin: 25px auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-        }*/
-
-    h3 {
-        font-weight: 600;
-        color: #8b0000;
-        margin-bottom: 20px;
-        font-size: 22px;
-        text-align: center;
-    }
-
-    .form-label {
-        font-weight: 500;
-        font-size: 14px;
-        margin-bottom: 6px;
-        display: block;
-    }
-
-    .form-control, .form-select {
-        font-size: 14px;
-        padding: 4px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        margin-bottom: 4px;
-        width: 100%;
-    }
-
-    .error-message {
-        color: red;
-        font-size: 13px;
-        margin-bottom: 12px;
-    }
-
-    .btn-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-    }
-
-    .btn-back {
-        background-color: #800000;
-        color: #fff;
-        border: 2px solid #800000;
-        padding: 2px 5px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-        .btn-back:hover {
-            background-color: #800000;
-            color: white;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile Responsive -->
+    <title>Reset Password</title>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-    .btn-save {
-        background-color: #800000;
-        font-weight: 600;
-        padding: 2px 4px;
-        border-radius: 6px;
-        font-size: 12px;
-        color: white;
-        width: 59px;
-        border: none;
-        cursor: pointer;
-    }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            max-width: 400px;
+            margin: 40px auto;
+        }
 
-        .btn-save:hover {
+        h2 {
+            text-align: center;
+            font-weight: 700;
+            color: #800000;
+            margin-bottom: 24px;
+            font-size: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input[readonly] {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        button[type="submit"] {
+            background-color: #800000;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
             background-color: #a10000;
         }
 
-
-    .is-invalid {
-        border-color: red !important;
-    }
-
-    .content {
-        margin-left: 115px;
-        padding: 3px 26px 40px;
-        min-height: 100vh;
-    }
-
-    @media (min-width: 768px) {
-        .col-md-6 {
-            flex: 0 0 auto;
-            width: 50%;
-        }
-    }
-
-    .custom-textarea {
-        height: 102px;
-        width: 49%;
-        resize: vertical;
-    }
-
-
-    .form-section {
-        background: #fff;
-        padding: 31px;
-        border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 40px;
-        margin-left: 101px;
-        margin-right: 4px;
-        width: 1125px;
-    }
-
-    label {
-        font-weight: 600;
-        margin-right: -10px;
-        font-size: 12px;
-    }
-
-    select, input[type="date"] {
-        padding: 6px;
-        margin: 5px 10px 10px 0;
-        min-width: 180px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    input[readonly] {
-        background-color: #e9ecef;
-    }
-
-    .table-section {
-        margin-top: 20px;
-        margin-left: 10px;
-        margin-right: 10px;
-        /*        overflow-x: auto;
-    */ width: 100%;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 12px;
-        table-layout: fixed;
-    }
-
-    th {
-        padding: 8px;
-        border: 1px solid #dee2e6;
-        text-align: center;
-        vertical-align: middle;
-        word-wrap: break-word;
-        /*        text-overflow: ellipsis;
-    */ white-space: nowrap;
-        max-width: 150px;
-    }
-
-    td {
-        border: 1px solid #dee2e6;
-        text-align: center;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .table-responsive {
-        margin-top: 20px;
-    }
-
-    th {
-        background-color: #800000;
-        color: white;
-        padding: 4px;
-        font-size: 11px;
-    }
-
-    .btn-submit {
-        background-color: #800000;
-        color: white;
-        padding: 7px 20px;
-        border: none;
-        border-radius: 6px;
-        font-size: 12px;
-        margin-top: 12px;
-        cursor: pointer;
-        text-decoration: none; /* remove underline */
-    }
-
-        .btn-submit:hover {
-            background-color: #660000;
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #800000;
+            font-weight: 600;
+            text-decoration: none;
         }
 
+        a:hover {
+            text-decoration: underline;
+            color: #a10000;
+        }
 
-    .btn-container {
-        display: flex;
-        justify-content: flex-end;
-    }
+        .alert {
+            font-weight: 600;
+            color: red;
+            margin-bottom: 15px;
+        }
 
-    .btn-container-fixed {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-        width: 100%;
-    }
-
-
-
-    .firsts {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        gap: 12px;
-        margin: 20px;
-    }
-
-        .firsts select,
-        .firsts input[type="date"],
-        .firsts input[type="text"] {
-            min-width: 140px;
-            max-width: 200px;
+        #error_password {
+            color: red;
+            margin-top: -12px;
+            margin-bottom: 15px;
             font-size: 13px;
-            padding: 6px 8px;
-            flex-shrink: 0;
+            font-weight: 600;
         }
 
-    .content {
-        padding: 10px 26px 18px;
-        /* background-color: #EEE; */
-        margin-left: 128px;
-        flex-grow: 1;
-    }
+        /* Responsive adjustments for mobile */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                margin: 20px;
+            }
 
-    td input[type="radio"] {
-        margin-bottom: 2px;
-    }
+            h2 {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
 
-    td label {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        font-size: 12px;
-        gap: 4px;
-    }
+            input[type="text"],
+            input[type="password"] {
+                padding: 8px;
+                font-size: 13px;
+            }
 
-    .status-options {
-        display: flex;
-        /* justify-content: center; */
-        gap: 13px;
-    }
-</style>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+            button[type="submit"] {
+                font-size: 12px;
+                padding: 8px;
+            }
 
-<div class="form-section">
-    <h4 style="text-align: center; font-size: 22px; color: #800; margin-top: -17px;">
-        {% if is_edit %}Edit Study Material{% else %}Add Study Material{% endif %}
-    </h4>
+            a {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Reset Password</h2>
 
-    <form method="GET" class="form-inline filter-row">
-        <div class="firsts">
+    {% if error %}
+    <div class="alert">{{ error }}</div>
+    {% endif %}
 
-            <select name="program_type" onchange="this.form.submit()">
-                <option value="">Program Type</option>
-                {% for pt in program_types %}
-                <option value="{{ pt.id }}" {% if pt.id|stringformat:"s" == selected.program_type %}selected{% endif %}>{{ pt.name }}</option>
-                {% endfor %}
-            </select>
+    <form method="post" novalidate>
+        {% csrf_token %}
 
-            <select name="academic_year" onchange="this.form.submit()">
-                <option value="">Batch</option>
-                {% for year in academic_years %}
-                <option value="{{ year }}" {% if year|stringformat:"s" == selected.academic_year %}selected{% endif %}>{{ year }}</option>
-                {% endfor %}
-            </select>
+        <label for="username">Employee User ID</label>
+        <input type="text"
+               name="username"
+               id="username"
+               class="input-field"
+               placeholder="Employee User ID"
+               required
+               value="{{ selected_user|default:'' }}"
+               readonly
+               autocomplete="username">
 
-            <select name="course" onchange="this.form.submit()">
-                <option value="">Combination</option>
-                {% for course in courses %}
-                <option value="{{ course.id }}" {% if course.id|stringformat:"s" == selected.course %}selected{% endif %}>{{ course.name }}</option>
-                {% endfor %}
-            </select>
+        <label for="new_password">New Password</label>
+        <input type="password"
+               name="new_password"
+               id="new_password"
+               placeholder="Enter New Password"
+               class="input-field"
+               required
+               minlength="8"
+               maxlength="16"
+               title="Password must be at least 8 characters."
+               autocomplete="new-password">
 
-            <select name="semester" onchange="this.form.submit()">
-                <option value="">Sem/Year</option>
-                {% for sem in semesters %}
-                <option value="{{ sem.id }}" {% if sem.id|stringformat:"s" == selected.semester %}selected{% endif %}>{{ sem.label }}</option>
-                {% endfor %}
-            </select>
+        <label for="confirm_password">Confirm New Password</label>
+        <input type="password"
+               name="confirm_password"
+               id="confirm_password"
+               placeholder="Confirm New Password"
+               class="input-field"
+               required
+               autocomplete="new-password">
 
-            <select name="subject" onchange="this.form.submit()">
-                <option value="">Subject</option>
-                {% for sub in subjects %}
-                <option value="{{ sub.id }}" {% if sub.id|stringformat:"s" == selected.subject %}selected{% endif %}>{{ sub.name }}</option>
-                {% endfor %}
-            </select>
-
-        </div>
+        <button type="submit">Set New Password</button>
+        <a href="{% url 'employee_login_view' %}?username={{ selected_user }}">Back to Login</a>
     </form>
-
-
-    <!-- Form Container -->
-    <div class="container form-container">
-        <form method="post" enctype="multipart/form-data" action="">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-
-            <!-- Title -->
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="form-label">Title</label>
-                    {{ form.title|add_class:"form-control" }}
-                </div>
-            </div>
-
-            <!-- Description -->
-            <div class="row mt-2">
-                <div class="col-md-12">
-                    <label class="form-label">Description</label>
-                    {{ form.description|add_class:"form-control custom-textarea" }}
-                </div>
-            </div>
-
-            <!-- Material Type -->
-            <div class="row mt-2">
-                <div class="col-md-6">
-                    <label class="form-label">Material Type</label>
-                    {{ form.material_type|add_class:"form-control" }}
-                </div>
-            </div>
-
-            <!-- Attachment Field -->
-            <div class="row mt-2" id="attachmentField">
-                <div class="col-md-6">
-                    <label class="form-label">Attachment</label>
-                    {{ form.attachment|add_class:"form-control" }}
-                </div>
-            </div>
-
-            <!-- Link URL Field -->
-            <div class="row mt-2" id="linkUrlField">
-                <div class="col-md-6">
-                    <label class="form-label">Link URL</label>
-                    {{ form.link_url|add_class:"form-control" }}
-                </div>
-            </div>
-
-            <!-- Submit Buttons -->
-            <div class="btn-container mt-4">
-                <a href="{% url 'employee_study_material_list' %}" class="btn-back">Back</a>
-                <button type="submit" class="btn-back">
-                    {% if is_edit %} Update {% else %} Save {% endif %}
-                </button>
-            </div>
-        </form>
-    </div>
-
 </div>
 
 <script>
-    function toggleAttachmentField() {
-        const type = document.querySelector('[name="material_type"]').value;
-        document.getElementById('attachmentField').style.display = (type === 'pdf' || type === 'ebook' || type === 'video') ? 'block' : 'none';
-        document.getElementById('linkUrlField').style.display = (type === 'link') ? 'block' : 'none';
-    }
-    toggleAttachmentField();
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const newPasswordInput = document.getElementById('new_password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+
+        function validatePassword(password) {
+            // Password must:
+            // - Start with a capital letter
+            // - Include at least one special character from !@#$%^&*(),.?":{}|<>
+            // - End with a digit
+            // - Be 8-16 characters long
+            const pattern = /^[A-Z][a-zA-Z]*[!@#$%^&*(),.?":{}|<>][a-zA-Z0-9]*[0-9]$/;
+            return pattern.test(password) && password.length >= 8 && password.length <= 16;
+        }
+
+        function showError(message) {
+            let errorDiv = document.getElementById('error_password');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'error_password';
+                newPasswordInput.parentNode.insertBefore(errorDiv, newPasswordInput.nextSibling);
+            }
+            errorDiv.textContent = message;
+        }
+
+        function clearError() {
+            const errorDiv = document.getElementById('error_password');
+            if (errorDiv) {
+                errorDiv.textContent = '';
+            }
+        }
+
+        form.addEventListener('submit', function (e) {
+            const password = newPasswordInput.value.trim();
+            const confirmPassword = confirmPasswordInput.value.trim();
+
+            if (!validatePassword(password)) {
+                e.preventDefault();
+                showError("Invalid password format. Password must:\n" +
+                    "- Start with a capital letter\n" +
+                    "- Include a special character\n" +
+                    "- End with a digit\n" +
+                    "- Be 8-16 characters long\n" +
+                    "- eg: Admin@12");
+                newPasswordInput.focus();
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showError("Passwords do not match.");
+                confirmPasswordInput.focus();
+                return;
+            }
+
+            clearError();
+        });
+
+        // Live feedback while typing
+        newPasswordInput.addEventListener('input', function () {
+            if (validatePassword(this.value.trim())) {
+                clearError();
+            }
+        });
+    });
 </script>
+</body>
+</html>
 {% endblock %}

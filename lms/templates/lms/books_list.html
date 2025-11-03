@@ -5,6 +5,7 @@
 
 {% block content %}
 <style>
+    /* General Styles */
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,94 +14,83 @@
     }
 
     .container {
-        margin-left: 200px;
-        padding: 30px;
-        max-width: calc(100% - 200px);
+        padding: 20px;
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 20px;
+        margin: 20px auto;
+        max-width: 1200px;
         box-sizing: border-box;
     }
 
+    /* Header Flex */
     .header-flex {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        position: relative;
+        flex-wrap: wrap;
         margin-bottom: 20px;
+        gap: 10px;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        flex: 1 1 100%;
+        text-align: center;
+    }
 
     .btn-add {
-        position: absolute;
-        right: 0;
         background-color: #800000;
         color: #fff;
-        font-size: 13px;
-        padding: 6px 12px;
+        font-size: 14px;
+        padding: 8px 16px;
         border: none;
-        border-radius: 4px;
+        border-radius: 6px;
         font-weight: bold;
         text-decoration: none;
         cursor: pointer;
+        transition: background 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
-    .search-form {
-        position: absolute;
-        left: 0;
-        padding: 6px 10px;
+    .search-form input {
+        padding: 8px 12px;
         border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 13px;
+        border-radius: 6px;
+        font-size: 14px;
         width: 200px;
+        box-sizing: border-box;
     }
 
+    .search-form button {
+        padding: 8px 12px;
+        border: none;
+        background-color: #800000;
+        color: #fff;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
 
-        .search-form input {
-            padding: 6px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 13px;
-            width: 200px;
-        }
+    .search-form button:hover {
+        background-color: #a10000;
+    }
 
-        .search-form button {
-            padding: 6px 10px;
-            border: none;
-            background-color: #800000;
-            color: #fff;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-
-            .search-form button:hover {
-                background-color: #a10000;
-            }
-
+    /* Table Styles */
     table {
         width: 100%;
-        font-size: 12px;
         border-collapse: collapse;
-        margin-top: 10px;
+        font-size: 12px;
     }
 
     th, td {
-        padding: 1px;
+        padding: 6px;
         text-align: center;
         border: 1px solid #dee2e6;
         vertical-align: middle;
@@ -113,6 +103,28 @@
 
     tr:nth-child(even) {
         background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        background-color: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        text-decoration: none;
+        color: #800000;
+        padding: 4px 6px;
+        display: inline-block;
+        margin: 2px;
+    }
+
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
+
+    .btn-icon-green {
+        font-size: 12px;
     }
 
     /* Snackbar */
@@ -132,11 +144,22 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
+    @keyframes fadein {
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
+    }
+
+    @keyframes fadeout {
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* Confirmation Popup */
     #overlay {
         position: fixed;
         top: 0;
@@ -175,79 +198,63 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
-
-    .icon-btn {
-        border: 1px solid #dee2e6;
-        background-color: #fff;
-        padding: 3px 5px;
-        margin: 2px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        display: inline-block;
-        text-decoration: none;
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
     }
 
-        .icon-btn i {
-            font-size: 11px;
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .header-flex {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-add {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .search-form input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+            font-size: 12px;
+        }
+
+        thead {
+            display: none;
+        }
+
+        tbody tr {
+            display: block;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border: none;
+        }
+
+        tbody td:before {
+            content: attr(data-label);
+            font-weight: 600;
             color: #800000;
         }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
+        tbody td a.icon-btn {
+            margin: 0 2px;
         }
-
-    .content {
-        margin-left: 0px;
-        padding: 28px 26px 40px;
-        min-height: 100vh;
-    }
-
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-
-    .btn-icon-green {
-        /*color: green;*/
-        /* border: 1px solid green; */
-        font-size: 12px;
-    }
-
-    .btn-icon {
-        /*border: 1px solid #dee2e6;*/
-        background-color: #fff;
-        /*padding: 4px 8px;*/
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: bold;
-        transition: background-color 0.3s;
-        text-decoration: none;
-        color: #800000;
     }
 </style>
 
@@ -256,8 +263,7 @@
         <input type="text" id="bookSearch" class="search-form" placeholder="Search Books...">
         <h2>Library Books</h2>
         <a href="{% url 'add_book' %}" class="btn-add">+ Add Book</a>
-        <a href="{% url 'borrow_book' %}" class="btn-add" style="margin-right: 113px;">+ Borrow a Book</a>
-
+        <a href="{% url 'borrow_book' %}" class="btn-add">+ Borrow a Book</a>
     </div>
 
     <table>
@@ -267,9 +273,9 @@
                 <th>Title</th>
                 <th>Author(s)</th>
                 <th>Category</th>
-                <th>ISBN(International Standard Book Number)</th>
+                <th>ISBN</th>
                 <th>Copies</th>
-                <th>Link</th> <!-- ✅ NEW COLUMN -->
+                <th>Link</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -277,47 +283,37 @@
         <tbody>
             {% for book in books %}
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>
+                <td data-label="Sl No">{{ forloop.counter }}</td>
+                <td data-label="Title">
                     <a href="{% url 'book_borrow_details' book.id %}" style="color:#800000; font-weight:500;">
                         {{ book.title }}
                     </a>
                 </td>
-
-                <td>{{ book.authors }}</td>
-                <td>{{ book.category.name }}</td>
-                <td>{{ book.isbn }}</td>
-                <td>{{ book.available_copies }}</td>
-                <td>
+                <td data-label="Author(s)">{{ book.authors }}</td>
+                <td data-label="Category">{{ book.category.name }}</td>
+                <td data-label="ISBN">{{ book.isbn }}</td>
+                <td data-label="Copies">{{ book.available_copies }}</td>
+                <td data-label="Link">
                     {% if book.link_pass %}
-                    <a href="{{ book.link_pass }}" target="_blank" class="btn-icon btn-icon-green" title="Open Book Link">🔗</a>
-                    {% else %}
-                    —
-                    {% endif %}
+                    <a href="{{ book.link_pass }}" target="_blank" class="btn-icon btn-icon-green">🔗</a>
+                    {% else %}—{% endif %}
                 </td>
-                <td>
+                <td data-label="Status">
                     {% if book.status == 'active' %}
                     <span style="color:green; font-weight: 600;">Available</span>
                     {% else %}
                     <span style="color:red; font-weight: 600;">Unavailable</span>
                     {% endif %}
                 </td>
-
-
-                <td>
-                    <a href="{% url 'book_view' book.id %}" class="icon-btn" title="View">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{% url 'book_update' book.id %}" class="icon-btn" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
+                <td data-label="Actions">
+                    <a href="{% url 'book_view' book.id %}" class="icon-btn" title="View"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'book_update' book.id %}" class="icon-btn" title="Edit"><i class="fas fa-edit"></i></a>
                     <form id="delete-form-{{ book.id }}" method="POST" action="{% url 'book_delete' book.id %}" style="display:none;">
                         {% csrf_token %}
                     </form>
                     <a href="#" class="icon-btn text-danger" title="Delete" onclick="confirmBookDelete('{{ book.id }}', '{{ book.title }}')">
                         <i class="fas fa-trash-alt"></i>
                     </a>
-
                 </td>
             </tr>
             {% endfor %}
@@ -369,7 +365,6 @@
         document.getElementById('confirm-popup').style.display = 'none';
         deleteBookId = null;
     });
-
 
     // Snackbar
     function showSnackbar(msg) {

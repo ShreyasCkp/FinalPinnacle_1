@@ -4,8 +4,6 @@
 
 {% block content %}
 <style>
-    /* Reusing the same styles from the Users page */
-
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,6 +20,7 @@
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         margin-top: 20px;
         box-sizing: border-box;
+        overflow-x: auto;
     }
 
     .header-flex {
@@ -32,14 +31,14 @@
         margin-bottom: 20px;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .btn-add {
         position: absolute;
@@ -56,15 +55,16 @@
         transition: background-color 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
     table {
         width: 100%;
         font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        min-width: 800px; /* ensures horizontal scroll on small screens */
     }
 
     th, td {
@@ -87,10 +87,6 @@
         background-color: #f8f9fa;
     }
 
-    /*tr:hover {
-        background-color: #e9ecef;
-    }*/
-
     .icon-btn {
         border: 1px solid #dee2e6;
         background-color: #fff;
@@ -102,14 +98,14 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     #overlay,
     #confirm-popup {
@@ -152,10 +148,10 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
 
     #snackbar {
         visibility: hidden;
@@ -173,39 +169,71 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        .container {
+            margin-left: 0;
+            padding: 15px;
+            max-width: 100%;
+            overflow-x: auto;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        table {
+            font-size: 10px;
+            min-width: 600px; /* horizontal scroll for smaller screens */
+        }
+
+        th, td {
+            padding: 6px 4px;
+        }
+
+        .header-flex h2 {
+            font-size: 18px;
+        }
+
+        .btn-add {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+
+        .icon-btn i {
+            font-size: 10px;
         }
     }
 
-    .content {
-        margin-left: 0px;
-        padding: 28px 26px 40px;
-        min-height: 100vh;
+    @media (max-width: 480px) {
+        table {
+            font-size: 9px;
+            min-width: 500px;
+        }
+
+        th, td {
+            padding: 4px 2px;
+        }
+
+        .header-flex h2 {
+            font-size: 16px;
+        }
+
+        .btn-add {
+            font-size: 10px;
+            padding: 3px 6px;
+        }
     }
 </style>
 
@@ -225,8 +253,7 @@
                 <th>Amount</th>
                 <th>Program Type</th>
                 <th>Combination</th>
-                <th>Academic cycle </th>
-
+                <th>Academic Cycle</th>
                 <th>Due Date</th>
                 <th>Batch</th>
                 <th>Actions</th>
@@ -240,10 +267,7 @@
                 <td>₹{{ fee.fee_amount }}</td>
                 <td>{{ fee.program_type }}</td>
                 <td>{{ fee.combination }}</td>
-
-                <td>{{ fee.combination }} {{ fee.semester}}</td>
-                <!--<td>{{ fee.semester }}</td>-->
-
+                <td>{{ fee.combination }} {{ fee.semester }}</td>
                 <td>{{ fee.due_date }}</td>
                 <td>{{ fee.academic_year }}</td>
                 <td>
@@ -258,7 +282,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" class="text-muted text-center">No fee records found.</td></tr>
+            <tr><td colspan="9" class="text-muted text-center">No fee records found.</td></tr>
             {% endfor %}
         </tbody>
     </table>

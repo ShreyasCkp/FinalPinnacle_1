@@ -252,9 +252,33 @@
     }
 }
 
+.fw-bold {
+    color: #800000;
+    /* font-size: 28px; */
+}
+
 p {
     margin-top: 0;
     /* margin-bottom: 1rem; */
+}
+
+@media (max-width: 768px) {
+    .content {
+        margin-left: 0;
+        padding: 3px 18px 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .fw-bold {
+        font-size: 22px;
+        color: #800000;
+    }
+}
+
+.text-primary {
+    --bs-text-opacity: 1;
+    /* color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important; */
 }
     </style>
 </head>

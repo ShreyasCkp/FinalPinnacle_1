@@ -8,99 +8,168 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
 <style>
-    .student-data-container {
-        max-width: 976px;
-        margin: 50px auto;
+    body {
+        background: #f7f8f8;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .tab-card {
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        background: #ffffff;
-        padding: 11px;
-        margin-top: 20px;
+    .student-data-container {
+        max-width: 960px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        padding: 25px;
     }
 
-    table {
-        background: #ffffff;
+    h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #800000;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .tab-card {
         border-radius: 10px;
+        background: #ffffff;
+        padding: 20px;
+    }
+
+    /* Filter form */
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .filter-form label {
+        font-weight: 600;
+        font-size: 12px;
+        margin-right: 5px;
+    }
+
+    .filter-form select {
+        font-size: 12px;
+        padding: 5px;
+        border-radius: 6px;
+    }
+
+    .filter-form .btn {
+        background-color: #800000;
+        border: none;
+        font-size: 12px;
+        padding: 6px 16px;
+        border-radius: 6px;
+        color: white;
+    }
+
+    .filter-form .btn:hover {
+        background-color: #a00000;
+    }
+
+    /* Table */
+    table {
+        border-radius: 8px;
         overflow: hidden;
         margin-top: 20px;
+        font-size: 12px;
     }
 
     .table thead {
-        background-color: #007bff;
-        color: white;
+        background-color: #800000;
+        color: #fff;
     }
 
     .table th, .table td {
         text-align: center;
-        padding: 2px;
-        font-size: 10px;
+        padding: 8px;
+        vertical-align: middle;
     }
 
-    th {
-        font-size: 13px;
+    .table td i {
+        font-size: 14px;
     }
 
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-        border-radius: 8px;
-        padding: 3px 11px;
-        font-size: 10px;
-    }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-    .filter-form label {
-        margin-right: 5px;
+    .table a {
+        color: #800000;
         font-weight: 600;
-        font-size: 12px;
+        text-decoration: none;
     }
 
-    .filter-form select {
-        margin-right: 15px;
-        font-size: 9px;
-        padding: 1px;
+    .table a:hover {
+        text-decoration: underline;
     }
 
-    h2 {
-        font-size: 20px;
-        font-weight: 700;
-        color: #333;
-        text-align: center;
-    }
-
-    .content {
-        padding: 13px 26px 18px;
-    }
-
-    .sidebar {
-        width: 200px;
-        height: 100vh;
-        background: linear-gradient(135deg, #8B0000, #800000); /* Maroon gradient */
-
-        color: white;
-        padding-top: 0px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    }
-
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            padding: 7px 8px;
-            display: block;
-            font-weight: 500;
+    /* Responsive Table */
+    @media (max-width: 768px) {
+        .student-data-container {
+            padding: 15px;
+            margin: 20px;
         }
+
+        h2 {
+            font-size: 18px;
+        }
+
+        .filter-form {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+
+        .filter-form label {
+            font-size: 13px;
+        }
+
+        .filter-form select, .filter-form .btn {
+            width: 100%;
+            font-size: 13px;
+            padding: 8px;
+        }
+
+        .table-responsive {
+            border: none;
+        }
+
+        /* Stack table as cards for small screens */
+        table thead {
+            display: none;
+        }
+
+        table, table tbody, table tr, table td {
+            display: block;
+            width: 100%;
+        }
+
+        table tr {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+            background-color: #fff;
+        }
+
+        table td {
+            text-align: left;
+            padding: 6px 10px;
+            position: relative;
+            font-size: 13px;
+        }
+
+        table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            color: #800000;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .table td i {
+            font-size: 16px;
+        }
+    }
 </style>
 
 <div class="student-data-container">
@@ -110,15 +179,14 @@
         <!-- Filter Form -->
         <form method="get" class="form-inline filter-form mb-3 justify-content-center">
             <label for="channel">Channel:</label>
-            <select name="channel" class="form-control mx-2" id="channel">
+            <select name="channel" class="form-control" id="channel">
                 <option value="">All</option>
                 <option value="sms" {% if request.GET.channel == 'sms' %}selected{% endif %}>SMS</option>
                 <option value="whatsapp" {% if request.GET.channel == 'whatsapp' %}selected{% endif %}>WhatsApp</option>
             </select>
 
-
             <label for="status">Status:</label>
-            <select name="status" class="form-control mx-2" id="status">
+            <select name="status" class="form-control" id="status">
                 <option value="">All</option>
                 <option value="delivered" {% if request.GET.status == 'delivered' %}selected{% endif %}>Delivered</option>
                 <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
@@ -126,17 +194,17 @@
             </select>
 
             <label for="department">Department:</label>
-            <select name="department" class="form-control mx-2" id="department">
+            <select name="department" class="form-control" id="department">
                 <option value="">All</option>
                 {% for dept in departments %}
                 <option value="{{ dept }}" {% if request.GET.department == dept %}selected{% endif %}>{{ dept }}</option>
                 {% endfor %}
             </select>
 
-            <button type="submit" class="btn btn-primary">Filter</button>
+            <button type="submit" class="btn">Filter</button>
         </form>
 
-        <!-- Table will come after filters -->
+        <!-- Table -->
         <div class="table-responsive mt-4">
             <table class="table table-bordered">
                 <thead>
@@ -154,12 +222,11 @@
                 <tbody>
                     {% for msg in messages %}
                     <tr>
-                        <td>{{ msg.subject }}</td>
-                        <td>{{ msg.department }}</td>
-                        <td>{{ msg.student_name }}</td>
-                        <td>{{ msg.guardian_phone_no }}</td>
-
-                        <td>
+                        <td data-label="Subject">{{ msg.subject }}</td>
+                        <td data-label="Department">{{ msg.department }}</td>
+                        <td data-label="Student">{{ msg.student_name }}</td>
+                        <td data-label="Phone No">{{ msg.guardian_phone_no }}</td>
+                        <td data-label="Sent Via">
                             {% if msg.send_sms %}
                             <i class="fas fa-sms" style="color: #007bff;"></i>
                             {% endif %}
@@ -167,30 +234,27 @@
                             <i class="fab fa-whatsapp" style="color: #25D366;"></i>
                             {% endif %}
                         </td>
-                        <td>{{ msg.sent_at|date:"Y-m-d H:i" }}</td>
-                        <td>
+                        <td data-label="Date">{{ msg.sent_at|date:"Y-m-d H:i" }}</td>
+                        <td data-label="Status">
                             {% if msg.send_sms %}
-                            {% if msg.sms_status_display == "Delivered" %}
-                            <i class="fas fa-check-circle" title="SMS Delivered" style="color: green;"></i>
-                            {% else %}
-                            <i class="fas fa-times-circle" title="SMS Not Delivered" style="color: red;"></i>
+                                {% if msg.sms_status_display == "Delivered" %}
+                                <i class="fas fa-check-circle" title="SMS Delivered" style="color: green;"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle" title="SMS Not Delivered" style="color: red;"></i>
+                                {% endif %}
                             {% endif %}
-                            {% endif %}
-
                             {% if msg.send_whatsapp %}
-                            {% if msg.whatsapp_status_display == "Delivered" %}
-                            <i class="fas fa-check-circle" title="WhatsApp Delivered" style="color: green; margin-left: 6px;"></i>
-                            {% else %}
-                            <i class="fas fa-times-circle" title="WhatsApp Not Delivered" style="color: red; margin-left: 6px;"></i>
-                            {% endif %}
+                                {% if msg.whatsapp_status_display == "Delivered" %}
+                                <i class="fas fa-check-circle" title="WhatsApp Delivered" style="color: green; margin-left: 6px;"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle" title="WhatsApp Not Delivered" style="color: red; margin-left: 6px;"></i>
+                                {% endif %}
                             {% endif %}
                         </td>
-                        <td>
+                        <td data-label="Action">
                             {% if msg.status_display == "Not Delivered" or msg.sms_status_display != "Delivered" or msg.whatsapp_status_display != "Delivered" %}
                             <a href="{% url 'resend_message' msg.id %}">Resend</a>
-                            {% else %}
-                            -
-                            {% endif %}
+                            {% else %} - {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

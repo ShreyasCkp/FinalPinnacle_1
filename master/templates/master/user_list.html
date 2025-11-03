@@ -1,10 +1,9 @@
-    {% extends 'layout.html' %}
+{% extends 'layout.html' %}
 
-    {% block title %}Roles{% endblock %}
+{% block title %}Roles{% endblock %}
 
-    {% block content %}
+{% block content %}
 <style>
-
     body {
         background-color: #f0f2f5;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,6 +20,7 @@
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         margin-top: 20px;
         box-sizing: border-box;
+        overflow-x: auto; /* allow horizontal scroll on small screens */
     }
 
     .header-flex {
@@ -29,16 +29,17 @@
         align-items: center;
         position: relative; /* for button positioning */
         margin-bottom: 20px;
+        flex-wrap: wrap;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .btn-add {
         position: absolute;
@@ -55,15 +56,16 @@
         transition: background-color 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
     table {
         width: 100%;
         font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        min-width: 500px; /* ensure horizontal scroll on small screens */
     }
 
     th, td {
@@ -78,17 +80,13 @@
     }
 
     thead {
-        background: linear-gradient( #8B0000, #800000);
+        background: linear-gradient(#8B0000, #800000);
         color: white;
     }
 
     tr:nth-child(even) {
         background-color: #f8f9fa;
     }
-
-    /*tr:hover {
-        background-color: #e9ecef;
-    }*/
 
     .icon-btn {
         border: 1px solid #dee2e6;
@@ -102,14 +100,14 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     /* Confirm popup */
     #overlay {
@@ -150,32 +148,10 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
-
-    /* .icon-btn {
-         border: 1px solid #dee2e6;
-         background-color: #fff;
-         padding: 3px 5px;
-         margin: 2px;
-         border-radius: 6px;
-         cursor: pointer;
-         transition: background-color 0.2s;
-         display: inline-block;
-         text-decoration: none;
-     }
-
-         .icon-btn i {
-             font-size: 11px;
-             color: #800000;
-         }
-
-         .icon-btn.text-danger i {
-             color: #b30000;
-         }*/
-
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
 
     .content {
         margin-left: 0px;
@@ -191,31 +167,31 @@
         border-radius: 4px;
         font-size: 13px;
         width: 200px;
+        margin-bottom: 10px;
     }
 
+    .search-form input {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 200px;
+    }
 
-        .search-form input {
-            padding: 6px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 13px;
-            width: 200px;
-        }
+    .search-form button {
+        padding: 6px 10px;
+        border: none;
+        background-color: #800000;
+        color: #fff;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
 
-        .search-form button {
-            padding: 6px 10px;
-            border: none;
-            background-color: #800000;
-            color: #fff;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-
-            .search-form button:hover {
-                background-color: #a10000;
-            }
+    .search-form button:hover {
+        background-color: #a10000;
+    }
 
     #snackbar {
         visibility: hidden;
@@ -233,47 +209,73 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .container {
+            margin-left: 0;
+            padding: 15px;
+            max-width: 100%;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        .header-flex {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .btn-add {
+            position: static;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .search-form {
+            position: static;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .search-form input {
+            width: 100%;
+        }
+
+        table {
+            font-size: 10px;
+            min-width: 0;
+        }
+
+        th, td {
+            padding: 4px;
+        }
+
+        td {
+            font-size: 8px;
         }
     }
 </style>
 
 <div class="container mt-4">
-    <!-- In your header-flex div -->
     <div class="header-flex">
         <input type="text" id="userSearch" class="search-form" placeholder="Search Roles...">
-
         <h2>Roles</h2>
         <a href="{% url 'add_user' %}" class="btn-add">
             <i class="bi bi-plus-lg me-2"></i> Add Role
         </a>
     </div>
-
 
     <table class="table table-bordered table-striped table-hover">
         <thead>
@@ -285,7 +287,6 @@
                 <th>Passcode</th>
                 <th>Actions</th>
                 {% endif %}
-
             </tr>
         </thead>
         <tbody>
@@ -310,7 +311,6 @@
                     </a>
                 </td>
                 {% endif %}
-
             </tr>
             {% empty %}
             <tr>
@@ -329,7 +329,7 @@
 </div>
 
 <script>
-    // Existing delete confirmation...
+    // Delete confirmation
     let deleteUserId = null;
     function confirmUserDelete(userId, username) {
         deleteUserId = userId;
@@ -345,9 +345,8 @@
         document.getElementById('overlay').style.display = 'none';
         deleteUserId = null;
     });
-</script>
 
-<script>
+    // Search filter
     document.getElementById('userSearch').addEventListener('input', function () {
         const filter = this.value.trim().toLowerCase();
         const rows = document.querySelectorAll("table tbody tr");
@@ -357,28 +356,22 @@
             const isEmptyRow = cells.length === 1 && cells[0].colSpan;
 
             if (isEmptyRow) {
-                // Hide "no users found" message by default
                 row.style.display = 'none';
                 return;
             }
 
-            // Combine all text from cells in the row
             const rowText = cells.map(cell => cell.textContent.toLowerCase()).join(" ");
             row.style.display = rowText.includes(filter) ? '' : 'none';
         });
 
-        // Show or hide the "no users found" row based on visible rows
         const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
         const noDataRow = document.querySelector("table tbody tr td[colspan]");
         if (noDataRow) {
             noDataRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
         }
     });
-</script>
 
-<div id="snackbar"></div>
-
-<script>
+    // Snackbar messages
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
@@ -388,7 +381,6 @@
         }, 3000);
     }
 
-    // Django message support
     {% if messages %}
         {% for message in messages %}
             showSnackbar("{{ message|escapejs }}");
@@ -396,4 +388,5 @@
     {% endif %}
 </script>
 
-    {% endblock %}
+<div id="snackbar"></div>
+{% endblock %}

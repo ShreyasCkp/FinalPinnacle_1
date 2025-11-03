@@ -6,19 +6,85 @@
 <head>
     <meta charset="utf-8" />
     <title>Permission Denied</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
         .centered-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 80vh;
+            height: auto;
             flex-direction: column;
             text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-width: 90%;
+            box-sizing: border-box;
+        }
+
+        .centered-container h1 {
+            font-size: 24px;
+            color: #800000;
+            margin-bottom: 12px;
+        }
+
+        .centered-container p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            background-color: #800000;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #a10000;
+        }
+
+        /* MOBILE RESPONSIVE STYLING */
+        @media (max-width: 480px) {
+            .centered-container h1 {
+                font-size: 20px;
+            }
+
+            .centered-container p {
+                font-size: 14px;
+            }
+
+            .back-button {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
         }
     </style>
 </head>
 <body>
-
+    <div class="centered-container">
+        <h1>Permission Denied</h1>
+        <p>You do not have access to this page.</p>
+        <a href="{% url 'home' %}" class="back-button">Go Back</a>
+    </div>
 </body>
 </html>
 {% endblock %}

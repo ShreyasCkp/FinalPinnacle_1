@@ -11,21 +11,26 @@
     body {
         font-family: 'Poppins', sans-serif;
         background-color: #f5f7fa;
+        margin: 0;
+        padding: 0;
     }
 
     .card {
         transition: all 0.3s ease;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border-radius: 12px;
     }
 
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
 
     .progress-bar {
-        height: 6px;
-        border-radius: 3px;
+        height: 8px;
+        border-radius: 4px;
         background-color: #e5e7eb;
         overflow: hidden;
     }
@@ -33,75 +38,130 @@
     .progress-fill {
         height: 100%;
         transition: width 0.5s ease;
+        border-radius: 4px;
     }
 
-    .content {
-        margin-left: 200px;
-        padding: 51px 26px 40px;
-        min-height: 100vh;
+    .dashboard-title {
+        color: #800000;
+        text-align: center;
+        font-size: 22px;
+        font-weight: 600;
+        margin-top: 20px;
+    }
+
+    .content-wrapper {
+        padding: 20px 15px;
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .grid-cols-4 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: 1fr;
+        }
+
+        .flex-row {
+            flex-direction: column;
+        }
+
+        .text-right {
+            text-align: left;
+        }
+
+        .card p {
+            font-size: 14px;
+        }
+
+        .dashboard-title {
+            font-size: 20px;
+        }
+
+        canvas {
+            max-width: 100% !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-title {
+            font-size: 18px;
+        }
+
+        .card {
+            padding: 15px;
+        }
+
+        .card h3 {
+            font-size: 14px;
+        }
+
+        .card p {
+            font-size: 18px;
+        }
     }
 </style>
-<h3 style="color:#800000; text-align:center; font-size: 22px; font-weight: 600; margin-top: 15px;">
-    Employee Dashboard
-</h3>
 
+<h3 class="dashboard-title">Employee Dashboard</h3>
 
-<!-- Summary Cards -->
-<div class="max-w-7xl mx-auto px-4 mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div class="card bg-white p-5 rounded">
-        <h3 class="text-gray-600 text-sm mb-2">Classes Today</h3>
-        <p class="text-2xl font-bold text-blue-600">{{ num_classes_today }}</p>
+<div class="content-wrapper">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <div class="card bg-white p-4">
+            <h3 class="text-gray-600 text-sm mb-1">Classes Today</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ num_classes_today }}</p>
+        </div>
+        <div class="card bg-white p-4">
+            <h3 class="text-gray-600 text-sm mb-1">Assignments Created</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ total_assignments }}</p>
+        </div>
+        <div class="card bg-white p-4">
+            <h3 class="text-gray-600 text-sm mb-1">Study Materials Uploaded</h3>
+            <p class="text-2xl font-bold text-blue-600">{{ total_study_materials }}</p>
+        </div>
     </div>
-    <div class="card bg-white p-5 rounded">
-        <h3 class="text-gray-600 text-sm mb-2">Assignments Created</h3>
-        <p class="text-2xl font-bold text-blue-600">{{ total_assignments }}</p>
-    </div>
-    <div class="card bg-white p-5 rounded">
-        <h3 class="text-gray-600 text-sm mb-2">Study Materials Uploaded</h3>
-        <p class="text-2xl font-bold text-blue-600">{{ total_study_materials }}</p>
-    </div>
-</div>
 
-<!-- Attendance Chart -->
-<div class="flex justify-center mt-10">
-    <div class="card bg-white rounded-lg p-5 w-full max-w-4xl">
-        <div class="flex justify-between items-center mb-4">
+    <!-- Attendance Chart -->
+    <div class="card bg-white rounded-lg p-4 mt-6 w-full max-w-full">
+        <div class="flex justify-between items-center mb-3 flex-wrap">
             <h2 class="text-lg font-semibold text-gray-800">Attendance Overview</h2>
             <span class="text-sm font-bold text-blue-600">{{ student_attendance_rate }}%</span>
         </div>
-        <div class="progress-bar mb-6">
+        <div class="progress-bar mb-4">
             <div class="progress-fill bg-blue-500" style="width: {{ student_attendance_rate }}%"></div>
         </div>
         <canvas id="attendanceChart" height="50"></canvas>
     </div>
-</div>
 
-<!-- Today's Classes -->
-<div class="max-w-5xl mx-auto px-4 mt-10 bg-white card p-6 rounded-lg shadow">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Today's Class Schedule</h2>
-    {% if classes_today %}
-    <ul class="space-y-3">
-        {% for cls in classes_today %}
-        <li class="border p-4 rounded bg-gray-50 flex justify-between items-center">
-            <div>
-                <p class="font-semibold text-gray-700">{{ cls.subject.name }}</p>
-                <p class="text-sm text-gray-500">{{ cls.course.name }} - {{ cls.course.name }} {{ cls.semester_number }}</p>
-
-            </div>
-            <div class="text-sm text-gray-600 text-right">
-                <p>Time: {{ cls.time_slot.start_time }} - {{ cls.time_slot.end_time }}</p>
-                <p>Room: {{ cls.room }}</p>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p class="text-gray-600">No classes scheduled today.</p>
-    {% endif %}
-</div>
+    <!-- Today's Classes -->
+    <div class="card bg-white p-4 mt-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-3">Today's Class Schedule</h2>
+        {% if classes_today %}
+        <ul class="space-y-3">
+            {% for cls in classes_today %}
+            <li class="border p-3 rounded bg-gray-50 flex justify-between items-center flex-col sm:flex-row">
+                <div>
+                    <p class="font-semibold text-gray-700">{{ cls.subject.name }}</p>
+                    <p class="text-sm text-gray-500">{{ cls.course.name }} - Semester {{ cls.semester_number }}</p>
+                </div>
+                <div class="text-sm text-gray-600 text-right mt-2 sm:mt-0">
+                    <p>Time: {{ cls.time_slot.start_time }} - {{ cls.time_slot.end_time }}</p>
+                    <p>Room: {{ cls.room }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-600">No classes scheduled today.</p>
+        {% endif %}
+    </div>
 </div>
 
 <script>
+    // User popup toggle
     document.getElementById('user-icon')?.addEventListener('click', function () {
         const popup = document.getElementById('user-popup');
         popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
@@ -114,20 +174,16 @@
         }
     });
 
+    // Notification popup toggle
     document.addEventListener('DOMContentLoaded', function () {
         const bell = document.getElementById('notification-icon');
         const popup = document.getElementById('notification-popup');
         bell.addEventListener('click', function () {
-            if (popup.style.display === 'none' || popup.style.display === '') {
-                popup.style.display = 'block';
-            } else {
-                popup.style.display = 'none';
-            }
+            popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
         });
     });
-</script>
-<!-- Chart Script -->
-<script>
+
+    // Attendance Chart
     const labels = ['Present', 'Late', 'Absent'];
     const studentData = [{{ student_present }}, {{ student_late }}, {{ student_absent }}];
 
@@ -147,13 +203,8 @@
         options: {
             responsive: true,
             plugins: { legend: { display: true } },
-            scales: {
-                y: { beginAtZero: true, stepSize: 5 }
-            },
-            interaction: {
-                mode: 'index',
-                intersect: false
-            }
+            scales: { y: { beginAtZero: true, stepSize: 5 } },
+            interaction: { mode: 'index', intersect: false }
         }
     });
 </script>

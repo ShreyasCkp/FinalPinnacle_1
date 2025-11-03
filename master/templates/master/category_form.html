@@ -19,8 +19,10 @@
         color: #333;
     }
 
+    /* Mobile-first: form visible on small screens */
     .form-container {
-        max-width: 600px;
+        display: block;
+        max-width: 90%;
         margin: 25px auto;
         background: #ffffff;
         padding: 30px;
@@ -77,10 +79,10 @@
         border: 2px solid #800000;
     }
 
-        .btn-back:hover {
-            background-color: #a10000;
-            color: white;
-        }
+    .btn-back:hover {
+        background-color: #a10000;
+        color: white;
+    }
 
     .btn-save {
         background-color: #a23030;
@@ -93,13 +95,20 @@
         cursor: pointer;
     }
 
-        .btn-save:hover {
-            background-color: #8a1f1f;
-        }
+    .btn-save:hover {
+        background-color: #8a1f1f;
+    }
 
     .content {
         padding: 25px 26px 40px;
-        margin-left: 200px;
+        margin-left: 0; /* Reset margin for mobile */
+    }
+
+    /* Hide form on larger screens */
+    @media (min-width: 768px) {
+        .form-container {
+            display: none;
+        }
     }
 </style>
 

@@ -13,94 +13,127 @@
     }
 
     .form-container {
-        max-width: 800px;
-        margin: 12px auto;
-        background: #ffffff;
-        padding: 19px;
+        background: #fff;
         border-radius: 12px;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-        margin-top: -14px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        padding: 25px 30px;
+        margin: 20px auto;
+        max-width: 700px;
     }
 
     h3 {
-        margin-top: 0px;
-        font-weight: 600;
-        color: #8b0000;
-        margin-bottom: 20px;
-        font-size: 22px;
         text-align: center;
+        font-weight: 700;
+        color: #800000;
+        margin-bottom: 25px;
+        font-size: 22px;
     }
 
     .form-label {
         font-weight: 500;
-        font-size: 12px;
-        margin-bottom: -3px;
+        font-size: 13px;
+        margin-bottom: 4px;
         display: block;
     }
 
     .form-control, .form-select {
-        font-size: 14px;
-        padding: 6px 10px;
-        border-radius: 5px;
+        font-size: 13px;
+        padding: 8px 10px;
+        border-radius: 6px;
         border: 1px solid #ccc;
-        margin-bottom: 16px;
         width: 100%;
+        transition: all 0.2s ease;
     }
 
-    .btn-save {
-        background-color: #a23030;
-        font-weight: 500;
-        padding: 1px;
-        font-size: 12px;
-        color: white;
-        border: none;
-        width: 8%;
-        border-radius: 8px;
-        margin-top: 20px;
+    .form-control:focus, .form-select:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.2);
+        outline: none;
     }
-
-        .btn-save:hover {
-            background-color: #8a1f1f;
-        }
 
     .info-box {
-        background-color: #f1f1f1;
-        border-left: 4px solid #a23030;
-        padding: 10px;
-        margin-bottom: 16px;
+        background-color: #f9f9f9;
+        border-left: 4px solid #800000;
+        padding: 15px 18px;
+        border-radius: 6px;
+        margin-bottom: 20px;
     }
 
-        .info-box p {
-            margin: 0;
-            font-size: 14px;
-        }
-
-    .text-danger {
+    .info-box p {
+        margin: 0;
         font-size: 13px;
+        line-height: 1.6;
     }
 
     .action-btn {
-        background-color: #a23030;
+        background: linear-gradient(135deg, #a23030, #800000);
         font-weight: 500;
-        padding: 4px 12px;
-        font-size: 12px;
-        color: white;
+        font-size: 13px;
+        color: #fff;
         border: none;
         border-radius: 6px;
-        min-width: 80px;
+        padding: 8px 16px;
+        min-width: 90px;
+        transition: all 0.2s ease;
+        text-decoration: none;
         text-align: center;
     }
 
-        .action-btn:hover {
-            background-color: #8a1f1f;
-            color: white;
-            text-decoration: none;
+    .action-btn:hover {
+        background: #8a1f1f;
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    .btn-group {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 20px;
+            margin: 15px;
         }
 
-    .content {
-        margin-left: 200px;
-        padding: 64px 26px 40px;
-        min-height: 100vh;
+        h3 {
+            font-size: 18px;
+        }
+
+        .info-box p {
+            font-size: 12px;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+        }
+
+        .row .col-md-6 {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        h3 {
+            font-size: 17px;
+        }
+
+        .form-control, .form-select {
+            font-size: 12px;
+            padding: 6px 8px;
+        }
+
+        .info-box {
+            padding: 12px;
+        }
     }
 </style>
 
@@ -132,7 +165,7 @@
     <form method="post">
         {% csrf_token %}
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label class="form-label" for="faculty">Available Faculty</label>
                 <select name="faculty" id="faculty" class="form-select" required>
                     <option value="">-- Select Faculty --</option>
@@ -146,7 +179,7 @@
                 </select>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <label class="form-label" for="subject">Change Subject (Optional)</label>
                 <select name="subject" id="subject" class="form-select" required>
                     <option value="{{ entry.subject.id }}">{{ entry.subject.name }}</option>
@@ -159,12 +192,10 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-between mt-4">
-            <a href="{% url 'daily_timetable' %}" class="btn action-btn">Back</a>
-            <button type="submit" class="btn action-btn">Update</button>
+        <div class="btn-group">
+            <a href="{% url 'daily_timetable' %}" class="action-btn">Back</a>
+            <button type="submit" class="action-btn">Update</button>
         </div>
-
-
     </form>
     {% endif %}
 </div>

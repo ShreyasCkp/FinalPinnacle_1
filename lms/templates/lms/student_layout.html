@@ -1,11 +1,15 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Pinnacle School of Commerce and Management{% endblock %}</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        /* Reset and base font styles */
+        /* RESET */
         * {
             margin: 0;
             padding: 0;
@@ -16,13 +20,12 @@
             font-family: Arial, sans-serif !important;
             font-size: 14px !important;
             color: #333;
+            overflow-x: hidden;
         }
 
-        /* Sidebar styles */
+        /* SIDEBAR */
         .sidebar {
-            width: 200px;
-            min-width: 200px;
-            max-width: 200px;
+            width: 220px;
             height: 100vh;
             background: linear-gradient(135deg, #800000, #800000);
             color: white;
@@ -31,107 +34,60 @@
             left: 0;
             display: flex;
             flex-direction: column;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
             z-index: 999;
+            transition: transform 0.3s ease-in-out;
         }
 
-            .sidebar::-webkit-scrollbar {
-                width: 6px;
-            }
-
-            .sidebar::-webkit-scrollbar-thumb {
-                background-color: rgba(255, 255, 255, 0.4);
-                border-radius: 4px;
-            }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
 
         .sidebar-title {
             padding: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        .sidebar-title img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .sidebar a {
+            font-size: 14px;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
-        }
-
-
-            .sidebar-title img {
-                width: 100%;
-                height: auto;
-                object-fit: contain;
-                display: block;
-            }
-
-
-        strong {
-            font-weight: 600;
-        }
-
-        .sidebar a,
-        .sidebar .dropdown-btn,
-        .sidebar .dropdown-container a {
-            font-size: 13.5px !important;
-            color: #fff !important;
-            text-decoration: none;
-            padding: 10px 12px !important;
-            display: flex !important;
-            align-items: center;
             gap: 10px;
-            font-weight: 500 !important;
             background-color: #800000;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             border-left: 3px solid transparent;
             transition: all 0.3s ease;
         }
 
-            .sidebar a i,
-            .sidebar .dropdown-btn i,
-            .sidebar .dropdown-container a i {
-                font-size: 15px !important;
-                width: 18px;
-            }
-
-            .sidebar a:hover,
-            .sidebar .dropdown-btn:hover,
-            .sidebar .dropdown-container a:hover {
-                background-color: #a50000;
-                border-left: 3px solid #fff;
-            }
-
-            /* Active menu item styles */
-            .sidebar a.active,
-            .sidebar .dropdown-btn.active,
-            .sidebar .dropdown-container a.active {
-                background-color: #a50000 !important;
-                border-left: 3px solid #fff !important;
-                color: #fff !important;
-                font-weight: 600 !important;
-            }
-
-                .sidebar a.active i,
-                .sidebar .dropdown-btn.active i,
-                .sidebar .dropdown-container a.active i {
-                    color: #fff !important;
-                }
-
-        /* Dropdown container */
-        .dropdown-container {
-            display: none;
-            padding-left: 0;
+        .sidebar a:hover {
+            background-color: #a50000;
+            border-left: 3px solid #fff;
         }
 
-        .show {
-            display: block;
+        .sidebar a.active {
+            background-color: #a50000;
+            border-left: 3px solid #fff;
+            font-weight: 600;
         }
 
-        /* Topbar */
+        .sidebar a i {
+            font-size: 15px;
+        }
+
+        /* TOPBAR */
         .topbar {
             position: fixed;
             top: 0;
-            left: 200px;
+            left: 220px;
             right: 0;
             height: 52px;
             background: linear-gradient(135deg, #8B0000, #800000);
@@ -139,72 +95,48 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 12px;
+            padding: 0 15px;
             z-index: 998;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease-in-out;
         }
 
-            .topbar a {
-                /*color: white !important;*/
-                font-weight: 500 !important;
-                text-decoration: none;
-                font-size: 14px !important;
-            }
+        .topbar .menu-toggle {
+            display: none;
+            font-size: 22px;
+            cursor: pointer;
+        }
 
-                .topbar a:hover {
-                    text-decoration: underline;
-                }
+        .topbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
 
-        /* Content area */
-        .main-area,
+        /* CONTENT AREA */
         .content {
-            margin-left: 200px;
-            padding: 80px 26px 40px;
+            margin-left: 220px;
+            padding: 80px 20px 40px;
             min-height: 100vh;
+            transition: margin-left 0.3s ease-in-out;
         }
 
-        /* Footer */
+        /* FOOTER */
         .footer {
-            margin-left: 200px;
+            margin-left: 220px;
             color: #8b0000;
             text-align: center;
             padding: 10px 0;
             font-weight: 500;
-            margin-top: 50px;
+            transition: margin-left 0.3s ease-in-out;
         }
 
-        /* Search suggestions */
-        #suggestions {
-            background: #fff;
-            border: 1px solid #ccc;
-            border-top: none;
-            max-height: 200px;
-            overflow-y: auto;
-            font-size: 12px;
-            display: none;
-            position: absolute;
-            width: 100%;
-            z-index: 1000;
-        }
-
-            #suggestions div {
-                padding: 6px 10px;
-                cursor: pointer;
-            }
-
-                #suggestions div:hover,
-                #suggestions .active {
-                    background-color: #800000;
-                    color: white;
-                }
-
-        /* User dropdown */
+        /* USER POPUP */
         #user-popup {
+            display: none;
             position: absolute;
             top: 43px;
             right: 0;
             background: white;
-            color: #333;
             border: 1px solid #ccc;
             border-radius: 8px;
             width: 220px;
@@ -212,119 +144,88 @@
             padding: 15px;
             z-index: 1000;
             text-align: center;
+        }
+
+        #user-popup a {
+            background: #800000;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* NOTIFICATION POPUP */
+        #notification-popup {
             display: none;
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 280px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
 
-            #user-popup i {
-                font-size: 13px;
-                color: #ffffff;
-                margin-bottom: 10px;
+        /* MEDIA QUERIES */
+        @media (max-width: 991px) {
+            .topbar {
+                left: 0;
+                padding-left: 55px;
             }
 
-            #user-popup p {
-                margin: 0;
-                font-size: 15px;
-                color: #800000;
+            .topbar .menu-toggle {
+                display: block;
+                position: absolute;
+                left: 15px;
             }
 
-            #user-popup a {
-                background: #800000;
-                color: white;
-                padding: 2px 8px;
-                border-radius: 6px;
-                text-decoration: none;
-                font-size: 14px;
-                display: inline-block;
-                margin-top: 12px;
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                width: 220px;
+                height: 100%;
+                top: 0;
+                left: 0;
+                z-index: 1000;
             }
 
-        #sidebar-search {
-            padding: 4px 6px;
-            border-radius: 4px;
-            border: none;
-            font-size: 13px;
-            color: #800000;
-            outline: none;
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .content {
+                margin-left: 0;
+                padding-top: 70px;
+            }
+
+            .footer {
+                margin-left: 0;
+            }
         }
 
-        /* Dark mode styles */
-        body.dark-mode {
-            background: #121212;
-            color: #eee;
+        @media (max-width: 576px) {
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
+                padding: 10px;
+            }
+
+            .topbar div:first-child {
+                font-size: 16px;
+            }
         }
-
-            body.dark-mode .sidebar {
-                background: #2c2c2c;
-            }
-
-            body.dark-mode .topbar {
-                background: #1e1e1e;
-            }
-
-            body.dark-mode .sidebar a,
-            body.dark-mode .sidebar .dropdown-btn,
-            body.dark-mode .sidebar .dropdown-container a {
-                color: #ddd !important;
-            }
-
-                body.dark-mode .sidebar a:hover {
-                    background-color: #444;
-                }
-
-                body.dark-mode .sidebar a.active,
-                body.dark-mode .sidebar .dropdown-btn.active,
-                body.dark-mode .sidebar .dropdown-container a.active {
-                    background-color: #555 !important;
-                    border-left: 3px solid #fff !important;
-                }
-
-            body.dark-mode #user-popup {
-                background: #2c2c2c;
-                color: #fff;
-                border-color: #555;
-            }
-
-            body.dark-mode input,
-            body.dark-mode textarea,
-            body.dark-mode select {
-                background: #333;
-                color: #fff;
-                border: 1px solid #555;
-            }
-
-            body.dark-mode #suggestions div {
-                background: #2c2c2c;
-                color: #eee;
-            }
-
-            body.dark-mode .sidebar {
-                background: #1f1f1f;
-            }
-
-                body.dark-mode .sidebar a,
-                body.dark-mode .sidebar .dropdown-btn,
-                body.dark-mode .sidebar .dropdown-container a {
-                    background-color: #1f1f1f !important;
-                    color: #ddd !important;
-                }
-
-                    body.dark-mode .sidebar a:hover,
-                    body.dark-mode .sidebar .dropdown-btn:hover,
-                    body.dark-mode .sidebar .dropdown-container a:hover {
-                        background-color: #333 !important;
-                    }
-
-            body.dark-mode .sidebar-title {
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-                body.dark-mode .sidebar-title img {
-                    filter: brightness(0.8);
-                }
     </style>
 </head>
+
 <body>
-    <div class="sidebar">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-title">
             <img src="{% static 'image/logo.png' %}" alt="Logo">
         </div>
@@ -370,11 +271,13 @@
         </a>
     </div>
 
-
+    <!-- TOPBAR -->
     <div class="topbar">
+        <i class="fa-solid fa-bars menu-toggle" id="menu-toggle"></i>
         <div style="font-size: large; font-weight: 700;">Pinnacle School of Commerce and Management</div>
+
         <div style="display: flex; align-items: center; gap: 20px;">
-            <!-- Notification Bell -->
+            <!-- Notifications -->
             <div style="position: relative;">
                 <i class="fa-solid fa-bell" id="notification-icon" style="font-size: 20px; cursor: pointer;"></i>
                 {% if notification_count > 0 %}
@@ -383,85 +286,81 @@
                 </span>
                 {% endif %}
 
-                <!-- Notification Dropdown -->
-                <div id="notification-popup" style="display: none; position: absolute; top: 30px; right: 0; background: white; border: 1px solid #ccc; border-radius: 8px; width: 280px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000;">
-                    <div style="padding: 10px; font-weight: bold; background: #800000; color: white; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                <div id="notification-popup">
+                    <div style="padding: 10px; font-weight: bold; background: #800000; color: white;">
                         Notifications
                     </div>
                     <div style="max-height: 250px; overflow-y: auto;">
                         {% if notifications %}
-                        {% for note in notifications %}
-                        <a href="{{ note.url }}" style="display: block; padding: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #800000;">
-                            <i class="fa-solid {% if note.type == 'assignment' %}fa-file-alt{% else %}fa-calendar-alt{% endif %}" style="margin-right: 8px;"></i>
-                            {{ note.title }}
-                        </a>
-                        {% endfor %}
+                            {% for note in notifications %}
+                            <a href="{{ note.url }}" style="display: block; padding: 10px; border-bottom: 1px solid #eee; color: #800000;">
+                                <i class="fa-solid {% if note.type == 'assignment' %}fa-file-alt{% else %}fa-calendar-alt{% endif %}"></i> {{ note.title }}
+                            </a>
+                            {% endfor %}
                         {% else %}
                         <div style="padding: 10px; text-align: center; color: #800000;">No new notifications</div>
                         {% endif %}
                     </div>
                 </div>
             </div>
-            <!-- User Icon and Popup -->
+
+            <!-- User -->
             <div style="position: relative;">
                 <i class="fas fa-user-circle" id="user-icon" style="font-size: 24px; cursor: pointer;"></i>
-                <div id="user-popup" style="display: none; position: absolute; top: 43px; right: 0; background: white; color: #333; border: 1px solid #ccc; border-radius: 8px; width: 220px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 15px; z-index: 1000; text-align: center;">
-                    <i class="fas fa-user-circle" style="font-size: 60px; color: #800000; display: block; margin: 0 auto 10px;"></i>
-
+                <div id="user-popup">
+                    <i class="fas fa-user-circle" style="font-size: 60px; color: #800000; margin-bottom: 10px;"></i>
                     {% if logged_in_student %}
-                    <p style="margin: 0; font-size: 15px; color: #800000; font-weight: 600;">
-                        <strong>{{ logged_in_student.student_name }}</strong>
-                    </p>
-                    <p style="font-size: 13px; color: #555;">Student User ID: {{ logged_in_student.student_userid }}</p>
-                    <a href="{% url 'student_logout' %}" style="background: #800000; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 7px;">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
+                    <p><strong>{{ logged_in_student.student_name }}</strong></p>
+                    <p style="font-size: 13px; color: #555;">ID: {{ logged_in_student.student_userid }}</p>
+                    <a href="{% url 'student_logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     {% else %}
-                    <p style="margin: 0; font-size: 14px; color: #800000;"><strong>Unknown User</strong></p>
+                    <p><strong>Unknown User</strong></p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- CONTENT -->
     <div class="content">
         {% block content %}{% endblock %}
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
         Designed and Developed by CKP Software Technologies &copy; 2025. All rights reserved.
     </div>
 
-</body>
-</html>
-<script>
-    document.getElementById('user-icon')?.addEventListener('click', function () {
-        const popup = document.getElementById('user-popup');
-        popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
-    });
+    <!-- JS -->
+    <script>
+        // Sidebar toggle for mobile
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menu-toggle');
 
-    // Close popup when clicking outside
-    window.addEventListener('click', function (e) {
-        const popup = document.getElementById('user-popup');
-        const icon = document.getElementById('user-icon');
-        if (!popup.contains(e.target) && e.target !== icon) {
-            popup.style.display = 'none';
-        }
-    });
-</script>
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
 
+        // User popup
+        document.getElementById('user-icon')?.addEventListener('click', () => {
+            const popup = document.getElementById('user-popup');
+            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+        });
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
+        window.addEventListener('click', (e) => {
+            const popup = document.getElementById('user-popup');
+            const icon = document.getElementById('user-icon');
+            if (popup && !popup.contains(e.target) && e.target !== icon) popup.style.display = 'none';
+        });
+
+        // Notification popup
         const bell = document.getElementById('notification-icon');
         const popup = document.getElementById('notification-popup');
-
-        bell.addEventListener('click', function () {
-            if (popup.style.display === 'none' || popup.style.display === '') {
-                popup.style.display = 'block';
-            } else {
-                popup.style.display = 'none';
-            }
-        });
-    });
-</script>
+        if (bell && popup) {
+            bell.addEventListener('click', () => {
+                popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+            });
+        }
+    </script>
+</body>
+</html>

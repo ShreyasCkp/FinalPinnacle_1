@@ -13,110 +13,126 @@
     }
 
     .container {
-        margin-left: 200px;
-        padding: 30px;
-        max-width: calc(100% - 200px);
+        max-width: 100%;
+        padding: 20px;
         background: #fff;
         border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-        margin-top: 20px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        margin: 20px auto;
         box-sizing: border-box;
     }
 
     .header-flex {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        margin-bottom: 20px;
+        flex-direction: column;
+        align-items: stretch;
+        margin-bottom: 15px;
     }
 
-        .header-flex h3 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h3 {
+        font-weight: 700;
+        font-size: 20px;
+        color: #800000;
+        text-align: center;
+        margin-bottom: 10px;
+    }
 
     .btn-add {
-        position: absolute;
-        right: 0;
         background-color: #800000;
         color: #fff;
-        font-size: 13px;
-        padding: 6px 12px;
+        font-size: 14px;
+        padding: 8px 0;
         border: none;
-        border-radius: 4px;
+        border-radius: 6px;
         font-weight: bold;
         text-decoration: none;
+        text-align: center;
         cursor: pointer;
         transition: background-color 0.3s;
+        margin-bottom: 15px;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
+
+    .search-input {
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: 100%;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+    }
 
     table {
         width: 100%;
-        font-size: 12px;
         border-collapse: collapse;
         margin-top: 10px;
+        font-size: 13px;
     }
 
     th, td {
-        padding: 0px;
-        text-align: center;
+        text-align: left;
+        padding: 8px;
         border: 1px solid #dee2e6;
-        vertical-align: middle !important;
-    }
-
-    td {
-        font-size: 9px;
+        vertical-align: top;
     }
 
     thead {
-        background: linear-gradient(135deg, #8B0000, #800000);
-        color: white;
+        display: none; /* Hide table headers on mobile */
     }
 
-    tr:nth-child(even) {
-        background-color: #f8f9fa;
+    tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    /*tr:hover {
-        background-color: #e9ecef;
-    }*/
+    td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 14px;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #555;
+        flex-basis: 50%;
+    }
 
     .icon-btn {
+        display: inline-block;
         border: 1px solid #dee2e6;
         background-color: #fff;
-        padding: 3px 5px;
-        margin: 2px;
+        padding: 6px 8px;
+        margin-right: 5px;
         border-radius: 6px;
         cursor: pointer;
         transition: background-color 0.2s;
-        display: inline-block;
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 14px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     #overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
         background: rgba(0,0,0,0.5);
         display: none;
         z-index: 1000;
@@ -124,8 +140,7 @@
 
     #confirm-popup {
         position: fixed;
-        top: 50%;
-        left: 50%;
+        top: 50%; left: 50%;
         transform: translate(-50%, -50%);
         background: #fff;
         padding: 20px;
@@ -137,10 +152,10 @@
     }
 
     #confirm-yes, #confirm-no {
-        margin: 0 5px;
-        padding: 6px 12px;
-        font-size: 12px;
-        border-radius: 4px;
+        margin: 5px;
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 6px;
         cursor: pointer;
         background: transparent;
         color: #800000;
@@ -149,152 +164,17 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
-
-    .search-input {
-        position: absolute;
-        left: 0;
-        padding: 6px 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 13px;
-        width: 250px;
-        margin-bottom: 10px;
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
     }
 
     .content {
-        margin-left: 0px;
-        padding: 26px 26px 40px;
+        margin-left: 0;
+        padding: 20px;
         min-height: 100vh;
     }
-</style>
 
-<div class="container mt-4">
-    <div class="header-flex">
-        <input type="text" id="teacherSearch" class="search-input" placeholder="Search Class Teachers...">
-        <h3>Class Teacher</h3>
-
-        <a href="{% url 'class_teacher_add' %}" class="btn-add">
-            ➕ Add Class Teacher
-        </a>
-    </div>
-
-    {% if teachers %}
-    <table class="table table-bordered table-striped table-hover mt-3">
-        <thead>
-            <tr>
-                <th>Academic Year</th>
-                <th>Program Type</th>
-                <th>Course</th>
-                <th>Semester</th>
-                <th>Faculty</th>
-                <th style="width: 150px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for teacher in teachers %}
-            <tr>
-                <td>{{ teacher.academic_year }}</td>
-                <td>{{ teacher.program_type }}</td>
-                <td>{{ teacher.course.name }}</td>
-                <td>{{ teacher.semester }}</td>
-                <td>{{ teacher.faculty.name }}</td>
-                <td>
-                    <a href="{% url 'class_teacher_view' teacher.id %}" class="icon-btn" title="View">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{% url 'class_teacher_edit' teacher.id %}" class="icon-btn" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <form id="delete-form-{{ teacher.id }}" method="POST" action="{% url 'class_teacher_delete' teacher.id %}" style="display: none;">
-                        {% csrf_token %}
-                    </form>
-                    <a href="#" class="icon-btn text-danger" title="Delete"
-                       onclick="confirmDelete('{{ teacher.id }}', '{{ teacher.faculty.name }}')">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p class="text-muted text-center mt-4">No class teachers assigned yet.</p>
-    {% endif %}
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div id="overlay"></div>
-<div id="confirm-popup">
-    <p id="confirm-popup-message" style=" margin-bottom: 8px;"></p>
-    <button id="confirm-yes">Yes</button>
-    <button id="confirm-no">No</button>
-</div>
-
-<script>
-    let deleteId = null;
-    function confirmDelete(id, name) {
-        deleteId = id;
-        document.getElementById('confirm-popup').style.display = 'block';
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
-    }
-
-    document.getElementById('confirm-yes').addEventListener('click', () => {
-        if (deleteId) {
-            document.getElementById(`delete-form-${deleteId}`).submit();
-        }
-    });
-
-    document.getElementById('confirm-no').addEventListener('click', () => {
-        document.getElementById('confirm-popup').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-        deleteId = null;
-    });
-
-    // Live search filter for class teachers
-    document.getElementById('teacherSearch').addEventListener('input', function () {
-        const filter = this.value.toLowerCase();
-        const rows = document.querySelectorAll('table tbody tr');
-
-        rows.forEach(row => {
-            // Check all relevant cells for match
-            const cells = row.querySelectorAll('td');
-            let match = false;
-            cells.forEach(cell => {
-                if (cell.textContent.toLowerCase().includes(filter)) {
-                    match = true;
-                }
-            });
-            row.style.display = match ? '' : 'none';
-        });
-    });
-</script>
-
-<div id="snackbar"></div>
-
-<script>
-    function showSnackbar(message) {
-        const snackbar = document.getElementById("snackbar");
-        snackbar.textContent = message;
-        snackbar.className = "show";
-        setTimeout(() => {
-            snackbar.className = snackbar.className.replace("show", "");
-        }, 3000);
-    }
-
-    // Django message support
-    {% if messages %}
-        {% for message in messages %}
-            showSnackbar("{{ message|escapejs }}");
-        {% endfor %}
-    {% endif %}
-</script>
-
-<style>
     #snackbar {
         visibility: hidden;
         min-width: 250px;
@@ -311,33 +191,113 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
     }
 </style>
+
+<div class="container">
+    <div class="header-flex">
+        <input type="text" id="teacherSearch" class="search-input" placeholder="Search Class Teachers...">
+        <h3>Class Teacher</h3>
+        <a href="{% url 'class_teacher_add' %}" class="btn-add">➕ Add Class Teacher</a>
+    </div>
+
+    {% if teachers %}
+    <table>
+        <tbody>
+            {% for teacher in teachers %}
+            <tr>
+                <td data-label="Academic Year">{{ teacher.academic_year }}</td>
+                <td data-label="Program Type">{{ teacher.program_type }}</td>
+                <td data-label="Course">{{ teacher.course.name }}</td>
+                <td data-label="Semester">{{ teacher.semester }}</td>
+                <td data-label="Faculty">{{ teacher.faculty.name }}</td>
+                <td data-label="Actions">
+                    <a href="{% url 'class_teacher_view' teacher.id %}" class="icon-btn"><i class="fas fa-eye"></i></a>
+                    <a href="{% url 'class_teacher_edit' teacher.id %}" class="icon-btn"><i class="fas fa-edit"></i></a>
+                    <form id="delete-form-{{ teacher.id }}" method="POST" action="{% url 'class_teacher_delete' teacher.id %}" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" class="icon-btn text-danger" onclick="confirmDelete('{{ teacher.id }}', '{{ teacher.faculty.name }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted text-center mt-4">No class teachers assigned yet.</p>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="overlay"></div>
+<div id="confirm-popup">
+    <p id="confirm-popup-message" style="margin-bottom: 8px;"></p>
+    <button id="confirm-yes">Yes</button>
+    <button id="confirm-no">No</button>
+</div>
+
+<script>
+    let deleteId = null;
+    function confirmDelete(id, name) {
+        deleteId = id;
+        document.getElementById('confirm-popup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('confirm-popup-message').innerHTML = `Are you sure you want to delete <b>${name}</b>?`;
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', () => {
+        if(deleteId){
+            document.getElementById(`delete-form-${deleteId}`).submit();
+        }
+    });
+
+    document.getElementById('confirm-no').addEventListener('click', () => {
+        document.getElementById('confirm-popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        deleteId = null;
+    });
+
+    // Live search filter
+    document.getElementById('teacherSearch').addEventListener('input', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            let match = false;
+            cells.forEach(cell => {
+                if(cell.textContent.toLowerCase().includes(filter)) match = true;
+            });
+            row.style.display = match ? '' : 'none';
+        });
+    });
+
+    function showSnackbar(message){
+        const snackbar = document.getElementById("snackbar");
+        snackbar.textContent = message;
+        snackbar.className = "show";
+        setTimeout(()=>{snackbar.className = snackbar.className.replace("show","");}, 3000);
+    }
+
+    {% if messages %}
+        {% for message in messages %}
+            showSnackbar("{{ message|escapejs }}");
+        {% endfor %}
+    {% endif %}
+</script>
+<div id="snackbar"></div>
 {% endblock %}

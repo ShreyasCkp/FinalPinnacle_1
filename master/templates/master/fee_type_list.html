@@ -28,16 +28,17 @@
         align-items: center;
         position: relative;
         margin-bottom: 20px;
+        flex-wrap: wrap;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .btn-add {
         position: absolute;
@@ -54,109 +55,8 @@
         transition: background-color 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
-
-    table {
-        width: 100%;
-        font-size: 12px;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-
-    th, td {
-        padding: 0px;
-        text-align: center;
-        border: 1px solid #dee2e6;
-        vertical-align: middle !important;
-    }
-
-    td {
-        font-size: 9px;
-    }
-
-    thead {
-        background: linear-gradient(135deg, #8B0000, #800000);
-        color: white;
-    }
-
-    tr:nth-child(even) {
-        background-color: #f8f9fa;
-    }
-
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
-
-    .icon-btn {
-        border: 1px solid #dee2e6;
-        background-color: #fff;
-        padding: 3px 5px;
-        margin: 2px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        display: inline-block;
-        text-decoration: none;
-    }
-
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
-
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
-
-    #overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0,0,0,0.5);
-        display: none;
-        z-index: 1000;
-    }
-
-    #confirm-popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        display: none;
-        z-index: 1001;
-        text-align: center;
-    }
-
-    #confirm-yes, #confirm-no {
-        margin: 0 5px;
-        padding: 6px 12px;
-        font-size: 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        background: transparent;
-        color: #800000;
-        font-weight: 600;
-        border: 2px solid #800000;
-        transition: all 0.2s ease;
-    }
-
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
-
-    .content {
-        margin-left: 0px;
-        padding: 27px 24px 40px;
-        min-height: 100vh;
+    .btn-add:hover {
+        background-color: #a10000;
     }
 
     .search-input {
@@ -169,12 +69,61 @@
         width: 220px;
     }
 
-
-    #overlay,
-    #confirm-popup {
-        display: none;
+    table {
+        width: 100%;
+        font-size: 12px;
+        border-collapse: collapse;
+        margin-top: 10px;
     }
 
+    th, td {
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        vertical-align: middle !important;
+    }
+
+    td {
+        font-size: 11px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #8B0000, #800000);
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .icon-btn {
+        border: 1px solid #dee2e6;
+        background-color: #fff;
+        padding: 3px 5px;
+        margin: 2px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
+
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
+
+    /* ✅ Mobile responsive table wrapper */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Confirm popup */
     #overlay {
         position: fixed;
         top: 0;
@@ -182,6 +131,7 @@
         width: 100vw;
         height: 100vh;
         background: rgba(0,0,0,0.5);
+        display: none;
         z-index: 1000;
     }
 
@@ -194,8 +144,11 @@
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        display: none;
         z-index: 1001;
         text-align: center;
+        width: 90%;
+        max-width: 300px;
     }
 
     #confirm-yes, #confirm-no {
@@ -211,15 +164,12 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
-</style>
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
 
-
-
-<style>
+    /* Snackbar for messages */
     #snackbar {
         visibility: hidden;
         min-width: 250px;
@@ -236,32 +186,81 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* ✅ Responsive Design */
+    @media (max-width: 992px) {
+        .container {
+            margin-left: 0;
+            max-width: 95%;
+            padding: 20px;
+            box-shadow: none;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        .header-flex {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-flex h2 {
+            font-size: 20px;
+            text-align: center;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .search-input {
+            position: static;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-add {
+            position: static;
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        table {
+            font-size: 11px;
+        }
+
+        th, td {
+            padding: 6px;
+        }
+
+        .icon-btn i {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        h2 {
+            font-size: 18px;
+        }
+
+        .btn-add {
+            font-size: 12px;
+            padding: 8px;
+        }
+
+        .search-input {
+            font-size: 12px;
+            padding: 5px 8px;
         }
     }
 </style>
@@ -275,45 +274,45 @@
         </a>
     </div>
 
-    <table class="table table-bordered table-striped table-hover mt-3">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Optional</th>
-                <th>Deductible</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for fee_type in fee_types %}
-            <tr>
-                <td>{{ fee_type.name }}</td>
-                <td>{{ fee_type.is_optional }}</td>
-                <td>{{ fee_type.is_deductible }}</td>
-                <td>
-                    <a href="{% url 'fee_type_view' fee_type.pk %}" class="icon-btn" title="View">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{% url 'fee_type_edit' fee_type.pk %}" class="icon-btn" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
-
-                    <form id="fee-delete-form-{{ fee_type.pk }}" action="{% url 'fee_type_delete' fee_type.pk %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                    </form>
-                    <a href="#" class="icon-btn text-danger" onclick="confirmFeeDelete('{{ fee_type.pk }}', '{{ fee_type.name }}')" title="Delete">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-
-                </td>
-
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover mt-3">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Optional</th>
+                    <th>Deductible</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fee_type in fee_types %}
+                <tr>
+                    <td>{{ fee_type.name }}</td>
+                    <td>{{ fee_type.is_optional }}</td>
+                    <td>{{ fee_type.is_deductible }}</td>
+                    <td>
+                        <a href="{% url 'fee_type_view' fee_type.pk %}" class="icon-btn" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'fee_type_edit' fee_type.pk %}" class="icon-btn" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form id="fee-delete-form-{{ fee_type.pk }}" action="{% url 'fee_type_delete' fee_type.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                        </form>
+                        <a href="#" class="icon-btn text-danger" onclick="confirmFeeDelete('{{ fee_type.pk }}', '{{ fee_type.name }}')" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
+                </tr>
                 {% empty %}
-            <tr>
-                <td colspan="4">No Fee Types found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                <tr>
+                    <td colspan="4">No Fee Types found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Confirm Popup -->
@@ -324,8 +323,10 @@
     <button id="confirm-no">No</button>
 </div>
 
+<div id="snackbar"></div>
 
 <script>
+    // Search functionality
     document.getElementById('subjectSearch').addEventListener('input', function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('table tbody tr');
@@ -334,19 +335,12 @@
             const name = row.cells[0]?.textContent.toLowerCase() || '';
             const optional = row.cells[1]?.textContent.toLowerCase() || '';
             const deductible = row.cells[2]?.textContent.toLowerCase() || '';
-
-            const match = name.includes(filter) ||
-                optional.includes(filter) ||
-                deductible.includes(filter);
-
+            const match = name.includes(filter) || optional.includes(filter) || deductible.includes(filter);
             row.style.display = match ? '' : 'none';
         });
     });
-</script>
 
-<div id="snackbar"></div>
-
-<script>
+    // Delete confirmation popup
     let deleteFeeId = null;
 
     function confirmFeeDelete(feeId, feeName) {
@@ -366,6 +360,7 @@
         deleteFeeId = null;
     });
 
+    // Snackbar notification
     function showSnackbar(message) {
         const snackbar = document.getElementById("snackbar");
         snackbar.textContent = message;
@@ -382,54 +377,4 @@
     {% endif %}
 </script>
 
-<style>
-    #snackbar {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: #800000;
-        color: #fff;
-        text-align: center;
-        border-radius: 4px;
-        padding: 14px 24px;
-        position: fixed;
-        z-index: 9999;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 14px;
-    }
-
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
-
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-</style>
-
 {% endblock %}
-
-
-

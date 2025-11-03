@@ -20,6 +20,7 @@
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         margin-top: 20px;
         box-sizing: border-box;
+        overflow-x: auto; /* allow horizontal scroll if needed */
     }
 
     .header-flex {
@@ -28,20 +29,22 @@
         align-items: center;
         position: relative;
         margin-bottom: 20px;
+        flex-wrap: wrap;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .btn-add {
         position: absolute;
         right: 0;
+        top: 0;
         background-color: #800000;
         color: #fff;
         font-size: 13px;
@@ -54,9 +57,9 @@
         transition: background-color 0.3s;
     }
 
-        .btn-add:hover {
-            background-color: #a10000;
-        }
+    .btn-add:hover {
+        background-color: #a10000;
+    }
 
     table {
         width: 100%;
@@ -81,10 +84,6 @@
         background-color: #f8f9fa;
     }
 
-    /* tr:hover {
-        background-color: #e9ecef;
-    }*/
-
     .icon-btn {
         border: 1px solid #dee2e6;
         background-color: #fff;
@@ -97,14 +96,14 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
-        }
+    .icon-btn.text-danger i {
+        color: #b30000;
+    }
 
     .alert {
         color: #800000;
@@ -158,10 +157,10 @@
         transition: all 0.2s ease;
     }
 
-        #confirm-yes:hover, #confirm-no:hover {
-            background-color: #800000;
-            color: white;
-        }
+    #confirm-yes:hover, #confirm-no:hover {
+        background-color: #800000;
+        color: white;
+    }
 
     #snackbar {
         visibility: hidden;
@@ -179,57 +178,78 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* ===== Responsive Design ===== */
+    @media screen and (max-width: 1024px) {
+        .container {
+            margin-left: 0;
+            max-width: 100%;
+            padding: 15px;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        .header-flex h2 {
+            font-size: 20px;
+        }
+
+        .btn-add {
+            position: static;
+            margin-top: 10px;
         }
     }
 
-
-    .icon-btn {
-        border: 1px solid #dee2e6;
-        background-color: #fff;
-        padding: 3px 5px;
-        margin: 2px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        display: inline-block;
-        text-decoration: none;
-    }
-
-        .icon-btn i {
+    @media screen and (max-width: 768px) {
+        table {
             font-size: 11px;
-            color: #800000;
         }
 
-        .icon-btn.text-danger i {
-            color: #b30000;
+        th, td {
+            padding: 4px 6px;
         }
+
+        .btn-add {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .header-flex h2 {
+            font-size: 18px;
+        }
+
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        th, td {
+            font-size: 10px;
+            padding: 3px 5px;
+        }
+
+        .btn-add {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+    }
+
 </style>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       integrity="sha512-dYdAvXpHoA4rYUNFTZcmu9BsvZTCbNbsn/gyLv2eD9Ox8gVNk0Fqaq7mj2WyZKQXHTA1zOK6nDtxb4Ib8FJ/Og=="
       crossorigin="anonymous" />
@@ -249,14 +269,10 @@
                 <th>Student Name</th>
                 <th>Program Type</th>
                 <th>Academic Year</th>
-                <!--<th>Course</th>-->
                 <th>Semester/Year</th>
                 <th>Subject</th>
-                <!--<th>Exam Type</th>-->
-                <!--<th>Assignment</th>-->
                 <th>External Marks</th>
                 <th>External Marks Obtained</th>
-                <!--<th>Grade</th>-->
                 <th>Action</th>
             </tr>
         </thead>
@@ -267,7 +283,6 @@
                 <td>{{ mark.student.student_name }}</td>
                 <td>{{ mark.program_type.name }}</td>
                 <td>{{ mark.academic_year.year }}</td>
-                <!--<td>{{ mark.course.name }}</td>-->
                 <td>{{ mark.course.name }} {{ mark.sem_year }}</td>
                 <td>{{ mark.subject.name }}</td>
                 <td>{{ mark.max_marks }}</td>
@@ -278,20 +293,7 @@
                        class="icon-btn" title="Download Marksheet">
                         <i class="fas fa-download"></i>
                     </a>
-
-                    <!--<a href="{% url 'student_marksheet_view' mark.student.id %}"
-                       class="icon-btn" title="Download Marksheet">
-                        <i class="fas fa-download"></i>
-                    </a>-->
                     {% endifchanged %}
-
-                    <!--<a href="{% url 'student_marks_view' mark.id %}" class="icon-btn" ><i class="fas fa-eye"></i></a>
-                    <a href="{% url 'student_marks_edit' mark.id %}" class="icon-btn" ><i class="fas fa-edit"></i></a>
-                    <form action="{% url 'student_marks_delete' mark.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="icon-btn text-danger"  > <i class="fas fa-trash-alt"></i></button>
-                    </form>-->
-
                 </td>
             </tr>
             {% empty %}
@@ -300,9 +302,7 @@
             </tr>
             {% endfor %}
         </tbody>
-
-
-
     </table>
 </div>
+
 {% endblock %}

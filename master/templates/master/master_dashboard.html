@@ -2,108 +2,68 @@
 {% block title %}Master{% endblock %}
 {% block content %}
 
-<div class="container py-5">
-    <h2 class="fw-bold text-primary mb-4 text-center"> Master</h2>
+<div class="container py-5 master-container">
+    <h2 class="fw-bold text-primary mb-4 text-center">Master</h2>
 
     <!-- Master Dashboard Buttons -->
-    <div class="d-flex flex-wrap gap-3 mb-4">
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-4 master-buttons">
 
         {% if form_permissions.academic_year.add %}
-        <a href="{% url 'academic_year_list' %}" class="btn btn-maroon px-4 py-3">
+        <a href="{% url 'academic_year_list' %}" class="btn btn-maroon">
             <i class="bi bi-calendar-event me-2"></i> Batch
         </a>
         {% endif %}
 
         {% if form_permissions.course_type.add %}
-        <!-- Course Type -->
-        <a href="{% url 'course_type_list' %}" class="btn btn-maroon px-4 py-3">
+        <a href="{% url 'course_type_list' %}" class="btn btn-maroon">
             <i class="bi bi-diagram-3 me-2"></i> Program Types
-            <!-- Alternate FA: <i class="fas fa-stream me-2"></i> -->
-        </a>
-        {% endif %}
-        {% if form_permissions.course_form.add %}
-        <!-- Combination -->
-        <a href="{% url 'course_form_list' %}" class="btn btn-maroon px-4 py-3">
-            <i class="bi bi-shuffle me-2"></i> Combinations
-            <!-- Alternate FA: <i class="fas fa-random me-2"></i> -->
         </a>
         {% endif %}
 
+        {% if form_permissions.course_form.add %}
+        <a href="{% url 'course_form_list' %}" class="btn btn-maroon">
+            <i class="bi bi-shuffle me-2"></i> Combinations
+        </a>
+        {% endif %}
 
         {% if form_permissions.subject_form.add %}
-
-        <!-- Subject -->
-        <a href="{% url 'subject_form_list' %}" class="btn btn-maroon px-4 py-3">
+        <a href="{% url 'subject_form_list' %}" class="btn btn-maroon">
             <i class="bi bi-journal-bookmark me-2"></i> Subjects
-            <!-- Alternate FA: <i class="fas fa-book-open me-2"></i> -->
         </a>
-
-
         {% endif %}
 
-        <!--<a href="{% url 'class_teacher_list' %}" class="btn btn-maroon px-4 py-3">
-            <i class="bi bi-person-badge-fill me-2"></i> Class Teachers
-        </a>-->
-
-        <!--{% if form_permissions.transport_form.add %}
-
-    <a href="{% url 'master_transport_list' %}" class="btn btn-maroon px-4 py-3">
-        <i class="bi bi-bus-front-fill me-2"></i> Transport-->
-        <!-- Alternate FA: <i class="fas fa-book-open me-2"></i> -->
-        <!--</a>
-    {% endif %}-->
         {% if form_permissions.fee_type.add %}
-
-        <a href="{% url 'fee_type_list' %}" class="btn btn-maroon px-4 py-3">
+        <a href="{% url 'fee_type_list' %}" class="btn btn-maroon">
             <i class="bi bi-cash-coin me-2"></i> Fee Types
         </a>
         {% endif %}
 
-        <!-- Subject -->
-        <a href="{% url 'event_type_list' %}" class="btn btn-maroon px-4 py-3">
-            <i class="bi bi-journal-bookmark me-2"></i> Event Types
-            <!-- Alternate FA: <i class="fas fa-book-open me-2"></i> -->
+        <a href="{% url 'event_type_list' %}" class="btn btn-maroon">
+            <i class="bi bi-calendar-event me-2"></i> Event Types
         </a>
 
-        <!--<a href="{% url 'content_list' %}" class="btn btn-maroon px-4 py-3">
-        <i class="bi bi-journal-bookmark me-2"></i> Content
-    </a>
-
-    <a href="{% url 'chapter_list' %}" class="btn btn-maroon px-4 py-3">
-        <i class="bi bi-journal-bookmark me-2"></i> Chapter
-    </a>-->
-
-        <a href="{% url 'category_list' %}" class="btn btn-maroon px-4 py-3">
+        <a href="{% url 'category_list' %}" class="btn btn-maroon">
             <i class="bi bi-journal-bookmark me-2"></i> Book Categories
         </a>
+
         <a href="{% url 'exam_type_list' %}"
-           class="btn btn-maroon px-4 py-3 {% if 'exam_type_list' in request.resolver_match.url_name %}active{% endif %}">
+           class="btn btn-maroon {% if 'exam_type_list' in request.resolver_match.url_name %}active{% endif %}">
             <i class="fa-solid fa-clipboard-list me-2"></i> Exam Types
         </a>
 
         <a href="{% url 'college_start_end_plan_list' %}"
-           class="btn btn-maroon px-4 py-3 {% if 'college_start_end_plan_list' in request.resolver_match.url_name %}active{% endif %}">
+           class="btn btn-maroon {% if 'college_start_end_plan_list' in request.resolver_match.url_name %}active{% endif %}">
             <i class="fa-solid fa-calendar-days me-2"></i> College Start-End Plans
         </a>
-
-        <!--<a href="{% url 'holiday_list' %}" class="btn btn-maroon px-4 py-3 {% if 'holiday_list' in request.resolver_match.url_name %}active{% endif %}">
-            <i class="fa-solid fa-calendar-days me-2"></i> Holidays
-
-        </a>-->
-
     </div>
 
-
-
-    <!-- Loaded form content will appear here -->
     <div id="form-container"></div>
 </div>
 
-<!-- Bootstrap CSS & Icons (if not already in master layout) -->
+<!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- JavaScript for dynamic form loading -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".load-form").forEach(function (btn) {
@@ -114,8 +74,7 @@
                     .then(html => {
                         document.getElementById("form-container").innerHTML = html;
                     })
-                    .catch(error => {
-                        console.error("Error loading form:", error);
+                    .catch(() => {
                         document.getElementById("form-container").innerHTML =
                             "<div class='alert alert-danger'>Failed to load content.</div>";
                     });
@@ -124,92 +83,100 @@
     });
 </script>
 
-<!-- Full CSS for Matching Style -->
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #f7f8f8;
-        padding: 0;
-    }
-
-    h2 {
-        font-size: 22px;
-        text-align: center;
+        font-family: 'Inter', Arial, sans-serif;
+        background: #f4f6f9;
     }
 
     .fw-bold {
-        color: #800000;
-        font-size: 28px;
+        color: #800000 !important;
     }
 
     .text-primary {
-        --bs-text-opacity: 1;
         color: #800000 !important;
-        margin-top: -60px;
-        font-size: 20px;
     }
 
-    .btn {
-        min-width: 178px;
-        font-weight: 600;
-        transition: all 0.2s ease-in-out;
-        padding: 12px;
-        font-size: 9px;
+    .master-container {
+        max-width: 1000px;
+        margin: auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .py-3 {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-    }
-
-    .btn-maroon {
+    .master-buttons .btn-maroon {
         color: #800000;
         border: 2px solid #800000;
-        background-color: transparent;
-        font-size: 12px;
+        background: transparent;
+        font-weight: 600;
+        font-size: 13px;
+        border-radius: 8px;
+        min-width: 160px;
+        padding: 10px 14px;
+        text-align: center;
         transition: all 0.2s ease-in-out;
     }
 
-        .btn-maroon:hover {
-            background-color: #800000;
-            color: #fff;
-        }
+    .master-buttons .btn-maroon:hover {
+        background: #800000;
+        color: #fff;
+    }
 
     #form-container {
         margin-top: 30px;
         border-radius: 9px;
         animation: fadeIn 0.3s ease-in-out;
         padding: 20px;
-        clear: both;
-    }
-
-    .container {
-        padding-bottom: 100px;
     }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 📱 Responsive Design */
+    @media (max-width: 992px) {
+        .master-buttons {
+            justify-content: center;
         }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        .master-buttons .btn-maroon {
+            min-width: 45%;
+            font-size: 12px;
         }
     }
 
-    .gap-3 {
-        gap: 1rem !important;
+    @media (max-width: 768px) {
+        .master-container {
+            padding: 20px 15px;
+        }
+        .master-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        .master-buttons .btn-maroon {
+            width: 80%;
+            font-size: 14px;
+            padding: 10px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
     }
 
-    .d-flex.flex-wrap.gap-3.mb-4 .btn {
-        font-size: 9px;
-    }
-
-    .content {
-        padding: 80px 26px 40px;
-        margin-left: 200px;
+    @media (max-width: 480px) {
+        .master-buttons .btn-maroon {
+            width: 100%;
+            font-size: 13px;
+            padding: 12px;
+        }
+        .master-container {
+            border-radius: 0;
+            box-shadow: none;
+            padding: 15px;
+        }
     }
 </style>
 

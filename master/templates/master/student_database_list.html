@@ -13,7 +13,7 @@
 
     .container {
         margin-left: 200px; /* Leave space for sidebar */
-        padding: 30px;
+        padding: 20px;
         max-width: calc(100% - 200px);
         background: #fff;
         border-radius: 12px;
@@ -28,16 +28,17 @@
         align-items: center;
         position: relative;
         margin-bottom: 20px;
+        flex-wrap: wrap;
     }
 
-        .header-flex h2 {
-            flex-grow: 1;
-            margin: 0;
-            font-weight: 700;
-            font-size: 22px;
-            color: #800000;
-            text-align: center;
-        }
+    .header-flex h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-weight: 700;
+        font-size: 22px;
+        color: #800000;
+        text-align: center;
+    }
 
     .search-form {
         position: absolute;
@@ -56,25 +57,25 @@
         margin-bottom: 20px;
     }
 
-        .filters select,
-        .filters button {
-            font-size: 13px;
-            padding: 6px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+    .filters select,
+    .filters button {
+        font-size: 13px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
 
-        .filters button {
-            border: 1px solid #6c757d;
-            background-color: white;
-            color: black;
-            transition: background-color 0.3s ease;
-        }
+    .filters button {
+        border: 1px solid #6c757d;
+        background-color: white;
+        color: black;
+        transition: background-color 0.3s ease;
+    }
 
-            .filters button:hover {
-                background-color: #800000;
-                color: white;
-            }
+    .filters button:hover {
+        background-color: #800000;
+        color: white;
+    }
 
     table {
         width: 100%;
@@ -115,10 +116,10 @@
         text-decoration: none;
     }
 
-        .icon-btn i {
-            font-size: 11px;
-            color: #800000;
-        }
+    .icon-btn i {
+        font-size: 11px;
+        color: #800000;
+    }
 
     #snackbar {
         visibility: hidden;
@@ -136,10 +137,10 @@
         font-size: 14px;
     }
 
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
+    #snackbar.show {
+        visibility: visible;
+        animation: fadein 0.4s, fadeout 0.4s 2.6s;
+    }
 
     .content {
         margin-left: 0px;
@@ -148,26 +149,59 @@
     }
 
     @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+        from { bottom: 0; opacity: 0; }
+        to { bottom: 30px; opacity: 1; }
     }
 
     @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
+        from { bottom: 30px; opacity: 1; }
+        to { bottom: 0; opacity: 0; }
+    }
+
+    /* Mobile Responsive */
+    @media screen and (max-width: 768px) {
+        .container {
+            margin-left: 0;
+            padding: 15px;
+            max-width: 100%;
         }
 
-        to {
-            bottom: 0;
-            opacity: 0;
+        .search-form {
+            position: static;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .filters {
+            flex-direction: column;
+        }
+
+        .filters select,
+        .filters button {
+            width: 100%;
+        }
+
+        table {
+            font-size: 10px;
+        }
+
+        th, td {
+            padding: 4px 6px;
+        }
+
+        .icon-btn i {
+            font-size: 12px;
+        }
+
+        .header-flex h2 {
+            font-size: 18px;
+            text-align: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        td[data-promodate] form button {
+            padding: 2px 6px;
         }
     }
 </style>
@@ -176,12 +210,7 @@
     <div class="header-flex">
         <input type="text" id="studentSearch" class="search-form" placeholder="Search Students...">
         <h2>All Students Information</h2>
-
     </div>
-
-    <!--<div style="margin-bottom: 7px;">
-    </div>-->
-
 
     <form method="get" class="filters">
         <select name="program_type" id="program_type" onchange="this.form.submit()">
@@ -199,7 +228,6 @@
             <option value="{{ combo }}" {% if combo == selected_combination %}selected{% endif %}>{{ combo }}</option>
             {% endfor %}
         </select>
-
 
         <select name="sort" onchange="this.form.submit()">
             <option value="">-- Sort by Name --</option>
@@ -221,10 +249,7 @@
                 <th>Program Type</th>
                 <th>Combination</th>
                 <th>Sem/Year</th>
-                <!--<th>Quota Type</th>-->
                 <th>Status</th>
-
-                <!--<th>Student Phone No</th>-->
                 <th>Father Name</th>
                 <th>Action</th>
             </tr>
@@ -236,39 +261,27 @@
                 <td>{{ forloop.counter }}</td>
                 <td data-admission-date="{{ student.admission_date|date:'Y-m-d H:i:s' }}">
                     {% if student.pu_admission %}
-                    {{ student.pu_admission.admission_no }}
+                        {{ student.pu_admission.admission_no }}
                     {% elif student.degree_admission %}
-                    {{ student.degree_admission.admission_no }}
+                        {{ student.degree_admission.admission_no }}
                     {% else %}
-                    -
+                        -
                     {% endif %}
                 </td>
-
                 <td>{{ student.academic_year }}</td>
                 <td>{{ student.student_userid|default:"-" }}</td>
-                <td>
-                    <a href="{% url 'student_profile' student.id %}">
-                        {{ student.student_name }}
-                    </a>
-                </td>
+                <td><a href="{% url 'student_profile' student.id %}">{{ student.student_name }}</a></td>
                 <td>{{ student.course_type }}</td>
                 <td>{{ student.course.name }}</td>
                 <td>
                     {{ student.course.name }}
                     {% if student.course_type.name == "PUC Regular" %}
-                    {{ student.current_year }}
+                        {{ student.current_year }}
                     {% else %}
-                    {{ student.semester }}
+                        {{ student.semester }}
                     {% endif %}
                 </td>
-
-                <!--<td>{{ student.quota_type }}</td>-->
                 <td>{{ student.status }}</td>
-
-                
-
-                <!--<td>{{ student.student_phone_no|default:"-" }}</td>-->
-                
                 <td>{{ student.father_name|default:"-" }}</td>
                 <td data-promodate="{{ entry.promotion_end_date }}">
                     <a href="{% url 'student_profile' student.id %}" class="icon-btn" title="View">
@@ -291,8 +304,6 @@
                     </button>
                     {% endif %}
                 </td>
-
-
             </tr>
             {% endwith %}
             {% empty %}
@@ -304,7 +315,7 @@
     </table>
 </div>
 
-<!-- Promotion Confirmation Modal -->
+<!-- Promotion Modal -->
 <div id="promotionModal" class="custom-modal">
     <div class="custom-modal-content">
         <p>Are you sure you want to promote this student?</p>
@@ -316,214 +327,92 @@
 </div>
 
 <style>
-    .custom-modal {
-        display: none;
-        position: fixed;
-        z-index: 99999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.5);
-    }
-
-    .custom-modal-content {
-        background-color: #fff;
-        margin: 15% auto;
-        padding: 20px 30px;
-        border: 1px solid #888;
-        width: 300px;
-        border-radius: 10px;
-        text-align: center;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    }
-
-    .modal-buttons {
-        margin-top: 20px;
-        display: flex;
-        justify-content: space-around;
-    }
-
-    .confirm-btn, .cancel-btn {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
-        font-size: 13px;
-        cursor: pointer;
-    }
-
-    .confirm-btn {
-        background-color: #800000;
-        color: white;
-    }
-
-    .cancel-btn {
-        background-color: #ccc;
-        color: #333;
-    }
+    .custom-modal { display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);}
+    .custom-modal-content { background-color: #fff; margin: 20% auto; padding: 20px 30px; border: 1px solid #888; width: 300px; border-radius: 10px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);}
+    .modal-buttons { margin-top: 20px; display: flex; justify-content: space-around; }
+    .confirm-btn, .cancel-btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; cursor: pointer;}
+    .confirm-btn { background-color: #800000; color: white;}
+    .cancel-btn { background-color: #ccc; color: #333;}
 </style>
 
 <script>
-    let selectedForm = null;
+let selectedForm = null;
 
-    document.querySelectorAll('.promotion-btn').forEach(button => {
-        button.addEventListener('click', function (e) {
-            e.preventDefault();  // prevent immediate form submission
-            selectedForm = this.closest('form');  // store reference to form
-            document.getElementById('promotionModal').style.display = 'block';
-        });
+document.querySelectorAll('.promotion-btn').forEach(button => {
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+        selectedForm = this.closest('form');
+        document.getElementById('promotionModal').style.display = 'block';
+    });
+});
+
+document.getElementById('confirmPromotion').addEventListener('click', function () {
+    if (selectedForm) selectedForm.submit();
+    document.getElementById('promotionModal').style.display = 'none';
+});
+
+document.getElementById('cancelPromotion').addEventListener('click', function () {
+    selectedForm = null;
+    document.getElementById('promotionModal').style.display = 'none';
+});
+
+window.addEventListener('click', function (event) {
+    const modal = document.getElementById('promotionModal');
+    if (event.target === modal) modal.style.display = 'none';
+});
+
+function showSnackbar(message) {
+    const snackbar = document.getElementById("snackbar");
+    snackbar.textContent = message;
+    snackbar.className = "show";
+    setTimeout(() => { snackbar.className = snackbar.className.replace("show", ""); }, 3000);
+}
+
+// Django messages
+{% if messages %}
+    {% for message in messages %}
+        showSnackbar("{{ message|escapejs }}");
+    {% endfor %}
+{% endif %}
+
+document.getElementById('studentSearch').addEventListener('input', function () {
+    const filter = this.value.trim().toLowerCase();
+    const rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll("td"));
+        const isEmptyRow = cells.length === 1 && cells[0].colSpan;
+        if (isEmptyRow) { row.style.display = 'none'; return; }
+        const rowText = cells.map(cell => cell.textContent.toLowerCase()).join(" ");
+        row.style.display = rowText.includes(filter) ? '' : 'none';
     });
 
-    document.getElementById('confirmPromotion').addEventListener('click', function () {
-        if (selectedForm) {
-            selectedForm.submit();
+    const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+    const noDataRow = document.querySelector("table tbody tr td[colspan]");
+    if (noDataRow) noDataRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const rows = document.querySelectorAll('td[data-promodate]');
+    const today = new Date();
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    rows.forEach(cell => {
+        const dateStr = cell.getAttribute('data-promodate');
+        if (!dateStr) return;
+        const endDate = new Date(dateStr);
+        const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+        const formButton = cell.querySelector('form button[type="submit"]');
+        const icon = formButton?.querySelector('i');
+        if (formButton) {
+            const enablePromotion = todayOnly > endDateOnly;
+            formButton.disabled = !enablePromotion;
+            formButton.title = enablePromotion ? "Promote" : "Promotion not allowed yet";
+            if (icon) icon.style.color = enablePromotion ? "#800000" : "grey";
         }
-        document.getElementById('promotionModal').style.display = 'none';
     });
-
-    document.getElementById('cancelPromotion').addEventListener('click', function () {
-        selectedForm = null;
-        document.getElementById('promotionModal').style.display = 'none';
-    });
-
-    // Optional: Close modal when clicking outside
-    window.addEventListener('click', function (event) {
-        const modal = document.getElementById('promotionModal');
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
+});
 </script>
-
 
 <div id="snackbar"></div>
-
-<script>
-    function showSnackbar(message) {
-        const snackbar = document.getElementById("snackbar");
-        snackbar.textContent = message;
-        snackbar.className = "show";
-        setTimeout(() => {
-            snackbar.className = snackbar.className.replace("show", "");
-        }, 3000);
-    }
-
-    // Django message support
-    {% if messages %}
-        {% for message in messages %}
-            showSnackbar("{{ message|escapejs }}");
-        {% endfor %}
-    {% endif %}
-
-
-</script>
-<script>
-    document.getElementById('studentSearch').addEventListener('input', function () {
-        const filter = this.value.trim().toLowerCase();
-        const rows = document.querySelectorAll("table tbody tr");
-
-        rows.forEach(row => {
-            const cells = Array.from(row.querySelectorAll("td"));
-            const isEmptyRow = cells.length === 1 && cells[0].colSpan;
-
-            if (isEmptyRow) {
-                // Hide "no records found" row for now
-                row.style.display = 'none';
-                return;
-            }
-
-            const rowText = cells.map(cell => cell.textContent.toLowerCase()).join(" ");
-            row.style.display = rowText.includes(filter) ? '' : 'none';
-        });
-
-        // Show/hide the "no records found" row
-        const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
-        const noDataRow = document.querySelector("table tbody tr td[colspan]");
-        if (noDataRow) {
-            noDataRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
-        }
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const rows = document.querySelectorAll('td[data-promodate]');
-
-        const today = new Date();
-        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // Strip time
-
-        rows.forEach(cell => {
-            const dateStr = cell.getAttribute('data-promodate');
-            if (!dateStr) return;
-
-            const endDate = new Date(dateStr);
-            const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-
-            const formButton = cell.querySelector('form button[type="submit"]');
-            const icon = formButton?.querySelector('i');
-
-            if (formButton) {
-                const enablePromotion = todayOnly > endDateOnly; // ✅ Enable only *after* end date
-
-                formButton.disabled = !enablePromotion;
-                formButton.title = enablePromotion ? "Promote" : "Promotion not allowed yet";
-                if (icon) {
-                    icon.style.color = enablePromotion ? "#800000" : "grey";
-                }
-            }
-        });
-    });
-</script>
-
-
-
-
-
-<style>
-    #snackbar {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: #800000;
-        color: #fff;
-        text-align: center;
-        border-radius: 4px;
-        padding: 14px 24px;
-        position: fixed;
-        z-index: 9999;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 14px;
-    }
-
-        #snackbar.show {
-            visibility: visible;
-            animation: fadein 0.4s, fadeout 0.4s 2.6s;
-        }
-
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-</style>
 {% endblock %}
