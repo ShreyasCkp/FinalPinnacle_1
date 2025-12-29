@@ -1,23 +1,101 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
 *.sqlite3
- 
-# Django secret settings
+*.db
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Django
+*.log
+local_settings.py
+settings_secret.py
+db.sqlite3
+db.sqlite3-journal
+
+# Django - Generated static files (should be generated during deployment)
+staticfiles/
+/staticfiles/
+
+# Django - User uploaded media files (should be on external storage)
+media/
+/media/
+uploads/
+/uploads/
+excel_uploads/
+/excel_uploads/
+
+# Environment variables
 *.env
 .env
-settings_secret.py
- 
-# VS Code / IDE stuff
+.env.local
+.env.*.local
+
+# IDE / Editor files
 .vscode/
 .idea/
-venv/
- 
-# OS files
+*.swp
+*.swo
+*~
 .DS_Store
 Thumbs.db
-obj/ 
-.vs".vs/" 
+obj/
+.vs/
+*.pyproj.user
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+Properties/
+*.pubxml
+*.pubxml.user
+readme.html
 
+# Visual Studio / Visual Studio Code
+.vscode/
+.vs/
+*.pyproj.user
+student_alerts_app.pyproj.user
 
-# Ignore files listed in requirements.txt
+# Security / Keys (should never be committed)
+downloads
+downloads.pub
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+*.pub
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.cache
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Git
+.git/
+git
