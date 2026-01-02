@@ -11,11 +11,10 @@ APPEND_SLASH = True
 # ✅ Allow Azure + local + container IPs
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',') if config('ALLOWED_HOSTS', default='*') != '*' else ['*']
 
-# ✅ CSRF trusted origins (from environment variable)
-CSRF_TRUSTED_ORIGINS = config(
-    'CSRF_TRUSTED_ORIGINS',
-    default='https://pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net'
-).split(',')
+# CSRF trusted origins (from environment variable or SITE_URL)
+_csrf_default = SITE_URL if SITE_URL else ''
+_csrf_value = config('CSRF_TRUSTED_ORIGINS', default=_csrf_default)
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_value.split(',') if origin.strip()]
 # ✅ Database (with SSL for Azure)
 DATABASES = {
     'default': {

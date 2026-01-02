@@ -13,7 +13,7 @@ fi
 
 # Upgrade pip and install dependencies
 python3 -m pip install --no-cache-dir --upgrade pip | tee -a $LOG_DIR/startup.log
-python3 -m pip install --no-cache-dir -r /home/site/wwwroot/requirements.txt | tee -a $LOG_DIR/startup.log
+python3 -m pip install --no-cache-dir --prefer-binary -r /home/site/wwwroot/requirements.txt | tee -a $LOG_DIR/startup.log
 
 # Apply database migrations
 python3 /home/site/wwwroot/manage.py migrate --noinput | tee -a $LOG_DIR/startup.log || echo "⚠️ Migrations failed" | tee -a $LOG_DIR/startup.log
