@@ -25,6 +25,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
 
       # 3. Verify requirements.txt exists
       - name: Verify requirements.txt
@@ -34,11 +36,18 @@ jobs:
             exit 1
           fi
 
+      # 4. Install system dependencies (for pycairo/cairo)
+      - name: Install system dependencies
+        if: hashFiles('requirements-apt.txt') != ''
+        run: |
+          sudo apt-get update
+          xargs -a requirements-apt.txt sudo apt-get install -y
+
       # 4. Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install --prefer-binary -r requirements.txt
 
       # 5. Collect static files
       - name: Collect static files
