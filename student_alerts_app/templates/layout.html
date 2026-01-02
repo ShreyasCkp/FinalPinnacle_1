@@ -24,14 +24,23 @@
             line-height: 1.6;
         }
 
+        body.app-layout {
+            --sidebar-width: 200px;
+            --sidebar-offset: 200px;
+            --topbar-height: 52px;
+            --sidebar-bg: #800000;
+            --sidebar-bg-hover: #a50000;
+            --sidebar-border: rgba(255,255,255,0.3);
+        }
+
         /* SIDEBAR */
         .sidebar {
             position: fixed;
             top: 0;
             left: 0;
-            width: 200px;
+            width: var(--sidebar-width);
             height: 100vh;
-            background: #800000;
+            background: var(--sidebar-bg);
             overflow-y: auto;
             z-index: 1000;
         }
@@ -41,14 +50,20 @@
         }
 
         .sidebar-title {
-            padding: 12px;
+            height: 52px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
+            border-bottom: 1px solid var(--sidebar-border);
         }
 
         .sidebar-title img {
-            width: 100%;
+            width: auto;
+            max-width: 100%;
             height: auto;
+            max-height: 40px;
             object-fit: contain;
         }
 
@@ -59,9 +74,13 @@
             gap: 10px;
             padding: 10px 12px;
             font-size: 13.5px;
+            font-family: Arial, sans-serif;
+            font-weight: 500;
+            line-height: 1.25;
+            letter-spacing: 0;
             color: #fff;
             text-decoration: none;
-            background-color: #800000;
+            background-color: var(--sidebar-bg);
             border-left: 3px solid transparent;
             white-space: nowrap;
             overflow: hidden;
@@ -70,15 +89,17 @@
 
         .sidebar a i {
             width: 18px;
+            font-size: 14px;
+            line-height: 1;
         }
 
         .sidebar a:hover {
-            background-color: #a50000;
+            background-color: var(--sidebar-bg-hover);
             border-left: 3px solid #fff;
         }
 
         .sidebar a.active {
-            background-color: #a50000;
+            background-color: var(--sidebar-bg-hover);
             border-left: 3px solid #fff;
             font-weight: 600;
         }
@@ -87,9 +108,9 @@
         .topbar {
             position: fixed;
             top: 0;
-            left: 200px;
+            left: var(--sidebar-offset);
             right: 0;
-            height: 52px;
+            height: var(--topbar-height);
             background: linear-gradient(135deg, #8B0000, #800000);
             color: white;
             display: flex;
@@ -118,7 +139,7 @@
 
         /* MAIN CONTENT */
         .content {
-            margin-left: 200px;
+            margin-left: var(--sidebar-offset);
             padding: 80px 24px 80px;
             min-height: 100vh;
             background: #f5f7fa;
@@ -128,11 +149,12 @@
         .footer {
             position: fixed !important;
             bottom: 0 !important;
-            left: 200px !important;
+            left: var(--sidebar-offset) !important;
             right: 0 !important;
             text-align: center !important;
             padding: 14px 0 !important;
             color: #8b0000 !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
             font-size: 14px !important;
             font-weight: 500 !important;
             background: #ffffff !important;
@@ -204,6 +226,10 @@
 
         /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
+            body.app-layout {
+                --sidebar-offset: 0px;
+            }
+
             .sidebar {
                 width: 200px;
                 transform: translateX(-100%);
@@ -215,7 +241,6 @@
 
             .topbar {
                 left: 0;
-                height: 55px;
                 justify-content: space-between;
             }
 
@@ -223,10 +248,6 @@
                 display: block;
                 color: #fff;
                 margin-right: 10px;
-            }
-
-            .topbar div:first-child {
-                font-size: 15px;
             }
 
             .content {
@@ -239,11 +260,6 @@
                 font-size: 14px !important;
                 font-weight: 500 !important;
                 padding: 12px 0 !important;
-            }
-
-            .sidebar a {
-                font-size: 14px;
-                padding: 10px;
             }
 
             #user-popup {
@@ -291,110 +307,6 @@ p {
     /* color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important; */
 }
 
-        .app-layout .sidebar {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 200px !important;
-            height: 100vh !important;
-            background: #800000 !important;
-            overflow-y: auto !important;
-            transition: none !important;
-            animation: none !important;
-            z-index: 1000 !important;
-        }
-
-        .app-layout .sidebar,
-        .app-layout .sidebar * {
-            transition: none !important;
-            animation: none !important;
-        }
-
-        .app-layout .sidebar a,
-        .app-layout .sidebar .dropdown-btn {
-            display: flex !important;
-            align-items: center !important;
-            gap: 10px !important;
-            padding: 10px 12px !important;
-            font-size: 13.5px !important;
-            font-family: Arial, sans-serif !important;
-            font-weight: 500 !important;
-            line-height: 1.25 !important;
-            letter-spacing: 0 !important;
-            color: #fff !important;
-            text-decoration: none !important;
-            background-color: #800000 !important;
-            border-left: 3px solid transparent !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            transition: none !important;
-        }
-
-        .app-layout .sidebar a i,
-        .app-layout .sidebar .dropdown-btn i {
-            width: 18px !important;
-            font-size: 14px !important;
-            line-height: 1 !important;
-            font-family: "Font Awesome 6 Free" !important;
-            font-weight: 900 !important;
-        }
-
-        .app-layout .sidebar a:hover,
-        .app-layout .sidebar .dropdown-btn:hover {
-            background-color: #a50000 !important;
-            border-left-color: #fff !important;
-        }
-
-        .app-layout .sidebar a.active,
-        .app-layout .sidebar .dropdown-btn.active {
-            background-color: #a50000 !important;
-            border-left-color: #fff !important;
-            font-weight: 600 !important;
-        }
-
-        .app-layout .topbar {
-            left: 200px !important;
-        }
-
-        .app-layout .content {
-            margin-left: 200px !important;
-        }
-
-        .app-layout .footer {
-            left: 200px !important;
-            right: 0 !important;
-            position: fixed !important;
-            bottom: 0 !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            color: #8b0000 !important;
-        }
-
-        @media (max-width: 768px) {
-            .app-layout .sidebar {
-                width: 200px !important;
-                transform: translateX(-100%) !important;
-            }
-
-            .app-layout .sidebar.show {
-                transform: translateX(0) !important;
-            }
-
-            .app-layout .topbar {
-                left: 0 !important;
-            }
-
-            .app-layout .content {
-                margin-left: 0 !important;
-            }
-
-            .app-layout .footer {
-                left: 0 !important;
-                font-size: 14px !important;
-                font-weight: 500 !important;
-            }
-        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -412,7 +324,7 @@ p {
 
     <!-- FOOTER -->
     <div class="footer">
-        Designed & Developed by CKP Software Technologies © 2025. All rights reserved.
+        Designed & Developed by CKP Software Technologies &copy; 2025. All rights reserved.
     </div>
 
     <!-- SCRIPT -->
