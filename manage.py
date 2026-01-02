@@ -10,9 +10,13 @@ import os
 import sys
 
 if __name__ == '__main__':
-    os.environ.setdefault(
-        'DJANGO_SETTINGS_MODULE',
-        'student_alerts_app.settings')
+    django_env = os.getenv('DJANGO_ENV', 'local').lower()
+    settings_module = (
+        'student_alerts_app.deployment'
+        if django_env in ('deployment', 'production')
+        else 'student_alerts_app.settings'
+    )
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

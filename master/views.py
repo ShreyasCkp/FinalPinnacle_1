@@ -1,12 +1,9 @@
 ﻿from django.shortcuts import render, redirect
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 import pandas as pd
-from django.shortcuts import render, redirect
 from django.contrib import messages
-
-from django.shortcuts import render, redirect
 from .models import UserCustom
 from license.models import License
 from core.utils import log_activity
@@ -29,52 +26,43 @@ from core.utils import log_activity
 def custom_login_view(request):
     error = None
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        try:
-            user = UserCustom.objects.get(username=username)
-            if user.is_locked:
-                error = "User account is locked due to multiple wrong attempts. Please contact admin."
-            elif user.password == password:
-                user.wrong_attempts = 0
-                user.save()
-                request.session['user_id'] = user.id
-                log_activity(user, 'login', user)
-                
-                if not user.passcode_set:
-                    return redirect('choose_passcode_view')
-                
-                uname = user.username.lower()
-                # Apply license logic only for user IDs 1 and 2
-                if "dean" in uname or "academic director" in uname:
-                    return handle_license_and_redirect(user, request)
+        username = (request.POST.get('username') or '').strip()
+        password = (request.POST.get('password') or '').strip()
+
+        if not username or not password:
+            error = "Please enter both username and password."
+        else:
+            user_custom = UserCustom.objects.filter(username=username).first()
+            if user_custom:
+                if user_custom.is_locked:
+                    error = "Account is locked due to multiple failed attempts. Contact admin."
+                elif user_custom.password != password:
+                    user_custom.wrong_attempts = (user_custom.wrong_attempts or 0) + 1
+                    if user_custom.wrong_attempts >= 3:
+                        user_custom.is_locked = True
+                    user_custom.save(update_fields=['wrong_attempts', 'is_locked'])
+                    error = "Invalid username or password."
                 else:
-                    
-                    if "dean" in uname:
-                        return redirect('dashboard_view')  # or dean_dashboard
-                    elif "academic director" in uname:
-                        return redirect('dashboard_view2')
-                    elif "front office" in uname:
-                        return redirect('dashboard_view3')
-                    elif "employee" in uname:
-                        return redirect('dashboard_view4')         
-                   
-                
+                    user_custom.wrong_attempts = 0
+                    user_custom.is_locked = False
+                    user_custom.save(update_fields=['wrong_attempts', 'is_locked'])
+                    request.session['user_id'] = user_custom.id
+                    request.session['username'] = user_custom.username
+                    return redirect('dashboard_view')
             else:
-                user.wrong_attempts += 1
-                if user.wrong_attempts >= 3:
-                    user.is_locked = True
-                user.save()
-                if user.is_locked:
-                    error = "Invalid password. Account locked after 3 wrong attempts. Please contact admin."
-                else:
-                    error = "Invalid password."
-        except UserCustom.DoesNotExist:
-            error = 'User does not exist'
+                user = authenticate(request, username=username, password=password)
+                if user is not None:
+                    login(request, user)
+                    user_custom, _ = UserCustom.objects.get_or_create(
+                        username=username,
+                        defaults={'password': password},
+                    )
+                    request.session['user_id'] = user_custom.id
+                    request.session['username'] = user_custom.username
+                    return redirect('dashboard_view')
+                error = "Invalid username or password."
 
-    users = UserCustom.objects.exclude(username__icontains='employee')
-
-    return render(request, 'master/login.html', {'error': error, 'users': users})
+    return render(request, 'master/login.html', {'error': error})
  
 from django.shortcuts import render, redirect
 from .models import UserCustom
@@ -87,18 +75,32 @@ import re
 
 def handle_license_and_redirect(user, request):
     """Handles license logic and redirects to dashboard or license page."""
+    # First check if license is already validated in session
+    if request.session.get('license_valid') and request.session.get('license_key'):
+        license_key = request.session.get('license_key')
+        try:
+            license = License.objects.get(license_key=license_key, activated=True)
+            if license.is_valid():
+                return redirect('dashboard')
+        except License.DoesNotExist:
+            pass
+    
+    # Try to find license by client_name (username)
     try:
         license = License.objects.get(client_name=user.username, activated=True)
+        if license.is_valid():
+            request.session['license_valid'] = True
+            request.session['license_key'] = license.license_key
+            request.session['license_end_date'] = license.end_date.strftime("%B %d, %Y")
+            return redirect('dashboard')
     except License.DoesNotExist:
-        license = None
-
-    if license and license.is_valid():
-        request.session['license_valid'] = True
-        request.session['license_end_date'] = license.end_date.isoformat()
-        return redirect('dashboard')
-    else:
-        request.session['license_valid'] = False
-        return redirect('license_check_view')
+        pass
+    
+    # No valid license found, redirect to license check page
+    request.session['license_valid'] = False
+    request.session.pop('license_key', None)
+    request.session.pop('license_end_date', None)
+    return redirect('license_check_view')
 
 
 @custom_login_required
@@ -751,14 +753,6 @@ def logout_view(request):
 from django.shortcuts import render, redirect
 from .forms import ExcelUploadForm
 from .models import ExcelUpload, StudentRecord
-import pandas as pd
-import os
-import pandas as pd
-import os
-from django.shortcuts import render, redirect
-from .models import ExcelUpload, StudentRecord
-from .forms import ExcelUploadForm
-
 import pandas as pd
 import os
 from django.shortcuts import render, redirect

@@ -4,9 +4,35 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DJANGO_ENV = os.getenv('DJANGO_ENV', 'local').lower()
+ENV_FILE = '.env.production' if DJANGO_ENV in ('deployment', 'production') else '.env.local'
+ENV_PATH = BASE_DIR / ENV_FILE
+FALLBACK_ENV_PATH = BASE_DIR / '.env'
+
+
+def _load_env_file(path):
+    if not path.exists():
+        return
+    for line in path.read_text(encoding='utf-8').splitlines():
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+_load_env_file(ENV_PATH)
+if ENV_PATH != FALLBACK_ENV_PATH:
+    _load_env_file(FALLBACK_ENV_PATH)
+
 SECRET_KEY = config('SECRET_KEY', default='fallback_secret_key')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS - handle both comma-separated string and wildcard
+allowed_hosts_str = config('ALLOWED_HOSTS', default='*')
+ALLOWED_HOSTS = ['*'] if allowed_hosts_str == '*' else [h.strip() for h in allowed_hosts_str.split(',')]
 
 # Installed apps
 INSTALLED_APPS = [
@@ -83,20 +109,50 @@ WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [
     '.svg', '.ico', '.mp4', '.webm'
 ]
 
+# Site URL Configuration
+SITE_URL = config('SITE_URL', default='http://localhost:8000')
+LOGIN_URL = config('LOGIN_URL', default=f'{SITE_URL}/admission/student-login/')
+
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+
+# Email Provider Configuration (for Postmark/SendGrid)
+EMAIL_PROVIDER_NAME = config('EMAIL_PROVIDER_NAME', default='smtp')
+EMAIL_PROVIDERS = {
+    'smtp': {
+        'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+    },
+    'postmark': {
+        'API_TOKEN': config('POSTMARK_API_TOKEN', default=''),
+        'FROM_EMAIL': config('POSTMARK_FROM_EMAIL', default=DEFAULT_FROM_EMAIL),
+    },
+    'sendgrid': {
+        'API_TOKEN': config('SENDGRID_API_KEY', default=''),
+        'FROM_EMAIL': config('SENDGRID_FROM_EMAIL', default=DEFAULT_FROM_EMAIL),
+    },
+}
 
 # Msgkart
-MSGKART_API_KEY = config('MSGKART_API_KEY')
-MSGKART_EMAIL = config('MSGKART_EMAIL')
-MSGKART_PHONE_ID = config('MSGKART_PHONE_ID')
-MSGKART_ACCOUNT_ID = config('MSGKART_ACCOUNT_ID')
-MSGKART_BASE_URL = config('MSGKART_BASE_URL')
+MSGKART_API_KEY = config('MSGKART_API_KEY', default='')
+MSGKART_EMAIL = config('MSGKART_EMAIL', default='')
+MSGKART_PHONE_ID = config('MSGKART_PHONE_ID', default='')
+MSGKART_ACCOUNT_ID = config('MSGKART_ACCOUNT_ID', default='')
+MSGKART_BASE_URL = config('MSGKART_BASE_URL', default='https://api.msgkart.com')
+
+# CSRF Configuration
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='http://localhost:8000'
+).split(',')
+
+# Timezone
+TIME_ZONE = config('TIME_ZONE', default='Asia/Kolkata')
+USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

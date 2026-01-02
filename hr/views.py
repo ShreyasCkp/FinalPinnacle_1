@@ -888,6 +888,7 @@ def number_to_words(num):
 
 
 from decimal import Decimal
+from num2words import num2words
 def employee_salary_slip_view(request):
     employee_id = request.COOKIES.get("employee_id")
 
@@ -1025,7 +1026,6 @@ from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from datetime import date
 from decimal import Decimal
-from num2words import num2words
 from django.templatetags.static import static
 
 def download_payslip(request, month, year=None):

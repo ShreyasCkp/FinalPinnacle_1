@@ -1474,7 +1474,7 @@ def send_whatsapp_message(request, enquiry_no):
 
 from django.db.models import Q
 from django.utils import timezone
-
+from datetime import timedelta
 from django.shortcuts import render
 
 from admission.models import Enquiry1, Enquiry2, PUAdmission, DegreeAdmission, FollowUp
@@ -1933,7 +1933,7 @@ from django.shortcuts import render, redirect
 from django.shortcuts import render, get_object_or_404
 from admission.models import Enquiry1, Enquiry2
 from admission.forms import Enquiry1Form, Enquiry2Form
-
+from master.models import CourseType, Course
 from django.core.exceptions import ObjectDoesNotExist
 
 @custom_login_required
@@ -1985,6 +1985,7 @@ def enquiry_form_edit(request, enquiry_no):
         if form.is_valid():
             form.save()
 
+            from core.utils import get_logged_in_user, log_activity
             user = get_logged_in_user(request)
             log_activity(user, 'edited', enquiry)
 
@@ -2016,6 +2017,7 @@ def enquiry_form_delete(request, enquiry_no):
     enquiry.delete()
 
     # Log the activity
+    from core.utils import get_logged_in_user, log_activity
     user = get_logged_in_user(request)
     log_activity(user, 'deleted', enquiry)
 
@@ -2210,8 +2212,13 @@ def send_bulk_emails(request):
                 user.set_password(password)
                 user.save()
 
-            # ✅ Build the full login URL dynamically
-            login_url = request.build_absolute_uri("http://192.168.1.143:8000//admission/student-login/")
+            # ✅ Build the full login URL dynamically using settings or request
+            from django.conf import settings
+            login_path = '/admission/student-login/'
+            if hasattr(settings, 'SITE_URL') and settings.SITE_URL:
+                login_url = f"{settings.SITE_URL.rstrip('/')}{login_path}"
+            else:
+                login_url = request.build_absolute_uri(login_path)
 
             subject = 'Login Credentials for Student Portal'
             html_content = f"""

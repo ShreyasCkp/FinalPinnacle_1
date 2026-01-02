@@ -9,13 +9,14 @@ DEBUG = False
 APPEND_SLASH = True
 
 # ✅ Allow Azure + local + container IPs
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',') if config('ALLOWED_HOSTS', default='*') != '*' else ['*']
 
-# ✅ CSRF trusted origins (only https)
-CSRF_TRUSTED_ORIGINS = [
-    'https://pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net',
-]
-# ✅ Database (with SSL)
+# ✅ CSRF trusted origins (from environment variable)
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://pinnacle-college-final-gwdbf8dvfcetgmef.centralindia-01.azurewebsites.net'
+).split(',')
+# ✅ Database (with SSL for Azure)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -23,7 +24,7 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'PORT': config('DB_PORT', default='5432'),
         'OPTIONS': {'sslmode': 'require'},
     }
 }

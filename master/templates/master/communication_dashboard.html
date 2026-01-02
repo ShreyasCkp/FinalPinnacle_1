@@ -2,167 +2,163 @@
 
 {% block title %}Communication{% endblock %}
 
-{% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Communication</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
+<style>
+    .communication-page {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .communication-page .container {
+        padding: 15px;
+    }
+
+    .communication-page .text-primary {
+        color: #8b0000 !important;
+        font-size: 20px;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .communication-page .plus-btn a {
+        font-size: 13px;
+        border-radius: 7px;
+        background: #800000;
+        padding: 8px 12px;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .communication-page .plus-btn a:hover {
+        background-color: #a10000;
+    }
+
+    .communication-page .dashboard-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .communication-page h5,
+    .communication-page h2 {
+        font-size: 15px;
+        text-align: center;
+        color: #8b0000;
+    }
+
+    .communication-page .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 15px;
+        background-color: white;
+    }
+
+    .communication-page .text-white {
+        color: #8b0000 !important;
+    }
+
+    .communication-page .badge {
+        font-size: 11px;
+        padding: 0.3em 0.6em;
+    }
+
+    .communication-page .badge-success { background-color: #28a745; }
+    .communication-page .badge-danger { background-color: #b30000; }
+    .communication-page .bg-warning { background-color: #ffc107 !important; color: #000; }
+
+    .communication-page .scroll-table {
+        overflow-x: auto;
+    }
+
+    .communication-page table {
+        width: 100%;
+        font-size: 11px;
+        border-collapse: collapse;
+    }
+
+    .communication-page th,
+    .communication-page td {
+        text-align: center;
+        padding: 4px;
+        border: 1px solid #dee2e6;
+    }
+
+    .communication-page thead {
+        background-color: #800000;
+        color: white;
+    }
+
+    .communication-page .chart-container {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        max-height: 250px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .communication-page canvas {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        .communication-page .container {
+            padding: 10px;
         }
 
-        .container {
-            padding: 15px;
+        .communication-page .text-primary {
+            font-size: 18px;
+            margin-bottom: 10px;
         }
 
-        .text-primary {
-            color: #8b0000 !important;
-            font-size: 20px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .plus-btn a {
-            font-size: 13px;
-            border-radius: 7px;
-            background: #800000;
-            padding: 8px 12px;
-            color: white;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .plus-btn a:hover {
-            background-color: #a10000;
-        }
-
-        .dashboard-section {
-            display: flex;
+        .communication-page .dashboard-section {
             flex-direction: column;
-            gap: 1rem;
-            animation: fadeIn 0.5s ease-in-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .communication-page .card h2 {
+            font-size: 18px;
         }
 
-        h5, h2 {
-            font-size: 15px;
-            text-align: center;
-            color: #8b0000;
+        .communication-page table th,
+        .communication-page table td {
+            font-size: 10px;
+            padding: 3px;
         }
 
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            padding: 15px;
-            background-color: white;
-        }
-
-        .text-white {
-            color: #8b0000 !important;
-        }
-
-        .badge {
-            font-size: 11px;
-            padding: 0.3em 0.6em;
-        }
-
-        .badge-success { background-color: #28a745; }
-        .badge-danger { background-color: #b30000; }
-        .bg-warning { background-color: #ffc107 !important; color: #000; }
-
-        .scroll-table {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            font-size: 11px;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            text-align: center;
-            padding: 4px;
-            border: 1px solid #dee2e6;
-        }
-
-        thead {
-            background-color: #800000;
-            color: white;
-        }
-
-        /* Chart canvas control */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 220px;
-            max-height: 250px;
+        .communication-page .plus-btn {
             display: flex;
             justify-content: center;
-            align-items: center;
+            margin-bottom: 15px;
         }
 
-        canvas {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+        .communication-page .chart-container {
+            height: 180px;
+            max-height: 200px;
         }
+    }
+</style>
+{% endblock %}
 
-        /* Adjust layout for small screens */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .text-primary {
-                font-size: 18px;
-                margin-bottom: 10px;
-            }
-
-            .dashboard-section {
-                flex-direction: column;
-            }
-
-            .card h2 {
-                font-size: 18px;
-            }
-
-            table th, table td {
-                font-size: 10px;
-                padding: 3px;
-            }
-
-            .plus-btn {
-                display: flex;
-                justify-content: center;
-                margin-bottom: 15px;
-            }
-
-            /* Restrict chart height on small screens */
-            .chart-container {
-                height: 180px;
-                max-height: 200px;
-            }
-        }
-    </style>
-</head>
-
-<body>
+{% block content %}
+<div class="communication-page">
     <div class="container py-3">
         <h2 class="fw-bold text-primary">Communication</h2>
         <div class="plus-btn mb-3">
@@ -274,43 +270,41 @@
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Chart.js Script -->
-    <script>
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        indexAxis: 'y',
-        plugins: { legend: { display: false } },
-        scales: { x: { beginAtZero: true } }
-    };
+<script>
+const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: { x: { beginAtZero: true } }
+};
 
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {{ status_labels|safe }},
-            datasets: [{
-                data: {{ status_counts|safe }},
-                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
-            }]
-        },
-        options: chartOptions
-    });
+const ctx = document.getElementById('statusChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ status_labels|safe }},
+        datasets: [{
+            data: {{ status_counts|safe }},
+            backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
+        }]
+    },
+    options: chartOptions
+});
 
-    const ctx2 = document.getElementById('enquiryStatusChart').getContext('2d');
-    new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: {{ enquiry_status_labels|safe }},
-            datasets: [{
-                data: {{ enquiry_status_counts|safe }},
-                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
-            }]
-        },
-        options: chartOptions
-    });
-    </script>
-</body>
-</html>
+const ctx2 = document.getElementById('enquiryStatusChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        labels: {{ enquiry_status_labels|safe }},
+        datasets: [{
+            data: {{ enquiry_status_counts|safe }},
+            backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
+        }]
+    },
+    options: chartOptions
+});
+</script>
 {% endblock %}

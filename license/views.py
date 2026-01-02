@@ -1,7 +1,10 @@
-﻿from django.shortcuts import render
+﻿from django.shortcuts import render, redirect
 from datetime import datetime, date
 import logging
+from django.contrib import messages
 from master.decorators import custom_login_required
+from .models import License
+from .forms import LicenseForm
 
 logger = logging.getLogger(__name__)
 
@@ -176,29 +179,28 @@ def is_valid(self):
 
 
 
-# from datetime import date
-from datetime import date
-from django.shortcuts import redirect, render
-from .forms import LicenseForm  # assuming your form is defined
-
-from django.shortcuts import redirect, render
-from .forms import LicenseForm
- 
-from datetime import date
- 
-HARDCODED_KEY = "CKP-2025 v1.0.0"
-START_DATE = date(2025, 6, 5)
-END_DATE = date(2025, 11, 27)
+# Removed duplicate imports - already imported at top of file
  
 @custom_login_required
 def license_check_view(request):
     current_date = date.today()
  
-    if request.session.get('license_valid') and START_DATE <= current_date <= END_DATE:
-        # Make sure to store the expiry date string in session if not already
-        if 'license_end_date' not in request.session:
-            request.session['license_end_date'] = END_DATE.strftime("%B %d, %Y")
-        return redirect('home')
+    # Check if license is already valid in session
+    if request.session.get('license_valid'):
+        # Verify the license still exists and is valid
+        license_key = request.session.get('license_key')
+        if license_key:
+            try:
+                license = License.objects.get(license_key=license_key, activated=True)
+                if license.is_valid():
+                    if 'license_end_date' not in request.session:
+                        request.session['license_end_date'] = license.end_date.strftime("%B %d, %Y")
+                    return redirect('home')
+            except License.DoesNotExist:
+                # License was deleted or deactivated, clear session
+                request.session['license_valid'] = False
+                request.session.pop('license_key', None)
+                request.session.pop('license_end_date', None)
  
     error_message = None
  
@@ -207,15 +209,21 @@ def license_check_view(request):
         if form.is_valid():
             license_key = form.cleaned_data['license_key']
  
-            if license_key == HARDCODED_KEY:
-                if START_DATE <= current_date <= END_DATE:
-                    request.session['license_valid'] = True
-                    # Store expiry date in session for later use
-                    request.session['license_end_date'] = END_DATE.strftime("%B %d, %Y")
-                    return redirect('home')
-                else:
+            # Check database for license key
+            try:
+                license = License.objects.get(license_key=license_key)
+                
+                if not license.activated:
+                    error_message = 'License key is not activated. Please contact admin.'
+                elif not license.is_valid():
                     error_message = 'License expired. Please contact support.'
-            else:
+                else:
+                    # License is valid, set session
+                    request.session['license_valid'] = True
+                    request.session['license_key'] = license_key
+                    request.session['license_end_date'] = license.end_date.strftime("%B %d, %Y")
+                    return redirect('home')
+            except License.DoesNotExist:
                 error_message = 'Invalid license key.'
         else:
             error_message = 'Invalid form submission.'

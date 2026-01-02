@@ -1,0 +1,22 @@
+<div class="topbar">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <i class="fa-solid fa-bars menu-toggle" id="menu-toggle"></i>
+        <div style="font-size: smaller; font-weight: 700;">Pinnacle School of Commerce and Management</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="position: relative;">
+            <input id="sidebar-search" type="text" placeholder="Search..." />
+            <div id="suggestions"></div>
+        </div>
+
+        <div style="position: relative;">
+            <i class="fas fa-user-circle" id="user-icon" style="font-size: 24px; cursor: pointer;"></i>
+            <div id="user-popup">
+                <i class="fas fa-user-circle" style="font-size: 50px; color: #800000;"></i>
+                <p><strong>{{ custom_user.username }}</strong></p>
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+</div>

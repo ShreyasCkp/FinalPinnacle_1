@@ -3,6 +3,7 @@ Django==5.2.7
 
 # Database
 psycopg-binary==3.2.12
+psycopg2-binary==2.9.11
 
 # Production server
 gunicorn==23.0.0
@@ -20,11 +21,43 @@ numpy==2.3.4
 # Date/time utilities
 hijridate==2.5.0
 holidays==0.83
+python-dateutil==2.9.0.post0
+pytz==2025.2
+tzlocal==5.3.1
 
 # Configuration
 python-decouple==3.8
 
 # SMS/Communication
 twilio==9.8.5
+sendgrid==6.12.5
+python-http-client==3.3.7
 
+# PDF Processing
+pdfplumber==0.11.8
+pdfkit==1.0.0
+xhtml2pdf==0.2.17
+pypdf==6.5.0
+reportlab==4.4.7
 
+# Excel Processing
+openpyxl==3.1.5
+
+# QR Code Generation
+qrcode==8.2
+
+# Image Processing
+Pillow==12.0.0
+
+# Geolocation
+geopy==2.4.1
+
+# Security/Cryptography
+cryptography==46.0.3
+pycparser==2.23
+cffi==2.0.0
+
+# Utilities
+colorama==0.4.6
+MarkupSafe==3.0.3
+Werkzeug==3.1.4

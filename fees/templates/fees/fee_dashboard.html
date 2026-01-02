@@ -1,91 +1,34 @@
-﻿{% extends 'layout.html' %}
+{% extends 'layout.html' %}
 {% load static %}
 {% block title %}Fee Management{% endblock %}
-{% block content %}
-<div class="container py-5">
-    <h2 class="fw-bold mb-7 text-maroon text-center">Fee Management</h2>
 
-    <!-- Summary Cards -->
-    <div class="row mb-5">
-        <div class="col-md-4 col-sm-6 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-muted">Total Collected <i class="bi bi-cash-coin icon-font"></i></h6>
-                    <h3 class="fw-bold text-maroon">₹{{ total_collected|floatformat:-2 }}</h3>
-                    <h6 class="text-muted">{{ collection_rate }}% of expected fees</h6>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-sm-6 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-muted">Pending Payments <i class="bi bi-exclamation-triangle icon-font"></i></h6>
-                    <h3 class="fw-bold text-maroon">₹{{ pending_amount|floatformat:-2 }}</h3>
-                    <h6 class="text-muted">{{ pending_students }} students with pending fees</h6>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-sm-6 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-muted">Collection Rate <i class="bi bi-graph-up icon-font"></i></h6>
-                    <h3 class="fw-bold text-maroon">{{ collection_rate }}%</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="d-flex flex-wrap justify-content-center gap-3 mb-4 text-center">
-        <a href="{% url 'fee_declaration_list' %}" class="btn btn-maroon px-4 py-3">
-            <i class="fa-solid fa-wallet"></i> Fee Declaration
-        </a>
-
-        <a href="{% url 'student_fee_list' %}" class="btn btn-maroon px-4 py-3">
-            <i class="fa-solid fa-wallet"></i> Optional Fee Declaration
-        </a>
-    </div>
-</div>
-
-<!-- Overlay + Confirmation Popup -->
-<div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; opacity:0.5; z-index:1000;"></div>
-
-<div id="confirm-popup" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%);
-    background:#fff; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5); z-index:1001;">
-    <p id="confirm-popup-message"></p>
-    <button id="confirm-yes">Yes</button>
-    <button id="confirm-no">No</button>
-</div>
-
-<!-- Bootstrap CSS & Icons -->
+{% block extra_head %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-    body {
+    .fee-dashboard-page {
         font-family: Arial, sans-serif;
         background: #f7f8f8;
         margin: 0;
         padding: 0;
     }
 
-    .text-maroon {
+    .fee-dashboard-page .text-maroon {
         color: #800000 !important;
     }
 
-    .fw-bold {
+    .fee-dashboard-page .fw-bold {
         color: #800000;
         font-weight: 700 !important;
     }
 
-    h2.fw-bold {
+    .fee-dashboard-page h2.fw-bold {
         font-size: 28px;
         margin-top: -20px;
     }
 
-    .btn {
+    .fee-dashboard-page .btn {
         min-width: 160px;
         font-weight: 600;
         padding: 12px 20px;
@@ -93,43 +36,43 @@
         transition: all 0.2s ease-in-out;
     }
 
-    .btn-maroon {
+    .fee-dashboard-page .btn-maroon {
         color: #800000;
         border: 2px solid #800000;
         background-color: transparent;
     }
 
-    .btn-maroon:hover {
+    .fee-dashboard-page .btn-maroon:hover {
         background-color: #800000;
         color: #fff;
     }
 
-    .card {
+    .fee-dashboard-page .card {
         border-radius: 12px;
         transition: transform 0.2s ease-in-out;
         border: 1px solid #ddd;
     }
 
-    .card:hover {
+    .fee-dashboard-page .card:hover {
         transform: translateY(-4px);
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
 
-    .card h3 {
+    .fee-dashboard-page .card h3 {
         color: #800000;
         font-size: 20px;
         margin-bottom: 5px;
     }
 
-    #confirm-popup-message {
+    .fee-dashboard-page #confirm-popup-message {
         margin-bottom: 15px;
         font-size: 13px;
         color: #800000;
         text-align: center;
     }
 
-    #confirm-yes,
-    #confirm-no {
+    .fee-dashboard-page #confirm-yes,
+    .fee-dashboard-page #confirm-no {
         margin: 0 5px;
         padding: 6px 12px;
         border: 2px solid #800000;
@@ -142,113 +85,123 @@
         transition: all 0.2s ease-in-out;
     }
 
-    #confirm-yes:hover,
-    #confirm-no:hover {
+    .fee-dashboard-page #confirm-yes:hover,
+    .fee-dashboard-page #confirm-no:hover {
         background-color: #800000;
         color: #fff;
     }
 
-    /* Responsive Design */
     @media (max-width: 992px) {
-        .btn {
+        .fee-dashboard-page .btn {
             font-size: 12px;
             padding: 10px 16px;
             min-width: 140px;
         }
 
-        h2.fw-bold {
+        .fee-dashboard-page h2.fw-bold {
             font-size: 24px;
             margin-top: 0;
         }
     }
 
     @media (max-width: 768px) {
-        .container {
+        .fee-dashboard-page .container {
             padding: 20px 10px;
         }
 
-        .row.mb-5 {
+        .fee-dashboard-page .row.mb-5 {
             margin-bottom: 25px;
         }
 
-        h2.fw-bold {
+        .fee-dashboard-page h2.fw-bold {
             font-size: 22px;
             margin-top: 0;
         }
 
-        .btn {
+        .fee-dashboard-page .btn {
             width: 100%;
             font-size: 12px;
             padding: 10px;
         }
 
-        .card h3 {
+        .fee-dashboard-page .card h3 {
             font-size: 18px;
         }
 
-        .card h6 {
+        .fee-dashboard-page .card h6 {
             font-size: 12px;
         }
 
-        .d-flex.flex-wrap {
+        .fee-dashboard-page .d-flex.flex-wrap {
             gap: 10px !important;
         }
 
-        #confirm-popup {
+        .fee-dashboard-page #confirm-popup {
             width: 90%;
             top: 40%;
             padding: 15px;
         }
-
-        #confirm-yes,
-        #confirm-no {
-            font-size: 11px;
-            padding: 5px 10px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        h2.fw-bold {
-            font-size: 20px;
-        }
-
-        .btn {
-            font-size: 11px;
-            padding: 8px 10px;
-        }
-
-        .card h3 {
-            font-size: 16px;
-        }
-
-        .card h6 {
-            font-size: 11px;
-        }
     }
 </style>
+{% endblock %}
 
-<script>
-    let deleteEmployeeId = null;
+{% block content %}
+<div class="fee-dashboard-page">
+    <div class="container py-5">
+        <h2 class="fw-bold mb-7 text-maroon text-center">Fee Management</h2>
 
-    function confirmEmployeeDelete(empId, empName) {
-        deleteEmployeeId = empId;
-        document.getElementById("confirm-popup").style.display = "block";
-        document.getElementById("overlay").style.display = "block";
-        document.getElementById("confirm-popup-message").innerHTML =
-            `Are you sure you want to delete <b>${empName}</b>?`;
-    }
+        <!-- Summary Cards -->
+        <div class="row mb-5">
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Total Collected <i class="bi bi-cash-coin icon-font"></i></h6>
+                        <h3 class="fw-bold text-maroon">₹{{ total_collected|floatformat:-2 }}</h3>
+                        <h6 class="text-muted">{{ collection_rate }}% of expected fees</h6>
+                    </div>
+                </div>
+            </div>
 
-    document.getElementById("confirm-yes").addEventListener("click", function () {
-        if (deleteEmployeeId) {
-            document.getElementById(`employee-delete-form-${deleteEmployeeId}`).submit();
-        }
-    });
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Pending Payments <i class="bi bi-exclamation-triangle icon-font"></i></h6>
+                        <h3 class="fw-bold text-maroon">₹{{ pending_amount|floatformat:-2 }}</h3>
+                        <h6 class="text-muted">{{ pending_students }} students with pending fees</h6>
+                    </div>
+                </div>
+            </div>
 
-    document.getElementById("confirm-no").addEventListener("click", function () {
-        document.getElementById("confirm-popup").style.display = "none";
-        document.getElementById("overlay").style.display = "none";
-        deleteEmployeeId = null;
-    });
-</script>
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Collection Rate <i class="bi bi-graph-up icon-font"></i></h6>
+                        <h3 class="fw-bold text-maroon">{{ collection_rate }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Action Buttons -->
+        <div class="d-flex flex-wrap justify-content-center gap-3 mb-4 text-center">
+            <a href="{% url 'fee_declaration_list' %}" class="btn btn-maroon px-4 py-3">
+                <i class="fa-solid fa-wallet"></i> Fee Declaration
+            </a>
+
+            <a href="{% url 'student_fee_list' %}" class="btn btn-maroon px-4 py-3">
+                <i class="fa-solid fa-wallet"></i> Optional Fee Declaration
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay + Confirmation Popup -->
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; opacity:0.5; z-index:1000;"></div>
+
+    <div id="confirm-popup" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%);
+        background:#fff; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5); z-index:1001;">
+        <p id="confirm-popup-message"></p>
+        <button id="confirm-yes">Yes</button>
+        <button id="confirm-no">No</button>
+    </div>
+</div>
 {% endblock %}

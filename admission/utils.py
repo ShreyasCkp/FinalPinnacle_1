@@ -3,8 +3,11 @@ from sendgrid.helpers.mail import Mail
 from django.conf import settings
 
 def send_student_email(to_email, student_name, default_username, default_password):
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', getattr(settings, 'EMAIL_HOST_USER', ''))
+    login_url = getattr(settings, 'LOGIN_URL', getattr(settings, 'SITE_URL', 'http://localhost:8000') + '/admission/student-login/')
+    
     message = Mail(
-        from_email=settings.FROM_EMAIL,
+        from_email=from_email,
         to_emails=to_email,
         subject='?? Student Portal Login Credentials',
         html_content=f"""
@@ -12,7 +15,7 @@ def send_student_email(to_email, student_name, default_username, default_passwor
         <p>You have been <strong>approved</strong> for admission.</p>
         <p>Use the following credentials to log in to the Student Portal:</p>
         <ul>
-            <li><strong>Login URL:</strong> <a href="{settings.LOGIN_URL}">{settings.LOGIN_URL}</a></li>
+            <li><strong>Login URL:</strong> <a href="{login_url}">{login_url}</a></li>
             <li><strong>Username:</strong> {default_username}</li>
             <li><strong>Password:</strong> {default_password}</li>
         </ul>
@@ -22,7 +25,17 @@ def send_student_email(to_email, student_name, default_username, default_passwor
     )
 
     try:
-        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        # Try to get SendGrid API key from EMAIL_PROVIDERS or direct setting
+        sendgrid_api_key = None
+        if hasattr(settings, 'EMAIL_PROVIDERS') and 'sendgrid' in settings.EMAIL_PROVIDERS:
+            sendgrid_api_key = settings.EMAIL_PROVIDERS['sendgrid'].get('API_TOKEN', '')
+        if not sendgrid_api_key:
+            sendgrid_api_key = getattr(settings, 'SENDGRID_API_KEY', '')
+        
+        if not sendgrid_api_key:
+            raise ValueError("SendGrid API key not configured")
+            
+        sg = SendGridAPIClient(sendgrid_api_key)
         sg.send(message)
         print(f"? Email sent to {to_email}")
     except Exception as e:

@@ -1,0 +1,147 @@
+{% load static %}
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-title">
+        <img src="{% static 'image/logo.png' %}" alt="Logo">
+    </div>
+
+    {% if custom_user %}
+    {% with custom_user.username|lower as uname %}
+
+    <!-- DASHBOARD -->
+    {% if 'dean' in uname %}
+    <a href="{% url 'dashboard_view' %}" class="{% if 'dashboard_view' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+    {% elif 'academic director' in uname %}
+    <a href="{% url 'dashboard_view2' %}" class="{% if 'dashboard_view2' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+    {% elif 'front office' in uname %}
+    <a href="{% url 'dashboard_view3' %}" class="{% if 'dashboard_view3' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+    {% elif 'employee' in uname %}
+    <a href="{% url 'dashboard_view4' %}" class="{% if 'dashboard_view4' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+    {% else %}
+    <a href="{% url 'dashboard_view' %}" class="{% if 'dashboard_view' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+    {% endif %}
+
+    <!-- ROLES AND PERMISSIONS -->
+    {% if 'dean' in uname or 'academic director' in uname %}
+    <a href="{% url 'user_list' %}" class="{% if 'user_list' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-user"></i> Roles
+    </a>
+    {% endif %}
+
+    {% if 'dean' in uname %}
+    <a href="{% url 'user_rights_view' custom_user.id %}" class="{% if 'user_rights_view' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-key"></i> Role Permissions
+    </a>
+    {% endif %}
+
+    {% endwith %}
+    {% endif %}
+
+    <!-- MASTER -->
+    {% if form_permissions.course_type.add or form_permissions.course_form.add or form_permissions.semester_form.add or form_permissions.subject_form.add or form_permissions.transport_form.add %}
+    <a href="{% url 'master_dashboard' %}" class="{% if 'master' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fas fa-sliders-h"></i> Master
+    </a>
+    {% endif %}
+
+    <!-- ENQUIRY -->
+    {% if form_permissions.enquiry_form.add %}
+    <a href="{% url 'enquiry_dashboard' %}" class="{% if 'enquiry' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-question-circle"></i> Enquiry
+    </a>
+    {% endif %}
+
+    <!-- ADMISSION -->
+    {% if form_permissions.degree_admission_form.add %}
+    <a href="{% url 'admission_dashboard' %}" class="{% if 'admission' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-user-plus"></i> Admission
+    </a>
+    {% endif %}
+
+    <!-- FEE -->
+    {% if form_permissions.fee_declaration.add %}
+    <a href="{% url 'fee_dashboard' %}" class="{% if 'fee' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-wallet"></i> Fee
+    </a>
+    {% endif %}
+
+    <!-- COMMUNICATION -->
+    {% if form_permissions.communication_dashboard.access %}
+    <a href="{% url 'communication_dashboard' %}" class="{% if 'communication' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-comments"></i> Communication
+    </a>
+    {% endif %}
+
+    <!-- EMPLOYEE -->
+    {% if form_permissions.employee_form.add %}
+    <a href="{% url 'employee_dashboard' %}" class="{% if request.resolver_match.url_name == 'employee_dashboard' %}active{% endif %}">
+        <i class="fa-solid fa-users"></i> Employee
+    </a>
+    {% endif %}
+
+    <!-- STUDENT DATABASE -->
+    {% if form_permissions.student_database.access %}
+    <a href="{% url 'student_database' %}" class="{% if 'student_database' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-database"></i> All Students Information
+    </a>
+    {% endif %}
+
+    <!-- PROMOTION HISTORY -->
+    {% if form_permissions.promotion_history.access %}
+    <a href="{% url 'promotion_history' %}" class="{% if 'promotion_history' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fas fa-arrow-up"></i> Promotion History
+    </a>
+    {% endif %}
+
+    <!-- TIMETABLE -->
+    {% if form_permissions.timetable_form.add %}
+    <a href="{% url 'timetable_dashboard' %}" class="{% if 'timetable' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-table-list"></i> Timetable
+    </a>
+    {% endif %}
+
+    <!-- ATTENDANCE -->
+    {% if form_permissions.student_attendance_form.add or form_permissions.employee_attendance_form.add %}
+    <a href="{% url 'attendance_dashboard' %}" class="{% if 'attendance' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-user-check"></i> Attendance
+    </a>
+    {% endif %}
+
+    <!-- CALENDAR -->
+    {% if form_permissions.calendar_form.access %}
+    <a href="{% url 'calendar_form' %}" class="{% if 'calendar' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-calendar-days"></i> Calendar
+    </a>
+    {% endif %}
+
+    <!-- LEAVES -->
+    <a href="{% url 'employee_leave_list' %}" class="{% if 'employee_leave_list' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-file-pen"></i> Leaves
+    </a>
+
+    <!-- PAYROLL -->
+    <a href="{% url 'employee_salary_dashboard' %}" class="{% if 'employee_salary_dashboard' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Payroll
+    </a>
+
+    <!-- SALARY DECLARATION -->
+    <a href="{% url 'salary_declaration_list' %}" class="{% if 'salary_declaration_list' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-sack-dollar"></i> Salary Declaration
+    </a>
+
+    <!-- RECENT ACTIVITIES -->
+    {% if form_permissions.recent_activity_view.access %}
+    <a href="{% url 'recent_activity_view' %}" class="{% if 'recent_activity' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="fa-solid fa-clock-rotate-left"></i> Recent Activities
+    </a>
+    {% endif %}
+</div>

@@ -2,18 +2,7 @@
 from django.db.models import Q
 from datetime import timedelta
 import calendar
-from .models import attendance, Employee, StudentDatabase, StudentAttendance
 from django.shortcuts import render
-from django.utils import timezone
-from django.db.models import Q
-from datetime import timedelta
-import calendar
-from .models import attendance, Employee, StudentDatabase, StudentAttendance
-
-from django.shortcuts import render
-from django.utils import timezone
-from datetime import timedelta
-import calendar
 from .models import attendance, Employee, StudentDatabase, StudentAttendance
 from master.decorators import custom_login_required
 

@@ -4,6 +4,7 @@
 <head>
     <title>{% block title %}Login{% endblock %}</title>
     {% load static %}
+    {% load permission_tags %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         html, body {
@@ -47,20 +48,13 @@
         }
 
         .login-content {
-            opacity: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: opacity 0.5s ease, max-height 0.5s ease;
+            opacity: 1;
+            max-height: 1000px;
+            overflow: visible;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        .login-box:hover .login-content,
-        .login-box:focus-within .login-content {
-            opacity: 1;
-            max-height: 1000px;
         }
 
         .form-group {

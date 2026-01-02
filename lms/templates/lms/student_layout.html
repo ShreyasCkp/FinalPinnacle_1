@@ -17,9 +17,11 @@
         }
 
         body {
-            font-family: Arial, sans-serif !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
             font-size: 14px !important;
             color: #333;
+            background: #f5f7fa;
+            line-height: 1.6;
             overflow-x: hidden;
         }
 
@@ -97,6 +99,7 @@
             align-items: center;
             padding: 0 15px;
             z-index: 998;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: left 0.3s ease-in-out;
         }
 
@@ -115,19 +118,29 @@
         /* CONTENT AREA */
         .content {
             margin-left: 220px;
-            padding: 80px 20px 40px;
+            padding: 80px 24px 80px;
             min-height: 100vh;
+            background: #f5f7fa;
             transition: margin-left 0.3s ease-in-out;
         }
 
         /* FOOTER */
         .footer {
-            margin-left: 220px;
-            color: #8b0000;
-            text-align: center;
-            padding: 10px 0;
-            font-weight: 500;
-            transition: margin-left 0.3s ease-in-out;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 220px !important;
+            right: 0 !important;
+            color: #8b0000 !important;
+            text-align: center !important;
+            padding: 14px 0 !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            background: #ffffff !important;
+            z-index: 100 !important;
+            border-top: 1px solid rgba(139, 0, 0, 0.15) !important;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08) !important;
+            backdrop-filter: blur(10px) !important;
+            transition: left 0.3s ease-in-out;
         }
 
         /* USER POPUP */
@@ -199,11 +212,14 @@
 
             .content {
                 margin-left: 0;
-                padding-top: 70px;
+                padding: 70px 16px 80px;
             }
 
             .footer {
-                margin-left: 0;
+                left: 0 !important;
+                padding: 12px 0 !important;
+                font-size: 14px !important;
+                font-weight: 500 !important;
             }
         }
 
