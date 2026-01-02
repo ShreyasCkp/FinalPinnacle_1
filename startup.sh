@@ -6,6 +6,16 @@ mkdir -p $LOG_DIR
 
 echo "🚀 Starting Django app at $(date)" | tee -a $LOG_DIR/startup.log
 
+# Install system deps needed for pycairo (used by xhtml2pdf/svglib)
+if command -v apt-get >/dev/null 2>&1; then
+  if ! command -v pkg-config >/dev/null 2>&1; then
+    echo "📦 Installing system packages for cairo..." | tee -a $LOG_DIR/startup.log
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update | tee -a $LOG_DIR/startup.log
+    apt-get install -y --no-install-recommends pkg-config libcairo2-dev | tee -a $LOG_DIR/startup.log
+  fi
+fi
+
 # Optional: activate venv
 if [ -f "/home/site/wwwroot/antenv/bin/activate" ]; then
   source /home/site/wwwroot/antenv/bin/activate
