@@ -25,6 +25,15 @@ fi
 python3 -m pip install --no-cache-dir --upgrade pip | tee -a $LOG_DIR/startup.log
 python3 -m pip install --no-cache-dir --prefer-binary -r /home/site/wwwroot/requirements.txt | tee -a $LOG_DIR/startup.log
 
+# Fallback: install missing runtime-only deps if requirements didn't include them
+if ! python3 - <<'PY' >/dev/null 2>&1
+import num2words
+PY
+then
+  echo "📦 Installing missing dependency: num2words" | tee -a $LOG_DIR/startup.log
+  python3 -m pip install --no-cache-dir num2words==0.5.13 | tee -a $LOG_DIR/startup.log
+fi
+
 # Apply database migrations
 python3 /home/site/wwwroot/manage.py migrate --noinput | tee -a $LOG_DIR/startup.log || echo "⚠️ Migrations failed" | tee -a $LOG_DIR/startup.log
 
