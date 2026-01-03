@@ -37,11 +37,9 @@
     </a>
     {% endif %}
 
-    {% if 'dean' in uname %}
     <a href="{% url 'user_rights_view' custom_user.id %}" class="{% if 'user_rights_view' in request.resolver_match.url_name %}active{% endif %}">
         <i class="fa-solid fa-key"></i> Role Permissions
     </a>
-    {% endif %}
 
     {% endwith %}
     {% endif %}
