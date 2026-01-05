@@ -187,7 +187,7 @@
                     {% for form in all_forms %}
                     <tr>
                         <td>{{ form_display_names|get_item:form }}</td>
-                        {% if form == 'communication_dashboard' or form == 'calendar_form' or form == 'promotion_history' or form == 'student_database' or form == 'recent_activity_view' %}
+                        {% if form == 'communication_dashboard' or form == 'calendar_form' or form == 'promotion_history' or form == 'student_database' or form == 'recent_activity_view' or form == 'user_list' or form == 'role_permissions' %}
                         <td colspan="4">
                             {% with perms|get_item:form as form_perm %}
                             <input type="checkbox" name="{{ form }}_access" {% if form_perm.access %}checked{% endif %}> Access

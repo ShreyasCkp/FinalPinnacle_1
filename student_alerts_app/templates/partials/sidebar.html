@@ -8,11 +8,7 @@
     {% with custom_user.username|lower as uname %}
 
     <!-- DASHBOARD -->
-    {% if 'dean' in uname %}
-    <a href="{% url 'dashboard_view' %}" class="{% if 'dashboard_view' in request.resolver_match.url_name %}active{% endif %}">
-        <i class="fa-solid fa-chart-line"></i> Dashboard
-    </a>
-    {% elif 'academic director' in uname %}
+    {% if 'academic director' in uname %}
     <a href="{% url 'dashboard_view2' %}" class="{% if 'dashboard_view2' in request.resolver_match.url_name %}active{% endif %}">
         <i class="fa-solid fa-chart-line"></i> Dashboard
     </a>
@@ -31,15 +27,17 @@
     {% endif %}
 
     <!-- ROLES AND PERMISSIONS -->
-    {% if 'dean' in uname or 'academic director' in uname %}
+    {% if form_permissions.user_list.access %}
     <a href="{% url 'user_list' %}" class="{% if 'user_list' in request.resolver_match.url_name %}active{% endif %}">
         <i class="fa-solid fa-user"></i> Roles
     </a>
     {% endif %}
 
+    {% if form_permissions.role_permissions.access %}
     <a href="{% url 'user_rights_view' custom_user.id %}" class="{% if 'user_rights_view' in request.resolver_match.url_name %}active{% endif %}">
         <i class="fa-solid fa-key"></i> Role Permissions
     </a>
+    {% endif %}
 
     {% endwith %}
     {% endif %}

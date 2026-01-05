@@ -10,6 +10,9 @@ def role_permission_required(form_name, action='view'):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
+            if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+                return view_func(request, *args, **kwargs)
+
             user_id = request.session.get('user_id')
             if not user_id:
                 raise PermissionDenied("Login required.")
@@ -40,6 +43,9 @@ from django.shortcuts import redirect
 def custom_login_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+            return view_func(request, *args, **kwargs)
+
         if not request.session.get('user_id'):
             return redirect('login')  # Use the URL name of your login view
         return view_func(request, *args, **kwargs)

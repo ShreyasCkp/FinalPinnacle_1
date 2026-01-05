@@ -275,9 +275,11 @@
     <div class="header-flex">
         <input type="text" id="userSearch" class="search-form" placeholder="Search Roles...">
         <h2>Roles</h2>
+        {% if form_permissions.user_list.access %}
         <a href="{% url 'add_user' %}" class="btn-add">
             <i class="bi bi-plus-lg me-2"></i> Add Role
         </a>
+        {% endif %}
     </div>
 
     <table class="table table-bordered table-striped table-hover">
@@ -285,7 +287,7 @@
             <tr>
                 <th>Sl No</th>
                 <th>Rolename</th>
-                {% if custom_user and custom_user.id == 1 %}
+                {% if form_permissions.user_list.access %}
                 <th>Password</th>
                 <th>Passcode</th>
                 <th>Actions</th>
@@ -297,7 +299,7 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ user.username }}</td>
-                {% if custom_user and custom_user.id == 1 %}
+                {% if form_permissions.user_list.access %}
                 <td>{{ user.password|default:"-" }}</td>
                 <td>{{ user.passcode|default:"-" }}</td>
                 <td>
@@ -317,7 +319,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if custom_user and custom_user.id == 1 %}5{% else %}3{% endif %}" class="text-center text-muted">No users found.</td>
+                <td colspan="{% if form_permissions.user_list.access %}5{% else %}2{% endif %}" class="text-center text-muted">No users found.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -339,12 +339,12 @@ from .models import UserCustom, UserPermission
 def user_rights_view(request, user_id=None):
     # If no user selected, just show the user list
     all_users = UserCustom.objects.exclude(
-        Q(id=1) | Q(username__icontains='employee') | Q(username__icontains='dean')
-    )   
+        Q(username__icontains='employee')
+    )
     user = get_object_or_404(UserCustom, id=user_id)
 
     all_forms = [
-       'academic_year', 'course_type','course_form','subject_form','transport_form','fee_type','enquiry_form','schedule_follow_up_form','pu_admission_form','degree_admission_form','fee_declaration','communication_dashboard','student_database','employee_form','employee_attendance_form','student_attendance_form','timetable_form','calendar_form','recent_activity_view','promotion_history',]
+       'academic_year', 'course_type','course_form','subject_form','transport_form','fee_type','enquiry_form','schedule_follow_up_form','pu_admission_form','degree_admission_form','fee_declaration','communication_dashboard','student_database','employee_form','employee_attendance_form','student_attendance_form','timetable_form','calendar_form','recent_activity_view','promotion_history','user_list','role_permissions',]
     form_display_names = {
     
     'employee_attendance_form':'Employee Attendance',
@@ -366,7 +366,9 @@ def user_rights_view(request, user_id=None):
     'transport_form':'Transport',
     'fee_type':'Fee Types',
     'promotion_history':'Promotion History',
-     'recent_activity_view':'Recent Activities'
+     'recent_activity_view':'Recent Activities',
+     'user_list':'Roles',
+     'role_permissions':'Role Permissions'
 }
 
 
@@ -374,7 +376,7 @@ def user_rights_view(request, user_id=None):
         # Update or create permissions for each form
         for form in all_forms:
             perm, created = UserPermission.objects.get_or_create(user=user, form_name=form)
-            if form in ['communication_dashboard', 'calendar_form','student_database','recent_activity_view','promotion_history']:
+            if form in ['communication_dashboard', 'calendar_form','student_database','recent_activity_view','promotion_history','user_list','role_permissions']:
                 perm.can_access = f"{form}_access" in request.POST
                 # Optional: Clear other CRUD permissions
                 perm.can_view = False
