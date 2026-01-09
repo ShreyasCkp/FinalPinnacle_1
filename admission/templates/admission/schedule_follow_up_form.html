@@ -1,4 +1,4 @@
-﻿{% extends 'layout.html' %}
+{% extends 'layout.html' %}
 {% block title %}{% if action == 'edit' %}
  Edit Follow-up
 {% elif action == 'view' %}
@@ -6,6 +6,7 @@
 {% else %}
  Schedule Follow-up
 {% endif %}{% endblock %}
+{% block content %}
 
 
 

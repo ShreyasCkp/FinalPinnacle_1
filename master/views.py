@@ -928,8 +928,8 @@ def student_data_view(request):
 import datetime
 from django.shortcuts import render
 from django.utils import timezone
-from django.db.models import Sum, F, DecimalField, ExpressionWrapper
-from django.db.models.functions import Coalesce
+from django.db.models import Sum, F, DecimalField, ExpressionWrapper, Value
+from django.db.models.functions import Coalesce, Cast
 from core.models import RecentActivity
 from master.models import Notification
 from django.db.models import DateField
@@ -1550,25 +1550,34 @@ def dashboard_view3(request):
     total_deg_pending_adm = deg_adm_pending.count()
     total_pending_admissions = total_pu_pending_adm + total_deg_pending_adm
 
-    # Fees – apply only if allowed
+    # Fees - apply only if allowed
     if user_role != 'Academic Director' and ('fees' in sections or 'all' in sections):
+        fee_field = DecimalField(max_digits=12, decimal_places=2)
+
+        def _fee_amount(field_name):
+            return Coalesce(
+                Cast(F(field_name), fee_field),
+                Value(0, output_field=fee_field),
+                output_field=fee_field
+            )
+
         expr_declared = ExpressionWrapper(
-            Coalesce(F('tuition_fee'), 0) + Coalesce(F('transport_fee'), 0)
-            + Coalesce(F('hostel_fee'), 0) + Coalesce(F('books_fee'), 0)
-            + Coalesce(F('uniform_fee'), 0) + Coalesce(F('other_fee'), 0),
-            output_field=DecimalField(max_digits=12, decimal_places=2)
+            _fee_amount('tuition_fee') + _fee_amount('transport_fee')
+            + _fee_amount('hostel_fee') + _fee_amount('books_fee')
+            + _fee_amount('uniform_fee') + _fee_amount('other_fee'),
+            output_field=fee_field
         )
         expr_collected = ExpressionWrapper(
-            Coalesce(F('tuition_fee_paid'), 0) + Coalesce(F('transport_fee_paid'), 0)
-            + Coalesce(F('hostel_fee_paid'), 0) + Coalesce(F('books_fee_paid'), 0)
-            + Coalesce(F('uniform_fee_paid'), 0) + Coalesce(F('other_amount'), 0),
-            output_field=DecimalField(max_digits=12, decimal_places=2)
+            _fee_amount('tuition_fee_paid') + _fee_amount('transport_fee_paid')
+            + _fee_amount('hostel_fee_paid') + _fee_amount('books_fee_paid')
+            + _fee_amount('uniform_fee_paid') + _fee_amount('other_amount'),
+            output_field=fee_field
         )
         expr_pending = ExpressionWrapper(
-            Coalesce(F('tuition_pending_fee'), 0) + Coalesce(F('transport_pending_fee'), 0)
-            + Coalesce(F('hostel_pending_fee'), 0) + Coalesce(F('books_pending_fee'), 0)
-            + Coalesce(F('uniform_pending_fee'), 0),
-            output_field=DecimalField(max_digits=12, decimal_places=2)
+            _fee_amount('tuition_pending_fee') + _fee_amount('transport_pending_fee')
+            + _fee_amount('hostel_pending_fee') + _fee_amount('books_pending_fee')
+            + _fee_amount('uniform_pending_fee'),
+            output_field=fee_field
         )
         total_declared_fee = students.aggregate(total=Sum(expr_declared))['total'] or 0
         total_collected_fee = students.aggregate(total=Sum(expr_collected))['total'] or 0

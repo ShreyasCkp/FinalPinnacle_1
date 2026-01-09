@@ -17,7 +17,7 @@ def get_logged_in_user(request):
             return None
     return None
 
-def log_activity(user, action, instance,message=None):
+def log_activity(user, action, instance, message=None):
     """
     Logs user activity in RecentActivity table.
     :param user: UserCustom instance or None
@@ -34,29 +34,38 @@ def log_activity(user, action, instance,message=None):
     else:
         user_for_log = None
 
+    if instance is None:
+        model_name = "System"
+        object_id = 0
+        object_repr = message or ""
+    else:
+        model_name = instance.__class__.__name__
+        object_id = instance.pk or 0
+        object_repr = str(instance)
+
+    if not object_repr and message:
+        object_repr = message
+
+    # Truncate long representations
+    if len(object_repr) > 200:
+        object_repr = object_repr[:197] + '...'
+
     # Deduplication prevention (skip duplicate logs within 5 min)
     window = timezone.now() - timedelta(minutes=5)
     if RecentActivity.objects.filter(
         user=user_for_log,
         action=action,
-        model_name=instance.__class__.__name__,
-       object_id=instance.pk if instance else None,
-
+        model_name=model_name,
+        object_id=object_id,
         timestamp__gte=window
     ).exists():
         return
-
-    # Truncate long representations
-    object_repr = str(instance)
-    if len(object_repr) > 200:
-        object_repr = object_repr[:197] + '...'
 
     # Create the log entry
     RecentActivity.objects.create(
         user=user_for_log,
         action=action,
-        model_name=instance.__class__.__name__,
-        object_id=instance.pk if instance else None,
-
+        model_name=model_name,
+        object_id=object_id,
         object_repr=object_repr
     )
