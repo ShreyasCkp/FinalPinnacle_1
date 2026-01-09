@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User as AuthUser
+from django.conf import settings
 from .models import UserPermission, UserCustom
 
 def user_form_permissions(request):
@@ -14,16 +15,18 @@ def user_form_permissions(request):
         user = UserCustom.objects.filter(username=request.user.username).first()
 
     form_permissions = {}
-    is_admin_user = False
-    if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
-        is_admin_user = True
-    elif user:
-        auth_user = AuthUser.objects.filter(username=user.username, is_active=True).only(
-            'is_staff',
-            'is_superuser',
-        ).first()
-        if auth_user:
-            is_admin_user = auth_user.is_staff or auth_user.is_superuser
+    public_access = getattr(settings, 'PUBLIC_ACCESS', False)
+    is_admin_user = public_access
+    if not public_access:
+        if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+            is_admin_user = True
+        elif user:
+            auth_user = AuthUser.objects.filter(username=user.username, is_active=True).only(
+                'is_staff',
+                'is_superuser',
+            ).first()
+            if auth_user:
+                is_admin_user = auth_user.is_staff or auth_user.is_superuser
 
     if is_admin_user:
         all_forms = [

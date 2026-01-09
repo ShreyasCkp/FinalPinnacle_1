@@ -14,6 +14,7 @@ def blank_view(request):
     return render(request, 'master/blank.html')
  
 from django.shortcuts import render, redirect
+from django.conf import settings
 from .models import UserCustom
 from license.models import License
 from core.utils import log_activity
@@ -24,6 +25,8 @@ from core.utils import log_activity
 
 
 def custom_login_view(request):
+    if getattr(settings, 'PUBLIC_ACCESS', False):
+        return redirect('dashboard_view')
     error = None
     if request.method == 'POST':
         username = (request.POST.get('username') or '').strip()

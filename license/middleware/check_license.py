@@ -3,12 +3,15 @@
 
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.conf import settings
 
 class LicenseCheckMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
+        if getattr(settings, 'PUBLIC_ACCESS', False):
+            return self.get_response(request)
         exempt_urls = [
             reverse('login'),
             reverse('logout'),

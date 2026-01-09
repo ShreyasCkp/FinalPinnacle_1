@@ -1,6 +1,11 @@
 ﻿from functools import wraps
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 from .models import UserCustom, UserPermission
+
+
+def _public_access_enabled():
+    return getattr(settings, 'PUBLIC_ACCESS', False)
 
 def role_permission_required(form_name, action='view'):
     """
@@ -10,6 +15,8 @@ def role_permission_required(form_name, action='view'):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
+            if _public_access_enabled():
+                return view_func(request, *args, **kwargs)
             if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
                 return view_func(request, *args, **kwargs)
 
@@ -43,6 +50,8 @@ from django.shortcuts import redirect
 def custom_login_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
+        if _public_access_enabled():
+            return view_func(request, *args, **kwargs)
         if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
             return view_func(request, *args, **kwargs)
 

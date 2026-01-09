@@ -30,6 +30,7 @@ if ENV_PATH != FALLBACK_ENV_PATH:
 
 SECRET_KEY = config('SECRET_KEY', default='fallback_secret_key')
 DEBUG = config('DEBUG', default=True, cast=bool)
+PUBLIC_ACCESS = config('PUBLIC_ACCESS', default=False, cast=bool)
 # ALLOWED_HOSTS - handle both comma-separated string and wildcard
 allowed_hosts_str = config('ALLOWED_HOSTS', default='*')
 ALLOWED_HOSTS = ['*'] if allowed_hosts_str == '*' else [h.strip() for h in allowed_hosts_str.split(',')]
